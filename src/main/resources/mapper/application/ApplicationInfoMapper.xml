@@ -1,0 +1,1331 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.application.ApplicationInfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.application.ApplicationInfo">
+        <id column="ID" property="id" />
+        <result column="COMPANY" property="company" />
+        <result column="USER_NAME" property="userName" />
+        <result column="USER_PHONE" property="userPhone" />
+        <result column="PROJECT_NAME" property="projectName" />
+        <result column="APP_NAME" property="appName" />
+        <result column="APP_NAME_INPUT_TYPE" property="appNameInputType" />
+        <result column="REMARK" property="remark" />
+        <result column="CREATOR" property="creator" />
+        <result column="CREATOR_NAME" property="creatorName" />
+        <result column="STATUS" property="status" />
+        <result column="SERVICE_TYPE_ID" property="serviceTypeId" />
+        <result column="SERVICE_TYPE_NAME" property="serviceTypeName" />
+        <result column="FORM_NUM" property="formNum" />
+        <result column="RESOURCE_TYPE" property="resourceType" />
+        <result column="FLOW_STEP_ID" property="flowStepId" />
+        <result column="FLOW_STEP_ID_BAK" property="flowStepIdBak" />
+        <result column="ORDER_NUMBER" property="orderNumber" />
+        <result column="ACCOUNT" property="account" />
+        <result column="CLUSTER_TYPE" property="clusterType" />
+        <result column="VENDOR" property="vendor" />
+        <result column="EXPLANATION" property="explanation" />
+        <result column="CREATE_TIME" property="createTime" />
+        <result column="MODIFIED_TIME" property="modifiedTime" />
+        <result column="REVIEW_FLAG" property="reviewFlag" />
+        <result column="JS_UNIT" property="jsUnit" />
+        <result column="JS_PRINCIPAL" property="jsPrincipal" />
+        <result column="JS_PRINCIPAL_PHONE" property="jsPrincipalPhone" />
+        <result column="JS_MANAGER" property="jsManager" />
+        <result column="JS_MANAGER_PHONE" property="jsManagerPhone" />
+        <result column="CJ_UNIT" property="cjUnit" />
+        <result column="CJ_PRINCIPAL" property="cjPrincipal" />
+        <result column="CJ_PRINCIPAL_PHONE" property="cjPrincipalPhone" />
+        <result column="CJ_HANDLER" property="cjHandler" />
+        <result column="CJ_HANDLER_PHONE" property="cjHandlerPhone" />
+        <result column="CJ_PRINCIPAL_IDCARD" property="cjPrincipalIdcard" />
+        <result column="CJ_INPUT_TYPE" property="cjInputType" />
+        <result column="CJ_ORG_CODE" property="cjOrgCode" />
+        <result column="BUILD_MODE" property="buildMode" />
+        <result column="DRAFT" property="draft" />
+        <result column="POLICE_CATEGORY" property="policeCategory" />
+        <result column="APPLICATION_TIME" property="applicationTime" />
+        <result column="CREATOR_UNIT" property="creatorUnit" />
+        <result column="CREATOR_PHONE" property="creatorPhone" />
+        <result column="PROCESSING_PERSON" property="processingPerson" />
+        <result column="AREA_NAME" property="areaName" />
+        <result column="HW_POLICE_CATEGORY" property="hwPoliceCategory" />
+        <association property="user" column="CREATOR" select="com.upd.hwcloud.dao.UserMapper.findUserByIdcard" />
+    </resultMap>
+
+    <sql id="publicQuery">
+        and ai.RESOURCE_TYPE = #{p.resourceType}
+        <choose>
+            <when test="p.status == null or p.status == ''">
+                AND ai.STATUS not in (-1,0)
+            </when>
+            <when test="p.status == 1">
+                AND ai.STATUS in (1,7,101,102)
+            </when>
+            <when test="p.status == 5">
+                AND ai.STATUS in (5,8)
+            </when>
+            <otherwise>
+                AND ai.STATUS = #{p.status}
+            </otherwise>
+        </choose>
+        <!-- 可以按申请人/申请单号查询 -->
+        <if test="p.userName != null and p.userName != ''">
+            AND ai.CREATOR_NAME like #{p.userName}
+        </if>
+        <if test="p.orderNumber != null and p.orderNumber !=''">
+           and  ai.ORDER_NUMBER like #{p.orderNumber}
+        </if>
+        <if test="p.appName != null and p.appName !=''">
+          and   ai.APP_NAME like #{p.appName}
+        </if>
+    </sql>
+
+    <sql id="workbenchQuery">
+       and ai.RESOURCE_TYPE = #{p.queryVO.type}
+        <choose>
+            <!--全部状态除购物车-->
+            <when test="p.queryVO.status == null or p.queryVO.status == ''">
+                AND ai.STATUS not in (-1,0)
+            </when>
+            <!--待审核-->
+            <when test="p.queryVO.status == 0">
+                AND ai.STATUS in (1,7,101,102)
+            </when>
+            <!--待实施-->
+            <when test="p.queryVO.status == 1">
+                AND ai.STATUS = 2
+            </when>
+            <!--已驳回-->
+            <when test="p.queryVO.status == 2">
+                AND ai.STATUS in (5,6,8)
+            </when>
+            <!---删除或使用中-->
+            <otherwise>
+                AND ai.STATUS = #{p.queryVO.status}
+            </otherwise>
+        </choose>
+
+        <!-- 申请单号查询 -->
+        <if test="p.queryVO.keyWord != null and p.queryVO.keyWord != ''">
+            AND ai.ORDER_NUMBER = #{p.queryVO.keyWord}
+        </if>
+    </sql>
+
+    <select id="getPage" resultMap="BaseResultMap">
+        <!-- 查询状态为待审核/待实施时,可以选择处理人 -->
+        <if test="(p.status == 1 or p.status == 2) and (p.processType == 1 or p.processType == 2)">
+            SELECT R.* FROM (
+        </if>
+
+        SELECT
+        ai.*,
+        (select distinct 1 from TB_INNER_REVIEW_USER i
+        where ai.STATUS IN (7, 101, 102) and i.USER_ID = #{p.user.idcard} and i.APP_INFO_ID = ai.ID) REVIEW_FLAG
+        FROM TB_APPLICATION_INFO ai
+        <where>
+            <include refid="publicQuery"/>
+            <!--
+                1. 当处理人为管理员时,全部数据可见
+                2. 当处理人为普通用户时,可以看到
+                   a. 自己的
+                   b. 科信审核需要自己审核的
+                   c. 部门内审核需要自己审核的
+                   d. 自己审核过的
+                   e. 加办需要自己审核的
+                   f. 转发需要自己审核的
+                   g. 同一个环节别人已经审核的
+             -->
+            <if test="p.user.type != 100">
+                AND
+                (
+                ai.CREATOR = #{p.user.idcard}
+                <if test="p.stepIds != null and p.stepIds.size > 0">
+                    OR
+                    (
+                    ai.FLOW_STEP_ID IN
+                    <foreach collection="p.stepIds" item="stepId" open="(" separator="," close=")">
+                        #{stepId}
+                    </foreach>
+                    )
+                </if>
+                OR
+                (
+                exists(
+                select
+                1
+                from TB_APP_REVIEW_INFO ri
+                where ri.CREATOR = #{p.user.idcard}
+                and ri.APP_INFO_ID = ai.ID
+                )
+                )
+                OR
+                (
+                exists(
+                select
+                1
+                from TB_FLOW_STEP_USER fsu inner join TB_APP_REVIEW_INFO ri on fsu.STEP_ID = ri.FLOW_STEP_ID
+                where ri.APP_INFO_ID = ai.ID
+                and fsu.USER_ID = #{p.user.idcard}
+                )
+                )
+                OR
+                (
+                exists(
+                select
+                1
+                from TB_FLOW_STEP_USER fsu
+                where fsu.STEP_ID = ai.FLOW_STEP_ID_BAK
+                and ai.STATUS in (101, 102)
+                and fsu.USER_ID = #{p.user.idcard}
+                )
+                )
+                OR
+                (
+                exists(
+                select
+                1
+                from TB_INNER_REVIEW_USER ru
+                where ru.USER_ID = #{p.user.idcard}
+                and ru.APP_INFO_ID = ai.ID
+                and ai.STATUS IN (7, 101, 102)
+                )
+                )
+                )
+            </if>
+        </where>
+        ORDER BY ai.MODIFIED_TIME DESC
+
+        <if test="p.status == 1 or p.status == 2">
+            <!-- 选择处理人为:我 -->
+            <if test="p.processType == 1">
+                ) R WHERE R.REVIEW_FLAG IS NOT NULL
+                <if test="p.stepIds != null and p.stepIds.size > 0">
+                    OR R.FLOW_STEP_ID IN
+                    <foreach collection="p.stepIds" item="stepId" open="(" separator="," close=")">
+                        #{stepId}
+                    </foreach>
+                </if>
+            </if>
+            <!-- 选择处理人为:其他人 -->
+            <if test="p.processType == 2">
+                ) R WHERE R.REVIEW_FLAG IS NULL
+                <if test="p.stepIds != null and p.stepIds.size > 0">
+                    AND
+                    (
+                    R.FLOW_STEP_ID IS NULL OR R.FLOW_STEP_ID NOT IN
+                    <foreach collection="p.stepIds" item="stepId" open="(" separator="," close=")">
+                        #{stepId}
+                    </foreach>
+                    )
+                </if>
+            </if>
+        </if>
+    </select>
+    <select id="getFlowPage" resultMap="BaseResultMap">
+        SELECT distinct ai.*,ins.ID instanceId
+        from   TB_WFM_ACTIVITY act,TB_WFM_INSTANCE ins,TB_APPLICATION_INFO ai
+        ,TB_WFM_WORKFLOWMODEL m
+        <where>
+            and ai.ID=ins.BUSINESSID and act.INSTANCEID = ins.ID  and m.ID=act.MODELID
+            <if test="(p.startDate != null and p.startDate != '') and (p.endDate != null and p.endDate != '')">
+                AND TO_CHAR(ai.CREATE_TIME,'YYYY-MM-DD') &gt;= #{p.startDate}
+                AND TO_CHAR(ai.CREATE_TIME,'YYYY-MM-DD') &lt;= #{p.endDate}
+            </if>
+            <!-- 选择处理人为:我 -->
+            <if test="p.user.type != 100">
+                and (act.HANDLEPERSONIDS =  #{p.user.idcard} or m.noticeperon like concat(concat('%', #{p.user.idcard}),'%') )
+            </if>
+            <!-- 选择处理人为:我 -->
+            <if test="p.processType == 1">
+                and act.HANDLEPERSONIDS =#{p.user.idcard}
+                AND act.ACTIVITYSTATUS='待办' AND act.ACTIVITYTYPE is NULL
+            </if>
+            <!-- 选择处理人为:其他人 -->
+            <if test="p.processType == 2">
+                and  act.HANDLEPERSONIDS !=#{p.user.idcard}  AND act.ACTIVITYSTATUS='待办' AND act.ACTIVITYTYPE is NULL
+            </if>
+            <if test="p.serviceName != null and p.serviceName !=''">
+                and ai.SERVICE_TYPE_NAME like #{p.serviceName}
+            </if>
+            <include refid="publicQuery"/>
+        </where>
+        ORDER BY ai.MODIFIED_TIME DESC
+</select>
+
+    <select id="getFlowPageOfDaas" resultMap="BaseResultMap">
+      SELECT distinct ai.*,ins.ID instanceId
+        from   TB_DAAS_APPLICATION da,TB_WFM_ACTIVITY act,TB_WFM_INSTANCE ins,TB_APPLICATION_INFO ai
+        ,TB_WFM_WORKFLOWMODEL m
+        <where>
+            and ai.ID=ins.BUSINESSID and act.INSTANCEID = ins.ID  and m.ID=act.MODELID
+            and ai.ID = da.APP_INFO_ID
+            <if test="(p.startDate != null and p.startDate != '') and (p.endDate != null and p.endDate != '')">
+                AND TO_CHAR(ai.CREATE_TIME,'YYYY-MM-DD') &gt;= #{p.startDate}
+                AND TO_CHAR(ai.CREATE_TIME,'YYYY-MM-DD') &lt;= #{p.endDate}
+            </if>
+            <!-- 选择处理人为:我 -->
+            <if test="p.user.type != 100">
+                and (act.HANDLEPERSONIDS =  #{p.user.idcard} or m.noticeperon like concat(concat('%', #{p.user.idcard}),'%') )
+            </if>
+            <!-- 选择处理人为:我 -->
+            <if test="p.processType == 1">
+                and act.HANDLEPERSONIDS =#{p.user.idcard}
+                AND act.ACTIVITYSTATUS='待办' AND act.ACTIVITYTYPE is NULL
+            </if>
+            <!-- 选择处理人为:其他人 -->
+            <if test="p.processType == 2">
+                and  act.HANDLEPERSONIDS !=#{p.user.idcard}  AND act.ACTIVITYSTATUS='待办' AND act.ACTIVITYTYPE is NULL
+            </if>
+            <if test="p.serviceName != null and p.serviceName !=''">
+                and da.SERVICE_NAME like #{p.serviceName}
+            </if>
+            <include refid="publicQuery"/>
+        </where>
+        ORDER BY ai.MODIFIED_TIME DESC
+    </select>
+
+    <select id="getFlowPageOfSaasService" resultMap="BaseResultMap">
+        SELECT distinct ai.*,ins.ID instanceId
+        from   TB_SAAS_SERVICE_APPLICATION sa,TB_WFM_ACTIVITY act,TB_WFM_INSTANCE ins,TB_APPLICATION_INFO ai
+        ,TB_WFM_WORKFLOWMODEL m
+        <where>
+            and ai.ID=ins.BUSINESSID and act.INSTANCEID = ins.ID  and m.ID=act.MODELID
+            and ai.ID = sa.APP_INFO_ID
+            <if test="(p.startDate != null and p.startDate != '') and (p.endDate != null and p.endDate != '')">
+                AND TO_CHAR(ai.CREATE_TIME,'YYYY-MM-DD') &gt;= #{p.startDate}
+                AND TO_CHAR(ai.CREATE_TIME,'YYYY-MM-DD') &lt;= #{p.endDate}
+            </if>
+            <!-- 选择处理人为:我 -->
+            <if test="p.user.type != 100">
+                and (act.HANDLEPERSONIDS =  #{p.user.idcard} or m.noticeperon like concat(concat('%', #{p.user.idcard}),'%') )
+            </if>
+            <!-- 选择处理人为:我 -->
+            <if test="p.processType == 1">
+                and act.HANDLEPERSONIDS =#{p.user.idcard}
+                AND act.ACTIVITYSTATUS='待办' AND act.ACTIVITYTYPE is NULL
+            </if>
+            <!-- 选择处理人为:其他人 -->
+            <if test="p.processType == 2">
+                and  act.HANDLEPERSONIDS !=#{p.user.idcard}  AND act.ACTIVITYSTATUS='待办' AND act.ACTIVITYTYPE is NULL
+            </if>
+            <if test="p.serviceName != null and p.serviceName !=''">
+                and sa.NAME like #{p.serviceName}
+            </if>
+            <include refid="publicQuery"/>
+        </where>
+        ORDER BY ai.MODIFIED_TIME DESC
+    </select>
+
+
+    <select id="getFlowPageBank" resultMap="BaseResultMap">
+        SELECT distinct ai.*,(SELECT to_char(wm_concat(distinct U . NAME)) FROM TB_WFM_ACTIVITY act1,TB_USER U WHERE u.IDCARD=ACT1.HANDLEPERSONIDS AND ACT1.ACTIVITYSTATUS='待办' 	AND act1.INSTANCEID = ins. ID AND ACT1.ACTIVITYTYPE is NULL)  AS PROCESSING_PERSON
+        from  TB_APPLICATION_INFO ai ,TB_WFM_ACTIVITY act,TB_WFM_INSTANCE ins
+        ,TB_WFM_WORKFLOWMODEL m
+        <where>
+            <include refid="publicQuery"/>
+            and ai.ID=ins.BUSINESSID and act.INSTANCEID = ins.ID  and m.ID=act.MODELID
+            <if test="(p.startDate != null and p.startDate != '') and (p.endDate != null and p.endDate != '')">
+                AND TO_CHAR(ai.CREATE_TIME,'YYYY-MM-DD') &gt;= #{p.startDate}
+                AND TO_CHAR(ai.CREATE_TIME,'YYYY-MM-DD') &lt;= #{p.endDate}
+            </if>
+            <!-- 选择处理人为:我 -->
+            <if test="p.user.type != 100">
+                and (act.HANDLEPERSONIDS =  #{p.user.idcard} or m.noticeperon like concat(concat('%', #{p.user.idcard}),'%') )
+            </if>
+            <!-- 选择处理人为:我 -->
+            <if test="p.processType == 1">
+                and act.HANDLEPERSONIDS =#{p.user.idcard}
+                AND act.ACTIVITYSTATUS='待办' AND act.ACTIVITYTYPE is NULL
+            </if>
+            <!-- 选择处理人为:其他人 -->
+            <if test="p.processType == 2">
+                and  act.HANDLEPERSONIDS !=#{p.user.idcard}  AND act.ACTIVITYSTATUS='待办' AND act.ACTIVITYTYPE is NULL
+            </if>
+
+        </where>
+        ORDER BY ai.MODIFIED_TIME DESC
+    </select>
+
+    <select id="getFlowPageOfWorkbench" resultMap="BaseResultMap">
+        select  r.*,p.PROCESSING_PERSON from (SELECT distinct ai.*
+        from   TB_WFM_ACTIVITY act,TB_WFM_INSTANCE ins,TB_APPLICATION_INFO ai
+        ,TB_WFM_WORKFLOWMODEL m
+        <where>
+            and ai.ID=ins.BUSINESSID and act.INSTANCEID = ins.ID  and m.ID=act.MODELID
+            <if test="(p.queryVO.startDate != null and p.queryVO.startDate != '') and (p.queryVO.endDate != null and p.queryVO.endDate != '')">
+                AND TO_CHAR(ai.CREATE_TIME,'YYYY-MM-DD') &gt;= #{p.queryVO.startDate}
+                AND TO_CHAR(ai.CREATE_TIME,'YYYY-MM-DD') &lt;= #{p.queryVO.endDate}
+            </if>
+            <!-- 选择处理人为:我 -->
+            <if test="p.queryVO.processType == 1">
+                and act.HANDLEPERSONIDS =#{p.queryVO.handler}
+                AND act.ACTIVITYSTATUS='待办' AND act.ACTIVITYTYPE is NULL
+            </if>
+            <!-- 选择处理人为:其他人 -->
+            <if test="p.queryVO.processType == 2">
+                and  act.HANDLEPERSONIDS !=#{p.queryVO.handler}  AND act.ACTIVITYSTATUS='待办' AND act.ACTIVITYTYPE is NULL
+            </if>
+            <!--用户为警种租户管理员-->
+            <if test="p.queryVO.policeCategory !=null and p.queryVO.policeCategory !=''">
+                and  (ai.AREA_NAME = '省厅' or ai.AREA_NAME is null)
+                and  ai.POLICE_CATEGORY like #{p.queryVO.policeCategory}
+            </if>
+            <!--用户为地市租户管理员-->
+            <if test="p.queryVO.area !=null and p.queryVO.area !=''">
+                and  ai.AREA_NAME = #{p.queryVO.area}
+                and  ai.AREA_NAME != '省厅'
+            </if>
+            <!--用户为个人用户-->
+            <if test="p.queryVO.creator !=null and p.queryVO.creator !=''">
+                and  ai.CREATOR = #{p.queryVO.creator}
+            </if>
+            <include refid="workbenchQuery"/>
+        </where>
+        ) r
+        left join
+        (select act.INSTANCEID,ins.BUSINESSID,to_char(wm_concat(distinct U . NAME)) AS PROCESSING_PERSON
+        from TB_USER u,TB_WFM_ACTIVITY act,TB_WFM_INSTANCE ins  where u.IDCARD = act.HANDLEPERSONIDS  and ins.ID = act.INSTANCEID and act.ACTIVITYSTATUS='待办' and act.ACTIVITYTYPE is NULL group by act.INSTANCEID,ins.BUSINESSID) p ON p.BUSINESSID = r.ID
+        ORDER BY r.MODIFIED_TIME DESC
+    </select>
+
+    <!--优化前-->
+    <select id="getFlowPageOfWorkbenchBank" resultMap="BaseResultMap">
+        SELECT distinct ai.*,(SELECT to_char(wm_concat(distinct U . NAME)) FROM TB_WFM_ACTIVITY act1,TB_USER U WHERE u.IDCARD=ACT1.HANDLEPERSONIDS AND ACT1.ACTIVITYSTATUS='待办' 	AND act1.INSTANCEID = ins. ID AND ACT1.ACTIVITYTYPE is NULL)  AS PROCESSING_PERSON
+        from  TB_APPLICATION_INFO ai ,TB_WFM_ACTIVITY act,TB_WFM_INSTANCE ins
+        ,TB_WFM_WORKFLOWMODEL m
+        <where>
+            <include refid="workbenchQuery"/>
+            and ai.ID=ins.BUSINESSID and act.INSTANCEID = ins.ID  and m.ID=act.MODELID
+            <if test="(p.queryVO.startDate != null and p.queryVO.startDate != '') and (p.queryVO.endDate != null and p.queryVO.endDate != '')">
+                AND TO_CHAR(ai.CREATE_TIME,'YYYY-MM-DD') &gt;= #{p.queryVO.startDate}
+                AND TO_CHAR(ai.CREATE_TIME,'YYYY-MM-DD') &lt;= #{p.queryVO.endDate}
+            </if>
+            <!-- 选择处理人为:我 -->
+            <if test="p.queryVO.processType == 1">
+                and act.HANDLEPERSONIDS =#{p.queryVO.handler}
+                AND act.ACTIVITYSTATUS='待办' AND act.ACTIVITYTYPE is NULL
+            </if>
+            <!-- 选择处理人为:其他人 -->
+            <if test="p.queryVO.processType == 2">
+                and  act.HANDLEPERSONIDS !=#{p.queryVO.handler}  AND act.ACTIVITYSTATUS='待办' AND act.ACTIVITYTYPE is NULL
+            </if>
+            <!--用户为警种租户管理员-->
+            <if test="p.queryVO.policeCategory !=null and p.queryVO.policeCategory !=''">
+                and  (ai.AREA_NAME = '省厅' or ai.AREA_NAME is null)
+                and  ai.POLICE_CATEGORY like #{p.queryVO.policeCategory}
+            </if>
+            <!--用户为地市租户管理员-->
+            <if test="p.queryVO.area !=null and p.queryVO.area !=''">
+                and  ai.AREA_NAME = #{p.queryVO.area}
+                and  ai.AREA_NAME != '省厅'
+            </if>
+            <!--用户为个人用户-->
+            <if test="p.queryVO.creator !=null and p.queryVO.creator !=''">
+                and  ai.CREATOR = #{p.queryVO.creator}
+            </if>
+        </where>
+        ORDER BY ai.MODIFIED_TIME DESC
+    </select>
+
+    <!-- 获取今日申请单总数 -->
+    <select id="getCountToday" resultType="java.lang.Integer">
+        SELECT
+          count(1)
+        FROM TB_APPLICATION_INFO
+        WHERE trunc(CREATE_TIME) = trunc(Sysdate)
+    </select>
+
+    <select id="getTodoCount" resultType="java.lang.Integer">
+        SELECT
+        count(1)
+        FROM TB_APPLICATION_INFO ai
+        WHERE
+        ai.RESOURCE_TYPE = #{resourceType}
+        AND
+        (
+        (
+        <!-- 状态为科信待审核,待实施 -->
+        ai.STATUS IN (1,2)
+        AND ai.FLOW_STEP_ID IN (
+        <!-- 查询当前用户所能处理的所有步骤id -->
+        select
+        fs.ID
+        from TB_FLOW_STEP fs
+        <choose>
+            <when test="resourceType == 2">
+                right join TB_APPLY_FLOW af on af.ID = fs.FLOW_ID
+                left join TB_FLOW_STEP_USER fsu on fs.ID = fsu.STEP_ID
+                where
+                fsu.USER_ID = #{user.idcard}
+                and af.TARGET_RESOURCE = #{resourceType}
+            </when>
+            <otherwise>
+                left join TB_FLOW_STEP_USER fsu on fs.ID = fsu.STEP_ID
+                left join TB_APPLICATION_INFO i on fs.FLOW_ID = i.SERVICE_TYPE_ID
+                where
+                fsu.USER_ID = #{user.idcard}
+                and i.RESOURCE_TYPE = #{resourceType}
+            </otherwise>
+        </choose>
+        )
+        )
+        OR
+        (
+        <!-- 状态为部门内待审核,转发,加班 -->
+        ai.STATUS IN (7, 101, 102)
+        AND exists(
+        <!-- 处理人记录表中存在 -->
+        SELECT
+        1
+        FROM TB_INNER_REVIEW_USER ru
+        WHERE ru.USER_ID = #{user.idcard}
+        AND ru.APP_INFO_ID = ai.ID
+        AND ai.STATUS IN (7, 101, 102)
+        )
+        )
+        )
+    </select>
+    <select id="getNewCount" resultType="java.lang.Integer">
+        SELECT
+        count(DISTINCT ai.ID)
+        FROM TB_APPLICATION_INFO ai join TB_WFM_INSTANCE ins on ins.BUSINESSID = ai.ID
+        join TB_WFM_ACTIVITY act  on act.INSTANCEID = ins.ID
+        WHERE
+        ai.RESOURCE_TYPE = #{resourceType}
+        and ai.STATUS in (1,2,7,101,102)
+        and act.HANDLEPERSONIDS = #{user.idcard}
+        and act.ACTIVITYTYPE is null
+        and act.ACTIVITYSTATUS = '待办'
+    </select>
+
+
+    <!--IPDS待办-->
+    <select id="getServiceTodo" resultType="java.lang.Integer">
+        SELECT
+        count(DISTINCT ai.ID)
+        FROM TB_APPLICATION_INFO ai join TB_WFM_INSTANCE ins on ins.BUSINESSID = ai.ID
+        join TB_WFM_ACTIVITY act  on act.INSTANCEID = ins.ID
+        WHERE ai.STATUS in (1,2,7,101,102) and ai.RESOURCE_TYPE != 4
+        <if test="idCard != null and idCard !=''">
+            and act.HANDLEPERSONIDS = #{idCard}
+        </if>
+        and act.ACTIVITYTYPE is null
+        and act.ACTIVITYSTATUS = '待办'
+    </select>
+
+
+
+    <select id="getProcessingPersonByStepId" resultType="java.lang.String">
+        select wm_concat(NAME) from TB_USER where IDCARD in (
+            select fsu.USER_ID from TB_FLOW_STEP_USER fsu where fsu.STEP_ID = #{stepId}
+        )
+    </select>
+
+    <select id="getProcessingPersonByAppInfoId" resultType="java.lang.String">
+        select wm_concat(NAME) from TB_USER where IDCARD in (
+            select iru.USER_ID from TB_INNER_REVIEW_USER iru where iru.APP_INFO_ID = #{appInfoId}
+        )
+    </select>
+    <select id="getRePerson" resultType="java.lang.String">
+        select MAX(iru.USER_ID) from
+             TB_INNER_REVIEW_USER iru where iru.APP_INFO_ID = #{appInfoId}
+    </select>
+
+    <select id="findByAppName" resultType="com.upd.hwcloud.bean.entity.application.ApplicationInfo">
+        SELECT A.*,O1.ID AS jsUnitId,O2.ID AS cjUnitId FROM TB_APPLICATION_INFO A
+        LEFT JOIN TB_ORG O1 ON A.JS_UNIT = O1.FULL_NAME
+        LEFT JOIN TB_MANUFACTURERS O2 ON A.CJ_UNIT = O2.MANUFACTURER_NAME
+        WHERE A.STATUS = #{status}
+        ORDER BY A.APPLICATION_TIME asc
+    </select>
+
+    <select id="getAppInfo" resultType="com.upd.hwcloud.bean.entity.application.ApplicationInfo">
+        SELECT A.*,O1.ID AS jsUnitId,O2.ID AS cjUnitId FROM TB_APPLICATION_INFO A
+        LEFT JOIN TB_ORG O1 ON A.JS_UNIT = O1.FULL_NAME
+        LEFT JOIN TB_MANUFACTURERS O2 ON A.CJ_UNIT = O2.MANUFACTURER_NAME
+        WHERE A.ID = #{id}
+    </select>
+    <select id="getByActId"  resultType="com.upd.hwcloud.bean.entity.application.ApplicationInfo">
+        select ai.SERVICE_TYPE_NAME,ai.ORDER_NUMBER from TB_APPLICATION_INFO ai left join TB_WFM_INSTANCE ins on ai.ID=ins.BUSINESSID
+        left join TB_WFM_ACTIVITY act on act.INSTANCEID=ins.ID
+        where act.ID=#{activityId}
+    </select>
+
+    <sql id="areaPoliceCategory">
+        <choose>
+            <when test="type == 'area'">
+                and a.AREA_NAME = #{name}
+            </when>
+            <otherwise>
+                and a.HW_POLICE_CATEGORY = #{name} and a.AREA_NAME = '省厅'
+            </otherwise>
+        </choose>
+    </sql>
+
+
+
+
+    <sql id="escRecent">
+        from TB_APPLICATION_INFO a,TB_IAAS_TXYFW i
+        where a.ID = i.APP_INFO_ID and a.FORM_NUM = 'IAAS_TXYFW' and a.STATUS not in (-1, 0, 4)
+        and trunc(a.CREATE_TIME) &gt;= trunc(sysdate - 30)
+        <include refid="areaPoliceCategory" />
+    </sql>
+
+    <select id="ecsStatistics4Recent" resultType="com.upd.hwcloud.bean.dto.EcsStatisticsTotal">
+        select sum(i.NUM) num,round(sum(i.NUM * i.STORAGE) / 1000, 2) storage
+        <include refid="escRecent" />
+    </select>
+
+    <select id="ecsList4Recent" resultType="com.upd.hwcloud.bean.dto.EcsStatistics">
+        select * from (
+        select a.ORDER_NUMBER,a.APP_NAME,i.NUM,i.SPECIFICATION,round(i.STORAGE / 1000, 2) storage
+        <include refid="escRecent" />
+        order by a.CREATE_TIME desc
+        ) where rownum &lt;= 5
+    </select>
+
+
+
+
+    <sql id="escApplied">
+        from TB_APPLICATION_INFO a,TB_IAAS_TXYFW_IMPL i
+        where a.ID = i.APP_INFO_ID and a.FORM_NUM = 'IAAS_TXYFW' and a.STATUS not in (-1, 0, 4)
+        <include refid="areaPoliceCategory" />
+    </sql>
+
+    <select id="ecsStatistics4Applied" resultType="com.upd.hwcloud.bean.dto.EcsStatisticsTotal">
+        select count(1) num,round(sum(i.STORAGE) / 1000, 2) storage
+        <include refid="escApplied" />
+    </select>
+
+    <select id="ecsList4Applied" resultType="com.upd.hwcloud.bean.dto.EcsStatistics">
+        select * from (
+        select a.ORDER_NUMBER,a.APP_NAME,i.SERVER_ID,i.SERVER_IP,i.SPECIFICATION,round(i.STORAGE / 1000, 2) storage
+        <include refid="escApplied" />
+        order by a.CREATE_TIME desc
+        ) where rownum &lt;= 5
+    </select>
+
+
+
+
+    <sql id="escReview">
+        from TB_APPLICATION_INFO a, TB_IAAS_TXYFW i
+        where a.ID = i.APP_INFO_ID and a.FORM_NUM = 'IAAS_TXYFW' and a.STATUS in (1,2,7,101,102)
+        <include refid="areaPoliceCategory" />
+    </sql>
+
+    <select id="ecsStatistics4Review" resultType="com.upd.hwcloud.bean.dto.EcsStatisticsTotal">
+        select sum(i.NUM) num,round(sum(i.NUM * i.STORAGE) / 1000, 2) storage
+        <include refid="escReview" />
+    </select>
+
+    <select id="ecsList4Review" resultType="com.upd.hwcloud.bean.dto.EcsStatistics">
+        select * from (
+        select a.ORDER_NUMBER,a.APP_NAME,i.NUM,i.SPECIFICATION,round(i.STORAGE / 1000, 2) storage
+        <include refid="escReview"/>
+        order by a.CREATE_TIME desc
+        ) where rownum &lt;= 5
+    </select>
+
+    <select id="getAppNameList" resultType="java.lang.String">
+        select a.APP_NAME from TB_APPLICATION_INFO a
+        where a.CREATOR = #{user.idcard} and a.STATUS = 3
+        group by a.APP_NAME
+    </select>
+
+    <select id="getUseRes" resultType="com.upd.hwcloud.bean.dto.ResourceCount">
+        select a.SERVICE_TYPE_NAME serviceName,count(1) count from TB_APPLICATION_INFO a
+        where a.CREATOR = #{user.idcard} and a.STATUS = 3 and a.RESOURCE_TYPE = #{resourceType}
+        <if test="appName != null and appName != ''">
+            and a.APP_NAME = #{appName}
+        </if>
+        group by a.SERVICE_TYPE_NAME
+        order by count desc
+    </select>
+
+    <select id="getDaasUseRes" resultType="java.lang.Integer">
+        select count(*) from TB_APPLICATION_INFO a,TB_DAAS_APPLICATION d
+        where a.ID = d.APP_INFO_ID and a.CREATOR = #{user.idcard} and a.STATUS = 3 and a.RESOURCE_TYPE = 2
+        <if test="appName != null and appName != ''">
+            and a.APP_NAME = #{appName}
+        </if>
+    </select>
+
+    <select id="getReviewCount" resultType="java.lang.Integer">
+        SELECT count(DISTINCT ai.ID)
+        FROM TB_APPLICATION_INFO ai join TB_WFM_INSTANCE ins on ins.BUSINESSID = ai.ID join TB_WFM_ACTIVITY act  on act.INSTANCEID = ins.ID
+        WHERE ai.RESOURCE_TYPE = #{resourceType} and ai.STATUS in (1,7,101,102)
+        <if test="p.queryVO.policeCategory !=null and p.queryVO.policeCategory !=''">
+            and  (ai.AREA_NAME = '省厅' or ai.AREA_NAME is null)
+            and  ai.POLICE_CATEGORY like #{p.queryVO.policeCategory}
+        </if>
+        <if test="p.queryVO.area !=null and p.queryVO.area !=''">
+            and  ai.AREA_NAME = #{p.queryVO.area}
+            and  ai.AREA_NAME != '省厅'
+        </if>
+        <if test="p.queryVO.creator !=null and p.queryVO.creator !=''">
+            and ai.CREATOR = #{user.idcard}
+        </if>
+         and act.ACTIVITYTYPE is null and act.ACTIVITYSTATUS = '待办'
+    </select>
+
+    <select id="getImplCount" resultType="java.lang.Integer">
+    SELECT count(DISTINCT ai.ID)
+    FROM TB_APPLICATION_INFO ai join TB_WFM_INSTANCE ins on ins.BUSINESSID = ai.ID join TB_WFM_ACTIVITY act  on act.INSTANCEID = ins.ID
+    WHERE ai.RESOURCE_TYPE = #{resourceType} and ai.STATUS = 2
+        <if test="p.queryVO.policeCategory !=null and p.queryVO.policeCategory !=''">
+            and  (ai.AREA_NAME = '省厅' or ai.AREA_NAME is null)
+            and  ai.POLICE_CATEGORY like #{p.queryVO.policeCategory}
+        </if>
+        <if test="p.queryVO.area !=null and p.queryVO.area !=''">
+            and  ai.AREA_NAME = #{p.queryVO.area}
+            and  ai.AREA_NAME != '省厅'
+        </if>
+        <if test="p.queryVO.creator !=null and p.queryVO.creator !=''">
+            and ai.CREATOR = #{user.idcard}
+        </if>
+     and act.ACTIVITYTYPE is null and act.ACTIVITYSTATUS = '待办'
+</select>
+
+    <select id="getImplCountBank" resultType="java.lang.Integer">
+        SELECT count(DISTINCT ai.ID)
+        FROM TB_APPLICATION_INFO ai join TB_WFM_INSTANCE ins on ins.BUSINESSID = ai.ID join TB_WFM_ACTIVITY act  on act.INSTANCEID = ins.ID
+        WHERE ai.RESOURCE_TYPE = #{resourceType} and ai.STATUS = 2
+        <if test="tenantArea != null and tenantArea != ''">
+            and a.AREAS = #{tenantArea}
+        </if>
+        <if test="tenantPoliceCategory != null and tenantPoliceCategory != ''">
+            and a.POLICE_CATEGORY = #{tenantPoliceCategory}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and (
+            a.CREATOR_NAME = #{keyword}
+            or a.ORDER_NUMBER = #{keyword}
+            )
+        </if>
+        and act.HANDLEPERSONIDS = #{user.idcard} and act.ACTIVITYTYPE is null and act.ACTIVITYSTATUS = '待办'
+    </select>
+
+    <select id="getRejectCount" resultType="java.lang.Integer">
+        SELECT count(DISTINCT ai.ID)
+        FROM TB_APPLICATION_INFO ai join TB_WFM_INSTANCE ins on ins.BUSINESSID = ai.ID join TB_WFM_ACTIVITY act  on act.INSTANCEID = ins.ID
+        WHERE ai.RESOURCE_TYPE = #{resourceType} and ai.STATUS in (5,6,8)
+        <if test="p.queryVO.policeCategory !=null and p.queryVO.policeCategory !=''">
+            and  (ai.AREA_NAME = '省厅' or ai.AREA_NAME is null)
+            and  ai.POLICE_CATEGORY like #{p.queryVO.policeCategory}
+        </if>
+        <if test="p.queryVO.area !=null and p.queryVO.area !=''">
+            and  ai.AREA_NAME = #{p.queryVO.area}
+            and  ai.AREA_NAME != '省厅'
+        </if>
+        <if test="p.queryVO.creator !=null and p.queryVO.creator !=''">
+            and ai.CREATOR = #{user.idcard}
+        </if>
+    </select>
+
+    <select id="getUseCount" resultType="java.lang.Integer">
+        SELECT count(DISTINCT ai.ID)
+        FROM TB_APPLICATION_INFO ai join TB_WFM_INSTANCE ins on ins.BUSINESSID = ai.ID join TB_WFM_ACTIVITY act  on act.INSTANCEID = ins.ID
+        WHERE ai.RESOURCE_TYPE = #{resourceType} and ai.STATUS = 3
+        <if test="p.queryVO.policeCategory !=null and p.queryVO.policeCategory !=''">
+            and  (ai.AREA_NAME = '省厅' or ai.AREA_NAME is null)
+            and  ai.POLICE_CATEGORY like #{p.queryVO.policeCategory}
+        </if>
+        <if test="p.queryVO.area !=null and p.queryVO.area !=''">
+            and  ai.AREA_NAME = #{p.queryVO.area}
+            and  ai.AREA_NAME != '省厅'
+        </if>
+        <if test="p.queryVO.creator !=null and p.queryVO.creator !=''">
+            and ai.CREATOR = #{user.idcard}
+        </if>
+    </select>
+
+    <select id="getIaasPaasWorkbenchPage" resultType="com.upd.hwcloud.bean.entity.application.ApplicationInfo">
+        SELECT ai.* FROM TB_APPLICATION_INFO ai
+        WHERE ai.STATUS = 3 and ai.CREATOR = #{p.user.idcard} and ai.RESOURCE_TYPE = #{p.resourceType}
+        <if test="p.orderNumber != null and p.orderNumber != ''">
+            AND ai.ORDER_NUMBER = #{p.orderNumber}
+        </if>
+        <if test="(p.startDate != null and p.startDate != '') and (p.endDate != null and p.endDate != '')">
+            AND TO_CHAR(ai.CREATE_TIME,'YYYY-MM-DD') &gt;= #{p.startDate}
+            AND TO_CHAR(ai.CREATE_TIME,'YYYY-MM-DD') &lt;= #{p.endDate}
+        </if>
+        <if test="p.appName != null and p.appName != ''">
+            AND ai.APP_NAME like concat(concat('%', #{p.appName}),'%')
+        </if>
+        <if test="p.serviceName != null and p.serviceName != ''">
+            AND ai.SERVICE_TYPE_NAME like concat(concat('%', #{p.serviceName}),'%')
+        </if>
+        ORDER BY ai.MODIFIED_TIME DESC
+    </select>
+
+    <select id="getDaasWorkbenchPage" resultType="com.upd.hwcloud.bean.dto.DaasApplicationExt">
+        SELECT
+        d.SERVICE_NAME,d.PROVIDER,d.VERSION,d.APP_KEY,d.APP_SECRET,ai.APP_NAME,ai.ORDER_NUMBER,ai.CREATOR_NAME,ai.CREATE_TIME
+        FROM
+        TB_APPLICATION_INFO ai left join TB_DAAS_APPLICATION d on ai.ID = d.APP_INFO_ID
+        WHERE
+        ai.STATUS = 3 and ai.RESOURCE_TYPE = 2 and ai.CREATOR = #{p.user.idcard}
+        <if test="p.orderNumber != null and p.orderNumber != ''">
+            AND ai.ORDER_NUMBER = #{p.orderNumber}
+        </if>
+        <if test="(p.startDate != null and p.startDate != '') and (p.endDate != null and p.endDate != '')">
+            AND TO_CHAR(ai.CREATE_TIME,'YYYY-MM-DD') &gt;= #{p.startDate}
+            AND TO_CHAR(ai.CREATE_TIME,'YYYY-MM-DD') &lt;= #{p.endDate}
+        </if>
+        <if test="p.appName != null and p.appName != ''">
+            AND ai.APP_NAME like concat(concat('%', #{p.appName}),'%')
+        </if>
+        <if test="p.serviceName != null and p.serviceName != ''">
+            AND d.SERVICE_NAME like concat(concat('%', #{p.serviceName}),'%')
+        </if>
+        ORDER BY ai.MODIFIED_TIME DESC
+    </select>
+    <select id="iaasOrderStatistics" resultType="com.upd.hwcloud.bean.entity.application.ApplicationInfo">
+        SELECT DISTINCT
+        A.*,B.HANDLETIME AS bigDataAuditTime,C.HANDLETIME AS businessHandlingTime
+        FROM
+        TB_APPLICATION_INFO A
+        LEFT JOIN
+        (SELECT AI."ID",WA.HANDLETIME
+        FROM TB_APPLICATION_INFO AI,TB_WFM_INSTANCE WI,TB_WFM_WORKFLOWMODEL WW,TB_WFM_ACTIVITY WA
+        WHERE AI."ID" = WI.BUSINESSID AND WA.INSTANCEID = WI. ID AND WW.ID = WA.MODELID AND WA.ACTIVITYSTATUS = '已提交' AND WW.MODELNAME = '大数据办审批') B
+        ON A."ID" = B."ID"
+        LEFT JOIN
+        (SELECT AI."ID",WA.HANDLETIME
+        FROM TB_APPLICATION_INFO AI,TB_WFM_INSTANCE WI,TB_WFM_ACTIVITY WA,TB_WFM_WORKFLOWMODEL WW
+        WHERE AI."ID" = WI.BUSINESSID AND WA.INSTANCEID = WI. ID AND WW. ID = WA.MODELID AND WA.ACTIVITYSTATUS = '已提交' AND WW.MODELNAME = '业务办理') C
+        ON A."ID" = C."ID"
+        WHERE
+        A.FORM_NUM = #{form_num}
+        AND A.STATUS  in (2,3)
+        <if test="areas != null and areas != ''">
+            AND A.AREA_NAME = #{areas}
+        </if>
+        <if test="policeCategory != null and policeCategory != ''">
+            AND A.POLICE_CATEGORY = #{policeCategory}
+        </if>
+        <if test="(submitStartDate!= null and submitStartDate != '') and (submitEndDate != null and submitEndDate != '')">
+            AND TO_CHAR(A.APPLICATION_TIME,'YYYY-MM-DD') &gt;= #{submitStartDate}
+            AND TO_CHAR(A.APPLICATION_TIME,'YYYY-MM-DD') &lt;= #{submitEndDate}
+        </if>
+        <if test="(bigdataStartDate!= null and bigdataStartDate != '') and (bigdataEndDate != null and bigdataEndDate != '')">
+            AND TO_CHAR(B.HANDLETIME,'YYYY-MM-DD') &gt;= #{bigdataStartDate}
+            AND TO_CHAR(B.HANDLETIME,'YYYY-MM-DD') &lt;= #{bigdataEndDate}
+        </if>
+        <if test="(carryStartDate!= null and carryStartDate != '') and (carryEndDate != null and carryEndDate != '')">
+            AND TO_CHAR(C.HANDLETIME,'YYYY-MM-DD') &gt;= #{carryStartDate}
+            AND TO_CHAR(C.HANDLETIME,'YYYY-MM-DD') &lt;= #{carryEndDate}
+        </if>
+        ORDER BY A.APPLICATION_TIME DESC
+    </select>
+
+    <select id="pdiApplicationExport" resultType="com.upd.hwcloud.bean.entity.PassDaasIaasApplicationExport">
+        WITH
+        total
+        AS
+        (SELECT a.ORDER_NUMBER,a.CREATOR_NAME,a.CREATE_TIME,decode(a.RESOURCE_TYPE,'1','IaaS','2','DaaS','3','PaaS') RESOURCE_TYPE,a.SERVICE_TYPE_NAME,a.CREATOR_UNIT ORG_NAME,a.PROJECT_NAME,
+        a.APP_NAME,
+        decode(b.STEP_NAME,'本单位审批','0','服务台复核','1','大数据办审批','2','业务办理','3') node,
+        b.CREATOR HADER_PERSON,
+        c.NAME,
+        a.AREA_NAME,
+        a.POLICE_CATEGORY,
+        decode(b.STEP_NAME,'服务台复核',c.NAME,null) RECHECK_PERSON,
+        decode(b.STEP_NAME,'服务台复核',to_char(b.CREATE_TIME,'yyyy-mm-dd hh24:mi:ss'),null) RECHECK_TIME,
+        decode(b.STEP_NAME,'服务台复核',decode(b.RESULT,'1','通过','0','驳回'),null) RECHECK_RESULT,
+        decode(b.STEP_NAME,'服务台复核',b.REMARK,null) RECHECK_OPNION,
+        decode(b.STEP_NAME,'大数据办审批',c.NAME,null) BIGDATA_PERSON,
+        decode(b.STEP_NAME,'大数据办审批',to_char(b.CREATE_TIME,'yyyy-mm-dd hh24:mi:ss'),null) BIGDATA_TIME,
+        decode(b.STEP_NAME,'大数据办审批',decode(b.RESULT,'1','通过','0','驳回'),null) BIGDATA_RESULT,
+        decode(b.STEP_NAME,'大数据办审批',b.REMARK,null) BIGDATA_OPNION,
+        decode(b.STEP_NAME,'业务办理',c.NAME,null) CARRAY_PERSON,
+        decode(b.STEP_NAME,'业务办理',to_char(b.CREATE_TIME,'yyyy-mm-dd hh24:mi:ss'),null) CARRAY_TIME,
+        decode(b.STEP_NAME,'业务办理',decode(b.RESULT,'1','通过','0','驳回'),null) CARRAY_RESULT
+        from TB_APPLICATION_INFO a
+        join TB_APP_REVIEW_INFO b on a.ID = b.APP_INFO_ID
+        join TB_USER c on b.CREATOR = c.IDCARD
+        where b.STEP_NAME in ('本单位审批','服务台复核','大数据办审批','业务办理')
+        AND a.STATUS NOT IN('-1','4')
+        group by a.ORDER_NUMBER,a.APP_NAME,b.STEP_NAME,b.CREATOR,c.NAME,b.CREATE_TIME,b.RESULT,b.REMARK,a.PROJECT_NAME ,a.AREA_NAME,a.POLICE_CATEGORY,a.CREATOR_NAME,a.RESOURCE_TYPE,a.SERVICE_TYPE_NAME,a.CREATOR_UNIT,a.CREATE_TIME
+        ORDER BY a.ORDER_NUMBER DESC ,b.STEP_NAME
+        ) ,
+        count AS (
+        select tl.ORDER_NUMBER,tl.CREATOR_NAME,tl.CREATE_TIME,tl.RESOURCE_TYPE,tl.SERVICE_TYPE_NAME,tl.ORG_NAME,tl.PROJECT_NAME,tl.APP_NAME,
+        decode(max(node),'0','本单位审批','1','服务台复核','2','大数据办审批','3','业务办理') NODE,
+        tl.AREA_NAME,tl.POLICE_CATEGORY,
+        max(tl.RECHECK_PERSON) RECHECK_PERSON,max(tl.RECHECK_TIME) RECHECK_TIME,max(tl.RECHECK_RESULT) RECHECK_RESULT,max(tl.RECHECK_OPNION) RECHECK_OPNION,max(tl.BIGDATA_PERSON) BIGDATA_PERSON,max(tl.BIGDATA_TIME) BIGDATA_TIME,
+        max(tl.BIGDATA_RESULT) BIGDATA_RESULT,max(tl.BIGDATA_OPNION) BIGDATA_OPNION,max(tl.CARRAY_PERSON) CARRAY_PERSON,max(tl.CARRAY_TIME) CARRAY_TIME,max(tl.CARRAY_RESULT) CARRAY_RESULT
+        from total tl
+        group by tl.ORDER_NUMBER,tl.PROJECT_NAME,tl.APP_NAME,tl.AREA_NAME,tl.POLICE_CATEGORY,tl.CREATOR_NAME,tl.RESOURCE_TYPE,tl.SERVICE_TYPE_NAME,tl.ORG_NAME,tl.CREATE_TIME
+        ORDER BY tl.ORDER_NUMBER
+        )
+        select rownum ID,ORDER_NUMBER,CREATOR_NAME,CREATE_TIME,RESOURCE_TYPE,SERVICE_TYPE_NAME,ORG_NAME,PROJECT_NAME,APP_NAME,decode(CARRAY_RESULT,'通过','使用中',NODE) NODE,RECHECK_PERSON,RECHECK_TIME,RECHECK_RESULT,RECHECK_OPNION,BIGDATA_PERSON,BIGDATA_TIME,BIGDATA_RESULT,BIGDATA_OPNION,CARRAY_PERSON,CARRAY_TIME,CARRAY_RESULT,AREA_NAME,POLICE_CATEGORY
+        from count
+        where 1=1
+        <if test="areas != null and areas != ''">
+            and AREA_NAME = #{areas}
+        </if>
+        <if test="policeCategory != null and policeCategory != ''">
+            AND POLICE_CATEGORY = #{policeCategory}
+        </if>
+        <if test="p.submitStartDate != null and p.submitEndDate != null">
+            and (RECHECK_TIME BETWEEN #{p.submitStartDate}||'00:00:00' AND #{p.submitEndDate}||'23:59:59')
+        </if>
+        <if test="p.bigdataStartDate != null and p.bigdataEndDate != null">
+            and (BIGDATA_TIME BETWEEN #{p.bigdataStartDate}||'00:00:00' AND #{p.bigdataEndDate}||'23:59:59')
+        </if>
+        <if test="p.carryStartDate != null and p.carryEndDate != null">
+            and (CARRAY_TIME BETWEEN #{p.carryStartDate}||'00:00:00' AND #{p.carryEndDate}||'23:59:59')
+        </if>
+        ORDER BY ORDER_NUMBER DESC,decode (node,'本单位审批',0,'服务台复核',1,'大数据办审批',2,'业务办理',3),RECHECK_TIME,BIGDATA_TIME,CARRAY_TIME
+    </select>
+    <select id="saasApplicationExport" resultType="com.upd.hwcloud.bean.entity.SaasApplicationExport" >
+        with total as(
+        select a.ID,a.ORDER_NUMBER,a.CREATOR_NAME,a.ORG_NAME,a.AREAS,a.POLICE_CATEGORY,a.APPLICATION_TIME,
+        decode(c.STEP_NAME,'二级管理员审批','0','服务台复核','1','一级管理员审批','2','大数据办审批','3','业务办理','4') STEP_NAME,
+        max(decode(c.STEP_NAME,'服务台复核',d.NAME,null)) RECHECK_PERSON,
+        max(decode(c.STEP_NAME,'服务台复核',to_char(c.CREATE_TIME,'yyyy-mm-dd hh24:mi:ss'),null)) RECHECK_TIME,
+        max(decode(c.STEP_NAME,'服务台复核',decode(c.RESULT,'1','通过','0','驳回'),null)) RECHECK_RESULT,
+        max(decode(c.STEP_NAME,'服务台复核',c.REMARK,null)) RECHECK_OPNION,
+        max(decode(c.STEP_NAME,'业务办理',c.RESULT,null)) CRA_RESULT,
+        max(decode(c.STEP_NAME,'大数据办审批',to_char(c.CREATE_TIME,'yyyy-mm-dd hh24:mi:ss'),null)) BIGDATA_TIME,
+        max(decode(c.STEP_NAME,'业务办理',to_char(c.CREATE_TIME,'yyyy-mm-dd hh24:mi:ss'),null)) CARRAY_TIME
+
+        from TB_SAAS_APPLICATION_MERGE a
+        join TB_SAAS_APPLICATION b on a.ID =b.MERGE_ID
+        join TB_APP_REVIEW_INFO c on a.ID = c.APP_INFO_ID
+        join TB_USER d on c.CREATOR = d.IDCARD
+        where STEP_NAME in ('二级管理员审批','服务台复核','一级管理员审批','大数据办审批','业务办理')
+        GROUP BY a.ID,a.ORDER_NUMBER,a.CREATOR_NAME,a.ORG_NAME,c.STEP_NAME,a.AREAS,a.POLICE_CATEGORY,a.APPLICATION_TIME
+        ORDER BY a.ORDER_NUMBER
+        ) ,count as(
+        select t1.id IDS,t1.ORDER_NUMBER,t1.CREATOR_NAME,t1.ORG_NAME,t1.AREAS,t1.POLICE_CATEGORY,t1.APPLICATION_TIME,
+        decode(max(nvl(t1.CRA_RESULT,'0')),'1','使用中',decode(max(t1.STEP_NAME),'0','二级管理员审批','1','服务台复核','2','一级管理员审批','3','大数据办审批','4','业务办理')) STEP_NAME,
+        MAX(t1.RECHECK_PERSON) RECHECK_PERSON,MAX(t1.RECHECK_TIME) RECHECK_TIME,MAX(t1.RECHECK_RESULT) RECHECK_RESULT,MAX(t1.RECHECK_OPNION) RECHECK_OPNION,MAX(t1.BIGDATA_TIME) BIGDATA_TIME,MAX(t1.CARRAY_TIME) CARRAY_TIME
+        from total t1
+        GROUP BY t1.id,t1.ORDER_NUMBER,t1.CREATOR_NAME,t1.ORG_NAME,t1.AREAS,t1.POLICE_CATEGORY,t1.APPLICATION_TIME
+        ), productNum as
+        ( select a.id,count(1) num from TB_SAAS_APPLICATION_MERGE a
+        join TB_SAAS_APPLICATION b on a.ID =b.MERGE_ID
+        group by a.ID
+        )
+        SELECT rownum ID,t.* from(
+        select count.*,pdn.num from count join productNum pdn on count.IDS = pdn.id
+        where 1=1
+        <if test="areas != null and areas != ''">
+            and count.AREAS = #{areas}
+        </if>
+        <if test="policeCategory != null and policeCategory != ''">
+            AND count.POLICE_CATEGORY = #{policeCategory}
+        </if>
+        <if test="p.submitStartDate != null and p.submitEndDate != null">
+            AND TO_CHAR(count.APPLICATION_TIME,'YYYY-MM-DD') &gt;= #{p.submitStartDate}
+            AND TO_CHAR(count.APPLICATION_TIME,'YYYY-MM-DD') &lt;= #{p.submitEndDate}
+        </if>
+        <if test="p.bigdataStartDate != null and p.bigdataEndDate != null">
+            and (count.BIGDATA_TIME BETWEEN #{p.bigdataStartDate}||'00:00:00' AND
+            #{p.bigdataEndDate}||'23:59:59')
+        </if>
+        <if test="p.carryStartDate != null and p.carryEndDate != null">
+            and (count.CARRAY_TIME BETWEEN #{p.carryStartDate}||'00:00:00' AND
+            #{p.carryEndDate}||'23:59:59')
+        </if>
+        ORDER BY count.ORDER_NUMBER,decode
+        (count.STEP_NAME,'二级管理员审批',0,'服务台复核',1,'一级管理员审批',2,'大数据办审批',3 ,'业务办理',4,5)
+        ) t
+
+    </select>
+    <select id="servicePublishRegistExport" resultType="com.upd.hwcloud.bean.entity.ServicePublishApplicationRegistExport" >
+        SELECT ROWNUM AS id,T.*
+        FROM (
+        with total as (select a.ORDER_NUMBER,a.CREATOR_NAME,b.ORG_NAME,a.CREATE_TIME,a.NAME
+        APP_NAME,decode(a.APPLY_TYPE,'2','是','否') ISGOV,a.AREA,a.POLICE_CATEGORY,
+        decode(c.STEP_NAME,'本单位审批','0','服务台复核','1','大数据办审批','2','服务上线','3') STEP_NAME,
+        max(decode(c.STEP_NAME,'服务台复核',b.NAME,null)) RECHECK_PERSON,
+        max(decode(c.STEP_NAME,'服务台复核',to_char(c.CREATE_TIME,'yyyy-mm-dd hh24:mi:ss'),null)) RECHECK_TIME,
+        max(decode(c.STEP_NAME,'服务台复核',decode(c.RESULT,'1','通过','0','驳回'),null)) RECHECK_RESULT,
+        max(decode(c.STEP_NAME,'服务台复核',c.REMARK,null)) RECHECK_OPNION,
+        max(decode(c.STEP_NAME,'大数据办审批',to_char(c.CREATE_TIME,'yyyy-mm-dd hh24:mi:ss'),null)) BIGDATA_TIME,
+        max(decode(c.STEP_NAME,'服务上线',to_char(c.CREATE_TIME,'yyyy-mm-dd hh24:mi:ss'),null)) CARRAY_TIME,
+        max(decode(c.STEP_NAME,'服务上线',c.RESULT,null)) CRA_RESULT
+        from TB_SAAS_REGISTER a
+        join TB_APP_REVIEW_INFO c on a.ID = c.APP_INFO_ID
+        join TB_USER b on a.CREATOR = b.IDCARD
+        where c.STEP_NAME in ('本单位审批','服务台复核','大数据办审批','服务上线')
+        GROUP BY
+        a.ORDER_NUMBER,a.CREATOR_NAME,b.ORG_NAME,a.CREATE_TIME,a.NAME,a.APPLY_TYPE,a.AREA,a.POLICE_CATEGORY,c.STEP_NAME
+        ORDER BY a.ORDER_NUMBER
+        ),count as(
+        select
+        t1.ORDER_NUMBER,t1.CREATOR_NAME,t1.ORG_NAME,t1.CREATE_TIME,t1.APP_NAME,t1.ISGOV,t1.AREA,t1.POLICE_CATEGORY,DECODE(MAX(t1.STEP_NAME),'0','本单位审批','1','服务台复核','2','大数据办审批','3','服务上线')
+        STEP_NAME,MAX(t1.RECHECK_PERSON) RECHECK_PERSON,MAX(t1.RECHECK_TIME) RECHECK_TIME,MAX(t1.RECHECK_RESULT)
+        RECHECK_RESULT,MAX(t1.RECHECK_OPNION) RECHECK_OPNION,
+        MAX(t1.BIGDATA_TIME) BIGDATA_TIME,MAX(t1.CARRAY_TIME) CARRAY_TIME
+        from total t1
+        GROUP BY
+        t1.ORDER_NUMBER,t1.CREATOR_NAME,t1.ORG_NAME,t1.CREATE_TIME,t1.APP_NAME,t1.ISGOV,t1.AREA,t1.POLICE_CATEGORY
+        )
+        select rownum ID,ORDER_NUMBER,CREATOR_NAME,ORG_NAME,CREATE_TIME,APP_NAME,ISGOV,AREA ,POLICE_CATEGORY,
+        (CASE WHEN STEP_NAME='服务上线' AND RECHECK_RESULT='通过' THEN '完成' else STEP_NAME end)
+        STEP_NAME,RECHECK_PERSON,RECHECK_TIME,RECHECK_RESULT,RECHECK_OPNION,BIGDATA_TIME,CARRAY_TIME
+        from count
+        where 1=1
+        <if test="areas != null and areas != ''">
+            and AREA = #{areas}
+        </if>
+        <if test="policeCategory != null and policeCategory != ''">
+            AND POLICE_CATEGORY = #{policeCategory}
+        </if>
+        <if test="p.submitStartDate != null and p.submitEndDate != null">
+            and (RECHECK_TIME BETWEEN #{p.submitStartDate}||'00:00:00' AND #{p.submitEndDate}||'23:59:59')
+        </if>
+        <if test="p.bigdataStartDate != null and p.bigdataEndDate != null">
+            and (BIGDATA_TIME BETWEEN #{p.bigdataStartDate}||'00:00:00' AND #{p.bigdataEndDate}||'23:59:59')
+        </if>
+        <if test="p.carryStartDate != null and p.carryEndDate != null">
+            and (CARRAY_TIME BETWEEN #{p.carryStartDate}||'00:00:00' AND #{p.carryEndDate}||'23:59:59')
+        </if>
+        ORDER BY ORDER_NUMBER desc,decode (STEP_NAME,'本单位审批',0,'服务台复核',1,'大数据办审批',2,'服务上线',3,4)
+        )T
+
+    </select>
+    <select id="iaasZysbAppExport" resultType="com.upd.hwcloud.bean.entity.IaasZYSBapplicationExport" >
+        with total as(select t.MASTER_ID,max(decode(t.num,1,nvl(t.PROJECT_NAME,null))) pro1,
+        max(decode(t.num,2,nvl(t.PROJECT_NAME,null))) pro2,
+        max(decode(t.num,3,nvl(t.PROJECT_NAME,null))) pro3,
+        max(decode(t.num,4,nvl(t.PROJECT_NAME,null))) pro4,
+        max(decode(t.num,5,nvl(t.PROJECT_NAME,null))) pro5,
+        max(decode(t.num,6,nvl(t.PROJECT_NAME,null))) pro6
+        from (
+        select a.*,row_number() over(PARTITION by a.MASTER_ID order by a.CREATE_TIME ) num from TB_IAAS_ZYSB_XMXX a
+        ) t
+        GROUP BY t.MASTER_ID
+        ),count as(
+        select a.ORDER_NUMBER,a.CREATOR_NAME,a.CREATOR_UNIT ORG_NAME,b.MASTER_ID,b.pro1,b.pro2,b.pro3,b.pro4,b.pro5,b.pro6,a.AREAS,a.POLICE_CATEGORY,
+        decode(c.STEP_NAME,'本单位审批','0','服务台复核','1','大数据办审批','2') STEP_NAME,
+        max(decode(c.STEP_NAME,'服务台复核',d.NAME,null)) RECHECK_PERSON,
+        max(decode(c.STEP_NAME,'服务台复核',to_char(c.CREATE_TIME,'yyyy-mm-dd hh24:mi:ss'),null)) RECHECK_TIME,
+        max(decode(c.STEP_NAME,'服务台复核',decode(c.RESULT,'1','通过','0','驳回'),null)) RECHECK_RESULT,
+        max(decode(c.STEP_NAME,'服务台复核',c.REMARK,null)) RECHECK_OPNION,
+        max(decode(c.STEP_NAME,'大数据办审批',c.RESULT,null)) CRA_RESULT,
+        max(decode(c.STEP_NAME,'大数据办审批',to_char(c.CREATE_TIME,'yyyy-mm-dd hh24:mi:ss'),null)) BIGDATA_TIME
+        from TB_IAAS_ZYSB a
+        join total b on a.ID = b.MASTER_ID
+        join TB_APP_REVIEW_INFO c on a.ID = c.APP_INFO_ID
+        join TB_USER d on c.CREATOR = d.IDCARD
+        group by a.ORDER_NUMBER,a.CREATOR_NAME,a.CREATOR_UNIT,b.MASTER_ID,b.pro1,b.pro2,b.pro3,b.pro4,b.pro5,b.pro6,c.STEP_NAME,a.AREAS,a.POLICE_CATEGORY
+        ),tt as(
+        select t1.ORDER_NUMBER,t1.CREATOR_NAME,t1.ORG_NAME,t1.MASTER_ID,t1.pro1,t1.pro2,t1.pro3,t1.pro4,t1.pro5,t1.pro6,t1.AREAS,t1.POLICE_CATEGORY,
+        decode(max(nvl(t1.CRA_RESULT,'0')),'1','完成',decode(max(t1.STEP_NAME),'0','本单位审批','1','服务台复核','2','大数据办审批')) STEP_NAME,
+        MAX(t1.RECHECK_PERSON) RECHECK_PERSON,MAX(t1.RECHECK_TIME) RECHECK_TIME,MAX(t1.RECHECK_RESULT) RECHECK_RESULT,MAX(t1.RECHECK_OPNION) RECHECK_OPNION,MAX(t1.BIGDATA_TIME) BIGDATA_TIME
+        from count t1
+        GROUP BY t1.ORDER_NUMBER,t1.CREATOR_NAME,t1.ORG_NAME,t1.MASTER_ID,t1.pro1,t1.pro2,t1.pro3,t1.pro4,t1.pro5,t1.pro6,t1.AREAS,t1.POLICE_CATEGORY
+        ORDER BY t1.ORDER_NUMBER
+        )
+        select rownum ID,tt.* from tt
+        where 1=1
+        <if test="areas != null and areas != ''">
+            and AREAS = #{areas}
+        </if>
+        <if test="policeCategory != null and policeCategory != ''">
+            AND POLICE_CATEGORY = #{policeCategory}
+        </if>
+        <if test="p.submitStartDate != null and p.submitEndDate != null">
+            and (RECHECK_TIME BETWEEN #{p.submitStartDate}||'00:00:00' AND #{p.submitEndDate}||'23:59:59')
+        </if>
+        <if test="p.bigdataStartDate != null and p.bigdataEndDate != null">
+            and (BIGDATA_TIME BETWEEN #{p.bigdataStartDate}||'00:00:00' AND #{p.bigdataEndDate}||'23:59:59')
+        </if>
+        ORDER BY ORDER_NUMBER,decode (STEP_NAME,'本单位审批',0,'服务台复核',1,'大数据办审批',2,'完成',3,4)
+    </select>
+    <select id="getIPDApplicationInfoOrderList" resultType="com.upd.hwcloud.bean.vo.applicationInfoOrder.IPDVo">
+        SELECT ROWNUM AS num,T.*,B.HANDLETIME AS bigDataAuditTime,C.HANDLETIME AS businessHandlingTime
+        FROM(
+        SELECT DISTINCT A.ID,A .ORDER_NUMBER,A .CREATOR_NAME,A.CREATOR_PHONE,DECODE(A.RESOURCE_TYPE,'1','IAAS','2','DAAS','3','PAAS') SERVICE_TYPE,A .SERVICE_TYPE_NAME,A .CREATOR_UNIT ORG_NAME,A .PROJECT_NAME,A .APP_NAME,A .APPLICATION_TIME,A.AREA_NAME,A.POLICE_CATEGORY,A.CJ_UNIT,A.CJ_PRINCIPAL,A.CJ_PRINCIPAL_PHONE
+        FROM
+        TB_APPLICATION_INFO A,
+        TB_WFM_ACTIVITY ACT,
+        TB_WFM_INSTANCE INS,
+        TB_WFM_WORKFLOWMODEL M
+        WHERE
+        A.STATUS NOT IN (-1,0,4)
+        AND A.RESOURCE_TYPE IN(1,2,3)
+        AND A.ID = INS.BUSINESSID
+        AND ACT.INSTANCEID = INS.ID
+        AND M.ID = ACT.MODELID
+        ORDER BY A .ORDER_NUMBER DESC
+        ) T
+        LEFT JOIN
+        (SELECT AI."ID",WA.HANDLETIME
+        FROM TB_APPLICATION_INFO AI,TB_WFM_INSTANCE WI,TB_WFM_WORKFLOWMODEL WW,TB_WFM_ACTIVITY WA
+        WHERE AI."ID" = WI.BUSINESSID AND WA.INSTANCEID = WI. ID AND WW.ID = WA.MODELID AND WA.ACTIVITYSTATUS = '已提交' AND WW.MODELNAME = '大数据办审批') B
+        ON T."ID" = B."ID"
+        LEFT JOIN
+        (SELECT AI."ID",WA.HANDLETIME
+        FROM TB_APPLICATION_INFO AI,TB_WFM_INSTANCE WI,TB_WFM_ACTIVITY WA,TB_WFM_WORKFLOWMODEL WW
+        WHERE AI."ID" = WI.BUSINESSID AND WA.INSTANCEID = WI. ID AND WW. ID = WA.MODELID AND WA.ACTIVITYSTATUS = '已提交' AND WW.MODELNAME = '业务办理') C
+        ON T."ID" = C."ID"
+        WHERE
+        1=1
+        <if test="areas != null and areas != ''">
+            AND T.AREA_NAME = #{areas}
+        </if>
+        <if test="policeCategory != null and policeCategory != ''">
+            AND T.POLICE_CATEGORY = #{policeCategory}
+        </if>
+        <if test="(submitStartDate!= null and submitStartDate != '') and (submitEndDate != null and submitEndDate != '')">
+            AND TO_CHAR(T.APPLICATION_TIME,'YYYY-MM-DD') &gt;= #{submitStartDate}
+            AND TO_CHAR(T.APPLICATION_TIME,'YYYY-MM-DD') &lt;= #{submitEndDate}
+        </if>
+        <if test="(bigdataStartDate!= null and bigdataStartDate != '') and (bigdataEndDate != null and bigdataEndDate != '')">
+            AND TO_CHAR(B.HANDLETIME,'YYYY-MM-DD') &gt;= #{bigdataStartDate}
+            AND TO_CHAR(B.HANDLETIME,'YYYY-MM-DD') &lt;= #{bigdataEndDate}
+        </if>
+        <if test="(carryStartDate!= null and carryStartDate != '') and (carryEndDate != null and carryEndDate != '')">
+            AND TO_CHAR(C.HANDLETIME,'YYYY-MM-DD') &gt;= #{carryStartDate}
+            AND TO_CHAR(C.HANDLETIME,'YYYY-MM-DD') &lt;= #{carryEndDate}
+        </if>
+    </select>
+    <select id="getCurrentNodeById" resultType="java.lang.String">
+        SELECT * FROM
+        (SELECT M.MODELNAME
+        FROM TB_WFM_ACTIVITY C
+        LEFT JOIN TB_WFM_WORKFLOWMODEL M ON M.ID = C.MODELID
+        LEFT JOIN TB_WFM_INSTANCE I ON I.ID = C.INSTANCEID
+        WHERE I.BUSINESSID = #{id}
+        ORDER BY C.CREATETIME DESC) WHERE ROWNUM = 1
+    </select>
+
+    <select id="getTenantUsePaasResource" resultType="com.upd.hwcloud.bean.dto.GeneralDTO">
+        select DISTINCT  paas.NAME name,paas.SHORT_NAME shortName,paas.ID id,paas.DESCRIPTION description,paas.URL general from TB_APPLICATION_INFO info,TB_PAAS paas
+        where info.STATUS = 3 and info.SERVICE_TYPE_ID = paas.ID
+        <if test="p.queryVO.policeCategory !=null and p.queryVO.policeCategory !=''">
+            and info.POLICE_CATEGORY like #{p.queryVO.policeCategory}
+            and (info.AREA_NAME = '省厅' or info.AREA_NAME is null)
+        </if>
+        <if test="p.queryVO.area !=null and p.queryVO.area != ''">
+            and info.AREA_NAME = #{p.queryVO.area}
+            and info.AREA_NAME != '省厅'
+        </if>
+        <if test="p.queryVO.serviceName !=null and p.queryVO.serviceName !=''">
+            and paas.NAME like #{p.queryVO.serviceName}
+        </if>
+        <if test="p.queryVO.category!=null and p.queryVO.category!=''">
+            and  paas.SUB_TYPE = #{p.queryVO.category}
+        </if>
+        <if test="p.queryVO.creator !=null and p.queryVO.creator !=''">
+            and info.CREATOR = #{p.queryVO.creator}
+        </if>
+    </select>
+
+    <select id="getTenantUseIaasResourceInfo" resultType="com.upd.hwcloud.bean.entity.application.ApplicationInfo">
+        select ID ,SERVICE_TYPE_ID ,ORDER_NUMBER,SERVICE_TYPE_NAME,FORM_NUM from  TB_APPLICATION_INFO where
+        RESOURCE_TYPE = 1 and STATUS = 3 and FORM_NUM != 'IAAS_TXYFWBG' and FORM_NUM !='IAAS_TXYFWXG' and FORM_NUM != 'IAAS_DEFAULT'
+        <if test="p.queryVO.policeCategory !=null and p.queryVO.policeCategory !=''">
+           and  (AREA_NAME = '省厅' or AREA_NAME is null)
+           and POLICE_CATEGORY like #{p.queryVO.policeCategory}
+
+        </if>
+        <if test="p.queryVO.area !=null and p.queryVO.area !=''">
+            and AREA_NAME = #{p.queryVO.area}
+            and AREA_NAME != '省厅'
+        </if>
+        <if test="p.queryVO.creator !=null and p.queryVO.creator !=''">
+            and CREATOR = #{p.queryVO.creator}
+        </if>
+
+    </select>
+    <select id="getTenantUseIaasType" resultType="com.upd.hwcloud.bean.dto.GeneralDTO">
+        select SERVICE_TYPE_ID id ,SERVICE_TYPE_NAME name from  TB_APPLICATION_INFO where
+        RESOURCE_TYPE = 1 and STATUS = 3 and FORM_NUM != 'IAAS_TXYFWBG' and FORM_NUM !='IAAS_TXYFWXG' and FORM_NUM != 'IAAS_DEFAULT'
+        <if test="p.queryVO.policeCategory !=null and p.queryVO.policeCategory !=''">
+            and  (AREA_NAME = '省厅' or AREA_NAME is null)
+            and POLICE_CATEGORY like #{p.queryVO.policeCategory}
+
+        </if>
+        <if test="p.queryVO.area !=null and p.queryVO.area !=''">
+            and AREA_NAME = #{p.queryVO.area}
+            and AREA_NAME != '省厅'
+        </if>
+        <if test="p.queryVO.creator !=null and p.queryVO.creator !=''">
+            and CREATOR = #{p.queryVO.creator}
+        </if>
+
+    </select>
+
+    <!--通过门户订单查询-->
+    <select id="serviceOfSaas" resultType="com.upd.hwcloud.bean.dto.GeneralDTO">
+        select DISTINCT info.APP_NAME,info.SERVICE_TYPE_ID id,info.SERVICE_TYPE_NAME name from TB_APPLICATION_INFO info
+        LEFT JOIN  TB_SAAS s ON s.NAME = info.APP_NAME
+        where info.status = 3 and info.RESOURCE_TYPE = #{type}  and s.NAME is not null and s.status = 2 and s.NAME = #{name}
+    </select>
+
+    <select id="daasServiceOfSaasStatistics" resultType="com.upd.hwcloud.bean.vo.workbench.SaasLvThree">
+        select distinct r.*,b.NAME SERVICE_NAME,b.PROVIDER   from
+        (select  a.APP_NAME,a.PRODUCT_FAMILY_ID,a.PRODUCT_FAMILY_NAME,sum(REQ_COUNT) req,sum(a.REQ_COUNT_4XX) + sum(a.REQ_COUNT_5XX) abnormal, ROUND((sum(a.REQ_COUNT_4XX) + sum(a.REQ_COUNT_5XX))/sum(a.REQ_COUNT),4) abnormalRate,ROUND(avg(a.AVG_LATENCY),2) delay
+        from  TB_APP_STATISTICS a where a.APP_NAME = #{name}  and a.CATA_LOG = 7
+        group by a.APP_NAME,a.PRODUCT_FAMILY_ID,a.PRODUCT_FAMILY_NAME)  r
+        LEFT JOIN  TB_BIGDATA b ON  r.PRODUCT_FAMILY_ID = b.APIPRODUCT_ID
+        where b.NAME is not null
+    </select>
+
+    <select id="paasServiceOfSaasStatistics" resultType="com.upd.hwcloud.bean.vo.workbench.SaasLvThree">
+        select distinct r.*,b.NAME SERVICE_NAME,b.PROVIDER,p.ID from
+        (select  a.APP_NAME,a.PRODUCT_FAMILY_ID,a.PRODUCT_FAMILY_NAME,sum(REQ_COUNT) req,sum(a.REQ_COUNT_4XX) + sum(a.REQ_COUNT_5XX) abnormal, ROUND((sum(a.REQ_COUNT_4XX) + sum(a.REQ_COUNT_5XX))/sum(a.REQ_COUNT),4) abnormalRate,ROUND(avg(a.AVG_LATENCY),2) delay
+        from  TB_APP_STATISTICS a where a.APP_NAME = #{name} and a.CATA_LOG IN (8,9,10)
+        group by a.APP_NAME,a.PRODUCT_FAMILY_ID,a.PRODUCT_FAMILY_NAME)  r
+        LEFT JOIN  TB_BIGDATA b ON  r.PRODUCT_FAMILY_ID = b.APIPRODUCT_ID
+        LEFT JOIN TB_PAAS p ON  b.NAME  = p.NAME
+        where b.NAME is not null
+    </select>
+    
+    <select id="getDaasResourcePage" resultType="com.upd.hwcloud.bean.vo.workbench.ResourceOverviewVO">
+        select da.SERVICE_NAME,da.SERVICE_ID,sa.id as APP_ID,info.ID as INFO_ID,info.APP_NAME,info.CREATOR_NAME,info.CREATOR_UNIT,info.CREATE_TIME,info.ORDER_NUMBER,sum(s.REQ_COUNT) as COUNT
+        from TB_APPLICATION_INFO info
+        Left join TB_DAAS_APPLICATION da ON info.id = da.APP_INFO_ID
+        Left join TB_SAAS sa ON sa.NAME = info.APP_NAME
+        Left join TB_BIGDATA b ON b.APIG_GUID = da.SERVICE_ID
+        Left join TB_APP_STATISTICS s ON s.PRODUCT_FAMILY_ID = b.APIPRODUCT_ID and s.APP_NAME = info.APP_NAME
+        where info.STATUS = 3 and info.RESOURCE_TYPE = 2
+        <if test="p.queryVO.policeCategory !=null and p.queryVO.policeCategory !=''">
+            and  (info.AREA_NAME = '省厅' or info.AREA_NAME is null)
+            and  info.POLICE_CATEGORY like #{p.queryVO.policeCategory}
+        </if>
+        <if test="p.queryVO.area !=null and p.queryVO.area !=''">
+            and info.AREA_NAME = #{p.queryVO.area}
+        </if>
+        <if test="p.queryVO.creator !=null and p.queryVO.creator !=''">
+            and info.CREATOR = #{p.queryVO.creator}
+        </if>
+        <if test="p.queryVO.serviceName !=null and p.queryVO.serviceName !=''">
+            and da.SERVICE_NAME like #{p.queryVO.serviceName}
+        </if>
+        <if test="p.queryVO.keyWord !=null and p.queryVO.keyWord !=''">
+            and info.APP_NAME like #{p.queryVO.keyWord}
+        </if>
+        GROUP BY da.SERVICE_NAME,da.SERVICE_ID,sa.id,info.ID,info.APP_NAME,info.CREATOR_NAME,info.CREATOR_UNIT,info.CREATE_TIME,info.ORDER_NUMBER
+    </select>
+    
+    <select id="getDaasResourceOverview" resultType="java.util.HashMap">
+        SELECT count(DISTINCT SERVICE_NAME) num,count(DISTINCT APP_NAME) APPNUM,sum(count) sumCount from
+        (select da.SERVICE_NAME,da.SERVICE_ID,sa.id as APP_ID,info.ID as INFO_ID,info.APP_NAME,info.CREATOR_NAME,info.CREATOR_UNIT,info.CREATE_TIME,info.ORDER_NUMBER,sum(s.REQ_COUNT) as COUNT
+        from TB_APPLICATION_INFO info
+        Left join TB_DAAS_APPLICATION da ON info.id = da.APP_INFO_ID
+        Left join TB_SAAS sa ON sa.NAME = info.APP_NAME
+        Left join TB_BIGDATA b ON b.APIG_GUID = da.SERVICE_ID
+        Left join TB_APP_STATISTICS s ON s.PRODUCT_FAMILY_ID = b.APIPRODUCT_ID and s.APP_NAME = info.APP_NAME
+        where info.STATUS = 3 and info.RESOURCE_TYPE = 2 and sa.STATUS = 2
+        <if test="p.queryVO.policeCategory !=null and p.queryVO.policeCategory !=''">
+            and  (info.AREA_NAME = '省厅' or info.AREA_NAME is null)
+            and  info.POLICE_CATEGORY like #{p.queryVO.policeCategory}
+        </if>
+        <if test="p.queryVO.area !=null and p.queryVO.area !=''">
+            and info.AREA_NAME = #{p.queryVO.area}
+        </if>
+        <if test="p.queryVO.creator !=null and p.queryVO.creator !=''">
+            and info.CREATOR = #{p.queryVO.creator}
+        </if>
+        GROUP BY da.SERVICE_NAME,da.SERVICE_ID,sa.id,info.ID,info.APP_NAME,info.CREATOR_NAME,info.CREATOR_UNIT,info.CREATE_TIME,info.ORDER_NUMBER)
+    </select>
+
+    <select id="getPaasResourcePage" resultType="com.upd.hwcloud.bean.vo.workbench.ResourceOverviewVO">
+        select info.SERVICE_TYPE_NAME as serviceName,info.SERVICE_TYPE_ID as serviceId,sa.id as appId,info.ID as infoId,info.APP_NAME,info.CREATOR_NAME,info.CREATOR_UNIT,info.CREATE_TIME,info.ORDER_NUMBER,sum(s.REQ_COUNT) as COUNT
+        from TB_APPLICATION_INFO info
+        Left join TB_PAAS p ON p.id = info.SERVICE_TYPE_ID
+        Left join TB_BIGDATA b ON p.SERVICE_GUID = b.APIG_GUID
+        Left join TB_SAAS sa ON sa.NAME = info.APP_NAME
+        Left join TB_APP_STATISTICS s ON s.PRODUCT_FAMILY_ID = b.APIPRODUCT_ID and s.APP_NAME = info.APP_NAME
+        where info.STATUS = 3 and info.RESOURCE_TYPE = 3 and sa.STATUS = 2
+        <if test="p.queryVO.policeCategory !=null and p.queryVO.policeCategory !=''">
+            and  (info.AREA_NAME = '省厅' or info.AREA_NAME is null)
+            and  info.POLICE_CATEGORY like #{p.queryVO.policeCategory}
+        </if>
+        <if test="p.queryVO.area !=null and p.queryVO.area !=''">
+            and info.AREA_NAME = #{p.queryVO.area}
+        </if>
+        <if test="p.queryVO.creator !=null and p.queryVO.creator !=''">
+            and info.CREATOR = #{p.queryVO.creator}
+        </if>
+        <if test="p.queryVO.serviceName !=null and p.queryVO.serviceName !=''">
+            and info.SERVICE_TYPE_NAME like #{p.queryVO.serviceName}
+        </if>
+        <if test="p.queryVO.keyWord !=null and p.queryVO.keyWord !=''">
+            and info.APP_NAME like #{p.queryVO.keyWord}
+        </if>
+        GROUP BY info.SERVICE_TYPE_NAME,info.SERVICE_TYPE_ID,sa.id,info.ID,info.APP_NAME,info.CREATOR_NAME,info.CREATOR_UNIT,info.CREATE_TIME,info.ORDER_NUMBER
+    </select>
+
+    <select id="getPaasResourceOverview" resultType="java.util.HashMap">
+        SELECT  count(DISTINCT serviceName) num,sum(COUNT) sumCount from
+        (select info.SERVICE_TYPE_NAME as serviceName,info.SERVICE_TYPE_ID as serviceId,sa.id as appId,info.ID as infoId,info.APP_NAME,info.CREATOR_NAME,info.CREATOR_UNIT,info.CREATE_TIME,info.ORDER_NUMBER,sum(s.REQ_COUNT) as COUNT
+        from TB_APPLICATION_INFO info
+        Left join TB_PAAS p ON p.id = info.SERVICE_TYPE_ID
+        Left join TB_BIGDATA b ON p.SERVICE_GUID = b.APIG_GUID
+        Left join TB_SAAS sa ON sa.NAME = info.APP_NAME
+        Left join TB_APP_STATISTICS s ON s.PRODUCT_FAMILY_ID = b.APIPRODUCT_ID and s.APP_NAME = info.APP_NAME
+        where info.STATUS = 3 and info.RESOURCE_TYPE = 3
+        <if test="p.queryVO.policeCategory !=null and p.queryVO.policeCategory !=''">
+            and  (info.AREA_NAME = '省厅' or info.AREA_NAME is null)
+            and  info.POLICE_CATEGORY like #{p.queryVO.policeCategory}
+        </if>
+        <if test="p.queryVO.area !=null and p.queryVO.area !=''">
+            and info.AREA_NAME = #{p.queryVO.area}
+        </if>
+        <if test="p.queryVO.creator !=null and p.queryVO.creator !=''">
+            and info.CREATOR = #{p.queryVO.creator}
+        </if>
+        GROUP BY info.SERVICE_TYPE_NAME,info.SERVICE_TYPE_ID,sa.id,info.ID,info.APP_NAME,info.CREATOR_NAME,info.CREATOR_UNIT,info.CREATE_TIME,info.ORDER_NUMBER)
+    </select>
+
+    <select id="getNcovUsedEcsList" resultType="com.upd.hwcloud.bean.entity.application.ApplicationInfo">
+        SELECT *  from TB_APPLICATION_INFO
+        where
+        TO_CHAR(CREATE_TIME,'YYYY-MM-DD') &gt;= #{startTime}
+        and STATUS = 3
+        and RESOURCE_TYPE = 1
+        and FORM_NUM = 'IAAS_TXYFW'
+    </select>
+
+    <select id="getNcovIaasVoList" resultType="com.upd.hwcloud.bean.vo.ncov.NcovIaasVo">
+        select info.APP_NAME,count(info.APP_NAME) ecsNum,sum(substr(impl.SPECIFICATION,0,instr(impl.SPECIFICATION,'/',1,1)-1)) cpuNum,
+        sum(substr(impl.SPECIFICATION,instr(impl.SPECIFICATION,'/',1,1)+1,length(impl.SPECIFICATION))) memoryNum,
+        sum(impl.STORAGE) storageNum
+        from TB_APPLICATION_INFO info
+        Left join TB_IAAS_TXYFW_IMPL impl
+        ON info.id  = impl.APP_INFO_ID
+        where TO_CHAR(info.CREATE_TIME,'YYYY-MM-DD') &gt;=#{startTime}
+        and info.STATUS = 3
+        and info.RESOURCE_TYPE = 1
+        and info.FORM_NUM = 'IAAS_TXYFW'
+        GROUP BY info.APP_NAME
+    </select>
+
+    <select id="allCloudId" resultType="com.upd.hwcloud.bean.dto.cov.CloudIdAndUseType">
+        SELECT info.ID,utype.USE_TYPE useType FROM TB_APPLICATION_INFO info INNER JOIN TB_IAAS_YZMYZY utype ON info.ID = utype.APP_INFO_ID WHERE info.SERVICE_TYPE_NAME = 'FusionAccess（桌面云）' AND info.STATUS = 3 AND info.AREA_NAME IS NOT NULL AND info.CREATE_TIME >= to_date('2019-9-24 00:00:00','yyyy-mm-dd hh24:mi:ss')
+    </select>
+
+    <select id="policeNum" resultType="int">
+        SELECT COUNT(DISTINCT POLICE_CATEGORY) FROM TB_APPLICATION_INFO WHERE SERVICE_TYPE_NAME = 'FusionAccess（桌面云）' AND STATUS = 3 AND AREA_NAME = '省厅' AND CREATE_TIME >= to_date(#{startTime},'yyyy-mm-dd hh24:mi:ss')
+    </select>
+
+    <select id="areaNum" resultType="int">
+        SELECT COUNT(DISTINCT AREA_NAME) FROM TB_APPLICATION_INFO WHERE SERVICE_TYPE_NAME = 'FusionAccess（桌面云）' AND STATUS = 3 AND AREA_NAME != '省厅'AND CREATE_TIME >= to_date(#{startTime},'yyyy-mm-dd hh24:mi:ss')
+    </select>
+
+    <select id="cloudDeskByArea" resultType="com.upd.hwcloud.bean.dto.cov.CloudDeskNumByAreaOrPolice">
+        SELECT AREA_NAME name,COUNT(*) count FROM TB_APPLICATION_INFO WHERE SERVICE_TYPE_NAME = 'FusionAccess（桌面云）' AND STATUS = 3 AND AREA_NAME != '省厅' AND CREATE_TIME >= to_date(#{startTime},'yyyy-mm-dd hh24:mi:ss') GROUP BY AREA_NAME
+    </select>
+
+    <select id="idAndUnit" resultType="com.upd.hwcloud.bean.dto.cov.CloudDeskIdAndUnit">
+        SELECT info.ID,info.CREATOR_UNIT unit,utype.USE_TYPE useType FROM TB_APPLICATION_INFO info INNER JOIN TB_IAAS_YZMYZY utype ON info.ID = utype.APP_INFO_ID WHERE info.SERVICE_TYPE_NAME = 'FusionAccess（桌面云）' AND info.STATUS = 3 AND info.AREA_NAME IS NOT NULL AND info.CREATE_TIME >= to_date('2019-9-24 00:00:00','yyyy-mm-dd hh24:mi:ss') ORDER BY CREATOR_UNIT
+    </select>
+
+    <select id="cloudDeskByPolice" resultType="com.upd.hwcloud.bean.dto.cov.CloudDeskNumByAreaOrPolice">
+        SELECT POLICE_CATEGORY name,COUNT(*) count FROM TB_APPLICATION_INFO WHERE SERVICE_TYPE_NAME = 'FusionAccess（桌面云）' AND STATUS = 3 AND AREA_NAME = '省厅' AND CREATE_TIME >= to_date(#{startTime},'yyyy-mm-dd hh24:mi:ss') GROUP BY POLICE_CATEGORY
+    </select>
+</mapper>

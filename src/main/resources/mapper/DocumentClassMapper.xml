@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.document.DocumentClassMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.document.DocumentClass">
+        <id column="ID" property="id" />
+        <result column="NAME" property="name" />
+        <result column="SORT_NUM" property="sortNum" />
+        <result column="CREATE_TIME" property="createTime" />
+        <result column="MODIFIED_TIME" property="modifiedTime" />
+        <result column="CREATOR" property="creator" />
+        <result column="CLASS_NUM" property="classNum" />
+        <result column="REMARK" property="remark" />
+        <result column="TYPE" property="type" />
+        <result column="IMAGE" property="image" />
+        <result column="PARENT_ID" property="parentId" />
+    </resultMap>
+
+    <select id="getPage" resultType="com.upd.hwcloud.bean.entity.document.DocumentClass">
+        SELECT D.*,C.NAME AS PARENT_NAME FROM TB_DOCUMENT_CLASS D
+        LEFT JOIN TB_DOCUMENT_CLASS C ON D.PARENT_ID = C.ID
+        <where>
+            <if test="type != null and type != ''">
+                AND D.TYPE = #{type}
+            </if>
+            <if test="name != null and name != ''">
+                AND (
+                    D.NAME like CONCAT(CONCAT('%',#{name}),'%')
+                    OR C.NAME like CONCAT(CONCAT('%',#{name}),'%')
+                )
+            </if>
+            <if test="user.type != 100">
+                AND D.CREATOR = #{user.idcard}
+            </if>
+        </where>
+        ORDER BY D.SORT_NUM ASC, D.MODIFIED_TIME DESC
+    </select>
+
+</mapper>

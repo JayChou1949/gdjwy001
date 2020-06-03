@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.AssetMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.Asset">
+        <id column="ID" property="id" />
+        <result column="CREATE_TIME" property="createTime" />
+        <result column="MODIFIED_TIME" property="modifiedTime" />
+        <result column="CREATOR" property="creator" />
+        <result column="CONTRACT_NO" property="contractNo" />
+        <result column="TIME" property="time" />
+        <result column="VENDER" property="vender" />
+        <result column="DEVICE_NAME" property="deviceName" />
+        <result column="AMOUNT" property="amount" />
+        <result column="MODEL_NUMBER" property="modelNumber" />
+        <result column="CONFIG" property="config" />
+        <result column="LOCATION" property="location" />
+        <result column="COMPUTER_ROOM" property="computerRoom" />
+        <result column="CABINET" property="cabinet" />
+        <result column="FRAME" property="frame" />
+        <result column="REMARK" property="remark" />
+        <result column="PRODUCT_LINE" property="productLine" />
+        <result column="DEVICE_TYPE" property="deviceType" />
+        <result column="PRODUCT_TYPE" property="productType" />
+        <result column="BOQ_NO" property="boqNo" />
+        <result column="TOTAL" property="total" />
+        <result column="SOFTWARE_NAME" property="softwareName" />
+    </resultMap>
+
+    <select id="getPage" resultType="com.upd.hwcloud.bean.entity.Asset">
+        SELECT * FROM TB_ASSET
+        <where>
+            <if test="contractNo != null and contractNo != ''">
+                AND CONTRACT_NO = #{contractNo}
+            </if>
+            <if test="vender != null and vender != ''">
+                AND VENDER LIKE CONCAT(CONCAT('%',#{vender}),'%')
+            </if>
+            <if test="startTime != null and startTime != ''">
+                AND TIME &gt;= to_date(#{startTime}, 'YYYY-MM-DD HH24:MI:SS')
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND TIME &lt;= to_date(#{endTime}, 'YYYY-MM-DD HH24:MI:SS')
+            </if>
+        </where>
+    </select>
+
+    <select id="getByVender" resultType="com.upd.hwcloud.bean.dto.ByVender">
+        SELECT SUM(AMOUNT) AS sum,VENDER FROM TB_ASSET
+        GROUP BY VENDER
+    </select>
+
+    <select id="getByMonth" resultType="com.upd.hwcloud.bean.dto.ByMonth">
+        select SUM(AMOUNT) AS sum,TO_CHAR(TIME,'yyyy-mm') AS month from TB_ASSET
+        WHERE TIME between  ADD_MONTHS (sysdate, -6) and SYSDATE
+        GROUP BY TO_CHAR(TIME,'yyyy-mm')
+        ORDER BY TO_CHAR(TIME,'yyyy-mm')
+    </select>
+</mapper>

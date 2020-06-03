@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.UserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.User">
+        <id column="ID" property="id" />
+        <result column="USER_TYPE" property="userType" />
+        <result column="NAME" property="name" />
+        <result column="IDCARD" property="idcard" />
+        <result column="NATION" property="nation" />
+        <result column="SEX" property="sex" />
+        <result column="PHOTO" property="photo" />
+        <result column="ORG_ID" property="orgId" />
+        <result column="ORG_NAME" property="orgName" />
+        <result column="ADDRESS" property="address" />
+        <result column="SORT_NO" property="sortNo" />
+        <result column="MAN_TYPE" property="manType" />
+        <result column="RANK" property="rank" />
+        <result column="TITLE" property="title" />
+        <result column="POLICE_ID" property="policeId" />
+        <result column="POLICE_NAME" property="policeName" />
+        <result column="COMPANY" property="company" />
+        <result column="COMPANY_PERSON" property="companyPerson" />
+        <result column="PERSON_MOBILE" property="personMobile" />
+        <result column="PROJECT" property="project" />
+        <result column="DELETED" property="deleted" />
+        <result column="POLICE_CATEGORY" property="policeCategory" />
+        <result column="POLICE_NUMBER" property="policeNumber" />
+        <result column="MOBILE_WORK" property="mobileWork" />
+        <result column="PHONE" property="phone" />
+        <result column="QQ_ACCOUNT" property="qqAccount" />
+        <result column="EMAIL" property="email" />
+        <result column="WX_ACCOUNT" property="wxAccount" />
+        <result column="BIRTH_STR" property="birthStr" />
+        <result column="CREATE_TIME_STR" property="createTimeStr" />
+        <result column="AUXILIARY_TYPE" property="auxiliaryType" />
+        <result column="JOB_TYPE" property="jobType" />
+        <result column="POST_TYPE" property="postType" />
+        <result column="IS_PARENT_ORG" property="isParentOrg" />
+        <result column="TYPE" property="type" />
+        <result column="NOTIFY_TYPE" property="notifyType" />
+        <result column="ROLE_NAME" property="roleName" />
+        <result column="COMPANY_NAME" property="companyName" />
+        <result column="POLICE_CATEGORY_NAME" property="policeCategoryName" />
+        <result column="TENANT_AREA" property="tenantArea" />
+        <result column="TENANT_POLICE_CATEGORY" property="tenantPoliceCategory" />
+        <result column="DEFAULT_TENANT" property="defaultTenant" />
+        <result column="BELONGNAME" property="belongName" />
+        <result column="TOTAL" property="total" />
+        <result column="USER_NUMBER" property="deleteTime" />
+        <result column="GOV_CODE" property="govCode" />
+        <result column="DELETE_TIME" property="deleteTime" />
+        <result column="NATIONAL_PROJECT" property="nationalProject"/>
+
+    </resultMap>
+
+
+    <select id="getPage" resultMap="BaseResultMap">
+        SELECT
+          u.*,
+          (SELECT wm_concat(r.NAME) FROM SYS_ROLE r, S_USER_ROLE ur WHERE r.ID = ur.ROLE_ID AND ur.USER_ID = u.IDCARD) ROLE_NAME,
+          (SELECT MANUFACTURER_NAME FROM TB_MANUFACTURERS m WHERE m.ID = u.COMPANY) COMPANY_NAME
+          FROM TB_USER u
+          <where>
+              AND u.DELETED = '0'
+              <if test="type != null">
+                  AND u.TYPE = #{type}
+              </if>
+              <if test="name != null and name != ''">
+                  AND
+                  (
+                    u.NAME LIKE CONCAT(CONCAT('%',#{name}),'%')
+                    OR u.IDCARD LIKE CONCAT(CONCAT('%',#{name}),'%')
+                    OR u.ORG_NAME LIKE CONCAT(CONCAT('%',#{name}),'%')
+                    OR u.COMPANY LIKE CONCAT(CONCAT('%',#{name}),'%')
+                  )
+              </if>
+          </where>
+    </select>
+
+    <select id="findUserByIdcard" resultType="com.upd.hwcloud.bean.entity.User">
+        SELECT * FROM TB_USER WHERE IDCARD = #{idcard}
+    </select>
+
+    <select id="getUserListByStepId" resultType="com.upd.hwcloud.bean.entity.User">
+        SELECT
+          *
+        FROM
+         TB_USER u
+        WHERE
+          EXISTS(SELECT 1 FROM TB_FLOW_STEP_USER su WHERE su.STEP_ID = #{stepId} AND u.IDCARD = su.USER_ID)
+    </select>
+
+    <select id="getRoleIdsByUserId" resultType="java.lang.String">
+        SELECT
+          ROLE_ID
+        FROM S_USER_ROLE
+        WHERE
+          USER_ID = #{idcard}
+    </select>
+
+    <!-- 根据用户ID查询相应权限 -->
+    <select id="findPermissionsByUserId"  resultType="java.lang.String">
+        SELECT
+        DISTINCT p.DESCRIPTION
+        FROM s_permission p
+        LEFT JOIN s_role_permission rp ON rp.pid=p.id
+        LEFT JOIN s_user_role ur ON ur.role_id=rp.rid
+        where
+        ur.user_id=#{uid}
+        AND p.DESCRIPTION IS NOT NULL
+    </select>
+    <!-- 根据用户名查询相应角色 -->
+    <select id="findRolesByUserId" resultType="java.lang.String">
+        SELECT r.name FROM s_user_role ur,sys_role  r
+        WHERE ur.user_id = #{uid}
+        AND ur.role_id = r.id
+    </select>
+
+    <select id="findUserByManufacturerId" resultType="com.upd.hwcloud.bean.entity.User">
+        select u.* from TB_USER u
+        where u.USER_TYPE = 30 and u.DELETED = '0' and u.COMPANY = #{manufacturerId}
+        order by SORT_NO asc
+    </select>
+
+
+    <select id="search" resultType="com.upd.hwcloud.bean.entity.User">
+        select u.*,(SELECT MANUFACTURER_NAME FROM TB_MANUFACTURERS m WHERE m.ID = u.COMPANY) COMPANY_NAME
+        from TB_USER u
+        where u.DELETED = '0' and u.NAME like CONCAT(CONCAT('%',#{name}),'%')
+        <if test="orgId != null and orgId != ''">
+            and (
+              (u.USER_TYPE != 30 and u.ORG_ID = #{orgId})
+              or
+              (u.USER_TYPE = 30 and u.COMPANY = #{orgId})
+            )
+        </if>
+    </select>
+
+    <select id="findUserByUserType" resultMap="BaseResultMap">
+        SELECT
+        u.*,
+        (SELECT wm_concat(r.NAME) FROM SYS_ROLE r, S_USER_ROLE ur WHERE r.ID = ur.ROLE_ID AND ur.USER_ID = u.IDCARD) ROLE_NAME,
+        (SELECT MANUFACTURER_NAME FROM TB_MANUFACTURERS m WHERE m.ID = u.COMPANY) COMPANY_NAME
+        FROM TB_USER u
+        <where>
+            AND u.DELETED = '0'
+            <if test="type != null">
+                AND u.TYPE = #{type}
+            </if>
+            <if test="name != null and name != ''">
+                AND
+                (
+                u.NAME LIKE CONCAT(CONCAT('%',#{name}),'%')
+                OR u.IDCARD LIKE CONCAT(CONCAT('%',#{name}),'%')
+                OR u.ORG_NAME LIKE CONCAT(CONCAT('%',#{name}),'%')
+                OR u.COMPANY LIKE CONCAT(CONCAT('%',#{name}),'%')
+                )
+            </if>
+        </where>
+    </select>
+
+</mapper>

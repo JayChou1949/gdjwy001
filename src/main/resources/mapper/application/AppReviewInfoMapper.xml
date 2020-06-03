@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.application.AppReviewInfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.application.AppReviewInfo">
+        <id column="ID" property="id" />
+        <result column="CREATOR" property="creator" />
+        <result column="CREATE_TIME" property="createTime" />
+        <result column="MODIFIED_TIME" property="modifiedTime" />
+        <result column="RESULT" property="result" />
+        <result column="REMARK" property="remark" />
+        <result column="STEP_NAME" property="stepName" />
+        <result column="APP_INFO_ID" property="appInfoId" />
+        <result column="R_TYPE" property="rType" />
+        <result column="FLOW_STEP_ID" property="flowStepId" />
+        <association property="user" column="CREATOR" select="com.upd.hwcloud.dao.UserMapper.findUserByIdcard" />
+    </resultMap>
+
+    <select id="getLastPassReviewInfoByAppInfoId" resultMap="BaseResultMap">
+        SELECT * FROM (
+                        SELECT
+                          *
+                        FROM TB_APP_REVIEW_INFO
+                        WHERE APP_INFO_ID = #{appInfoId} AND RESULT = 1
+                        ORDER BY MODIFIED_TIME DESC
+                      ) R WHERE ROWNUM = 1
+    </select>
+
+    <select id="getLastDenyReviewInfoByAppInfoId" resultMap="BaseResultMap">
+        SELECT * FROM (
+                        SELECT
+                          *
+                        FROM TB_APP_REVIEW_INFO
+                        WHERE APP_INFO_ID = #{appInfoId} AND RESULT = 0
+                        ORDER BY MODIFIED_TIME DESC
+                      ) R WHERE ROWNUM = 1
+    </select>
+
+    <select id="getAllReviewInfoByAppInfoId" resultMap="BaseResultMap">
+        SELECT
+          *
+        FROM TB_APP_REVIEW_INFO
+        WHERE APP_INFO_ID = #{appInfoId}
+        ORDER BY MODIFIED_TIME DESC
+    </select>
+    <select id="getReviewInfoVoByAppInfoId" resultType="com.upd.hwcloud.bean.vo.applicationInfoOrder.ReviewInfoVo">
+        SELECT * FROM
+(SELECT F.NAME,E.CREATE_TIME,DECODE(E.RESULT,0,'驳回',1,'通过') AS RESULT,E.REMARK
+FROM TB_APP_REVIEW_INFO E
+LEFT JOIN TB_WFM_WORKFLOWMODEL D ON E.FLOW_STEP_ID = D.ID
+LEFT JOIN TB_USER F ON F.IDCARD = E.CREATOR
+WHERE D.MODELNAME = #{name} AND E.APP_INFO_ID = #{appInfoId} ORDER BY E.CREATE_TIME DESC) WHERE ROWNUM = 1
+    </select>
+
+</mapper>

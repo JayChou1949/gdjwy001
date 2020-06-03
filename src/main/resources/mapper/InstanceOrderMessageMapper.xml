@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.InstanceOrderMessageMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.InstanceOrderMessage">
+        <result column="INSTANCE_ID" property="instanceId" />
+        <result column="ALIAS" property="alias" />
+        <result column="AREA_NAME" property="areaName" />
+        <result column="POLICE_CATEGORY" property="policeGategory" />
+        <result column="CREATED_AT" property="createdAt" />
+        <result column="UPDATED_AT" property="updatedAt" />
+        <result column="IDCARD" property="idCard" />
+        <result column="NAME" property="name" />
+        <result column="POLICE_NUMBER" property="policeNumber" />
+        <result column="POST_TYPE" property="postType" />
+        <result column="ORG_NAME" property="orgName" />
+        <result column="CREATE_TIME" property="createTime" />
+        <result column="PROJECT_ID" property="projectId" />
+    </resultMap>
+
+    <select id="getMessageByGuid" parameterType="string" resultMap="BaseResultMap">
+        SELECT ins.GUID INSTANCE_ID,ins.ALIAS ,ins.AREA_NAME,ins.POLICE_CATEGORY,INS.PROJECT_ID,INS.CREATED_AT,INS.UPDATED_AT,usr.*
+        from TB_SERVICE_INSTANCE ins LEFT JOIN TB_USER usr ON ins.USER_ID = usr.IDCARD
+        WHERE ins.GUID = #{guid}
+    </select>
+
+</mapper>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.iaasConfig.VmDeviceMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.iaasConfig.VmDevice">
+        <id column="ID" property="id" />
+        <result column="CLOUD_SERVER" property="cloudServer" />
+        <result column="METAL_SERVER" property="metalServer" />
+        <result column="IMAGE" property="image" />
+        <result column="CLOUD_DISK" property="cloudDisk" />
+        <result column="PRI_CLOUD" property="priCloud" />
+        <result column="ELA_IP" property="elaIp" />
+        <result column="ELA_LOAD" property="elaLoad" />
+        <result column="VM_FIREWELL" property="vmFirewell" />
+        <result column="TYPE" property="type" />
+        <result column="AREA" property="area" />
+    </resultMap>
+
+</mapper>

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/mvc
+    http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+
+  <bean id="propertyConfigurer"
+        class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="locations">
+      <list>
+        <value>classpath:*.properties</value>
+        <value>classpath:dev/*.properties</value>
+        <value>classpath:beta/*.properties</value>
+        <value>classpath:test/*.properties</value>
+        <value>classpath:perPro/*.properties</value>
+        <value>classpath:pro/*.properties</value>
+      </list>
+    </property>
+    <property name="fileEncoding" value="UTF-8"/>
+  </bean>
+
+  <!-- 配置SpringMVC -->
+  <!-- 1.开启SpringMVC注解模式 -->
+  <!-- 简化配置：
+      (1)自动注册DefaultAnootationHandlerMapping,AnotationMethodHandlerAdapter
+      (2)提供一些列：数据绑定，数字和日期的format @NumberFormat, @DateTimeFormat, xml,json默认读写支持
+  -->
+  <!-- 主要作用于@Controller，激活该模式 下面是一种简写形式，完全可以手动配置替代这种简写形式； 它会自动注册DefaultAnnotationHandlerMapping与AnnotationMethodHandlerAdapter
+		两个bean, 是spring MVC为@Controllers分发请求所必须的 -->
+  <mvc:annotation-driven>
+    <mvc:message-converters>
+      <ref bean="messageConverters" />
+    </mvc:message-converters>
+    <mvc:argument-resolvers>
+      <bean class="com.upd.hwcloud.common.config.CurrentUserArgumentResolver" />
+    </mvc:argument-resolvers>
+  </mvc:annotation-driven>
+
+  <!--  ResponseBody 的类型 -->
+  <bean id="messageConverters" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+    <property name="supportedMediaTypes">
+      <list>
+        <value>application/json;charset=UTF-8</value>
+      </list>
+    </property>
+    <property name="objectMapper" ref="objectMapper" />
+  </bean>
+
+  <bean id="objectMapper" class="com.fasterxml.jackson.databind.ObjectMapper">
+    <property name="dateFormat">
+      <bean class="java.text.SimpleDateFormat">
+        <constructor-arg>
+          <value>yyyy-MM-dd HH:mm:ss</value>
+        </constructor-arg>
+      </bean>
+    </property>
+  </bean>
+
+  <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+    <property name="targetObject" ref="objectMapper" />
+    <property name="targetMethod" value="configure" />
+    <property name="arguments">
+      <list>
+        <value type="com.fasterxml.jackson.databind.DeserializationFeature">FAIL_ON_UNKNOWN_PROPERTIES</value>
+        <value>false</value>
+      </list>
+    </property>
+  </bean>
+
+  <!--&lt;!&ndash; 设置自定义异常处理 &ndash;&gt;-->
+  <!--<bean id="handlerExceptionResolver" class="com.upd.hwcloud.common.exception.AnnotationHandlerMethodExceptionResolver">-->
+    <!--<property name="defaultErrorView" value="error"/>&lt;!&ndash; 错误页面 &ndash;&gt;-->
+    <!--<property name="messageConverters" ref="messageConverters"/> &lt;!&ndash;见上一篇，有定义过，标有@ResponseBody被此messageConverters输出&ndash;&gt;-->
+  <!--</bean>-->
+
+  <context:component-scan base-package="com.upd.hwcloud" use-default-filters="false">
+    <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+  </context:component-scan>
+
+  <!-- 开启aspectj代理 -->
+  <aop:aspectj-autoproxy proxy-target-class="true" />
+
+  <!-- 2.静态资源默认servlet配置
+      (1)加入对静态资源的处理：js,gif,png
+      (2)允许使用"/"做整体映射
+   -->
+  <mvc:default-servlet-handler/>
+
+  <!-- 3.配置jsp 显示ViewResolver -->
+  <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+    <property name="viewClass" value="org.springframework.web.servlet.view.InternalResourceView" />
+    <property name="prefix" value="/WEB-INF/view/" />
+    <property name="suffix" value=".jsp" />
+    <property name="order" value="1" />
+  </bean>
+
+  <!--拦截器-->
+  <mvc:interceptors>
+    <mvc:interceptor>
+      <!-- 匹配的是url路径， 如果不配置或/**,将拦截所有的Controller -->
+      <mvc:mapping path="/**" />
+      <!-- /register 和 /login 不需要拦截-->
+      <!--<mvc:exclude-mapping path="/register" />-->
+      <!--spring-mvc-3.2.xsd 下面才不会报错-->
+      <!--防止静态文件被拦截-->
+      <mvc:exclude-mapping path="/**/fonts/*"/>
+      <mvc:exclude-mapping path="/**/*.css"/>
+      <mvc:exclude-mapping path="/**/*.js"/>
+      <mvc:exclude-mapping path="/**/*.png"/>
+      <mvc:exclude-mapping path="/**/*.gif"/>
+      <mvc:exclude-mapping path="/**/*.jpg"/>
+      <mvc:exclude-mapping path="/**/*.jpeg"/>
+      <mvc:exclude-mapping path="/**/*login*"/>
+      <mvc:exclude-mapping path="/**/*register.html"/>
+      <bean class="com.upd.hwcloud.common.filter.JWTCheckInterceptor" />
+    </mvc:interceptor>
+    <!-- 当设置多个拦截器时，先按顺序调用preHandle方法，然后逆序调用每个拦截器的postHandle和afterCompletion方法 -->
+  </mvc:interceptors>
+
+  <!--multipartResolver-->
+  <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+    <property name="maxUploadSize" value="209715200" />
+  </bean>
+
+  <!--定时任务配置-->
+  <task:annotation-driven/>
+
+  <!-- swaggger 配置 -->
+  <bean class="com.upd.hwcloud.common.config.SwaggerConfig" />
+
+</beans>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.bean.mapper.IaasbigdataMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.Iaasbigdata">
+        <id column="ID" property="id" />
+        <result column="NAME" property="name" />
+        <result column="KIND" property="kind" />
+        <result column="CPUTOTAL" property="cputotal" />
+        <result column="CPUUSED" property="cpuused" />
+        <result column="CPURATIO" property="cpuratio" />
+        <result column="RAMTOTAL" property="ramtotal" />
+        <result column="RAMUSED" property="ramused" />
+        <result column="RAMRATIO" property="ramratio" />
+        <result column="DISKTOTAL" property="disktotal" />
+        <result column="DISKUSED" property="diskused" />
+        <result column="DISKRATIO" property="diskratio" />
+        <result column="NET_ID" property="netId" />
+    </resultMap>
+
+</mapper>

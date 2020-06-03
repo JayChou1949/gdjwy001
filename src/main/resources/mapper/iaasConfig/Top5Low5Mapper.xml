@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.iaasConfig.Top5Low5Mapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.iaasConfig.Top5Low5">
+        <id column="ID" property="id" />
+        <result column="NAME" property="name" />
+        <result column="CPU" property="cpu" />
+        <result column="EMS" property="ems" />
+        <result column="STOR" property="stor" />
+        <result column="TYPE" property="type" />
+        <result column="SORT_TYPE" property="sortType" />
+        <result column="SORT_NUM" property="sortNum" />
+    </resultMap>
+
+    <select id="getByType" resultType="com.upd.hwcloud.bean.entity.iaasConfig.Top5Low5">
+        SELECT * FROM TB_TOP5_LOW5
+        WHERE TYPE = #{type}
+        ORDER BY TO_NUMBER(${column}) DESC
+    </select>
+
+</mapper>

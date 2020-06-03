@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.application.ResourceRecoverAppInfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.application.ResourceRecoverAppInfo">
+        <id column="ID" property="id" />
+        <result column="CREATOR" property="creator" />
+        <result column="CREATOR_ID_CARD" property="creatorIdCard" />
+        <result column="CREATOR_PHONE" property="creatorPhone" />
+        <result column="RECOVERED_PERSON" property="recoveredPerson" />
+        <result column="RECOVERED_PERSON_PHONE" property="recoveredPersonPhone" />
+        <result column="ORDER_NUMBER" property="orderNumber" />
+        <result column="STATUS" property="status" />
+        <result column="CREATE_TIME" property="createTime" />
+        <result column="MODIFIED_TIME" property="modifiedTime" />
+        <result column="RECOVERED_PERSON_ID_CARD" property="recoveredPersonIdCard"/>
+    </resultMap>
+
+    <select id="getPage" resultType="com.upd.hwcloud.bean.entity.application.ResourceRecoverAppInfo">
+        SELECT
+	      r.*,
+	      n.NUM
+        FROM
+	    (
+          SELECT DISTINCT
+	      ai.*,
+	      ins.ID instanceId
+        FROM
+	      TB_RESOURCE_RECOVER_APP_INFO ai,
+	      TB_WFM_ACTIVITY act,
+	      TB_WFM_INSTANCE ins,
+	      TB_WFM_WORKFLOWMODEL m
+        <where>
+            ai.ID = ins.BUSINESSID
+            AND act.INSTANCEID = ins.ID
+            AND m.ID = act.MODELID
+            <if test="p.name !=null and p.name !=''">
+                and ai.RECOVERED_PERSON = #{p.name}
+            </if>
+            <if test="p.orderNum != null and p.orderNum != ''">
+                and ai.ORDER_NUMBER = #{p.orderNum}
+            </if>
+            <choose>
+                <when test="p.status == null or p.status == '' ">
+                    and ai.STATUS != 4
+                </when>
+                <when test="p.status == 1">
+                    and ai.STATUS in (1,7,101,102)
+                </when>
+                <otherwise>
+                   and ai.STATUS = #{p.status}
+                </otherwise>
+            </choose>
+            <if test="p.status != null and p.status != ''">
+                and ai.STATUS = #{p.status}
+            </if>
+        </where>
+	  ) r Left join ( SELECT REF_ID, count( * ) NUM FROM TB_RESOURCE_RECOVER WHERE  REF_ID IS NOT NULL GROUP BY REF_ID ) n ON n.REF_ID = r.ID
+    ORDER BY r.MODIFIED_TIME DESC
+    </select>
+</mapper>

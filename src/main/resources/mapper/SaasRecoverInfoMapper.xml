@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.SaasRecoverInfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.SaasRecoverInfo">
+        <id column="ID" property="id" />
+        <result column="APP_INFO_ID" property="appInfoId" />
+        <result column="RE_NAME" property="reName" />
+        <result column="RE_IDCARD" property="reIdcard" />
+        <result column="RE_ORG_ID" property="reOrgId" />
+        <result column="RE_ORG_NAME" property="reOrgName" />
+        <result column="CREATE_TIME" property="createTime" />
+        <result column="MODIFIED_TIME" property="modifiedTime" />
+        <result column="NUM" property="num" />
+        <result column="IS_IMPORT" property="isImport" />
+    </resultMap>
+
+    <select id="getUserUseService" resultMap="BaseResultMap">
+        select r.RE_NAME,r.RE_IDCARD,r.RE_ORG_NAME,
+        (select count(*) from TB_SAAS_APPLICATION a,TB_SAAS_APPLICATION_EXT b where a.ID = b.MASTER_ID and a.creator=r.RE_IDCARD and a.RECOVER_FLAG != '-1' and a.STATUS ='3' and a.MERGE_ID is not null) NUM
+        from TB_SAAS_RECOVER_INFO r
+        where APP_INFO_ID= #{id}
+        group by r.RE_NAME,r.RE_IDCARD,r.RE_ORG_NAME
+    </select>
+    
+    <select id="getTodoCount" resultType="java.lang.Integer">
+        SELECT count(DISTINCT ai.ID)
+        FROM TB_SAAS_RECOVER_APPLICATION ai join TB_WFM_INSTANCE ins on ins.BUSINESSID = ai.ID
+        join TB_WFM_ACTIVITY act  on act.INSTANCEID = ins.ID
+        WHERE ai.STATUS in (1,2,7,101,102)
+        <if test="user.idcard !=null and user.idcard !=''">
+            and act.HANDLEPERSONIDS = #{user.idcard}
+        </if>
+        and act.ACTIVITYTYPE is null
+        and act.ACTIVITYSTATUS = '待办'
+    </select>
+
+    <select id="getApplicationTodo" resultType="java.lang.Integer">
+        SELECT count(DISTINCT ai.ID)
+        FROM TB_SAAS_RECOVER_APPLICATION ai join TB_WFM_INSTANCE ins on ins.BUSINESSID = ai.ID
+        join TB_WFM_ACTIVITY act  on act.INSTANCEID = ins.ID
+        WHERE ai.STATUS in (1,2,7,101,102)
+        <if test="idCard !=null and idCard !=''">
+            and act.HANDLEPERSONIDS = #{idCard}
+        </if>
+        and act.ACTIVITYTYPE is null
+        and act.ACTIVITYSTATUS = '待办'
+    </select>
+
+</mapper>

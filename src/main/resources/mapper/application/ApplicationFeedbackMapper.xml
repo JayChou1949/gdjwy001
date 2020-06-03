@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.application.ApplicationFeedbackMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.application.ApplicationFeedback">
+        <id column="ID" property="id" />
+        <result column="CREATOR" property="creator" />
+        <result column="CREATE_TIME" property="createTime" />
+        <result column="MODIFIED_TIME" property="modifiedTime" />
+        <result column="RESULT" property="result" />
+        <result column="REMARK" property="remark" />
+        <result column="APP_INFO_ID" property="appInfoId" />
+        <result column="SCORE" property="score" />
+        <association property="user" column="CREATOR" select="com.upd.hwcloud.dao.UserMapper.findUserByIdcard" />
+    </resultMap>
+
+    <select id="getListByAppInfoId" resultMap="BaseResultMap">
+        select * from TB_APPLICATION_FEEDBACK where APP_INFO_ID = #{id} order by MODIFIED_TIME DESC
+    </select>
+
+
+</mapper>

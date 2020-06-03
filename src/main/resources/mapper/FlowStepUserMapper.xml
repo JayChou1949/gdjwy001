@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.FlowStepUserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.FlowStepUser">
+        <result column="STEP_ID" property="stepId" />
+        <result column="USER_ID" property="userId" />
+    </resultMap>
+
+    <delete id="deleteUserByFlowId">
+        delete from TB_FLOW_STEP_USER fsu
+        where fsu.STEP_ID in (select fs.ID from TB_FLOW_STEP fs where fs.FLOW_ID = #{flowId})
+    </delete>
+
+    <select id="findUserByFlowStepId" resultType="com.upd.hwcloud.bean.entity.User">
+        select
+          u.*
+        from TB_FLOW_STEP_USER f
+        left join TB_USER u
+        on f.USER_ID = u.IDCARD
+        where f.STEP_ID = #{flowStepId}
+    </select>
+
+</mapper>

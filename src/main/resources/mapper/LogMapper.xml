@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.LogMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.Log">
+        <id column="ID" property="id" />
+        <result column="CREATOR_ID" property="creatorId" />
+        <result column="CREATE_TIME" property="createTime" />
+        <result column="REMARK" property="remark" />
+        <result column="PATH" property="path" />
+        <result column="IP" property="ip" />
+        <result column="CREATOR_NAME" property="creatorName" />
+    </resultMap>
+
+
+    <select id="getPage" resultType="com.upd.hwcloud.bean.entity.Log">
+        SELECT
+          l.id,l.IP,l.REMARK,l.CREATE_TIME,l.path,
+          (SELECT NAME FROM TB_USER u WHERE u.IDCARD = l.CREATOR_ID) CREATOR_NAME
+          FROM SYS_LOG l
+        <where>
+            <if test="(startDate != null and startDate != '') and (endDate != null and endDate != '')">
+                AND TO_CHAR(l.CREATE_TIME,'YYYY-MM-DD') &gt;= #{startDate}
+                AND TO_CHAR(l.CREATE_TIME,'YYYY-MM-DD') &lt;= #{endDate}
+            </if>
+            <if test="userId !=null and userId !=''">
+                and l.CREATOR_ID = #{userId}
+            </if>
+        </where>
+        ORDER BY l.CREATE_TIME DESC
+    </select>
+
+</mapper>

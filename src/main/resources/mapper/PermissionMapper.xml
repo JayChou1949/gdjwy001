@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.PermissionMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.Permission">
+        <id column="ID" property="id" />
+        <result column="PID" property="pid" />
+        <result column="NAME" property="name" />
+        <result column="TYPE" property="type" />
+        <result column="SORT" property="sort" />
+        <result column="URL" property="url" />
+        <result column="PERM_CODE" property="permCode" />
+        <result column="ICON" property="icon" />
+        <result column="DESCRIPTION" property="description" />
+        <result column="STATUS" property="status" />
+        <result column="CREATE_TIME" property="createTime" />
+        <result column="MODIFIED_TIME" property="modifiedTime" />
+    </resultMap>
+
+
+    <select id="selectRoleMenu" resultMap="BaseResultMap">
+        SELECT
+        p.*
+        FROM s_permission p
+        LEFT JOIN s_role_permission rp ON rp.pid=p.id
+        where
+        rp.rid=#{rid}
+        <if test="pid!=null">
+            AND p.pid=#{pid}
+        </if>
+        <if test="type!=null">
+            AND p.type=#{type}
+        </if>
+        ORDER BY p.sort
+    </select>
+    <select id="selectUserMenu" resultMap="BaseResultMap">
+        SELECT
+        DISTINCT p.*
+        FROM s_permission p
+        LEFT JOIN s_role_permission rp ON rp.pid=p.id
+        LEFT JOIN s_user_role ur ON ur.role_id=rp.rid
+        where
+        ur.user_id=#{uid}
+        <if test="pid!=null">
+            AND p.pid=#{pid}
+        </if>
+        <if test="type!=null">
+            AND p.type=#{type}
+        </if>
+        ORDER BY p.sort
+    </select>
+</mapper>

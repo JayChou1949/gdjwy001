@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.document.DocumentMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.document.Document">
+        <id column="ID" property="id" />
+        <result column="TITLE" property="title" />
+        <result column="IMAGE" property="image" />
+        <result column="SORT_NUM" property="sortNum" />
+        <result column="CREATE_TIME" property="createTime" />
+        <result column="MODIFIED_TIME" property="modifiedTime" />
+        <result column="STATUS" property="status" />
+        <result column="CREATOR" property="creator" />
+        <result column="CONTENT" property="content" />
+        <result column="FIRST_CLASS" property="firstClass" />
+        <result column="SECOND_CLASS" property="secondClass" />
+        <result column="DOC_CREATE_TIME" property="docCreateTime" />
+        <result column="INTRO" property="intro" />
+        <result column="CREATOR_NAME" property="creatorName" />
+    </resultMap>
+    
+    <sql id="column_exclude_content">
+        D.ID,D.TITLE,D.IMAGE,D.CREATE_TIME,D.MODIFIED_TIME,D.DOC_CREATE_TIME,D.SORT_NUM,D.INTRO
+    </sql>
+
+    <select id="getPage" resultType="com.upd.hwcloud.bean.entity.document.Document">
+        SELECT
+        <include refid="column_exclude_content" />,
+        (SELECT NAME FROM TB_USER u WHERE u.IDCARD = D.CREATOR) AS CREATOR_NAME,
+        (SELECT c1.NAME FROM TB_DOCUMENT_CLASS c1 WHERE D.FIRST_CLASS = c1.ID) AS firstClassName,
+        (SELECT c2.NAME FROM TB_DOCUMENT_CLASS c2 WHERE D.SECOND_CLASS = c2.ID) AS secondClassName,
+        (SELECT COUNT(*) FROM TB_FILES F WHERE F.REF_ID = D.ID) AS num
+        FROM TB_DOCUMENT D
+        WHERE
+        <choose>
+            <when test="status != null and status == 0">
+                D.STATUS IN (0, 3)
+            </when>
+            <otherwise>
+                D.STATUS = #{status}
+            </otherwise>
+        </choose>
+        <if test="name != null and name != ''">
+            AND (
+                D.TITLE LIKE CONCAT(CONCAT('%',#{name}),'%')
+                OR
+                D.INTRO LIKE CONCAT(CONCAT('%',#{name}),'%')
+                OR
+                D.CONTENT LIKE CONCAT(CONCAT('%',#{name}),'%')
+            )
+        </if>
+        <if test="firstClass != null and firstClass != ''">
+            AND D.FIRST_CLASS = #{firstClass}
+        </if>
+        <if test="secondClass != null and secondClass != ''">
+            AND D.SECOND_CLASS = #{secondClass}
+        </if>
+        <!--
+           1.门户不登录可以看到全部
+           2.后台管理分数据权限
+         -->
+        <if test="user != null and user.type != 100 and !isFront">
+            AND D.CREATOR = #{user.idcard}
+        </if>
+        ORDER BY D.SORT_NUM ASC, D.MODIFIED_TIME DESC
+    </select>
+
+</mapper>

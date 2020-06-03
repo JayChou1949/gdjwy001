@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.AppMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.App">
+        <id column="ID" property="id" />
+        <result column="APPLY_NAME" property="applyName" />
+        <result column="APPLY_CODE" property="applyCode" />
+        <result column="APPLY_CATEGORY" property="applyCategory" />
+        <result column="POLICE_SPECIES" property="policeSpecies" />
+        <result column="ORG_ID" property="orgId" />
+        <result column="ORG_NAME" property="orgName" />
+        <result column="SORT" property="sort" />
+        <result column="APPLY_URL" property="applyUrl" />
+        <result column="MANUFACTURER_ID" property="manufacturerId" />
+        <result column="MANUFACTURER_NAME" property="manufacturerName" />
+        <result column="APPLY_STATUS" property="applyStatus" />
+        <result column="MANAGER_NAME" property="managerName" />
+        <result column="MANAGER_PHONE" property="managerPhone" />
+        <result column="MANAGER_DESCRIBE" property="managerDescribe" />
+        <result column="API_KEY" property="apiKey" />
+        <result column="SECRET_KEY" property="secretKey" />
+        <result column="FZR" property="fzr" />
+        <result column="FZR_PHONE" property="fzrPhone" />
+        <result column="APPLY_ICON" property="applyIcon" />
+        <result column="DELETED" property="deleted" />
+        <result column="REGISTRATION_TIME" property="registrationTime" />
+        <result column="REGISTRATION_TIME_STR" property="registrationTimeStr" />
+    </resultMap>
+
+</mapper>

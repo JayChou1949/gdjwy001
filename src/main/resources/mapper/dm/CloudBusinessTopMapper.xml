@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.dm.CloudBusinessTopMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.dm.CloudBusinessTop">
+        <result column="NAME" property="name" />
+        <result column="NAME_CN" property="nameCn" />
+        <result column="TYPE" property="type" />
+        <result column="LV" property="lv" />
+        <result column="CREATE_DATE" property="createDate" />
+        <result column="CLOUD" property="cloud" />
+        <result column="VM_NUMBER" property="vmNumber" />
+        <result column="VCPU_TOTAL" property="vcpuTotal" />
+        <result column="VCPU_USAGE" property="vcpuUsage" />
+        <result column="MEMEORY_TOTAL" property="memeoryTotal" />
+        <result column="MEMEORY_USAGE" property="memeoryUsage" />
+        <result column="DISK_TOTAL" property="diskTotal" />
+        <result column="EVS_DISK_USAGE" property="evsDiskUsage" />
+        <result column="UPDATE_TIME" property="updateTime" />
+        <result column="TIME_STAMP" property="timeStamp" />
+        <result column="TENANT" property="tenant" />
+        <result column="SITE_NAME" property="siteName" />
+        <result column="SITE_TYPE" property="siteType" />
+        <result column="BUSINESS_UNIT1" property="businessUnit1" />
+    </resultMap>
+
+
+    <!--各警种应用数-->
+    <select id="policeApplication" resultType="com.upd.hwcloud.bean.dto.GeneralDTO">
+        SELECT  BUSINESS_UNIT1 NAME,count(BUSINESS_UNIT1) VALUE from TB_DM_CLOUD_BUSINESS_TOP WHERE NAME  LIKE '广东%' and BUSINESS_UNIT1 is not null GROUP BY BUSINESS_UNIT1
+    </select>
+
+
+    <select id="applicationCount" resultType="com.upd.hwcloud.bean.dto.GeneralDTO">
+        SELECT  BUSINESS_UNIT1 NAME,count(BUSINESS_UNIT1) VALUE from TB_DM_CLOUD_BUSINESS_TOP WHERE BUSINESS_UNIT1 is not null GROUP BY BUSINESS_UNIT1 ORDER  BY VALUE  DESC
+    </select>
+
+    <select id="areaApplication" resultType="com.upd.hwcloud.bean.dto.GeneralDTO">
+        SELECT  BUSINESS_UNIT1 NAME,count(BUSINESS_UNIT1) VALUE from TB_DM_CLOUD_BUSINESS_TOP WHERE NAME not  LIKE '广东%' and BUSINESS_UNIT1 is not null GROUP BY BUSINESS_UNIT1
+    </select>
+
+    <select id="page" resultMap="BaseResultMap">
+        SELECT * FROM TB_DM_CLOUD_BUSINESS_TOP
+        <where>
+            <if test="name !=null">
+             and    BUSINESS_UNIT1 = #{name}
+            </if>
+            <if test="cloud !=null">
+               and  CLOUD = #{cloud}
+            </if>
+        </where>
+
+        <if test="order != null and orderType != null">
+            ORDER BY ${order} ${orderType} nulls last
+        </if>
+    </select>
+</mapper>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.EventMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.Event">
+        <id column="ID" property="id" />
+        <result column="NAME" property="name" />
+        <result column="CREATE_TIME" property="createTime" />
+        <result column="MODIFIED_TIME" property="modifiedTime" />
+        <result column="CREATOR" property="creator" />
+        <result column="HAPPEN_TIME" property="happenTime" />
+        <result column="REMARK" property="remark" />
+        <association property="user" column="CREATOR" select="com.upd.hwcloud.dao.UserMapper.findUserByIdcard" />
+    </resultMap>
+    
+    <select id="getPage" resultMap="BaseResultMap">
+        SELECT * FROM TB_EVENT
+        <where>
+            <if test="name != null and name != ''">
+                AND NAME LIKE CONCAT(CONCAT('%',#{name}),'%')
+            </if>
+        </where>
+        ORDER BY HAPPEN_TIME DESC
+    </select>
+</mapper>

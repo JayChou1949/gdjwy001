@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.iaasConfig.PoliceCloudMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.iaasConfig.PoliceCloud">
+        <id column="ID" property="id" />
+        <result column="CPU_TOTAL" property="cpuTotal" />
+        <result column="CPU_ALLOTMENT" property="cpuAllotment" />
+        <result column="CPU_ALLOTMENT_PRO" property="cpuAllotmentPro" />
+        <result column="EMS_TOTAL" property="emsTotal" />
+        <result column="EMS_ALLOTMENT" property="emsAllotment" />
+        <result column="EMS_ALLOTMENT_PRO" property="emsAllotmentPro" />
+        <result column="STOR_TOTAL" property="storTotal" />
+        <result column="STOR_ALLOTMENT" property="storAllotment" />
+        <result column="STOR_ALLOTMENT_PRO" property="storAllotmentPro" />
+        <result column="TYPE" property="type" />
+        <result column="AREA" property="area" />
+        <result column="GPU_TOTAL" property="gpuTotal" />
+        <result column="GPU_ALLOTMENT" property="gpuAllotment" />
+        <result column="GPU_ALLOTMENT_PRO" property="gpuAllotmentPro" />
+    </resultMap>
+
+</mapper>

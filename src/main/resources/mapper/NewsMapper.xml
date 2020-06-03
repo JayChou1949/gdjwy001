@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.webManage.NewsMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.webManage.News">
+        <id column="ID" property="id" />
+        <result column="TITLE" property="title" />
+        <result column="URL" property="url" />
+        <result column="SORT_NUM" property="sortNum" />
+        <result column="CONTENT" property="content" />
+        <result column="CREATE_TIME" property="createTime" />
+        <result column="MODIFIED_TIME" property="modifiedTime" />
+        <result column="STATUS" property="status" />
+        <result column="CREATOR" property="creator" />
+        <result column="LINK" property="link" />
+        <result column="INTRO" property="intro" />
+        <result column="TIME" property="time" />
+        <result column="IS_TOP" property="isTop" />
+        <result column="VIEW_COUNT" property="viewCount" />
+        <result column="PROVINCIAL" property="provincial" />
+        <result column="POLICE_CATEGORY" property="policeCategory" />
+        <result column="AREA" property="area" />
+        <result column="PROJECT" property="project"/>
+        <association property="user" column="CREATOR" select="com.upd.hwcloud.dao.UserMapper.findUserByIdcard" />
+    </resultMap>
+
+    <sql id="columns">
+        n.ID,n.TITLE,n.CREATE_TIME,n.INTRO,n.LINK,n.URL,n.VIEW_COUNT,n.TIME,n.SORT_NUM,n.CREATOR,n.IS_TOP
+    </sql>
+
+    <update id="updateViewCountById">
+        UPDATE TB_NEWS SET VIEW_COUNT = (VIEW_COUNT + 1) WHERE ID = #{id}
+    </update>
+
+    <select id="getNewsByPage" resultType="com.upd.hwcloud.bean.entity.webManage.News">
+        SELECT
+        <include refid="columns"/>
+        FROM TB_NEWS n
+        WHERE n.STATUS = 2 and  n.PROVINCIAL  = #{p.province}
+        <if test="p.area !=null and p.area !=''">
+            AND n.AREA  like #{p.area}
+        </if>
+        <if test="p.police !=null and p.police !=''">
+            AND n.POLICE_CATEGORY like #{p.police}
+        </if>
+        <if test="p.project !=null and p.project !=''">
+            AND n.PROJECT like #{p.project}
+        </if>
+        ORDER BY n.IS_TOP DESC, n.TIME DESC, n.SORT_NUM ASC
+    </select>
+
+    <select id="getPage" resultMap="BaseResultMap">
+        SELECT
+        <include refid="columns"/>
+        FROM TB_NEWS n
+        WHERE n.PROVINCIAL  = #{p.province}
+        <choose>
+            <when test="status != null and status == 0">
+            AND    n.STATUS IN (0, 3)
+            </when>
+            <otherwise>
+            AND    n.STATUS = #{status}
+            </otherwise>
+        </choose>
+        <if test="title != null and title != ''">
+            AND n.TITLE LIKE CONCAT(CONCAT('%',#{title}),'%')
+        </if>
+        <if test="user.type != 100 and user.type !=20">
+            AND n.CREATOR = #{user.idcard}
+        </if>
+        <if test="p.area !=null and p.area !=''">
+            AND n.AREA  like #{p.area}
+        </if>
+        <if test="p.police !=null and p.police !=''">
+            AND n.POLICE_CATEGORY like #{p.police}
+        </if>
+        <if test="p.project !=null and p.project !=''">
+            AND n.PROJECT like #{p.project}
+        </if>
+        ORDER BY n.IS_TOP DESC, n.TIME DESC, n.SORT_NUM ASC
+    </select>
+
+</mapper>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.application.InnerReviewUserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.application.InnerReviewUser">
+        <id column="ID" property="id" />
+        <result column="USER_ID" property="userId" />
+        <result column="APP_INFO_ID" property="appInfoId" />
+    </resultMap>
+
+    <delete id="deleteAddAndForwardByResourceType">
+        delete from TB_INNER_REVIEW_USER ru
+        where exists (
+            select
+              1
+            from TB_APPLICATION_INFO ai
+            where ai.ID = ru.APP_INFO_ID
+            and ai.RESOURCE_TYPE = #{resourceType}
+            and ai.STATUS IN (101, 102)
+        )
+    </delete>
+
+    <delete id="deleteAddAndForwardByServiceId">
+        delete from TB_INNER_REVIEW_USER ru
+        where exists (
+            select
+              1
+            from TB_APPLICATION_INFO ai
+            where ai.ID = ru.APP_INFO_ID
+            and ai.SERVICE_TYPE_ID = #{serviceId}
+            and ai.STATUS IN (101, 102)
+        )
+    </delete>
+
+</mapper>

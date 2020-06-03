@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.IaasTotalMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.IaasTotal">
+        <id column="ID" property="id" />
+        <result column="NET" property="net" />
+        <result column="SERVER" property="server" />
+        <result column="ROUTE" property="route" />
+        <result column="STORE" property="store" />
+        <result column="SWITCHFC" property="switchfc" />
+        <result column="FIREWALL" property="firewall" />
+        <result column="CLOUDSERVER" property="cloudserver" />
+        <result column="BMS" property="bms" />
+        <result column="IMAGE" property="image" />
+        <result column="CDISK" property="cdisk" />
+        <result column="VPC" property="vpc" />
+        <result column="FIP" property="fip" />
+        <result column="ELP" property="elp" />
+        <result column="VFW" property="vfw" />
+        <result column="VCPUTOTAL" property="vcputotal" />
+        <result column="VCPUUSED" property="vcpuused" />
+        <result column="VCPURATIO" property="vcpuratio" />
+        <result column="DISKTOTAL" property="disktotal" />
+        <result column="DISKUSED" property="diskused" />
+        <result column="DISKRATIO" property="diskratio" />
+        <result column="RAMTOTAL" property="ramtotal" />
+        <result column="RAMUSED" property="ramused" />
+        <result column="RAMRATIO" property="ramratio" />
+        <result column="PUBLICPART" property="publicpart" />
+        <result column="ENTRYEXIT" property="entryexit" />
+        <result column="ANTITERRORIST" property="antiterrorist" />
+        <result column="TRAFFICMANAGER" property="trafficmanager" />
+        <result column="TRAFFICPOLICE" property="trafficpolice" />
+        <result column="DEPARTMENTONE" property="departmentone" />
+        <result column="DEPARTMENTTWO" property="departmenttwo" />
+        <result column="DEPARTMENTHREE" property="departmenthree" />
+        <result column="DEPARTMENTFOUR" property="departmentfour" />
+        <result column="BIGDATALIBRA" property="bigdatalibra" />
+        <result column="BIGDATAHD" property="bigdatahd" />
+        <result column="BIGDATADEEP" property="bigdatadeep" />
+        <result column="BIGDATACOLLECT" property="bigdatacollect" />
+        <result column="LIBRA1CPUTOTAL" property="libra1cputotal" />
+        <result column="LIBRA1CPUUSED" property="libra1cpuused" />
+        <result column="LIBRA1CPURATIO" property="libra1cpuratio" />
+        <result column="LIBRA2CPUTOTAL" property="libra2cputotal" />
+        <result column="LIBRA2CPUUSED" property="libra2cpuused" />
+        <result column="LIBRA2CPURATIO" property="libra2cpuratio" />
+        <result column="LIBRA3CPUTOTAL" property="libra3cputotal" />
+        <result column="LIBRA3CPUUSED" property="libra3cpuused" />
+        <result column="LIBRA3CPURATIO" property="libra3cpuratio" />
+        <result column="HD1CPUTOTAL" property="hd1cputotal" />
+        <result column="HD1CPUUSED" property="hd1cpuused" />
+        <result column="HD1CPURATIO" property="hd1cpuratio" />
+        <result column="HD2CPUTOTAL" property="hd2cputotal" />
+        <result column="HD2CPUUESD" property="hd2cpuuesd" />
+        <result column="HD2CPURATIO" property="hd2cpuratio" />
+        <result column="HD3CPUTOTAL" property="hd3cputotal" />
+        <result column="HD3CPUUSED" property="hd3cpuused" />
+        <result column="HD3CPURATIO" property="hd3cpuratio" />
+    </resultMap>
+
+</mapper>

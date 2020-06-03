@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.dm.CloudVmAddSubMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.dm.CloudVmAddSub">
+        <id column="ID" property="id" />
+        <result column="NAME" property="name" />
+        <result column="NAME_CN" property="nameCn" />
+        <result column="VID" property="vid" />
+        <result column="TYPE" property="type" />
+        <result column="VCPU_SIZE" property="vcpuSize" />
+        <result column="CPU_USAGE" property="cpuUsage" />
+        <result column="RAM_SIZE" property="ramSize" />
+        <result column="EVS_DISK_USAGE" property="evsDiskUsage" />
+        <result column="MEMORY_USAGE" property="memoryUsage" />
+        <result column="DISK_SIZE" property="diskSize" />
+        <result column="UPDATE_TIME" property="updateTime" />
+        <result column="CREATE_TIME" property="createTime" />
+        <result column="CREATE_DATE" property="createDate" />
+        <result column="TIME_STAMP" property="timeStamp" />
+        <result column="TENANT" property="tenant" />
+        <result column="SITE_NAME" property="siteName" />
+        <result column="SITE_TYPE" property="siteType" />
+        <result column="CI_STATUS" property="ciStatus" />
+        <result column="COMMENTS" property="comments" />
+        <result column="IP_ADDRESS" property="ipAddress" />
+        <result column="OS_VERSION" property="osVersion" />
+        <result column="CLOUD1" property="cloud1" />
+        <result column="CLOUD2" property="cloud2" />
+        <result column="BUSINESS_UNIT1" property="businessUnit1" />
+        <result column="BUSINESS_UNIT2" property="businessUnit2" />
+        <result column="ODS_IP" property="odsIp" />
+        <result column="CPU_MAX_USAGE" property="cpuMaxUsage" />
+        <result column="MEM_MAX_USAGE" property="memMaxUsage" />
+        <result column="DISK_MAX_USAGE" property="diskMaxUsage" />
+        <result column="DATA_TYPE" property="dataType" />
+    </resultMap>
+
+</mapper>

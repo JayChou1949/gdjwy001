@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.ServiceFeedbackReplyMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.ServiceFeedbackReply">
+        <id column="ID" property="id" />
+        <result column="FEEDBACK_ID" property="feedbackId" />
+        <result column="CONTENT" property="content" />
+        <result column="CREATOR" property="creator" />
+        <result column="CREATE_TIME" property="createTime" />
+        <result column="MODIFIED_TIME" property="modifiedTime" />
+        <result column="CREATOR_NAME" property="creatorName" />
+        <result column="REPLY_TYPE" property="replyType" />
+        <association property="user" column="CREATOR" select="com.upd.hwcloud.dao.UserMapper.findUserByIdcard" />
+    </resultMap>
+    <select id="getList" resultMap="BaseResultMap">
+        select
+            *
+        from TB_SERVICE_FEEDBACK_REPLY s
+        where s.FEEDBACK_ID = #{feedbackId}
+        order by s.CREATE_TIME desc
+    </select>
+</mapper>

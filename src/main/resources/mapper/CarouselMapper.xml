@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.webManage.CarouselMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.webManage.Carousel">
+        <id column="ID" property="id" />
+        <result column="TITLE" property="title" />
+        <result column="URL" property="url" />
+        <result column="IMAGE_ID" property="imageId" />
+        <result column="SORT_NUM" property="sortNum" />
+        <result column="CONTENT" property="content" />
+        <result column="CREATE_TIME" property="createTime" />
+        <result column="MODIFIED_TIME" property="modifiedTime" />
+        <result column="STATUS" property="status" />
+        <result column="CREATOR" property="creator" />
+        <result column="LINK" property="link" />
+        <result column="PROVINCIAL" property="provincial" />
+        <result column="POLICE_CATEGORY" property="policeCategory" />
+        <result column="AREA" property="area" />
+        <result column="PROJECT" property="project"/>
+        <association property="user" column="CREATOR" select="com.upd.hwcloud.dao.UserMapper.findUserByIdcard" />
+    </resultMap>
+
+    <sql id="columns">
+        c.ID,c.TITLE,c.URL,c.LINK,
+        f.URL AS imageUrl
+    </sql>
+
+    <!--这个兄弟，重写了条件构造器的list,属实恶心-->
+    <select id="selectList" resultType="com.upd.hwcloud.bean.entity.webManage.Carousel">
+        SELECT
+        <include refid="columns"/>
+        FROM TB_CAROUSEL c
+        LEFT JOIN TB_FILES f ON c.IMAGE_ID = f.ID
+        WHERE c.STATUS = 2
+        ORDER BY c.SORT_NUM ASC, c.MODIFIED_TIME DESC
+    </select>
+
+
+    <!--设置了modified字段的自动填充,使用updateById()无法完成上/下移逻辑，单独写一个mapper-->
+    <update id="updateModifiedTimeAndSort">
+        UPDATE TB_CAROUSEL SET MODIFIED_TIME = #{time},SORT_NUM = #{sort} where ID = #{id}
+    </update>
+
+    <select id="getIndexCarouse" resultType="com.upd.hwcloud.bean.entity.webManage.Carousel">
+        SELECT
+        <include refid="columns"/>
+        FROM TB_CAROUSEL c
+        LEFT JOIN TB_FILES f ON c.IMAGE_ID = f.ID
+        WHERE c.STATUS = 2 and c.PROVINCIAL = #{p.province}
+        <if test="p.area !=null and p.area !=''">
+            AND c.AREA  like #{p.area}
+        </if>
+        <if test="p.police !=null and p.police !=''">
+            AND c.POLICE_CATEGORY like #{p.police}
+        </if>
+        <if test="p.project !=null and p.project !=''">
+            AND c.PROJECT like #{p.project}
+        </if>
+        ORDER BY c.SORT_NUM ASC, c.MODIFIED_TIME DESC
+    </select>
+
+    <select id="getAllOnlineOfType" resultMap="BaseResultMap">
+        select * from TB_CAROUSEL
+        <where>
+            <if test = "p.provincial == 1" >
+               and  PROVINCIAL = #{p.provincial}
+            </if>
+            <if test="p.provincial == 2">
+               and  PROVINCIAL = #{p.provincial}
+               and AREA = #{p.area}
+            </if>
+            <if test="p.provincial == 3">
+                and  PROVINCIAL = #{p.provincial}
+                and POLICE_CATEGORY = #{p.police}
+            </if>
+            <if test="p.provincial == 4">
+                and  PROVINCIAL = #{p.provincial}
+                and PROJECT = #{p.project}
+            </if>
+            and STATUS = 2c
+        </where>
+        ORDER BY SORT_NUM ASC, MODIFIED_TIME DESC
+    </select>
+
+    <select id="getPage" resultMap="BaseResultMap">
+        SELECT c.*,f.URL AS imageUrl FROM TB_CAROUSEL c
+        LEFT JOIN TB_FILES f ON c.IMAGE_ID = f.ID
+        WHERE c.PROVINCIAL  = #{p.province}
+        <choose>
+            <when test="status != null and status == 0">
+               AND  c.STATUS IN (0, 3)
+            </when>
+            <otherwise>
+               AND  c.STATUS = #{status}
+            </otherwise>
+        </choose>
+        <if test="title != null and title != ''">
+            AND c.TITLE LIKE CONCAT(CONCAT('%',#{title}),'%')
+        </if>
+        <if test="p.area !=null and p.area !=''">
+            AND c.AREA  like #{p.area}
+        </if>
+        <if test="p.police !=null and p.police !=''">
+            AND c.POLICE_CATEGORY like #{p.police}
+        </if>
+        <if test="p.project !=null and p.project !=''">
+            AND c.PROJECT like #{p.project}
+        </if>
+        ORDER BY c.SORT_NUM ASC, c.MODIFIED_TIME DESC
+    </select>
+
+    <!--这个兄弟，重写了条件构造器的selectById,属实恶心-->
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT c.*,f.URL AS imageUrl FROM TB_CAROUSEL c
+        LEFT JOIN TB_FILES f ON c.IMAGE_ID = f.ID
+        WHERE c.ID = #{id}
+    </select>
+</mapper>

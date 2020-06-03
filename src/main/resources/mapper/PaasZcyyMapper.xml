@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.PaasZcyyMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.PaasZcyy">
+        <id column="ID" property="id" />
+        <result column="APP_NAME" property="appName" />
+        <result column="AREA" property="area" />
+        <result column="POLICE_CATEGORY" property="policeCategory" />
+        <result column="MASTER_ID" property="masterId" />
+        <result column="sort" property="sort" />
+        <result column="BUILD_DATE" property="buildDate" />
+        <result column="CREATE_TIME" property="createTime" />
+        <result column="MODIFIED_TIME" property="modifiedTime" />
+    </resultMap>
+
+</mapper>

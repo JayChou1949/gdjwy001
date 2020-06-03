@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.ServiceFeedbackMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.ServiceFeedback">
+        <id column="ID" property="id" />
+        <result column="SERVICE_ID" property="serviceId" />
+        <result column="CONTENT" property="content" />
+        <result column="GNPJ" property="gnpj" />
+        <result column="YHTY" property="yhty" />
+        <result column="SFBJ" property="sfbj" />
+        <result column="CREATOR" property="creator" />
+        <result column="CREATE_TIME" property="createTime" />
+        <result column="MODIFIED_TIME" property="modifiedTime" />
+        <result column="REPLY_COUNT" property="replyCount"/>
+        <association property="user" column="CREATOR" select="com.upd.hwcloud.dao.UserMapper.findUserByIdcard" />
+    </resultMap>
+
+
+    <select id="getPage" resultMap="BaseResultMap">
+        select
+          *
+        from TB_SERVICE_FEEDBACK s
+        where s.SERVICE_ID = #{serviceId}
+        order by s.MODIFIED_TIME desc
+    </select>
+    <update id="updateReplyNum">
+        update TB_SERVICE_FEEDBACK set REPLY_COUNT = REPLY_COUNT+1 where ID=#{id}
+    </update>
+</mapper>

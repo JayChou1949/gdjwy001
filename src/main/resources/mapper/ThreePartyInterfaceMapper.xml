@@ -1,0 +1,396 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.ThreePartyInterfaceMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.ThreePartyInterface">
+        <id column="ID" property="id"/>
+        <result column="LABEL" property="label"/>
+        <result column="DATA" property="data"/>
+    </resultMap>
+
+    <select id="xtdytop" resultType="com.upd.hwcloud.bean.dto.XtdyExport">
+        select s.ACTUAL_ID ID,s.APP_NAME,s.CURRENT_TIME,s.REQ_COUNT,b.NAME SERVICE_ALIAS,b.PROVIDER
+        buildVendor,s.AREA_NAME,s.POLICE_CATEGORY,
+        s.MAX_LATENCY,s.AVG_LATENCY,s.MAX_BACKEND_LATENCY,s.AVG_BACKEND_LATENCY,s.MAX_INNER_LATENCY,s.AVG_INNER_LATENCY,(s.REQ_COUNT_4XX
+        + s.REQ_COUNT_5XX) abnormal,
+        b.CREATE_TIME serviceCreateTime,ins.CREATED_AT subscribeTime, nvl((select u.NAME from TB_USER u where u.IDCARD =
+        ins.USER_ID), ins.USER_ID) subscribeUser
+        from TB_APP_STATISTICS s left join TB_BIGDATA b on b.APIPRODUCT_ID = s.PRODUCT_FAMILY_ID
+        left join TB_SERVICE_INSTANCE ins on ins.ACTUAL_ID = s.ACTUAL_ID and ins.SERVICE_GUID = b.APIG_GUID
+        WHERE s.CATA_LOG = 7 and b.CATA_LOG = 7
+        <if test="starTime!=null and starTime!=''">
+            and s.CURRENT_TIME >= #{starTime}
+        </if>
+        <if test="endTime!=null and endTime!=''">
+            and s.CURRENT_TIME &lt;= #{endTime}
+        </if>
+        and
+        <if test="!normal">
+            not
+        </if>
+        regexp_like(s.APP_NAME, '[' || unistr('\0391') || '-' || unistr('\9fa5') || ']')
+        order by APP_NAME,SERVICE_ALIAS,CURRENT_TIME
+    </select>
+
+    <select id="daasInstance" resultType="com.upd.hwcloud.bean.dto.InstanceExport">
+        select ins.ALIAS,ins.APP_NAME,ins.NAME,ins.SERVICE_ALIAS,ins.CREATED_AT,ins.POLICE_CATEGORY,ins.AREA_NAME,
+        (select b.PROVIDER from TB_BIGDATA b where b.APIG_GUID = ins.SERVICE_GUID) PROVIDER
+        from TB_SERVICE_INSTANCE ins where CATA_LOG = 7
+        <if test="area!=null and area!=''">
+            and AREA_NAME = #{area}
+        </if>
+        <if test="category!=null and category!=''">
+            and POLICE_CATEGORY = #{category}
+        </if>
+        <if test="starTime!=null and starTime!=''">
+            AND CREATED_AT >= to_timestamp(#{starTime},'yyyy-mm-dd')
+        </if>
+        <if test="endTime!=null and endTime!=''">
+            AND CREATED_AT &lt;= (to_timestamp(#{endTime},'yyyy-mm-dd')+1)
+        </if>
+        order by ALIAS, CREATED_AT
+    </select>
+
+    <select id="fwfwtop" resultType="com.upd.hwcloud.bean.dto.DaasFwTopDTO">
+        select sum(s.REQ_COUNT) AS value ,b.NAME AS name,b.PROVIDER from TB_SERVICE_STATISTICS s,TB_BIGDATA b
+        WHERE b.CATA_LOG = 7 and b.STATUS = 2 and s.SERVICE_GUID = b.APIG_GUID
+        GROUP BY b.NAME,b.PROVIDER order by value desc
+    </select>
+
+    <select id="zxgztop" resultType="com.upd.hwcloud.bean.dto.DaasFwTopDTO">
+        select sum(s.REQ_COUNT) AS value ,b.NAME AS name,b.PROVIDER from TB_SERVICE_STATISTICS s,TB_BIGDATA b
+        WHERE b.CATA_LOG = 7 and b.STATUS = 2 and s.SERVICE_GUID = b.APIG_GUID
+        GROUP BY b.NAME,b.PROVIDER order by value desc
+    </select>
+
+    <select id="paasDelay" resultType="com.upd.hwcloud.bean.dto.DelayExport">
+        select b.NAME name,avg(AVG_LATENCY) delay,sum(REQ_COUNT) total from TB_SERVICE_STATISTICS s,TB_BIGDATA b
+        where s.SERVICE_GUID = b.APIG_GUID and b.STATUS = 2 and s.CATA_LOG in (8,9,10) group by b.NAME,s.SERVICE_GUID order by delay desc
+    </select>
+
+    <select id="paasAbnormal" resultType="com.upd.hwcloud.bean.dto.AbnoramlExport">
+        select s.SERVICE_GUID,b.NAME name,(sum(REQ_COUNT_4XX) + sum(REQ_COUNT_5XX)) abnormal,
+        (sum(REQ_COUNT_4XX) + sum(REQ_COUNT_5XX)) / sum(REQ_COUNT) abnormalRate,sum(REQ_COUNT) total from TB_SERVICE_STATISTICS s,TB_BIGDATA b
+        where s.SERVICE_GUID = b.APIG_GUID and b.STATUS = 2 and s.CATA_LOG in (8,9,10) group by b.NAME,s.SERVICE_GUID order by abnormalRate desc
+    </select>
+
+    <select id="paasFwfwExport" resultType="com.upd.hwcloud.bean.dto.Top10DTO">
+        select sum(s.REQ_COUNT) AS value ,b.NAME AS name from TB_SERVICE_STATISTICS s,TB_BIGDATA b
+        WHERE s.SERVICE_GUID = b.APIG_GUID and b.STATUS = 2 and s.CATA_LOG in (8,9,10)
+        GROUP BY b.NAME order by value desc
+    </select>
+
+    <select id="paasXtdyExport" resultType="com.upd.hwcloud.bean.dto.XtdyExport">
+        select s.ACTUAL_ID ID,s.APP_NAME,s.CURRENT_TIME,s.REQ_COUNT,b.NAME SERVICE_ALIAS,b.PROVIDER
+        buildVendor,s.AREA_NAME,s.POLICE_CATEGORY,
+        s.MAX_LATENCY,s.AVG_LATENCY,s.MAX_BACKEND_LATENCY,s.AVG_BACKEND_LATENCY,s.MAX_INNER_LATENCY,s.AVG_INNER_LATENCY,(s.REQ_COUNT_4XX
+        + s.REQ_COUNT_5XX) abnormal,
+        b.CREATE_TIME serviceCreateTime,ins.CREATED_AT subscribeTime, nvl((select u.NAME from TB_USER u where u.IDCARD =
+        ins.USER_ID), ins.USER_ID) subscribeUser
+        from TB_APP_STATISTICS s left join TB_BIGDATA b on b.APIPRODUCT_ID = s.PRODUCT_FAMILY_ID
+        left join TB_SERVICE_INSTANCE ins on ins.ACTUAL_ID = s.ACTUAL_ID and ins.SERVICE_GUID = b.APIG_GUID
+        WHERE s.CATA_LOG in (8,9,10) and b.CATA_LOG in (8,9,10)
+        <if test="starTime!=null and starTime!=''">
+            and s.CURRENT_TIME >= #{starTime}
+        </if>
+        <if test="endTime!=null and endTime!=''">
+            and s.CURRENT_TIME &lt;= #{endTime}
+        </if>
+        and
+        <if test="!normal">
+            not
+        </if>
+        regexp_like(s.APP_NAME, '[' || unistr('\0391') || '-' || unistr('\9fa5') || ']')
+        order by APP_NAME,SERVICE_ALIAS,CURRENT_TIME
+    </select>
+
+    <select id="paasInstance" resultType="com.upd.hwcloud.bean.dto.InstanceExport">
+        select ins.ALIAS,ins.APP_NAME,ins.NAME,ins.SERVICE_ALIAS,ins.CREATED_AT,ins.POLICE_CATEGORY,ins.AREA_NAME,
+        (select b.PROVIDER from TB_BIGDATA b where b.APIG_GUID = ins.SERVICE_GUID) PROVIDER
+        from TB_SERVICE_INSTANCE ins where CATA_LOG in (8,9,10)
+        <if test="area!=null and area!=''">
+            and AREA_NAME = #{area}
+        </if>
+        <if test="category!=null and category!=''">
+            and POLICE_CATEGORY = #{category}
+        </if>
+        <if test="starTime!=null and starTime!=''">
+            AND CREATED_AT >= to_timestamp(#{starTime},'yyyy-mm-dd')
+        </if>
+        <if test="endTime!=null and endTime!=''">
+            AND CREATED_AT &lt;= (to_timestamp(#{endTime},'yyyy-mm-dd')+1)
+        </if>
+        order by ALIAS, CREATED_AT
+    </select>
+
+    <select id="paasFwDyExport" resultType="com.upd.hwcloud.bean.dto.TopBdyDTO">
+        SELECT SERVICE_ALIAS NAME , COUNT(SERVICE_ALIAS) VALUE  FROM TB_SERVICE_INSTANCE
+        WHERE CATA_LOG in (8,9,10) and SERVICE_ALIAS is not null
+        GROUP BY SERVICE_ALIAS ORDER BY VALUE DESC
+    </select>
+
+    <select id="paasXtSubExport" resultType="com.upd.hwcloud.bean.dto.TopDyDTO">
+        select APP_NAME NAME,COUNT(APP_NAME) value from TB_SERVICE_INSTANCE
+        where  CATA_LOG in (8,9,10) and APP_NAME is not null and regexp_like(APP_NAME, '[' || unistr('\0391') || '-' || unistr('\9fa5') || ']')
+        group by APP_NAME ORDER BY value desc,name asc
+    </select>
+
+    <select id="paasZcjzExport" resultType="com.upd.hwcloud.bean.dto.TopJzDTO">
+        select POLICE_CATEGORY NAME,count(DISTINCT ACTUAL_ID) value from TB_APP_STATISTICS
+        where CATA_LOG in (8,9,10) and POLICE_CATEGORY is not null GROUP BY POLICE_CATEGORY ORDER BY VALUE desc,NAME
+    </select>
+
+    <sql id="areaPolice">
+        <choose>
+            <when test="type == 'area'">
+                and a.AREA_NAME != '省厅' and a.AREA_NAME = #{name}
+            </when>
+            <otherwise>
+                and a.AREA_NAME = '省厅' and a.POLICE_CATEGORY = #{name}
+            </otherwise>
+        </choose>
+    </sql>
+
+    <select id="getAreaPoliceAppCount" resultType="java.lang.Integer">
+        select count(DISTINCT ACTUAL_ID) FROM TB_SERVICE_INSTANCE a
+        WHERE a.CATA_LOG in (8,9,10) and a.STATUS = 'running' and a.ACTUAL_ID is not null
+        <include refid="areaPolice"/>
+    </select>
+
+    <select id="getAreaPoliceSubServiceCount" resultType="java.lang.Integer">
+        select count(*) FROM TB_SERVICE_INSTANCE a
+        WHERE a.CATA_LOG in (8,9,10) and a.STATUS = 'running'
+        <include refid="areaPolice"/>
+    </select>
+
+    <select id="getAreaPoliceReqCount" resultType="java.lang.Integer">
+        select sum(s.REQ_COUNT) FROM TB_SERVICE_STATISTICS s
+        inner join (
+        select DISTINCT(a.SERVICE_GUID) from TB_SERVICE_INSTANCE a
+        WHERE a.CATA_LOG in (8,9,10) and a.STATUS = 'running'
+        <include refid="areaPolice"/>
+        ) b
+        on b.SERVICE_GUID = s.SERVICE_GUID
+    </select>
+
+    <select id="getAreaPoliceYesterdayReqCount" resultType="java.lang.Integer">
+        select nvl(sum(s.REQ_COUNT), 0) FROM TB_SERVICE_STATISTICS s
+        inner join (
+        select DISTINCT(a.SERVICE_GUID) from TB_SERVICE_INSTANCE a
+        WHERE a.CATA_LOG in (8,9,10) and a.STATUS = 'running'
+        <include refid="areaPolice"/>
+        ) b
+        on b.SERVICE_GUID = s.SERVICE_GUID
+        where s.CURRENT_TIME = to_char(trunc(sysdate - 1), 'YYYY-MM-DD')
+    </select>
+
+    <select id="getAreaPoliceRecent10ReqService" resultType="com.upd.hwcloud.bean.dto.GeneralDTO">
+        select s.CURRENT_TIME name,sum(s.REQ_COUNT) value FROM TB_SERVICE_STATISTICS s
+        inner join (
+        select DISTINCT(a.SERVICE_GUID) from TB_SERVICE_INSTANCE a
+        WHERE a.CATA_LOG in (8,9,10) and a.STATUS = 'running'
+        <include refid="areaPolice"/>
+        ) b
+        on b.SERVICE_GUID = s.SERVICE_GUID
+        where s.CURRENT_TIME >= to_char(trunc(sysdate - 10), 'YYYY-MM-DD')
+        GROUP BY s.CURRENT_TIME
+        order by name desc
+    </select>
+
+    <select id="getAreaPoliceRecent7ReqDelay" resultType="com.upd.hwcloud.bean.dto.DelayDTO">
+        select s.CURRENT_TIME,avg(s.AVG_LATENCY) latency,avg(s.AVG_INNER_LATENCY) innerLatency FROM
+        TB_SERVICE_STATISTICS s
+        inner join (
+        select DISTINCT(a.SERVICE_GUID) from TB_SERVICE_INSTANCE a
+        WHERE a.CATA_LOG in (8,9,10) and a.STATUS = 'running'
+        <include refid="areaPolice"/>
+        ) b
+        on b.SERVICE_GUID = s.SERVICE_GUID
+        where s.CURRENT_TIME >= to_char(trunc(sysdate - 7), 'YYYY-MM-DD')
+        GROUP BY s.CURRENT_TIME
+        order by s.CURRENT_TIME desc
+    </select>
+
+    <select id="getAreaPoliceRecent7Req" resultType="com.upd.hwcloud.bean.dto.ReqDTO">
+        select s.CURRENT_TIME,sum(s.REQ_COUNT) reqCount,sum(s.REQ_COUNT_4XX + s.REQ_COUNT_5XX) abnormalReqCount FROM
+        TB_SERVICE_STATISTICS s
+        inner join (
+        select DISTINCT(a.SERVICE_GUID) from TB_SERVICE_INSTANCE a
+        WHERE a.CATA_LOG in (8,9,10) and a.STATUS = 'running'
+        <include refid="areaPolice"/>
+        ) b
+        on b.SERVICE_GUID = s.SERVICE_GUID
+        where s.CURRENT_TIME >= to_char(trunc(sysdate - 7), 'YYYY-MM-DD')
+        GROUP BY s.CURRENT_TIME
+        order by s.CURRENT_TIME desc
+    </select>
+
+    <select id="getServiceReqPage" resultType="com.upd.hwcloud.bean.dto.GeneralDTO">
+        select sum(s.REQ_COUNT) value,(select bb.NAME from TB_BIGDATA bb where bb.APIG_GUID = s.SERVICE_GUID) name FROM
+        TB_SERVICE_STATISTICS s
+        inner join (
+        select DISTINCT(a.SERVICE_GUID) from TB_SERVICE_INSTANCE a
+        WHERE a.CATA_LOG in (8,9,10) and a.STATUS = 'running'
+        <include refid="areaPolice"/>
+        ) b
+        on b.SERVICE_GUID = s.SERVICE_GUID
+        group by s.SERVICE_GUID
+        order by value desc
+    </select>
+
+    <select id="getAppReqPage" resultType="com.upd.hwcloud.bean.dto.GeneralDTO">
+        select a.APP_NAME name,sum(a.REQ_COUNT) value from TB_APP_STATISTICS a
+        WHERE a.CATA_LOG in (8,9,10) and regexp_like(a.APP_NAME, '[' || unistr('\0391') || '-' || unistr('\9fa5') ||
+        ']')
+        <include refid="areaPolice"/>
+        group by a.APP_NAME
+        order by value desc
+    </select>
+
+    <select id="getAppReqService" resultType="com.upd.hwcloud.bean.dto.AppReqServiceDTO">
+        select a.APP_NAME appName,b.NAME serviceName,
+        sum(a.REQ_COUNT) reqCount,sum(a.REQ_COUNT_4XX + a.REQ_COUNT_5XX) abnormalReqCount,
+        avg(a.AVG_LATENCY) latency,avg(a.AVG_INNER_LATENCY) innerLatency
+        from TB_APP_STATISTICS a left join TB_BIGDATA b on b.APIPRODUCT_ID = a.PRODUCT_FAMILY_ID
+        WHERE a.CATA_LOG in (8,9,10) and regexp_like(a.APP_NAME, '[' || unistr('\0391') || '-' || unistr('\9fa5') ||
+        ']')
+        <include refid="areaPolice"/>
+        <if test="p.appName != null and p.appName != ''">
+            AND a.APP_NAME like concat(concat('%', #{p.appName}),'%')
+        </if>
+        <if test="p.serviceName != null and p.serviceName != ''">
+            AND a.PRODUCT_FAMILY_NAME like concat(concat('%', #{p.serviceName}),'%')
+        </if>
+        group by a.APP_NAME,a.PRODUCT_FAMILY_ID,b.NAME
+        order by ${p.orderBy}
+    </select>
+
+    <select id="serviceMessage" resultType="com.upd.hwcloud.bean.dto.BigdataExport">
+       SELECT name,CREATE_TIME createTime,status,version,provider,label,APIG_GUID apigGuid,category,UPDATE_CYCLE updateCycle,
+       DATA_RESOURCE dataResource,DATA_FROM dataFrom,FROM_SYSTEM fromSystem,FROM_NET fromNet,COLLECTION_UNIT collectionUnit,explanation,
+       SERVICE_MODE serviceMode FROM TB_BIGDATA WHERE CATA_LOG = 7
+    </select>
+
+    <select id="policeCountAndOrder" resultType="com.upd.hwcloud.bean.dto.cov.CovOverview">
+        SELECT COUNT(DISTINCT I.POLICE_CATEGORY) count,COUNT(*) orderCount FROM TB_SERVICE_INSTANCE I INNER JOIN TB_BIGDATA B ON I.SERVICE_GUID=B.APIG_GUID WHERE B.CATEGORY = '疫情专项' AND I.STATUS ='running' AND I.AREA_NAME = '省厅' AND I.POLICE_CATEGORY IS NOT NULL
+    </select>
+
+    <select id="areaCountAndOrder" resultType="com.upd.hwcloud.bean.dto.cov.CovOverview">
+        SELECT COUNT(DISTINCT I.AREA_NAME) count,COUNT(*) orderCount FROM TB_SERVICE_INSTANCE I INNER JOIN TB_BIGDATA B ON I.SERVICE_GUID=B.APIG_GUID WHERE B.CATEGORY = '疫情专项' AND I.STATUS ='running' AND I.AREA_NAME != '省厅'
+    </select>
+
+    <select id="policeDy" resultType="int">
+        SELECT SUM(REQ_COUNT) FROM TB_APP_STATISTICS A
+        INNER JOIN TB_BIGDATA B ON A.PRODUCT_FAMILY_ID=B.APIPRODUCT_ID
+        WHERE B.CATEGORY = '疫情专项' AND A.AREA_NAME = '省厅' AND A.POLICE_CATEGORY IS NOT NULL
+    </select>
+    <select id="policeYesterdayDy" resultType="int">
+        SELECT SUM(REQ_COUNT) FROM TB_APP_STATISTICS A
+        INNER JOIN TB_BIGDATA B ON A.PRODUCT_FAMILY_ID=B.APIPRODUCT_ID
+        WHERE B.CATEGORY = '疫情专项' AND A.AREA_NAME = '省厅' AND A.POLICE_CATEGORY IS NOT NULL AND A.CURRENT_TIME=#{date}
+    </select>
+
+    <select id="areaDy" resultType="int">
+        SELECT SUM(REQ_COUNT) FROM TB_APP_STATISTICS A
+        INNER JOIN TB_BIGDATA B ON A.PRODUCT_FAMILY_ID=B.APIPRODUCT_ID
+        WHERE B.CATEGORY = '疫情专项' AND A.AREA_NAME != '省厅'
+    </select>
+
+    <select id="areaYesterdayDy" resultType="int">
+        SELECT SUM(REQ_COUNT) FROM TB_APP_STATISTICS A
+        INNER JOIN TB_BIGDATA B ON A.PRODUCT_FAMILY_ID=B.APIPRODUCT_ID
+        WHERE B.CATEGORY = '疫情专项' AND A.AREA_NAME != '省厅' AND A.CURRENT_TIME =#{date}
+    </select>
+
+    <select id="orderByPolice" resultType="com.upd.hwcloud.bean.dto.cov.CovOverviewLevel2">
+        SELECT I.POLICE_CATEGORY name,COUNT(I.POLICE_CATEGORY) orderCount FROM TB_SERVICE_INSTANCE I INNER JOIN TB_BIGDATA B ON I.SERVICE_GUID=B.APIG_GUID WHERE B.CATEGORY = '疫情专项' AND I.STATUS ='running' AND I.AREA_NAME = '省厅' AND I.POLICE_CATEGORY IS NOT NULL  GROUP BY I.POLICE_CATEGORY
+    </select>
+
+    <select id="dyByPolice" resultType="com.upd.hwcloud.bean.dto.cov.CovOverviewLevel2">
+        SELECT A.POLICE_CATEGORY name, SUM(REQ_COUNT) dyCount FROM TB_APP_STATISTICS A
+        INNER JOIN TB_BIGDATA B ON A.PRODUCT_FAMILY_ID=B.APIPRODUCT_ID
+        WHERE B.CATEGORY = '疫情专项' AND A.AREA_NAME = '省厅' AND A.POLICE_CATEGORY IS NOT NULL GROUP BY A.POLICE_CATEGORY
+    </select>
+
+    <select id="ydByPolice" resultType="com.upd.hwcloud.bean.dto.cov.CovOverviewLevel2">
+        SELECT A.POLICE_CATEGORY name, SUM(REQ_COUNT) ydCount FROM TB_APP_STATISTICS A
+        INNER JOIN TB_BIGDATA B ON A.PRODUCT_FAMILY_ID=B.APIPRODUCT_ID
+        WHERE B.CATEGORY = '疫情专项' AND A.AREA_NAME = '省厅' AND A.POLICE_CATEGORY IS NOT NULL AND A.CURRENT_TIME=#{date} GROUP BY A.POLICE_CATEGORY
+    </select>
+
+    <select id="orderByArea" resultType="com.upd.hwcloud.bean.dto.cov.CovOverviewLevel2">
+        SELECT I.AREA_NAME name,COUNT(I.AREA_NAME) orderCount FROM TB_SERVICE_INSTANCE I INNER JOIN TB_BIGDATA B ON I.SERVICE_GUID=B.APIG_GUID WHERE B.CATEGORY = '疫情专项' AND I.STATUS ='running' AND I.AREA_NAME != '省厅' GROUP BY I.AREA_NAME
+    </select>
+
+    <select id="dyByArea" resultType="com.upd.hwcloud.bean.dto.cov.CovOverviewLevel2">
+        SELECT A.AREA_NAME name, SUM(REQ_COUNT) dyCount FROM TB_APP_STATISTICS A
+        INNER JOIN TB_BIGDATA B ON A.PRODUCT_FAMILY_ID=B.APIPRODUCT_ID
+        WHERE B.CATEGORY = '疫情专项' AND A.AREA_NAME != '省厅' GROUP BY A.AREA_NAME
+    </select>
+
+    <select id="ydByArea" resultType="com.upd.hwcloud.bean.dto.cov.CovOverviewLevel2">
+        SELECT A.AREA_NAME name, SUM(REQ_COUNT) ydCount FROM TB_APP_STATISTICS A
+        INNER JOIN TB_BIGDATA B ON A.PRODUCT_FAMILY_ID=B.APIPRODUCT_ID
+        WHERE B.CATEGORY = '疫情专项' AND A.AREA_NAME != '省厅' AND A.CURRENT_TIME =#{date}GROUP BY A.AREA_NAME
+    </select>
+
+    <select id="policeTotal" resultType="int">
+        SELECT COUNT(*) FROM TB_APP_STATISTICS A
+        INNER JOIN TB_BIGDATA B ON A.PRODUCT_FAMILY_ID=B.APIPRODUCT_ID
+        WHERE B.CATEGORY = '疫情专项' AND A.AREA_NAME = '省厅' AND A.POLICE_CATEGORY =#{policeName}
+    </select>
+
+    <select id="policeStatistic" resultType="com.upd.hwcloud.bean.dto.cov.CovStatistic">
+        SELECT temp.* FROM
+        (SELECT tt.*,ROWNUM num FROM
+        (SELECT A.APP_NAME appName,A.POLICE_CATEGORY CATEGORY,B.NAME serviceName,A.REQ_COUNT req,A.CURRENT_TIME time FROM TB_APP_STATISTICS A
+        INNER JOIN TB_BIGDATA B ON A.PRODUCT_FAMILY_ID=B.APIPRODUCT_ID
+        WHERE B.CATEGORY = '疫情专项' AND A.AREA_NAME = '省厅' AND A.POLICE_CATEGORY =#{policeName} ORDER BY A.CURRENT_TIME DESC) tt WHERE ROWNUM &lt;=#{after}) temp WHERE temp.num>#{before}
+    </select>
+
+    <select id="areaTotal" resultType="int">
+        SELECT COUNT(*) FROM TB_APP_STATISTICS A
+        INNER JOIN TB_BIGDATA B ON A.PRODUCT_FAMILY_ID=B.APIPRODUCT_ID
+        WHERE B.CATEGORY = '疫情专项' AND A.AREA_NAME = #{areaName}
+    </select>
+
+    <select id="areaStatistic" resultType="com.upd.hwcloud.bean.dto.cov.CovStatistic">
+        SELECT temp.* FROM
+        (SELECT tt.*,ROWNUM num FROM
+        (SELECT A.APP_NAME appName,A.AREA_NAME CATEGORY,B.NAME serviceName,A.REQ_COUNT req,A.CURRENT_TIME time FROM TB_APP_STATISTICS A
+        INNER JOIN TB_BIGDATA B ON A.PRODUCT_FAMILY_ID=B.APIPRODUCT_ID
+        WHERE B.CATEGORY = '疫情专项' AND A.AREA_NAME = #{areaName} ORDER BY A.CURRENT_TIME DESC) tt WHERE ROWNUM &lt;=#{after}) temp WHERE temp.num>#{before}
+    </select>
+
+    <select id="policeOrderTotal" resultType="int">
+        SELECT COUNT(*) FROM TB_SERVICE_INSTANCE I INNER JOIN TB_BIGDATA B ON I.SERVICE_GUID=B.APIG_GUID
+        WHERE B.CATEGORY = '疫情专项' AND I.STATUS ='running' AND I.AREA_NAME = '省厅' AND I.POLICE_CATEGORY = #{policeName}
+    </select>
+
+    <select id="policeOrderDetail" resultType="com.upd.hwcloud.bean.dto.cov.CovOrderDetail">
+        SELECT temp.* FROM
+        (SELECT tt.*,ROWNUM num FROM
+        (SELECT I.APP_NAME appName,B.NAME serviceName,I.CREATED_AT orderTime,I.POLICE_CATEGORY category,ACTUAL_ID instanceId,B.APIPRODUCT_ID serviceId
+        FROM TB_SERVICE_INSTANCE I INNER JOIN TB_BIGDATA B ON I.SERVICE_GUID=B.APIG_GUID
+        WHERE B.CATEGORY = '疫情专项' AND I.STATUS ='running' AND I.AREA_NAME = '省厅' AND I.POLICE_CATEGORY = #{policeName} ORDER BY I.CREATED_AT DESC) tt WHERE ROWNUM &lt;=#{after}) temp WHERE temp.num>#{before}
+    </select>
+
+    <select id="areaOrderTotal" resultType="int">
+        SELECT COUNT(*) FROM TB_SERVICE_INSTANCE I INNER JOIN TB_BIGDATA B ON I.SERVICE_GUID=B.APIG_GUID
+        WHERE B.CATEGORY = '疫情专项' AND I.STATUS ='running' AND I.AREA_NAME = #{areaName}
+    </select>
+
+    <select id="areaOrderDetail" resultType="com.upd.hwcloud.bean.dto.cov.CovOrderDetail">
+        SELECT temp.* FROM
+        (SELECT tt.*,ROWNUM num FROM
+        (SELECT I.APP_NAME appName,B.NAME serviceName,I.CREATED_AT orderTime,I.AREA_NAME category,ACTUAL_ID instanceId,B.APIPRODUCT_ID serviceId
+        FROM TB_SERVICE_INSTANCE I INNER JOIN TB_BIGDATA B ON I.SERVICE_GUID=B.APIG_GUID
+        WHERE B.CATEGORY = '疫情专项' AND I.STATUS ='running' AND I.AREA_NAME = #{areaName} ORDER BY I.CREATED_AT DESC) tt WHERE ROWNUM &lt;=#{after}) temp WHERE temp.num>#{before}
+    </select>
+
+    <select id="lineDyCount" resultType="int">
+        SELECT SUM(REQ_COUNT) FROM TB_APP_STATISTICS WHERE ACTUAL_ID = #{instanceId} AND PRODUCT_FAMILY_ID = #{serviceId}
+    </select>
+
+</mapper>

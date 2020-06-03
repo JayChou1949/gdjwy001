@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.SaasRecoverApplicationMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.SaasRecoverApplication">
+        <id column="ID" property="id" />
+        <result column="CREATOR" property="creator" />
+        <result column="CREATOR_NAME" property="creatorName" />
+        <result column="ORG_ID" property="orgId" />
+        <result column="ORG_NAME" property="orgName" />
+        <result column="POST" property="post" />
+        <result column="PHONE" property="phone" />
+        <result column="CREATE_TIME" property="createTime" />
+        <result column="MODIFIED_TIME" property="modifiedTime" />
+        <result column="BILL_NUM" property="billNum" />
+        <result column="STATUS" property="status" />
+        <result column="RECHECK_TIME" property="recheckTime" />
+        <result column="BIG_DATA_TIME" property="bigDataTime" />
+        <result column="CARRY_TIME" property="carryTime" />
+        <result column="FLOW_INSTANCE_ID" property="flowInstanceId" />
+        <result column="AREAS" property="areas" />
+        <result column="POLICE_CATEGORY" property="policeCategory" />
+        <result column="APPLY_TYPE" property="applyType" />
+        <result column="IS_IMPORT" property="isImport" />
+    </resultMap>
+
+    <select id="getRecoverPage" resultMap="BaseResultMap">
+        select a.ID,a.BILL_NUM,a.CREATOR,a.CREATOR_NAME,a.ORG_ID,a.ORG_NAME,a.CREATE_TIME,a.STATUS
+				 from TB_SAAS_RECOVER_APPLICATION a
+				 join TB_WFM_INSTANCE b on a.ID=b.BUSINESSID
+				 join TB_WFM_ACTIVITY c on b.ID = c.INSTANCEID
+				 join TB_WFM_WORKFLOWMODEL d on d.ID = c.MODELID
+        <where>
+            <choose>
+                <when test="p.status == null or p.status == ''">
+                    a.STATUS not in (-1,0)
+                </when>
+                <when test="p.status == 1">
+                    AND a.STATUS in (1,7,101,102)
+                </when>
+                <when test="p.status == 5">
+                    AND a.STATUS in (5,8)
+                </when>
+                <otherwise>
+                    AND a.STATUS = #{p.status}
+                </otherwise>
+            </choose>
+            <!-- 可以按申请人/申请单号查询 -->
+            <if test="p.keyword != null and p.keyword != ''">
+                AND a.BILL_NUM = #{p.keyword}
+            </if>
+            <if test="p.user.idcard != null and p.user.idcard != ''">
+                AND (c.HANDLEPERSONIDS =  #{p.user.idcard} or (d.noticeperon like concat(concat('%', #{p.user.idcard}),'%') or d.ADVISERPERSON like concat(concat('%', #{p.user.idcard}),'%')))
+            </if>
+            <if test="(p.startDate != null and p.startDate != '') and (p.endDate != null and p.endDate != '')">
+                AND TO_CHAR(a.CREATE_TIME,'YYYY-MM-DD') &gt;= #{p.startDate}
+                AND TO_CHAR(a.CREATE_TIME,'YYYY-MM-DD') &lt;= #{p.endDate}
+            </if>
+        </where>
+				 GROUP BY a.ID,a.BILL_NUM,a.CREATOR,a.CREATOR_NAME,a.ORG_ID,a.ORG_NAME,a.CREATE_TIME,a.STATUS
+				 order by a.CREATE_TIME desc
+    </select>
+
+
+    <sql id="publicQuery">
+        <choose>
+            <when test="p.status == null or p.status == ''">
+                AND ai.STATUS not in (-1,0)
+            </when>
+            <when test="p.status == 1">
+                AND ai.STATUS in (1,7,101,102)
+            </when>
+            <when test="p.status == 5">
+                AND ai.STATUS in (5,8)
+            </when>
+            <otherwise>
+                AND ai.STATUS = #{p.status}
+            </otherwise>
+        </choose>
+        <!-- 可以按申请人/申请单号查询 -->
+        <if test="p.userName != null and p.userName != ''">
+            AND (
+            ai.CREATOR_NAME = #{p.userName}
+            OR
+            ai.ORDER_NUMBER = #{p.userName}
+            )
+        </if>
+    </sql>
+    <select id="getRecoverPageWithHandler" resultMap="BaseResultMap">
+        select r.*,p.PROCESSING_PERSON from (SELECT distinct ai.*
+        from TB_WFM_ACTIVITY act,TB_WFM_INSTANCE ins,TB_SAAS_RECOVER_APPLICATION ai ,TB_WFM_WORKFLOWMODEL m
+        <where>
+            <choose>
+                <when test="p.status == null or p.status == ''">
+                    ai.STATUS not in (-1,0)
+                </when>
+                <when test="p.status == 1">
+                    AND ai.STATUS in (1,7,101,102)
+                </when>
+                <when test="p.status == 5">
+                    AND ai.STATUS in (5,8)
+                </when>
+                <otherwise>
+                    AND ai.STATUS = #{p.status}
+                </otherwise>
+            </choose>
+            <!-- 可以按申请人/申请单号查询 -->
+            <if test="p.keyword != null and p.keyword != ''">
+                AND ai.BILL_NUM = #{p.keyword}
+            </if>
+            and ai.ID=ins.BUSINESSID and act.INSTANCEID = ins.ID  and m.ID=act.MODELID
+            <if test="p.user.idcard != null and p.user.idcard != ''">
+                AND (act.HANDLEPERSONIDS =  #{p.user.idcard} or (m.noticeperon like concat(concat('%', #{p.user.idcard}),'%') or m.ADVISERPERSON like concat(concat('%', #{p.user.idcard}),'%')))
+            </if>
+            <if test="(p.startDate != null and p.startDate != '') and (p.endDate != null and p.endDate != '')">
+                AND TO_CHAR(ai.CREATE_TIME,'YYYY-MM-DD') &gt;= #{p.startDate}
+                AND TO_CHAR(ai.CREATE_TIME,'YYYY-MM-DD') &lt;= #{p.endDate}
+            </if>
+            <!-- 选择处理人为:我 -->
+            <if test="p.user.type != 100">
+                and (act.HANDLEPERSONIDS =  #{p.user.idcard} or m.noticeperon like concat(concat('%', #{p.user.idcard}),'%') )
+            </if>
+            <!-- 选择处理人为:我 -->
+            <if test="p.processType == 1">
+                and act.HANDLEPERSONIDS =#{p.user.idcard}
+                AND act.ACTIVITYSTATUS='待办' AND act.ACTIVITYTYPE is NULL
+            </if>
+            <!-- 选择处理人为:其他人 -->
+            <if test="p.processType == 2">
+                and  act.HANDLEPERSONIDS !=#{p.user.idcard}  AND act.ACTIVITYSTATUS='待办' AND act.ACTIVITYTYPE is NULL
+            </if>
+        </where>) r
+        left join (select act.INSTANCEID,ins.BUSINESSID,to_char(wm_concat(distinct U . NAME)) AS PROCESSING_PERSON from TB_USER u,TB_WFM_ACTIVITY act,TB_WFM_INSTANCE ins  where u.IDCARD = act.HANDLEPERSONIDS  and ins.ID = act.INSTANCEID and act.ACTIVITYSTATUS='待办' and act.ACTIVITYTYPE is NULL group by act.INSTANCEID,ins.BUSINESSID) p ON p.BUSINESSID = r.ID
+        ORDER BY r.MODIFIED_TIME DESC
+    </select>
+
+    <select id="getRecoverPageWithHandlerBank" resultMap="BaseResultMap">
+        SELECT distinct ai.*,(SELECT to_char(wm_concat(distinct U . NAME)) FROM TB_WFM_ACTIVITY act1,TB_USER U WHERE u.IDCARD=ACT1.HANDLEPERSONIDS AND ACT1.ACTIVITYSTATUS='待办' 	AND act1.INSTANCEID = ins. ID AND ACT1.ACTIVITYTYPE is NULL)  AS PROCESSING_PERSON
+        from  TB_SAAS_RECOVER_APPLICATION ai,TB_WFM_ACTIVITY act,TB_WFM_INSTANCE ins,TB_WFM_WORKFLOWMODEL m
+        <where>
+            <choose>
+                <when test="p.status == null or p.status == ''">
+                    ai.STATUS not in (-1,0)
+                </when>
+                <when test="p.status == 1">
+                    AND ai.STATUS in (1,7,101,102)
+                </when>
+                <when test="p.status == 5">
+                    AND ai.STATUS in (5,8)
+                </when>
+                <otherwise>
+                    AND ai.STATUS = #{p.status}
+                </otherwise>
+            </choose>
+            <!-- 可以按申请人/申请单号查询 -->
+            <if test="p.keyword != null and p.keyword != ''">
+                AND ai.BILL_NUM = #{p.keyword}
+            </if>
+            and ai.ID=ins.BUSINESSID and act.INSTANCEID = ins.ID  and m.ID=act.MODELID
+            <if test="p.user.idcard != null and p.user.idcard != ''">
+                AND (act.HANDLEPERSONIDS =  #{p.user.idcard} or (m.noticeperon like concat(concat('%', #{p.user.idcard}),'%') or m.ADVISERPERSON like concat(concat('%', #{p.user.idcard}),'%')))
+            </if>
+            <if test="(p.startDate != null and p.startDate != '') and (p.endDate != null and p.endDate != '')">
+                AND TO_CHAR(ai.CREATE_TIME,'YYYY-MM-DD') &gt;= #{p.startDate}
+                AND TO_CHAR(ai.CREATE_TIME,'YYYY-MM-DD') &lt;= #{p.endDate}
+            </if>
+        </where>
+        ORDER BY ai.MODIFIED_TIME DESC
+    </select>
+
+
+    <select id="saasRecoverExport" resultType="com.upd.hwcloud.bean.dto.SaasRecoverTotal">
+        select ra.BILL_NUM,sa.CREATOR_NAME,sa.CREATOR,sa.ORG_NAME,sa.AREAS,sa.POLICE_CATEGORY,sa.POST_TYPE post,sa.MOBILE_WORK phone,
+        ra.CREATE_TIME,ra.RECHECK_TIME,ra.BIG_DATA_TIME,ra.CARRY_TIME,ext.SERVICE_NAME reServiceName
+        from TB_SAAS_RECOVER_APPLICATION ra,TB_SAAS_APPLICATION sa,TB_SAAS_APPLICATION_EXT ext
+        where ra.ID = sa.RECOVER_ID and ext.MASTER_ID = sa.ID and ra.STATUS = '3'
+        <if test="areas != null and areas != ''">
+            and sa.AREAS = #{areas}
+        </if>
+        <if test="policeCategory != null and policeCategory != ''">
+            and sa.POLICE_CATEGORY = #{policeCategory}
+        </if>
+        <if test="p.submitStartDate != null and p.submitEndDate != null">
+            and TO_CHAR(ra.RECHECK_TIME, 'yyyy-mm-dd') BETWEEN #{p.submitStartDate} AND #{p.submitEndDate}
+        </if>
+        <if test="p.bigdataStartDate != null and p.bigdataEndDate != null">
+            and TO_CHAR(ra.BIG_DATA_TIME, 'yyyy-mm-dd') BETWEEN #{p.bigdataStartDate} AND #{p.bigdataEndDate}
+        </if>
+        <if test="p.carryStartDate != null and p.carryEndDate != null">
+            and TO_CHAR(ra.CARRY_TIME, 'yyyy-mm-dd') BETWEEN #{p.carryStartDate} AND #{p.carryEndDate}
+        </if>
+        order by ra.BILL_NUM desc,sa.CREATOR_NAME
+    </select>
+</mapper>

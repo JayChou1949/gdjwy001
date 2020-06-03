@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.wfm.WorkflowMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.wfm.Workflow">
+        <id column="ID" property="id" />
+        <result column="WORKFLOWNAME" property="workflowname" />
+        <result column="WORKFLOWTYPE" property="workflowtype" />
+        <result column="ACESSURL" property="acessurl" />
+        <result column="IMAGEURL" property="imageurl" />
+        <result column="CREATOR" property="creator" />
+        <result column="CREATE_TIME" property="createTime" />
+        <result column="MODIFIED_TIME" property="modifiedTime" />
+        <result column="ROUTERNAME" property="routername" />
+        <result column="DEFAULT_PROCESS" property="defaultProcess"/>
+        <result column="AREA" property="area"/>
+        <result column="VERSION" property="version"/>
+        <result column="POLICE_CATEGORY" property="policeCategory"/>
+    </resultMap>
+
+    <select id="getHandlersMap" resultType="com.upd.hwcloud.bean.vo.KeyAndValueStr">
+        select  wf.DEFAULT_PROCESS key,wm_concat(DISTINCT mo.DEFAULTHANDLEPERSON) value
+        from TB_WFM_WORKFLOW wf
+        LEFT JOIN TB_WFM_WORKFLOWMODEL mo ON mo.WORKFLOWID = wf.id
+        where (wf.DEFAULT_PROCESS = 'ZYSB' or wf.DEFAULT_PROCESS = 'SAAS_POWER_RECOVER') and mo.DEFAULTHANDLEPERSON is not null
+        GROUP BY wf.DEFAULT_PROCESS
+    </select>
+
+</mapper>

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.IaasOverviewMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.IaasOverview">
+        <id column="ID" property="id"/>
+        <result column="AREA" property="area"/>
+        <result column="PHASE" property="phase"/>
+        <result column="CENTRAL" property="central"/>
+        <result column="SERVER" property="server"/>
+        <result column="NETWORK_DEVICE" property="networkDevice"/>
+        <result column="STORAGE_DEVICE" property="storageDevice"/>
+        <result column="ELASTIC_CLOUD_SERVER" property="elasticCloudServer"/>
+        <result column="BARE_METAL_SERVER" property="bareMetalServer"/>
+        <result column="DESKTOP_CLOUD" property="desktopCloud"/>
+        <result column="ELASTIC_VOLUME" property="elasticVolume"/>
+        <result column="ELASTIC_SCALING" property="elasticScaling"/>
+        <result column="ELASTIC_FILE" property="elasticFile"/>
+        <result column="OBJECT_STORAGE" property="objectStorage"/>
+        <result column="ELASTIC_LOAD_BALANCING" property="elasticLoadBalancing"/>
+        <result column="CLUSTERS" property="clusters"/>
+        <result column="MODULE" property="module"/>
+        <result column="BD_SERVER" property="bdServer"/>
+        <result column="BD_TORAGE_TOTAL" property="bdTorageTotal"/>
+        <result column="VCPU_TOTAL" property="vcpuTotal"/>
+        <result column="VCPU_USED" property="vcpuUsed"/>
+        <result column="VCPU_ALLOCATED" property="vcpuAllocated"/>
+        <result column="GPU_TOTAL" property="gpuTotal"/>
+        <result column="GPU_USED" property="gpuUsed"/>
+        <result column="GPU_ALLOCATED" property="gpuAllocated"/>
+        <result column="MEMORY_TOTAL" property="memoryTotal"/>
+        <result column="MEMORY_USED" property="memoryUsed"/>
+        <result column="MEMORY_ALLOCATED" property="memoryAllocated"/>
+        <result column="DISK_TOTAL" property="diskTotal"/>
+        <result column="DISK_USED" property="diskUsed"/>
+        <result column="DISK_ALLOCATED" property="diskAllocated"/>
+        <result column="CREATE_TIME" property="createTime"/>
+        <result column="MODIFIED_TIME" property="modifiedTime"/>
+    </resultMap>
+
+    <select id="sumAll" resultMap="BaseResultMap">
+        SELECT
+        SUM( SERVER ) SERVER,
+        SUM( NETWORK_DEVICE ) NETWORK_DEVICE,
+        SUM( STORAGE_DEVICE ) STORAGE_DEVICE,
+        SUM( ELASTIC_CLOUD_SERVER ) ELASTIC_CLOUD_SERVER,
+        SUM( BARE_METAL_SERVER ) BARE_METAL_SERVER,
+        SUM( DESKTOP_CLOUD ) DESKTOP_CLOUD,
+        SUM( ELASTIC_VOLUME ) ELASTIC_VOLUME,
+        SUM( ELASTIC_SCALING ) ELASTIC_SCALING,
+        SUM( ELASTIC_FILE ) ELASTIC_FILE,
+        SUM( OBJECT_STORAGE ) OBJECT_STORAGE,
+        SUM( ELASTIC_LOAD_BALANCING ) ELASTIC_LOAD_BALANCING,
+        SUM( CLUSTERS ) CLUSTERS,
+        SUM( "MODULE" ) "MODULE",
+        SUM( BD_SERVER ) BD_SERVER,
+        SUM( BD_TORAGE_TOTAL ) BD_TORAGE_TOTAL,
+        SUM( VCPU_TOTAL ) VCPU_TOTAL,
+        CASE
+        SUM( VCPU_TOTAL )
+        WHEN 0 THEN
+        0 ELSE ROUND( SUM( VCPU_TOTAL * VCPU_USED ) / SUM( VCPU_TOTAL ), 4 )
+        END VCPU_USED,
+        CASE
+        SUM( VCPU_TOTAL )
+        WHEN 0 THEN
+        0 ELSE ROUND( SUM( VCPU_TOTAL * VCPU_ALLOCATED ) / SUM( VCPU_TOTAL ), 4 )
+        END VCPU_ALLOCATED,
+        SUM( GPU_TOTAL ) GPU_TOTAL,
+        CASE
+        SUM( GPU_TOTAL )
+        WHEN 0 THEN
+        0 ELSE ROUND( SUM( GPU_TOTAL * GPU_USED ) / SUM( GPU_TOTAL ), 4 )
+        END GPU_USED,
+        CASE
+        SUM( GPU_TOTAL )
+        WHEN 0 THEN
+        0 ELSE ROUND( SUM( GPU_TOTAL * GPU_ALLOCATED ) / SUM( GPU_TOTAL ), 4 )
+        END GPU_ALLOCATED,
+        SUM( MEMORY_TOTAL ) MEMORY_TOTAL,
+        CASE
+        SUM( MEMORY_TOTAL )
+        WHEN 0 THEN
+        0 ELSE ROUND( SUM( MEMORY_TOTAL * MEMORY_USED ) / SUM( MEMORY_TOTAL ), 4 )
+        END MEMORY_USED,
+        CASE
+        SUM( MEMORY_TOTAL )
+        WHEN 0 THEN
+        0 ELSE ROUND( SUM( MEMORY_TOTAL * MEMORY_ALLOCATED ) / SUM( MEMORY_TOTAL ), 4 )
+        END MEMORY_ALLOCATED,
+        SUM( DISK_TOTAL ) DISK_TOTAL,
+        CASE
+        SUM( DISK_TOTAL )
+        WHEN 0 THEN
+        0 ELSE ROUND( SUM( DISK_TOTAL * DISK_USED ) / SUM( DISK_TOTAL ), 4 )
+        END DISK_USED,
+        CASE
+        SUM( DISK_TOTAL )
+        WHEN 0 THEN
+        0 ELSE ROUND( SUM( DISK_TOTAL * DISK_ALLOCATED ) / SUM( DISK_TOTAL ), 4 )
+        END DISK_ALLOCATED
+        FROM
+        TB_IAAS_OVERVIEW
+        <where>
+            <if test="area != null and area != ''">
+                AND area = #{area}
+            </if>
+        </where>
+    </select>
+</mapper>
+
+

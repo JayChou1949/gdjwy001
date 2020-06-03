@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.wfm.ActivityMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.wfm.Activity">
+        <id column="ID" property="id" />
+        <result column="INSTANCEID" property="instanceid" />
+        <result column="MODELID" property="modelid" />
+        <result column="CREATETIME" property="createtime" />
+        <result column="CREATEPERSONID" property="createpersonid" />
+        <result column="RECIVETIME" property="recivetime" />
+        <result column="HANDLETIME" property="handletime" />
+        <result column="HANDLEPERSONIDS" property="handlepersonids" />
+        <result column="ISSTART" property="isstart" />
+        <result column="PREVIOUSACTIVITYIDS" property="previousactivityids" />
+        <result column="ACTIVITYSTATUS" property="activitystatus" />
+        <result column="HANDLEDEPARTMENT" property="handledepartment" />
+        <result column="ACTIVITYTYPE" property="activitytype" />
+        <result column="ISRECEVE" property="isreceve" />
+    </resultMap>
+
+    <update id="terminationActivity" parameterType="String">
+	    update TB_WFM_Activity set activityStatus='已终止' where instanceId=#{instanceId} and activityStatus='待办'
+	</update>
+    <select id="selectFallBackActivity" resultMap="BaseResultMap" >
+	    select * from TB_WFM_Activity where modelId=#{modelId,jdbcType=VARCHAR} and instanceId =#{instanceId,jdbcType=VARCHAR} and (activityStatus ='已提交' or activityStatus ='已抢占')
+	</select>
+
+    <select id="getResultActivities" resultMap="BaseResultMap">
+	    select * from TB_WFM_Activity where instanceId=#{instanceId,jdbcType=VARCHAR} and activityStatus !='已回退' and activityStatus !='等待' and activityStatus !='已转发' and  activityStatus !='已呈批' and  activityStatus !='已抢单' and activityStatus !='已抢占'
+	      and activityStatus !='已加办'
+	</select>
+
+    <select id="getAgencyTaskNumberByIdCard" resultType="java.lang.Integer" parameterType="String">
+	    select count(1) from TB_WFM_Activity where handlePersonids=#{userId,jdbcType=VARCHAR} and ACTIVITYSTATUS='待办' order by createtime desc
+	</select>
+
+    <select id="getKxDoneByIdCard" resultType="java.lang.Integer">
+        SELECT
+	      count( * )
+        FROM
+	      TB_WFM_ACTIVITY act,
+	      TB_WFM_WORKFLOWMODEL m
+        WHERE
+	      m.ID = act.MODELID
+	      AND m.MODELNAME != '申请'
+	      AND m.MODELNAME != '本单位审批'
+	      AND m.MODELNAME != '二级管理员审批'
+	      AND act.ACTIVITYSTATUS = '已提交'
+	      AND act.HANDLEPERSONIDS = #{idCard}
+    </select>
+</mapper>

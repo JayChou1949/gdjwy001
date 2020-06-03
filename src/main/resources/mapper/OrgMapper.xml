@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.OrgMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.Org">
+        <id column="ID" property="id" />
+        <result column="CODE" property="code" />
+        <result column="FULL_NAME" property="fullName" />
+        <result column="SHORT_NAME" property="shortName" />
+        <result column="AREA_CODE" property="areaCode" />
+        <result column="ORG_TYPE" property="orgType" />
+        <result column="ORG_KIND" property="orgKind" />
+        <result column="DEPT_KIND" property="deptKind" />
+        <result column="BIZ_TYPE" property="bizType" />
+        <result column="ORG_LEVEL" property="orgLevel" />
+        <result column="UP_GOV_ID" property="upGovId" />
+        <result column="UP_GOV_NAME" property="upGovName" />
+        <result column="LINK_MAN" property="linkMan" />
+        <result column="TEL" property="tel" />
+        <result column="EMAIL" property="email" />
+        <result column="ADDRESS" property="address" />
+        <result column="POSTCODE" property="postcode" />
+        <result column="DETAIL" property="detail" />
+        <result column="DELETED" property="deleted" />
+        <result column="SORT_NO" property="sortNo" />
+        <result column="ORG_RANK" property="orgRank" />
+        <result column="TENANT_MANAGER" property="tenantManager" />
+    </resultMap>
+
+    <select id="queryParentTreeByOrgId" resultMap="BaseResultMap">
+        select
+          o.*
+        from TB_ORG o
+         start with o.ID = #{orgId}
+        connect by o.ID = prior o.UP_GOV_ID
+    </select>
+
+    <select id="querySubTreeByOrgId" resultMap="BaseResultMap">
+        select
+          o.*
+        from TB_ORG o
+         start with o.ID = #{orgId}
+        connect by prior o.ID = o.UP_GOV_ID
+    </select>
+
+    <select id="search" resultType="com.upd.hwcloud.bean.entity.Org">
+        select o.ID,o.FULL_NAME from TB_ORG o where o.FULL_NAME like CONCAT(CONCAT('%',#{keyword}),'%')
+        union
+        select m.ID,m.MANUFACTURER_NAME FULL_NAME from TB_MANUFACTURERS m where m.MANUFACTURER_NAME like CONCAT(CONCAT('%',#{keyword}),'%')
+    </select>
+
+    <select id="allOrgByLevel1" resultType="com.upd.hwcloud.bean.dto.cov.CloudDeskIdAndUnit">
+        SELECT ID id,FULL_NAME unit FROM TB_ORG WHERE UP_GOV_NAME = '广东省公安厅' AND FULL_NAME != '省直属单位' OR UP_GOV_NAME = '省直属单位'
+    </select>
+
+</mapper>

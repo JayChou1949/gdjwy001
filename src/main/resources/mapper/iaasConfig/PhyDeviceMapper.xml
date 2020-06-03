@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.iaasConfig.PhyDeviceMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.iaasConfig.PhyDevice">
+        <id column="ID" property="id" />
+        <result column="SERVER" property="server" />
+        <result column="ROUTER" property="router" />
+        <result column="STORAGE" property="storage" />
+        <result column="CHANGE" property="change" />
+        <result column="FIREWALL" property="firewall" />
+        <result column="BIGDATA" property="bigdata" />
+        <result column="TYPE" property="type" />
+        <result column="AREA" property="area" />
+    </resultMap>
+
+</mapper>

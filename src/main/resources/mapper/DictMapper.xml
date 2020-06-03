@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.DictMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.Dict">
+        <id column="ID" property="id" />
+        <result column="SORT" property="sort" />
+        <result column="PID" property="pid" />
+        <result column="P_VALUE" property="pValue" />
+        <result column="NAME" property="name" />
+        <result column="VALUE" property="value" />
+        <result column="LVL" property="lvl" />
+        <result column="REMARK" property="remark" />
+    </resultMap>
+
+    <update id="updateSubDictValue">
+        UPDATE SYS_DICT SET P_VALUE = #{pValue} where PID = #{pid}
+    </update>
+
+    <select id="getMaxSort" resultType="integer">
+        SELECT
+        MAX(SORT)
+        FROM
+        SYS_DICT
+        WHERE PID = #{pid}
+    </select>
+
+</mapper>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.IaasNewMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.IaasNew">
+        <id column="ID" property="id" />
+        <result column="NAME" property="name" />
+        <result column="SUB_TYPE" property="subType" />
+        <result column="SORT" property="sort" />
+        <result column="VERSION_CODE" property="versionCode" />
+        <result column="URL" property="url" />
+        <result column="IMAGE" property="image" />
+        <result column="DESCRIPTION" property="description" />
+        <result column="TAG_DESC" property="tagDesc" />
+        <result column="AP_NUM" property="apNum" />
+        <result column="CREATE_TIME" property="createTime" />
+        <result column="MODIFIED_TIME" property="modifiedTime" />
+        <result column="STATUS" property="status" />
+        <result column="CREATOR" property="creator" />
+        <result column="TOP" property="top" />
+        <result column="SUB_PAGE_URL" property="subPageUrl" />
+        <result column="BUILD_STATUS" property="buildStatus" />
+        <result column="SUB_PAGE_PERMISSION" property="subPagePermission" />
+        <result column="HOME" property="home" />
+        <result column="CAN_APPLICATION" property="canApplication" />
+        <result column="HAS_DOC" property="hasDoc" />
+        <result column="FORM_NUM" property="formNum" />
+        <result column="SHORT_NAME" property="shortName" />
+        <result column="INSTRUCTIONS" property="instructions" />
+        <result column="WORK_FLOW_ID" property="workFlowId" />
+        <result column="SUB_TYPE_NAME" property="subTypeName" />
+        <result column="FORM_NUM_MODIFY" property="formNumModify" />
+        <association property="user" column="CREATOR" select="com.upd.hwcloud.dao.UserMapper.findUserByIdcard" />
+    </resultMap>
+    <select id="getPage" resultMap="BaseResultMap">
+        SELECT S.*,(SELECT NAME FROM SYS_DICT D WHERE D.ID = S.SUB_TYPE) SUB_TYPE_NAME
+        FROM TB_IAAS S
+        WHERE
+        <if test="status != null">
+                STATUS = #{status}</if>
+        <if test="name != null and name != ''">
+            AND NAME LIKE CONCAT(CONCAT('%',#{name}),'%')
+        </if>
+        <if test="subType != null and subType != ''">
+            AND SUB_TYPE = #{subType}
+        </if>
+        <if test="user.type != 100">
+            AND CREATOR = #{user.idcard}
+        </if>
+        ORDER BY SORT ASC, MODIFIED_TIME DESC
+    </select>
+    <select id="getLabel" resultMap="BaseResultMap">
+        select s.ID,s.TAG_DESC
+        from TB_IAAS s
+
+        where s.STATUS = 2 and s.TAG_DESC is not null
+        <if test="home != null">
+            and s.HOME = #{home}
+        </if>
+        <if test="canApplication != null">
+            and s.CAN_APPLICATION = #{canApplication}
+        </if>
+    </select>
+
+
+    <select id="getPageByCondition" resultType="com.upd.hwcloud.bean.entity.IaasNew">
+        select DISTINCT s.*
+        from TB_IAAS s
+
+        where s.STATUS = 2
+        <if test="home != null">
+            and s.HOME = #{home}
+        </if>
+        <if test="canApplication != null">
+            and s.CAN_APPLICATION = #{canApplication}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and s.NAME like CONCAT(CONCAT('%',#{keyword}),'%')
+        </if>
+        <if test="label != null and label != ''">
+            and s.TAG_DESC like CONCAT(CONCAT('%',#{label}),'%')
+        </if>
+        order by s.SORT asc,s.MODIFIED_TIME desc,s.BUILD_STATUS asc
+    </select>
+</mapper>

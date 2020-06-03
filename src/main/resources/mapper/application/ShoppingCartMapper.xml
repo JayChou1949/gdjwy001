@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.application.ShoppingCartMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.application.ShoppingCart">
+        <id column="ID" property="id" />
+        <result column="SERVICE_TYPE_ID" property="serviceTypeId" />
+        <result column="SERVICE_TYPE_NAME" property="serviceTypeName" />
+        <result column="RESOURCE_TYPE" property="resourceType" />
+        <result column="STATUS" property="status" />
+        <result column="CREATE_TIME" property="createTime" />
+        <result column="MODIFIED_TIME" property="modifiedTime" />
+        <result column="CREATOR_ID_CARD" property="creatorIdCard" />
+        <result column="CREATOR_NAME" property="creatorName" />
+        <result column="FORM_NUM" property="formNum"/>
+        <result column="EXPLANATION" property="explanation" />
+        <result column="DS_ID" property="dsId"/>
+        <result column="DS_NAME" property="dsName" />
+        <result column="ACCOUNT" property="account"/>
+        <result column="CLUSTER_TYPE" property="clusterType"/>
+
+    </resultMap>
+
+</mapper>

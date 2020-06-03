@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.ApplyFlowMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.ApplyFlow">
+        <id column="ID" property="id" />
+        <result column="NAME" property="name" />
+        <result column="TARGET_RESOURCE" property="targetResource" />
+        <result column="SECRET_LEVEL" property="secretLevel" />
+        <result column="REMARK" property="remark" />
+        <result column="CREATOR" property="creator" />
+        <result column="CREATE_TIME" property="createTime" />
+        <result column="MODIFIED_TIME" property="modifiedTime" />
+        <result column="CREATOR_NAME" property="creatorName" />
+        <result column="STEP_NUM" property="stepNum" />
+    </resultMap>
+    
+    <sql id="page_column">
+        f.ID, f.NAME, f.CREATE_TIME, f.REMARK
+    </sql>
+
+    <select id="getPage" resultType="com.upd.hwcloud.bean.entity.ApplyFlow">
+        SELECT
+          <include refid="page_column" />,
+          (SELECT NAME FROM TB_USER u WHERE u.IDCARD = f.CREATOR) CREATOR_NAME,
+          (SELECT COUNT(1) FROM TB_FLOW_STEP s WHERE s.FLOW_ID = f.ID) STEP_NUM
+        FROM
+          TB_APPLY_FLOW f
+        <if test="name != null and name != ''">
+            WHERE NAME LIKE CONCAT(CONCAT('%',#{name}),'%')
+        </if>
+        ORDER BY MODIFIED_TIME DESC
+    </select>
+
+    <select id="getByResourceType" resultType="com.upd.hwcloud.bean.entity.ApplyFlow">
+        SELECT
+          <include refid="page_column" />
+        FROM TB_APPLY_FLOW f
+          WHERE TARGET_RESOURCE = #{resourceType}
+        <if test="secretLevel != null and secretLevel != ''">
+            AND SECRET_LEVEL = #{secretLevel}
+        </if>
+    </select>
+
+</mapper>

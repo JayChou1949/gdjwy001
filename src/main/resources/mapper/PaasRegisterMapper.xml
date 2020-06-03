@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.PaasRegisterMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.PaasRegister">
+        <id column="ID" property="id" />
+        <result column="NAME" property="name" />
+        <result column="BUILD_STATUS" property="buildStatus" />
+        <result column="CREATE_TIME" property="createTime" />
+        <result column="MODIFIED_TIME" property="modifiedTime" />
+        <result column="CREATOR" property="creator" />
+        <result column="SUB_TYPE" property="subType" />
+        <result column="DESCRIPTION" property="description" />
+        <result column="JS_UNIT" property="jsUnit" />
+        <result column="JS_PRINCIPAL" property="jsPrincipal" />
+        <result column="JS_PRINCIPAL_PHONE" property="jsPrincipalPhone" />
+        <result column="JS_MANAGER" property="jsManager" />
+        <result column="JS_MANAGER_PHONE" property="jsManagerPhone" />
+        <result column="CJ_UNIT" property="cjUnit" />
+        <result column="CJ_PRINCIPAL" property="cjPrincipal" />
+        <result column="CJ_PRINCIPAL_PHONE" property="cjPrincipalPhone" />
+        <result column="CJ_HANDLER" property="cjHandler" />
+        <result column="CJ_HANDLER_PHONE" property="cjHandlerPhone" />
+        <result column="CJ_PRINCIPAL_IDCARD" property="cjPrincipalIdcard" />
+        <result column="POLICE_CATEGORY" property="policeCategory" />
+        <result column="CJ_ORG_CODE" property="cjOrgCode" />
+        <result column="CJ_INPUT_TYPE" property="cjInputType" />
+        <result column="BUILD_MODE" property="buildMode" />
+        <result column="AREA" property="area" />
+        <result column="URL" property="url" />
+        <result column="CAN_APPLICATION" property="canApplication" />
+        <result column="IMAGE" property="image" />
+        <result column="RES_PERSON" property="resPerson" />
+        <result column="RES_ORG" property="resOrg" />
+        <result column="PERMISSION_INS" property="permissionIns" />
+        <result column="JS_CIRCLE" property="jsCircle" />
+        <result column="SM_CIRCLE" property="smCircle" />
+        <result column="ON_DATE" property="onDate" />
+        <result column="JS_PRINCIPAL_IDCARD" property="jsPrincipalIdcard" />
+        <result column="CREATOR_NAME" property="creatorName" />
+        <result column="STATUS" property="status" />
+        <result column="ORDER_NUMBER" property="orderNumber" />
+        <result column="WORK_FLOW_ID" property="workFlowId" />
+        <result column="APPLY_TYPE" property="applyType" />
+        <result column="API_ACCESS" property="apiAccess" />
+        <association property="user" column="CREATOR" select="com.upd.hwcloud.dao.UserMapper.findUserByIdcard" />
+    </resultMap>
+    <select id="getDetails" resultMap="BaseResultMap">
+
+        select z.*,'' as PROCESSING_PERSON from TB_PAAS_REGISTER z where ID=#{id}
+    </select>
+
+    <!--未使用，注意是使用会报错，按SaaSRegisterMapper的getPage调整-->
+    <select id="getPage" resultMap="BaseResultMap">
+        SELECT distinct ai.*,(SELECT to_char(wm_concat(distinct U . NAME)) FROM TB_WFM_ACTIVITY act1,TB_USER U WHERE u.IDCARD=ACT1.HANDLEPERSONIDS AND ACT1.ACTIVITYSTATUS='待办' 	AND act1.INSTANCEID = ins. ID AND ACT1.ACTIVITYTYPE is NULL)  AS PROCESSING_PERSON
+        from  TB_PAAS_REGISTER ai ,TB_WFM_ACTIVITY act,TB_WFM_INSTANCE ins
+        ,TB_WFM_WORKFLOWMODEL m
+        <where>
+            <choose>
+                <when test="p.status == null or p.status == ''">
+                    AND ai.STATUS not in (-1,0)
+                </when>
+                <when test="p.status == 1">
+                    AND ai.STATUS in (1,7,101,102)
+                </when>
+                <when test="p.status == 5">
+                    AND ai.STATUS in (5,8)
+                </when>
+                <otherwise>
+                    AND ai.STATUS = #{p.status}
+                </otherwise>
+            </choose>
+
+            <if test="p.appName != null and p.appName != ''">
+                <!-- 可以按申请人/申请单号查询 -->
+
+                AND (
+                ai.CREATOR_NAME = #{p.appName}
+                OR
+                ai.ORDER_NUMBER = #{p.appName}
+                )
+
+            </if>
+            and
+            ai.ID=ins.BUSINESSID and act.INSTANCEID = ins.ID  and m.ID=act.MODELID
+
+            <!-- 选择处理人为:我 -->
+
+            <if test="p.user.type != 100 ">
+                and (act.HANDLEPERSONIDS =  #{p.user.idcard} or m.noticeperon like concat(concat('%', #{p.user.idcard}),'%') )
+            </if>
+            <!-- 选择处理人为:我 -->
+            <if test="p.processType == 1">
+                and act.HANDLEPERSONIDS =#{p.user.idcard}
+                AND act.ACTIVITYSTATUS='待办' AND act.ACTIVITYTYPE is NULL
+            </if>
+            <!-- 选择处理人为:其他人 -->
+            <if test="p.processType == 2">
+                and  act.HANDLEPERSONIDS !=#{p.user.idcard}  AND act.ACTIVITYSTATUS='待办' AND act.ACTIVITYTYPE is NULL
+            </if>
+        </where>
+
+        ORDER BY ai.MODIFIED_TIME DESC
+    </select>
+
+    <select id="getResponsePage" resultType="com.upd.hwcloud.bean.entity.PaasRegister">
+        select ID,NAME,CREATOR_NAME,CREATE_TIME,BUILD_STATUS from TB_PAAS_REGISTER
+        <where>
+            ((JS_PRINCIPAL_NAME = #{name} and JS_UNIT = #{orgName}) or GOV_PRINCIPAL_IDCARD =#{idCard} or (JS_PRINCIPAL = #{name} and  JS_PRINCIPAL_PHONE = #{phone}))
+            <if test="appName != null and appName !=''">
+                NAME = #{appName}
+            </if>
+        </where>
+        order by MODIFIED_TIME desc
+    </select>
+
+    <select id="getTodoCount" resultType="java.lang.Integer">
+        SELECT
+        count(DISTINCT ai.ID)
+        FROM TB_PAAS_REGISTER ai join TB_WFM_INSTANCE ins on ins.BUSINESSID = ai.ID
+        join TB_WFM_ACTIVITY act  on act.INSTANCEID = ins.ID
+        WHERE ai.STATUS in (1,2,7,101,102)
+        and act.HANDLEPERSONIDS = #{user.idcard}
+        and act.ACTIVITYTYPE is null
+        and act.ACTIVITYSTATUS = '待办'
+    </select>
+
+    <select id="getRegisterTodo" resultType="java.lang.Integer">
+         SELECT
+        count(DISTINCT ai.ID)
+        FROM TB_PAAS_REGISTER ai join TB_WFM_INSTANCE ins on ins.BUSINESSID = ai.ID
+        join TB_WFM_ACTIVITY act  on act.INSTANCEID = ins.ID
+        WHERE ai.STATUS in (1,2,7,101,102)
+        <if test="idCard !=null and idCard != ''">
+            and act.HANDLEPERSONIDS = #{idcard}
+        </if>
+        and act.ACTIVITYTYPE is null
+        and act.ACTIVITYSTATUS = '待办'
+    </select>
+
+</mapper>

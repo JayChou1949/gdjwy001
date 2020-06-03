@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.iaasConfig.MoveDataVideoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.iaasConfig.MoveDataVideo">
+        <id column="ID" property="id" />
+        <result column="CPU_TOTAL" property="cpuTotal" />
+        <result column="CPU_USE" property="cpuUse" />
+        <result column="CPU_USE_PRO" property="cpuUsePro" />
+        <result column="EMS_TOTAL" property="emsTotal" />
+        <result column="EMS_USE" property="emsUse" />
+        <result column="EMS_USE_PRO" property="emsUsePro" />
+        <result column="DISK_TOTAL" property="diskTotal" />
+        <result column="DISK_USE" property="diskUse" />
+        <result column="DISK_USE_PRO" property="diskUsePro" />
+        <result column="TYPE" property="type" />
+        <result column="STATUS" property="status" />
+    </resultMap>
+
+</mapper>

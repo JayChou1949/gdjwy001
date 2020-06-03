@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.DataAccessMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.DataAccess">
+        <id column="ID" property="id" />
+        <result column="CREATE_TIME" property="createTime" />
+        <result column="MODIFIED_TIME" property="modifiedTime" />
+        <result column="CREATOR" property="creator" />
+        <result column="ORIGINATOR" property="originator" />
+        <result column="LAUNCH_TIME" property="launchTime" />
+        <result column="ORIGINATOR_ORG" property="originatorOrg" />
+        <result column="ORIGINATOR_PHONE" property="originatorPhone" />
+        <result column="RESOURCES_NAME" property="resourcesName" />
+        <result column="RESOURCES_DOMAIN" property="resourcesDomain" />
+        <result column="RESOURCES_INDUSTRY" property="resourcesIndustry" />
+        <result column="RESOURCES_POLICE" property="resourcesPolice" />
+        <result column="RESOURCES_ORG" property="resourcesOrg" />
+        <result column="UPDATE_FREQUENCY" property="updateFrequency" />
+        <result column="NEED_HISTORY" property="needHistory" />
+        <result column="DATA_RESOURCES" property="dataResources" />
+        <result column="DEMAND" property="demand" />
+        <result column="URGENT" property="urgent" />
+        <result column="HOPE_TIME" property="hopeTime" />
+    </resultMap>
+
+    <sql id="columns">
+        A.ID,A.CREATOR,A.CREATE_TIME,A.ORIGINATOR,A.LAUNCH_TIME,A.ORIGINATOR_PHONE,A.RESOURCES_NAME,
+        A.RESOURCES_ORG,A.NEED_HISTORY,A.DATA_RESOURCES,A.DEMAND,
+    </sql>
+
+    <select id="findListByHistory" resultType="com.upd.hwcloud.bean.entity.DataAccess">
+        SELECT *
+        FROM TB_DATA_ACCESS
+        WHERE NEED_HISTORY = 0 AND CREATOR = #{creator}
+        ORDER BY CREATE_TIME DESC
+    </select>
+
+    <select id="details" resultType="com.upd.hwcloud.bean.entity.DataAccess">
+        SELECT
+        <include refid="columns" />
+        D1.name AS originatorOrg,
+        D2.name AS resourcesDomain,
+        D3.name AS resourcesIndustry,
+        D4.name AS resourcesPolice,
+        D5.name AS updateFrequency,
+        D6.name AS urgent,
+        D7.name AS hopeTime
+        FROM TB_DATA_ACCESS A
+        LEFT JOIN SYS_DICT D1 ON A.ORIGINATOR_ORG = D1.ID
+        LEFT JOIN SYS_DICT D2 ON A.RESOURCES_DOMAIN = D2.ID
+        LEFT JOIN SYS_DICT D3 ON A.RESOURCES_INDUSTRY = D3.ID
+        LEFT JOIN SYS_DICT D4 ON A.RESOURCES_POLICE = D4.ID
+        LEFT JOIN SYS_DICT D5 ON A.UPDATE_FREQUENCY = D5.ID
+        LEFT JOIN SYS_DICT D6 ON A.URGENT = D6.ID
+        LEFT JOIN SYS_DICT D7 ON A.HOPE_TIME = D7.ID
+        WHERE A.ID = #{id}
+    </select>
+</mapper>
