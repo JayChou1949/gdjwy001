@@ -244,7 +244,7 @@ public class FilesServiceImpl extends ServiceImpl<FilesMapper, Files> implements
         File targetFile = new File(path, newFileName);
         FileUtils.copyInputStreamToFile(file.getInputStream(), targetFile);
         files.setUrl("/files/download/"+newFileName);
-        files.setRealURL("/"+folder+"/"+time+"/"+newFileName+"."+suffix);
+        files.setRealURL("/"+folder+"/"+time+"/"+newFileName);
         return files;
     }
 
