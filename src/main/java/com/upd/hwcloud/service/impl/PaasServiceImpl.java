@@ -275,4 +275,17 @@ public class PaasServiceImpl extends ServiceImpl<PaasMapper, Paas> implements IP
         }
         return true;
     }
+
+    @Transactional(rollbackFor = Throwable.class)
+    @Override
+    public void hotfix() {
+        List<Paas> paasList = this.list(new QueryWrapper<Paas>().lambda().isNotNull(Paas::getImage));
+        for(Paas p : paasList){
+            Files f = filesService.getOne(new QueryWrapper<Files>().lambda().eq(Files::getUrl,p.getImage()));
+            if(f != null){
+                p.setRealImage(f.getRealURL());
+            }
+        }
+        this.updateBatchById(paasList,100);
+    }
 }

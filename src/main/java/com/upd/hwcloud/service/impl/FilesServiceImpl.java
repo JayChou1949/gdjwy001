@@ -244,6 +244,7 @@ public class FilesServiceImpl extends ServiceImpl<FilesMapper, Files> implements
         File targetFile = new File(path, newFileName);
         FileUtils.copyInputStreamToFile(file.getInputStream(), targetFile);
         files.setUrl("/files/download/"+newFileName);
+        files.setRealURL("/"+folder+"/"+time+"/"+newFileName+"."+suffix);
         return files;
     }
 
@@ -264,6 +265,7 @@ public class FilesServiceImpl extends ServiceImpl<FilesMapper, Files> implements
         File targetFile = new File(path,name);
         FileUtils.copyInputStreamToFile(file.getInputStream(),targetFile);
         files.setUrl("/files/download/"+name);
+        //files.setRealURL("/"+folder+"/"+time+"/"+newFileName+"."+suffix);
         return files;
     }
     private Files updateNcovDataFile(MultipartFile file,String id,String path,String name,String title) throws IOException{

@@ -51,4 +51,6 @@ public interface IPaasService extends IService<Paas>,SortService  {
 
     List<Paas> search(String keyword);
     boolean servicePublish2PaaS(ServicePublish servicePublish,ServiceReturnBean returnBean);
+
+    void hotfix();
 }

@@ -9,6 +9,7 @@ import com.google.common.collect.Maps;
 import com.upd.hwcloud.bean.contains.ReviewStatus;
 import com.upd.hwcloud.bean.contains.ServiceStatus;
 import com.upd.hwcloud.bean.entity.Dict;
+import com.upd.hwcloud.bean.entity.Files;
 import com.upd.hwcloud.bean.entity.OperateRecord;
 import com.upd.hwcloud.bean.entity.Paas;
 import com.upd.hwcloud.bean.entity.Saas;
@@ -19,11 +20,13 @@ import com.upd.hwcloud.bean.vo.workbench.QueryVO;
 import com.upd.hwcloud.common.utils.UUIDUtil;
 import com.upd.hwcloud.dao.SaasMapper;
 import com.upd.hwcloud.service.IDictService;
+import com.upd.hwcloud.service.IFilesService;
 import com.upd.hwcloud.service.IOperateRecordService;
 import com.upd.hwcloud.service.ISaasService;
 import com.upd.hwcloud.service.IUserService;
 import com.upd.hwcloud.service.workbench.impl.CommonHandler;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,6 +55,9 @@ public class SaasServiceImpl extends ServiceImpl<SaasMapper, Saas> implements IS
     private IUserService userService;
     @Autowired
     private IOperateRecordService operateRecordService;
+
+    @Autowired
+    private IFilesService filesService;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -486,5 +492,20 @@ public class SaasServiceImpl extends ServiceImpl<SaasMapper, Saas> implements IS
     @Override
     public Integer policeCountOfSaasApplication(String id) {
         return saasMapper.policeCountOfSaasApplication(id);
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    @Override
+    public void hotfix() {
+        List<Saas> saasList = this.list(new QueryWrapper<Saas>().lambda().isNotNull(Saas::getImage));
+        for(Saas p : saasList){
+            Files f = filesService.getOne(new QueryWrapper<Files>().lambda().eq(Files::getUrl,p.getImage()));
+            if(f != null){
+                p.setRealImage(f.getRealURL());
+            }
+        }
+        if(CollectionUtils.isNotEmpty(saasList)){
+            this.updateBatchById(saasList,100);
+        }
     }
 }

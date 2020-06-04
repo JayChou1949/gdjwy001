@@ -73,4 +73,6 @@ public interface ISaasService extends IService<Saas> ,SortService {
 
     Integer policeCountOfSaasApplication(String id);
 
+    void hotfix();
+
 }
