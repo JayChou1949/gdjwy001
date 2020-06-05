@@ -37,7 +37,7 @@ public class NcovEcsImportUtil {
         try{
             ImportParams params = new ImportParams();
             params.setStartSheetIndex(0);
-            List<NcovEcsOverview> list = ExcelImportUtil.importExcel(new FileInputStream(new File(rootPath+"/"+sourceFileName)),NcovEcsOverview.class,params);
+            List<NcovEcsOverview> list = ExcelImportUtil.importExcel(new FileInputStream(new File(rootPath +"/"+sourceFileName)),NcovEcsOverview.class,params);
             if(CollectionUtils.isNotEmpty(list)){
                 return list.get(0);
             }

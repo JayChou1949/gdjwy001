@@ -75,10 +75,10 @@
     <!--<url-pattern>/*</url-pattern>-->
   <!--</filter-mapping>-->
   <!--&lt;!&ndash; 该过滤器负责对Ticket的校验工作，及系统的初始化工作&ndash;&gt;-->
-  <!--<filter>-->
-    <!--<filter-name>CAS Validation Filter</filter-name>-->
-    <!--<filter-class>com.upd.hwcloud.common.filter.LoginInitFilter</filter-class>-->
-  <!--</filter>-->
+  <filter>
+    <filter-name>CAS Validation Filter</filter-name>
+    <filter-class>com.upd.hwcloud.common.filter.LoginInitFilter</filter-class>
+  </filter>
   <!--<filter-mapping>-->
     <!--<filter-name>CAS Validation Filter</filter-name>-->
     <!--<url-pattern>/*</url-pattern>-->
