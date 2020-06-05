@@ -49,10 +49,12 @@ import com.upd.hwcloud.bean.vo.applicationInfoOrder.ReviewInfoVo;
 import com.upd.hwcloud.bean.vo.ncov.BusinessTopDto;
 import com.upd.hwcloud.bean.vo.ncov.NcovIaasVo;
 import com.upd.hwcloud.bean.vo.open.maintenance.TodoVo;
+import com.upd.hwcloud.bean.vo.wfm.ExportActVo;
 import com.upd.hwcloud.bean.vo.workbench.QueryVO;
 import com.upd.hwcloud.common.exception.BaseException;
 import com.upd.hwcloud.common.utils.AreaPoliceCategoryUtils;
 import com.upd.hwcloud.common.utils.BigDecimalUtil;
+import com.upd.hwcloud.common.utils.DateUtil;
 import com.upd.hwcloud.common.utils.IpUtil;
 import com.upd.hwcloud.common.utils.OkHttpUtils;
 import com.upd.hwcloud.dao.IaasZysbMapper;
@@ -106,6 +108,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -1657,6 +1660,35 @@ public class ApplicationInfoServiceImpl extends ServiceImpl<ApplicationInfoMappe
         return applicationInfoMapper.iaasZysbAppExport(areas, policeCategory, params);
     }
 
+    /**
+     * 流程创建时间存在BUG，部分数据时分秒都为0，递归校验当前环节
+     * @param sameDayActivities 同一天的ACT
+     * @param currentActVo  创建时间最新的一条ACT
+     * @return
+     */
+    private void checkCurrentModelName(List<ExportActVo> sameDayActivities, ExportActVo currentActVo,ExportActVo realCurrentActVo){
+        //如果为已抢占,先找一个同一级不为已抢占的
+        if(StringUtils.equals(currentActVo.getActivitystatus(),"已抢占")){
+            Optional<ExportActVo> sameLevelAct = sameDayActivities.parallelStream()
+                    .filter(item -> StringUtils.equals(item.getModelName(),currentActVo.getModelName())
+                            && !StringUtils.equals(item.getActivitystatus(),"已抢占")).findFirst();
+            if(sameLevelAct.isPresent()){
+                  checkCurrentModelName(sameDayActivities,sameLevelAct.get(),realCurrentActVo);
+            }
+        }else {
+            Optional<ExportActVo> nextAct = sameDayActivities.parallelStream()
+                    .filter(item -> StringUtils.equals(currentActVo.getId(),item.getPreviousactivityids()))
+                    .findFirst();
+            if(nextAct.isPresent()){
+                checkCurrentModelName(sameDayActivities,nextAct.get(),realCurrentActVo);
+            }else {
+                logger.info("Modifies");
+                org.springframework.beans.BeanUtils.copyProperties(currentActVo,realCurrentActVo);
+            }
+        }
+        logger.info("Button");
+    }
+
     @Override
     public List<IPDVo> getIPDApplicationInfoOrderList(Map<String, Object> params) {
         List<IPDVo> list = applicationInfoMapper.getIPDApplicationInfoOrderList(params);
@@ -1664,9 +1696,23 @@ public class ApplicationInfoServiceImpl extends ServiceImpl<ApplicationInfoMappe
         int count = 1;
         for (IPDVo ipdVo : list) {
             String id = ipdVo.getId();
-            String node = applicationInfoMapper.getCurrentNodeById(id);
-            if (node != null) {
-                ipdVo.setNode(node);
+           // String node = applicationInfoMapper.getCurrentNodeById(id);
+            ExportActVo model = activityMapper.getCurrentNodeWithTimeById(id);
+            if(model!=null){
+                logger.info("model -> {}",model);
+                String date  = DateUtil.formateDate(model.getCreateTime(),"yyyy-MM-dd");
+                List<ExportActVo> sameDayActivities = activityMapper.getSameDayActivity(id,date);
+                logger.info("sameDayActivities -> {}",sameDayActivities);
+                if(sameDayActivities.size()>1){
+                    ExportActVo  realCurrentModel = new ExportActVo();
+                    checkCurrentModelName(sameDayActivities,model,realCurrentModel);
+                    logger.info("realCurrentModel -> {}",realCurrentModel);
+                    ipdVo.setId(realCurrentModel.getId());
+                    ipdVo.setNode(realCurrentModel.getModelName());
+                }else {
+                    ipdVo.setId(model.getId());
+                    ipdVo.setNode(model.getModelName());
+                }
                 //服务台复核
                 ReviewInfoVo reviewInfoVo1 = appReviewInfoService.getReviewInfoVoByAppInfoId("服务台复核", id);
                 if (reviewInfoVo1 != null) {
@@ -1766,6 +1812,7 @@ public class ApplicationInfoServiceImpl extends ServiceImpl<ApplicationInfoMappe
             } else {
                 vo.setIsgov("否");
             }
+
             //当前处理状态
             String node = applicationInfoMapper.getCurrentNodeById(id);
             if (node != null) {

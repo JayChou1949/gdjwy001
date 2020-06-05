@@ -13,9 +13,15 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TimeAndModelName {
+public class ExportActVo {
+
+    private String Id;
+
+    private String previousactivityids;
 
     private Date createTime;
 
     private String modelName;
+
+    private String activitystatus;
 }
