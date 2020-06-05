@@ -1786,6 +1786,7 @@ public class ApplicationInfoServiceImpl extends ServiceImpl<ApplicationInfoMappe
                     vo.setStepName(model.getModelName());
                 }
             }
+
             //服务台复核
             ReviewInfoVo reviewInfoVo = appReviewInfoService.getReviewInfoVoByAppInfoId("服务台复核", id);
             if (reviewInfoVo != null) {
@@ -1822,12 +1823,20 @@ public class ApplicationInfoServiceImpl extends ServiceImpl<ApplicationInfoMappe
             }
 
             //当前处理状态
-            String node = applicationInfoMapper.getCurrentNodeById(id);
-            if (node != null) {
-                vo.setStepName(node);
-            }
-            if(StringUtils.equals(register.getStatus(),ApplicationInfoStatus.USE.getCode())){
-                vo.setStepName("使用中");
+            ExportActVo model = activityMapper.getCurrentNodeWithTimeById(id);
+            if(model!=null) {
+                logger.info("model -> {}", model);
+                String date = DateUtil.formateDate(model.getCreateTime(), "yyyy-MM-dd");
+                List<ExportActVo> sameDayActivities = activityMapper.getSameDayActivity(id, date);
+                logger.info("sameDayActivities -> {}", sameDayActivities);
+                if (sameDayActivities.size() > 1) {
+                    ExportActVo realCurrentModel = new ExportActVo();
+                    checkCurrentModelName(sameDayActivities, model, realCurrentModel);
+                    logger.info("realCurrentModel -> {}", realCurrentModel);
+                    vo.setStepName(realCurrentModel.getModelName());
+                } else {
+                    vo.setStepName(model.getModelName());
+                }
             }
             //服务台复核
             ReviewInfoVo reviewInfoVo = appReviewInfoService.getReviewInfoVoByAppInfoId("服务台复核", id);
