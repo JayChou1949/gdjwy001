@@ -141,6 +141,8 @@ public interface ApplicationInfoMapper extends BaseMapper<ApplicationInfo> {
     String getCurrentNodeById(@Param("id") String id);
 
 
+
+
     /**
      *  获取使用中paas服务
      * @param param
