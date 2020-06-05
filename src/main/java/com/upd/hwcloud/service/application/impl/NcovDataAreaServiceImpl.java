@@ -785,7 +785,7 @@ public class NcovDataAreaServiceImpl implements NcovDataAreaService {
     }
 
     private void downFile(HttpServletResponse response, String name) throws IOException {
-        File file = new File("E:\\hwyFiles\\ncovArea\\质量分析报告\\" + name);
+        File file = new File(rootPath+"/ncovArea/质量分析报告/" + name);
         if (file.exists()) {
             // 设置强制下载不打开
             response.setContentType("application/force-download");
