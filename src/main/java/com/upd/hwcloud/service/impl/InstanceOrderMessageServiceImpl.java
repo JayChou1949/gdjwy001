@@ -83,6 +83,7 @@ public class InstanceOrderMessageServiceImpl implements InstanceOrderMessageServ
             String resultStr = response.body().string();
             if (!response.isSuccessful()) {
                 logger.error("获取绑定信息失败: {}",resultStr);
+                response.close();
                 throw new BaseException("获取绑定信息失败");
             } else {
                 Map<String, Object> returnMap=JSONObject.parseObject(resultStr,new TypeReference<Map<String, Object>>(){});
@@ -97,6 +98,7 @@ public class InstanceOrderMessageServiceImpl implements InstanceOrderMessageServ
                     instanceOrderMessage.setAppSecret(appSecret);
                 }
             }
+            response.close();
         }
         return instanceOrderMessageList;
     }
@@ -140,9 +142,12 @@ public class InstanceOrderMessageServiceImpl implements InstanceOrderMessageServ
         String resultStr = response.body().string();
         if (!response.isSuccessful()) {
             logger.error("登录失败: {}",resultStr);
+            response.close();
             throw new BaseException("登录失败");
         }
-        return response.header("x-subject-token");
+        String token = response.header("x-subject-token");
+        response.close();
+        return token;
     }
 
     private static class TokenInterceptor implements Interceptor {

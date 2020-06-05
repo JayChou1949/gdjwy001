@@ -17,6 +17,7 @@ import com.upd.hwcloud.common.utils.OkHttpUtils;
 import com.upd.hwcloud.dao.application.IaasTxyfwMapper;
 import com.upd.hwcloud.service.application.IIaasTxyfwService;
 
+import okhttp3.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -116,13 +117,18 @@ public class IaasTxyfwServiceImpl extends ServiceImpl<IaasTxyfwMapper, IaasTxyfw
      * @return
      */
     private String requestList(String url){
+        Response response = null;
         try{
-            String data = OkHttpUtils.get(url,null).body().string();
-
+            response = OkHttpUtils.get(url, null);
+            String data = response.body().string();
             return data;
         }catch (Exception e){
             logger.error("获取虚拟机列表失败 "+url,e);
             throw new BaseException("请求定时器虚拟机列表接口失败");
+        } finally {
+            if (response!=null){
+                response.close();
+            }
         }
     }
 
@@ -162,13 +168,18 @@ public class IaasTxyfwServiceImpl extends ServiceImpl<IaasTxyfwMapper, IaasTxyfw
      * @return
      */
     private String requestDetail(String ecsId){
+        Response response = null;
         try{
-            String data = OkHttpUtils.get(iMocPreURL+"/imocSearch/selectByName?name="+ecsId,null).body().string();
-
+            response = OkHttpUtils.get(iMocPreURL + "/imocSearch/selectByName?name=" + ecsId, null);
+            String data = response.body().string();
             return data;
         }catch (Exception e){
             logger.error("获取虚拟机详情失败 "+ecsId,e);
             throw new BaseException("请求定时器虚拟机详情接口失败");
+        }finally {
+            if (response!=null){
+                response.close();
+            }
         }
     }
 

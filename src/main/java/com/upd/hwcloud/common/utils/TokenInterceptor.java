@@ -90,8 +90,10 @@ public class TokenInterceptor implements Interceptor {
         if (response.code() == 200) {
             String result = response.body().string();
             TokenResponse tokenResponse = JSONObject.parseObject(result, TokenResponse.class);
+            response.close();
             return tokenResponse.getAccessToken();
         }
+        response.close();
         return null;
     }
 

@@ -41,12 +41,18 @@ public class DCUCHttpEngin implements InitializingBean {
     }
 
     public User getUserInfoById(String userId) {
+        Response response = null;
         try {
-            String res = OkHttpUtils.get(okHttpClient,businessUrl + "/users/id/" + userId + ".action", null).body().string();
+            response = OkHttpUtils.get(okHttpClient, businessUrl + "/users/id/" + userId + ".action", null);
+            String res = response.body().string();
             return JSONObject.parseObject(res, User.class);
         } catch (Exception e) {
             logger.error("", e);
             return null;
+        } finally {
+            if (response!=null){
+                response.close();
+            }
         }
     }
 
@@ -61,6 +67,7 @@ public class DCUCHttpEngin implements InitializingBean {
             logger.error("创建IAM用户:[{}][{}]", idcard, result);
             throw new BaseException("创建用户失败");
         }
+        response.close();
         logger.error("创建IAM用户:[{}][{}]", idcard, result);
         IamResponse iamResponse = JSONObject.parseObject(result, IamResponse.class);
         boolean userExists = !iamResponse.isSuccess() && "用户已存在".equals(iamResponse.getMessage());

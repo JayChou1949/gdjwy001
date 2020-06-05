@@ -32,6 +32,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 
+import okhttp3.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1555,7 +1556,9 @@ public class ThreePartyInterfaceController {
     @ResponseBody
     public Object wdkSubPageType(String resourceFirstClass) throws Exception {
         String url = "http://15.40.3.71:8000/services/serviceInvoke/queryDataService/foreign/statisticsSecond/getSecondClass?resourceFirstClass=" + resourceFirstClass;
-        String res = OkHttpUtils.get(url, null).body().string();
+        Response response = OkHttpUtils.get(url, null);
+        String res = response.body().string();
+        response.close();
         return JSONObject.parseObject(res);
     }
 
@@ -1564,7 +1567,9 @@ public class ThreePartyInterfaceController {
     @ResponseBody
     public Object wdkSubPageInfo(String resourceFirstClass, String resourceSecondClass) throws Exception {
         String url = "http://15.40.3.71:8000/services/serviceInvoke/queryDataService/foreign/statisticsSecond/getSecondClassCount?resourceFirstClass=" + resourceFirstClass + "&resourceSecondClass=" + resourceSecondClass;
-        String res = OkHttpUtils.get(url, null).body().string();
+        Response response = OkHttpUtils.get(url, null);
+        String res = response.body().string();
+        response.close();
         return JSONObject.parseObject(res);
     }
 

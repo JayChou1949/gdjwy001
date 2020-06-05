@@ -86,6 +86,7 @@ import com.upd.hwcloud.service.application.ISpeedUpService;
 import com.upd.hwcloud.service.msg.MessageProvider;
 import com.upd.hwcloud.service.workbench.impl.CommonHandler;
 
+import okhttp3.Response;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -1845,13 +1846,18 @@ public class ApplicationInfoServiceImpl extends ServiceImpl<ApplicationInfoMappe
     }
 
     private String requestList(String url) {
+        Response response = null;
         try {
-            String data = OkHttpUtils.get(url, null).body().string();
-
+            response = OkHttpUtils.get(url, null);
+            String data = response.body().string();
             return data;
         } catch (Exception e) {
             logger.error("获取失败 " + url, e);
             throw new BaseException("请求定时器BusinessTop列表接口失败");
+        } finally {
+            if (response!=null){
+                response.close();
+            }
         }
     }
 
