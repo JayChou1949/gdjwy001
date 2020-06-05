@@ -5,6 +5,7 @@ import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.NumberToTextConverter;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.*;
 import java.text.DateFormat;
@@ -19,6 +20,9 @@ import java.util.List;
  */
 public class UnitExcelExportUtil {
 
+    @Value("${file.path}")
+    private static String rootPath;
+
     private UnitExcelExportUtil() {
     }
 
@@ -29,7 +33,7 @@ public class UnitExcelExportUtil {
      */
     public static List<List<Object>> list(String name) throws Exception {
         List<List<Object>> list=null;
-        File file = new File("E:/hwyFiles/"+name);
+        File file = new File(rootPath+"/"+name);
 //        File file = new File("E:/hwyFiles/省直疫情数据服务调用统计.xls");//song本地测试用
         InputStream inputStream=new FileInputStream(file);
         Workbook workbook = createWorkbook(inputStream);
@@ -49,7 +53,7 @@ public class UnitExcelExportUtil {
      * @throws Exception
      */
     public static List<List<Object>> ncovDataList(String name,Integer num,Integer sheetNum) throws Exception {
-        File file = new File("E:\\hwyFiles\\ncovArea\\"+name);
+        File file = new File(rootPath+"/ncovArea/"+name);
         InputStream inputStream=new FileInputStream(file);
         Workbook workbook = createWorkbook(inputStream);
         return getDataListBySheet(workbook,num,sheetNum);

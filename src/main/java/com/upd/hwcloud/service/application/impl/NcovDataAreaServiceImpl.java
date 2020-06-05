@@ -37,6 +37,9 @@ public class NcovDataAreaServiceImpl implements NcovDataAreaService {
     @Value("${ncov.dataservice.name}")
     private String dataServiceName;
 
+    @Value("${file.path}")
+    private static String rootPath;
+
     @Resource
     private NcovDataAreaMapper ncovDataAreaMapper;
 
@@ -221,7 +224,7 @@ public class NcovDataAreaServiceImpl implements NcovDataAreaService {
     @Override
     public void uploadFile(MultipartFile file,String name) throws IOException{
         backUpFile(name);
-        File targetFile = new File("E:/hwyFiles/ncovArea/" + name);
+        File targetFile = new File(rootPath+"/ncovArea/" + name);
         targetFile.exists();
         FileOutputStream fileOutputStream = new FileOutputStream(targetFile);
         InputStream inputStream = file.getInputStream();
@@ -231,11 +234,11 @@ public class NcovDataAreaServiceImpl implements NcovDataAreaService {
     }
 
     private void backUpFile(String name) throws IOException {
-        File file = new File("E:/hwyFiles/ncovArea/" + name);
+        File file = new File(rootPath+"/ncovArea/" + name);
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
         Date date = new Date();
         String format = simpleDateFormat.format(date);
-        File backUpFile = new File("E:/hwyFiles/ncovArea/backUp/"+format+"-" + name);
+        File backUpFile = new File(rootPath+"/ncovArea/backUp/"+format+"-" + name);
         FileOutputStream fileOutputStream = new FileOutputStream(file);
         FileInputStream inputStream = new FileInputStream(backUpFile);
         IOUtils.copy(inputStream, fileOutputStream);

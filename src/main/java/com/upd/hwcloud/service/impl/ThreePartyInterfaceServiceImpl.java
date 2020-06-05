@@ -19,6 +19,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -44,6 +45,9 @@ public class ThreePartyInterfaceServiceImpl extends ServiceImpl<ThreePartyInterf
 
     @Autowired
     private ThreePartyInterfaceMapper threePartyInterfaceMapper;
+
+    @Value("${file.path}")
+    private static String rootPath;
 
 
     @Override
@@ -278,7 +282,7 @@ public class ThreePartyInterfaceServiceImpl extends ServiceImpl<ThreePartyInterf
     }
 
     private void downFile(HttpServletResponse response, String name) throws IOException {
-        File file = new File("E:/hwyFiles/" + name);
+        File file = new File(rootPath+"/" + name);
         if (file.exists()) {
             // 设置强制下载不打开
             response.setContentType("application/force-download");
@@ -295,7 +299,7 @@ public class ThreePartyInterfaceServiceImpl extends ServiceImpl<ThreePartyInterf
     }
 
     private void upFile(MultipartFile file, String name) throws IOException {
-        File targetFile = new File("E:/hwyFiles/" + name);
+        File targetFile = new File(rootPath+"/" + name);
         targetFile.exists();
         FileOutputStream fileOutputStream = new FileOutputStream(targetFile);
         InputStream inputStream = file.getInputStream();
