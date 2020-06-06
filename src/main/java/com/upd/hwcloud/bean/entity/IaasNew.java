@@ -67,6 +67,12 @@ public class IaasNew extends Model<IaasNew> {
     private String image;
 
     /**
+     * 通过nginx获取地址
+     */
+    @TableField("REAL_IMAGE")
+    private String realImage;
+
+    /**
      * 描述
      */
     @ApiModelProperty(value = "描述")
@@ -280,6 +286,14 @@ public class IaasNew extends Model<IaasNew> {
     public IaasNew setImage(String image) {
         this.image = image;
         return this;
+    }
+
+    public String getRealImage() {
+        return realImage;
+    }
+
+    public void setRealImage(String realImage) {
+        this.realImage = realImage;
     }
 
     public String getDescription() {

@@ -1,11 +1,11 @@
 package com.upd.hwcloud.common.utils.easypoi;
 
-import com.upd.hwcloud.bean.entity.application.PaasTyyh;
 import com.upd.hwcloud.bean.vo.ncov.NcovEcsOverview;
-import com.upd.hwcloud.bean.vo.ncov.NcovExcelSheetOneVo;
 import com.upd.hwcloud.bean.vo.ncov.NcovIaasVo;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,11 +19,18 @@ import cn.afterturn.easypoi.excel.entity.ImportParams;
  * @author wuc
  * @date 2020/3/5
  */
+@Component
 public class NcovEcsImportUtil {
 
 
     private final static  String sourceFileName = "ncovEcsSource.xlsx";
 
+    private static String rootPath;
+
+    @Value("${file.path}")
+    public void setRootPath(String rootPath) {
+        NcovEcsImportUtil.rootPath = rootPath;
+    }
 
     /**
      * 疫情虚拟机总览数据
@@ -33,7 +40,7 @@ public class NcovEcsImportUtil {
         try{
             ImportParams params = new ImportParams();
             params.setStartSheetIndex(0);
-            List<NcovEcsOverview> list = ExcelImportUtil.importExcel(new FileInputStream(new File("E:/hwyFiles/"+sourceFileName)),NcovEcsOverview.class,params);
+            List<NcovEcsOverview> list = ExcelImportUtil.importExcel(new FileInputStream(new File(rootPath+"/"+sourceFileName)),NcovEcsOverview.class,params);
             if(CollectionUtils.isNotEmpty(list)){
                 return list.get(0);
             }
@@ -56,7 +63,7 @@ public class NcovEcsImportUtil {
         try{
             ImportParams params = new ImportParams();
             params.setStartSheetIndex(1);
-            List<NcovIaasVo> list = ExcelImportUtil.importExcel(new FileInputStream(new File("E:/hwyFiles/"+sourceFileName)),NcovIaasVo.class,params);
+            List<NcovIaasVo> list = ExcelImportUtil.importExcel(new FileInputStream(new File(rootPath+"/"+sourceFileName)),NcovIaasVo.class,params);
             System.out.println(list);
             System.out.println(list.size());
             return list;

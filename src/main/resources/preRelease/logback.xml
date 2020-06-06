@@ -8,10 +8,10 @@
   </appender>
 
   <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>/usr/local/jwyLogs/logFile.log</file>
+    <file>/mnt/jwyLogs/logFile.log</file>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
       <!-- daily rollover -->
-      <fileNamePattern>/usr/local/jwyLogs/logFile.%d{yyyy-MM-dd}.log</fileNamePattern>
+      <fileNamePattern>/mnt/jwyLogs/logFile.%d{yyyy-MM-dd}.log</fileNamePattern>
       <!-- keep 30 days' worth of history capped at 3GB total size -->
       <maxHistory>30</maxHistory>
       <totalSizeCap>3GB</totalSizeCap>

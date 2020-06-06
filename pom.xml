@@ -396,6 +396,12 @@
       </properties>
     </profile>
     <profile>
+      <id>preRelease</id>
+      <properties>
+        <profiles.active>preRelease</profiles.active>
+      </properties>
+    </profile>
+    <profile>
       <id>pro</id>
       <properties>
         <profiles.active>pro</profiles.active>

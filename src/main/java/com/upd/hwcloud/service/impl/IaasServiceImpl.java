@@ -39,6 +39,7 @@ import com.upd.hwcloud.service.IOperateRecordService;
 import com.upd.hwcloud.service.IUserService;
 import com.upd.hwcloud.service.application.*;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -99,6 +100,23 @@ public class IaasServiceImpl extends ServiceImpl<IaasMapper, Iaas> implements II
     private IIaasTxyfzjhExtService iaasTxyfzjhExtService;
     @Autowired
     private IIaasTxyfzjhImplService iaasTxyfzjhImplService;
+
+    @Transactional(rollbackFor = Throwable.class)
+    @Override
+    public void hotfix() {
+        List<Iaas> iaasList = this.list(new QueryWrapper<Iaas>().lambda().isNotNull(Iaas::getImage));
+
+        for(Iaas p : iaasList){
+            Files f = filesService.getOne(new QueryWrapper<Files>().lambda().eq(Files::getUrl,p.getImage()));
+            if(f != null){
+                p.setRealImage(f.getRealURL());
+            }
+        }
+
+        if(CollectionUtils.isNotEmpty(iaasList)){
+            this.updateBatchById(iaasList,50);
+        }
+    }
 
     @Transactional(rollbackFor = Exception.class)
     @Override

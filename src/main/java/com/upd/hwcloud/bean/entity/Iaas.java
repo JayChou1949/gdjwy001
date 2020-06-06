@@ -84,6 +84,12 @@ public class Iaas extends Model<Iaas> {
     private String image;
 
     /**
+     * 通过nginx获取地址
+     */
+    @TableField("REAL_IMAGE")
+    private String realImage;
+
+    /**
      * 描述
      */
     @TableField("DESCRIPTION")
@@ -367,6 +373,14 @@ public class Iaas extends Model<Iaas> {
     public Iaas setDescription(String description) {
         this.description = description;
         return this;
+    }
+
+    public String getRealImage() {
+        return realImage;
+    }
+
+    public void setRealImage(String realImage) {
+        this.realImage = realImage;
     }
 
     public String getProApplication() {

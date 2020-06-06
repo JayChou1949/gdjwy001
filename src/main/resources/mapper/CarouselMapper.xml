@@ -24,7 +24,8 @@
 
     <sql id="columns">
         c.ID,c.TITLE,c.URL,c.LINK,
-        f.URL AS imageUrl
+        f.URL AS imageUrl,
+        f.REAL_URL AS realUrl
     </sql>
 
     <!--这个兄弟，重写了条件构造器的list,属实恶心-->

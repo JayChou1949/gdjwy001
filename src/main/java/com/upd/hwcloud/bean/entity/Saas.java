@@ -98,6 +98,14 @@ public class Saas extends Model<Saas> {
          @TableField("IMAGE")
     private String image;
 
+
+
+    /**
+     * 通过nginx获取地址
+     */
+    @TableField("REAL_IMAGE")
+    private String realImage;
+
         /**
      * 描述
      */
@@ -310,6 +318,10 @@ public class Saas extends Model<Saas> {
     private boolean canAddShoppingCart = true;
 
 
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
     public String getProject() {
         return project;
     }
@@ -391,6 +403,14 @@ public class Saas extends Model<Saas> {
     public Saas setSubType(String subType) {
         this.subType = subType;
         return this;
+    }
+
+    public String getRealImage() {
+        return realImage;
+    }
+
+    public void setRealImage(String realImage) {
+        this.realImage = realImage;
     }
 
     public Long getSort() {

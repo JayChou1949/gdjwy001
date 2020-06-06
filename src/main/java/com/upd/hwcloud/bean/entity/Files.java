@@ -59,6 +59,12 @@ public class Files extends Model<Files> {
     @TableField("TITLE")
     private String title;
 
+    /**
+     * 真实路径 供Nginx服务器使用
+     */
+    @TableField("REAL_URL")
+    private String realURL;
+
     public String getId() {
         return id;
     }
@@ -127,6 +133,14 @@ public class Files extends Model<Files> {
 
     public void setRefId(String refId) {
         this.refId = refId;
+    }
+
+    public String getRealURL() {
+        return realURL;
+    }
+
+    public void setRealURL(String realURL) {
+        this.realURL = realURL;
     }
 
     @Override

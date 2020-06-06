@@ -2,6 +2,7 @@ package com.upd.hwcloud.service.application.impl;
 
 import com.google.common.collect.Lists;
 import com.upd.hwcloud.bean.dto.cov.*;
+import com.upd.hwcloud.common.utils.easypoi.NcovEcsImportUtil;
 import com.upd.hwcloud.common.utils.ncov.UnitExcelExportUtil;
 import com.upd.hwcloud.dao.application.NcovDataAreaMapper;
 import com.upd.hwcloud.service.application.NcovDataAreaService;
@@ -36,6 +37,13 @@ public class NcovDataAreaServiceImpl implements NcovDataAreaService {
     private String dataAccessName;
     @Value("${ncov.dataservice.name}")
     private String dataServiceName;
+
+    private static String rootPath;
+
+    @Value("${file.path}")
+    public void setRootPath(String rootPath) {
+        NcovDataAreaServiceImpl.rootPath = rootPath;
+    }
 
     @Resource
     private NcovDataAreaMapper ncovDataAreaMapper;
@@ -221,7 +229,7 @@ public class NcovDataAreaServiceImpl implements NcovDataAreaService {
     @Override
     public void uploadFile(MultipartFile file,String name) throws IOException{
         backUpFile(name);
-        File targetFile = new File("E:/hwyFiles/ncovArea/" + name);
+        File targetFile = new File(rootPath+"/ncovArea/" + name);
         targetFile.exists();
         FileOutputStream fileOutputStream = new FileOutputStream(targetFile);
         InputStream inputStream = file.getInputStream();
@@ -231,11 +239,11 @@ public class NcovDataAreaServiceImpl implements NcovDataAreaService {
     }
 
     private void backUpFile(String name) throws IOException {
-        File file = new File("E:/hwyFiles/ncovArea/" + name);
+        File file = new File(rootPath+"/ncovArea/" + name);
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
         Date date = new Date();
         String format = simpleDateFormat.format(date);
-        File backUpFile = new File("E:/hwyFiles/ncovArea/backUp/"+format+"-" + name);
+        File backUpFile = new File(rootPath+"/ncovArea/backUp/"+format+"-" + name);
         FileOutputStream fileOutputStream = new FileOutputStream(file);
         FileInputStream inputStream = new FileInputStream(backUpFile);
         IOUtils.copy(inputStream, fileOutputStream);
@@ -782,7 +790,7 @@ public class NcovDataAreaServiceImpl implements NcovDataAreaService {
     }
 
     private void downFile(HttpServletResponse response, String name) throws IOException {
-        File file = new File("E:\\hwyFiles\\ncovArea\\质量分析报告\\" + name);
+        File file = new File(rootPath+"/ncovArea/质量分析报告/" + name);
         if (file.exists()) {
             // 设置强制下载不打开
             response.setContentType("application/force-download");

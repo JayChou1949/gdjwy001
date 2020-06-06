@@ -20,6 +20,8 @@ import java.util.Map;
  */
 public interface IIaasService extends IService<Iaas> ,SortService {
 
+    void hotfix();
+
     /**
      * 上/下线
      * @param result 操作结果 1:上线,其它:下线

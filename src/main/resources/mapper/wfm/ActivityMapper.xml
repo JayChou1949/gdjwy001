@@ -27,6 +27,24 @@
 	    select * from TB_WFM_Activity where modelId=#{modelId,jdbcType=VARCHAR} and instanceId =#{instanceId,jdbcType=VARCHAR} and (activityStatus ='已提交' or activityStatus ='已抢占')
 	</select>
 
+    <select id="getCurrentNodeWithTimeById" resultType="com.upd.hwcloud.bean.vo.wfm.ExportActVo">
+        SELECT * FROM
+        (SELECT C.CREATETIME createTime ,M.MODELNAME,c.ID,c.PREVIOUSACTIVITYIDS,c.ACTIVITYSTATUS
+        FROM TB_WFM_ACTIVITY C
+        LEFT JOIN TB_WFM_WORKFLOWMODEL M ON M.ID = C.MODELID
+        LEFT JOIN TB_WFM_INSTANCE I ON I.ID = C.INSTANCEID
+        WHERE I.BUSINESSID = #{id}
+        ORDER BY C.CREATETIME DESC) WHERE ROWNUM = 1
+    </select>
+
+    <select id="getSameDayActivity" resultType="com.upd.hwcloud.bean.vo.wfm.ExportActVo">
+        SELECT C.CREATETIME createTime ,M.MODELNAME,c.ID,c.PREVIOUSACTIVITYIDS,c.ACTIVITYSTATUS
+        FROM TB_WFM_ACTIVITY C
+        LEFT JOIN TB_WFM_WORKFLOWMODEL M ON M.ID = C.MODELID
+        LEFT JOIN TB_WFM_INSTANCE I ON I.ID = C.INSTANCEID
+        WHERE I.BUSINESSID = #{id} and TO_CHAR(C.CREATETIME,'yyyy-MM-dd') = #{createTime}
+    </select>
+
     <select id="getResultActivities" resultMap="BaseResultMap">
 	    select * from TB_WFM_Activity where instanceId=#{instanceId,jdbcType=VARCHAR} and activityStatus !='已回退' and activityStatus !='等待' and activityStatus !='已转发' and  activityStatus !='已呈批' and  activityStatus !='已抢单' and activityStatus !='已抢占'
 	      and activityStatus !='已加办'

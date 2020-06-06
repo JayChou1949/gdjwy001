@@ -2,6 +2,8 @@ package com.upd.hwcloud.dao.wfm;
 
 import com.upd.hwcloud.bean.entity.wfm.Activity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.upd.hwcloud.bean.vo.wfm.ExportActVo;
+
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -46,4 +48,8 @@ public interface ActivityMapper extends BaseMapper<Activity> {
      * @return
      */
     int getKxDoneByIdCard(@Param("idCard")String idCard);
+
+    ExportActVo getCurrentNodeWithTimeById(@Param("id") String id);
+
+    List<ExportActVo> getSameDayActivity(@Param("id") String id,@Param("createTime") String createTime);
 }
