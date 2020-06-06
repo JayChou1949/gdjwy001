@@ -20,8 +20,12 @@ public class NcovExcelImportUtil {
 
     private final static  String sourceFileName = "ncovSource.xlsx";
 
-    @Value("${file.path}")
     private static String rootPath;
+
+    @Value("${file.path}")
+    public void setRootPath(String rootPath) {
+        NcovExcelImportUtil.rootPath = rootPath;
+    }
 
     public  static  List<NcovExcelSheetOneVo>  getSheetOneData(){
         try{

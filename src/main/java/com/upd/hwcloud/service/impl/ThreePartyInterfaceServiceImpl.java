@@ -46,8 +46,12 @@ public class ThreePartyInterfaceServiceImpl extends ServiceImpl<ThreePartyInterf
     @Autowired
     private ThreePartyInterfaceMapper threePartyInterfaceMapper;
 
-    @Value("${file.path}")
     private static String rootPath;
+
+    @Value("${file.path}")
+    public void setRootPath(String rootPath) {
+        ThreePartyInterfaceServiceImpl.rootPath = rootPath;
+    }
 
 
     @Override

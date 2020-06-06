@@ -8,6 +8,7 @@ import com.google.common.collect.Lists;
 import com.upd.hwcloud.bean.entity.Files;
 import com.upd.hwcloud.bean.entity.application.PaasTyyh;
 import com.upd.hwcloud.common.exception.BaseException;
+import com.upd.hwcloud.common.utils.easypoi.NcovEcsImportUtil;
 import com.upd.hwcloud.dao.FilesMapper;
 import com.upd.hwcloud.service.IFilesService;
 import org.apache.commons.io.FileUtils;
@@ -41,8 +42,12 @@ public class FilesServiceImpl extends ServiceImpl<FilesMapper, Files> implements
 
     @Autowired
     FilesMapper filesMapper;
+    private static String filePath;
+
     @Value("${file.path}")
-    private String filePath;
+    public void setRootPath(String rootPath) {
+        FilesServiceImpl.filePath = rootPath;
+    }
 
     private final static  String sourceFileName = "ncovSource.xlsx";
 

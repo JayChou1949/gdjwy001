@@ -24,9 +24,12 @@ public class NcovClusterImportUtil {
 
     private final static  String sourceFileName = "ncovCluster.xlsx";
 
-    @Value("${file.path}")
     private static String rootPath;
 
+    @Value("${file.path}")
+    public void setRootPath(String rootPath) {
+        NcovClusterImportUtil.rootPath = rootPath;
+    }
 
     /**
      * 获取第一个sheet概览数据

@@ -6,6 +6,7 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.NumberToTextConverter;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.text.DateFormat;
@@ -18,12 +19,14 @@ import java.util.List;
  * @author junglefisher
  * @date 2020/2/28 17:26
  */
+@Component
 public class UnitExcelExportUtil {
 
-    @Value("${file.path}")
     private static String rootPath;
 
-    private UnitExcelExportUtil() {
+    @Value("${file.path}")
+    public void setRootPath(String rootPath) {
+        UnitExcelExportUtil.rootPath = rootPath;
     }
 
     /**

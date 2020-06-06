@@ -2,6 +2,7 @@ package com.upd.hwcloud.service.application.impl;
 
 import com.google.common.collect.Lists;
 import com.upd.hwcloud.bean.dto.cov.*;
+import com.upd.hwcloud.common.utils.easypoi.NcovEcsImportUtil;
 import com.upd.hwcloud.common.utils.ncov.UnitExcelExportUtil;
 import com.upd.hwcloud.dao.application.NcovDataAreaMapper;
 import com.upd.hwcloud.service.application.NcovDataAreaService;
@@ -37,8 +38,12 @@ public class NcovDataAreaServiceImpl implements NcovDataAreaService {
     @Value("${ncov.dataservice.name}")
     private String dataServiceName;
 
-    @Value("${file.path}")
     private static String rootPath;
+
+    @Value("${file.path}")
+    public void setRootPath(String rootPath) {
+        NcovDataAreaServiceImpl.rootPath = rootPath;
+    }
 
     @Resource
     private NcovDataAreaMapper ncovDataAreaMapper;
