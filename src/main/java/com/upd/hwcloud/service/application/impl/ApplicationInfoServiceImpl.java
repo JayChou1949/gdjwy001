@@ -1787,6 +1787,9 @@ public class ApplicationInfoServiceImpl extends ServiceImpl<ApplicationInfoMappe
                     vo.setStepName(model.getModelName());
                 }
             }
+            if(StringUtils.equals(iaasZysb.getStatus(),ApplicationInfoStatus.USE.getCode())){
+                vo.setStepName("使用中");
+            }
 
             //服务台复核
             ReviewInfoVo reviewInfoVo = appReviewInfoService.getReviewInfoVoByAppInfoId("服务台复核", id);
@@ -1838,6 +1841,10 @@ public class ApplicationInfoServiceImpl extends ServiceImpl<ApplicationInfoMappe
                 } else {
                     vo.setStepName(model.getModelName());
                 }
+            }
+
+            if(StringUtils.equals(register.getStatus(),ApplicationInfoStatus.USE.getCode())){
+                vo.setStepName("使用中");
             }
             //服务台复核
             ReviewInfoVo reviewInfoVo = appReviewInfoService.getReviewInfoVoByAppInfoId("服务台复核", id);
