@@ -42,8 +42,6 @@ public class NcovClusterImportUtil {
             ImportParams params = new ImportParams();
             params.setStartSheetIndex(0);
             List<NcovClusterOverview> list = ExcelImportUtil.importExcel(new FileInputStream(new File(rootPath+"/"+sourceFileName)),NcovClusterOverview.class,params);
-            System.out.println(list);
-            System.out.println(list.size());
             if(CollectionUtils.isEmpty(list)){
                 return null;
             }else {
@@ -64,8 +62,6 @@ public class NcovClusterImportUtil {
         ImportParams params = new ImportParams();
         params.setStartSheetIndex(1);
         List<NcovClusterResource> list = ExcelImportUtil.importExcel(new FileInputStream(new File(rootPath+"/"+sourceFileName)),NcovClusterResource.class,params);
-        System.out.println(list);
-        System.out.println(list.size());
         return list;
     }catch (Exception e){
         e.printStackTrace();
@@ -79,8 +75,6 @@ public class NcovClusterImportUtil {
             ImportParams params = new ImportParams();
             params.setStartSheetIndex(2);
             List<NcovClusterApp> list = ExcelImportUtil.importExcel(new FileInputStream(new File(rootPath+"/"+sourceFileName)),NcovClusterApp.class,params);
-            System.out.println(list);
-            System.out.println(list.size());
             return list;
         }catch (Exception e){
             e.printStackTrace();

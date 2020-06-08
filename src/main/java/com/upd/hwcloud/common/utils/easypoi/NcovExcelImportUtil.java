@@ -34,8 +34,6 @@ public class NcovExcelImportUtil {
             ImportParams params = new ImportParams();
             params.setStartSheetIndex(0);
             List<NcovExcelSheetOneVo> list = ExcelImportUtil.importExcel(new FileInputStream(new File(rootPath+"/"+sourceFileName)),NcovExcelSheetOneVo.class,params);
-            System.out.println(list);
-            System.out.println(list.size());
             return list;
         }catch (Exception e){
             e.printStackTrace();
@@ -49,8 +47,6 @@ public class NcovExcelImportUtil {
             ImportParams params = new ImportParams();
             params.setStartSheetIndex(1);
             List<NcovExcelSheetTwoVo> list = ExcelImportUtil.importExcel(new FileInputStream(new File(rootPath+"/"+sourceFileName)),NcovExcelSheetTwoVo.class,params);
-            System.out.println(list);
-            System.out.println(list.size());
             return list;
         }catch (Exception e){
             e.printStackTrace();

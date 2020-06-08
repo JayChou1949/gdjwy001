@@ -76,8 +76,6 @@ public class NcovEcsImportUtil {
             ImportParams params = new ImportParams();
             params.setStartSheetIndex(1);
             List<NcovIaasVo> list = ExcelImportUtil.importExcel(new FileInputStream(new File(rootPath+"/"+sourceFileName)),NcovIaasVo.class,params);
-            System.out.println(list);
-            System.out.println(list.size());
             return list;
         }catch (Exception e){
             e.printStackTrace();
