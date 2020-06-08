@@ -7,4 +7,5 @@ package com.upd.hwcloud.bean.contains;
 public interface NcovKey {
 
     String HOME_PAGE = "homePage";
+    String DATA_MODELING = "dataModeling";
 }

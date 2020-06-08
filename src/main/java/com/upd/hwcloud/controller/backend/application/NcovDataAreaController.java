@@ -105,8 +105,13 @@ public class NcovDataAreaController {
     @ApiOperation(value = "数据建模")
     @RequestMapping(value ="/dataModeling",method = RequestMethod.GET)
     public R dataModeling(){
+        String  res = stringRedisTemplate.opsForValue().get(NcovKey.HOME_PAGE);
+        if(res != null){
+            return  R.ok(res);
+        }
         try {
             DataModeling dataModeling = ncovDataAreaService.dataModelingOverview();
+            stringRedisTemplate.opsForValue().set(NcovKey.DATA_MODELING, JSON.toJSONString(dataModeling),5, TimeUnit.HOURS);
             return R.ok(dataModeling);
         }catch (Exception e){
             e.printStackTrace();
