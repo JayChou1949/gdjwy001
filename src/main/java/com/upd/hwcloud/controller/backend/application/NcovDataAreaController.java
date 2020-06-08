@@ -1,9 +1,11 @@
 package com.upd.hwcloud.controller.backend.application;
 
 import cn.afterturn.easypoi.excel.entity.ExportParams;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
+import com.upd.hwcloud.bean.contains.NcovKey;
 import com.upd.hwcloud.bean.dto.XtdyExport;
 import com.upd.hwcloud.bean.dto.cov.*;
 import com.upd.hwcloud.bean.response.R;
@@ -13,6 +15,8 @@ import com.upd.hwcloud.common.utils.easypoi.ExportView;
 import com.upd.hwcloud.service.application.NcovDataAreaService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartRequest;
@@ -25,6 +29,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author junglefisher
@@ -37,11 +42,19 @@ public class NcovDataAreaController {
     @Resource
     private NcovDataAreaService ncovDataAreaService;
 
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
     @ApiOperation(value = "数据共享")
     @RequestMapping(value = "/dataSharing",method = RequestMethod.GET)
     public R dataSharing(){
+        String  res = stringRedisTemplate.opsForValue().get(NcovKey.HOME_PAGE);
+        if(res != null){
+            return  R.ok(res);
+        }
         try {
             DataSharing dataSharing = ncovDataAreaService.dataSharingOverview();
+            stringRedisTemplate.opsForValue().set(NcovKey.HOME_PAGE, JSON.toJSONString(dataSharing),5, TimeUnit.HOURS);
             return R.ok(dataSharing);
         }catch (Exception e){
             e.printStackTrace();
