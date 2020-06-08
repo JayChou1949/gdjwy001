@@ -12,4 +12,6 @@ public interface NcovKey {
     String DATA_GOVERNANCE = "dataGovernance";
     String DATA_ACCESS = "dataAccess";
     String DATA_SERVICE = "dataService";
+    String NCOV_IAAS_OVERVIEW = "ncovIaasOverview";
+    String EPIC_DESKTOP = "epicDesktop";
 }

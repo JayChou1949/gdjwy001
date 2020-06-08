@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Maps;
+import com.upd.hwcloud.bean.contains.NcovKey;
 import com.upd.hwcloud.bean.dto.*;
 import com.upd.hwcloud.bean.dto.cov.*;
 import com.upd.hwcloud.bean.entity.ThreePartyInterface;
@@ -21,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -46,6 +48,9 @@ public class ThreePartyInterfaceServiceImpl extends ServiceImpl<ThreePartyInterf
 
     @Autowired
     private ThreePartyInterfaceMapper threePartyInterfaceMapper;
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
 
     private static String rootPath;
 
