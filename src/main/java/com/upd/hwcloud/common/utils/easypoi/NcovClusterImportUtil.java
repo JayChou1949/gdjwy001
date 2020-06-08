@@ -7,6 +7,7 @@ import com.upd.hwcloud.bean.vo.ncov.NcovExcelSheetOneVo;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,6 +21,7 @@ import cn.afterturn.easypoi.excel.entity.ImportParams;
  * @author wuc
  * @date 2020/3/3
  */
+@Component
 public class NcovClusterImportUtil {
 
     private final static  String sourceFileName = "ncovCluster.xlsx";

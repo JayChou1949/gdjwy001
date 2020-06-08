@@ -4,6 +4,7 @@ import com.upd.hwcloud.bean.vo.ncov.NcovExcelSheetOneVo;
 import com.upd.hwcloud.bean.vo.ncov.NcovExcelSheetTwoVo;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,6 +17,7 @@ import cn.afterturn.easypoi.excel.entity.ImportParams;
  * @author wuc
  * @date 2020/2/19
  */
+@Component
 public class NcovExcelImportUtil {
 
     private final static  String sourceFileName = "ncovSource.xlsx";
