@@ -35,19 +35,41 @@ public class UnitExcelExportUtil {
      * @return
      * @throws Exception
      */
-    public static List<List<Object>> list(String name) throws Exception {
+    public static List<List<Object>> list(String name){
         List<List<Object>> list=null;
+        InputStream inputStream =null;
+        Workbook workbook = null;
         File file = new File(rootPath+"/"+name);
 //        File file = new File("E:/hwyFiles/省直疫情数据服务调用统计.xls");//song本地测试用
-        InputStream inputStream=new FileInputStream(file);
-        Workbook workbook = createWorkbook(inputStream);
-        if (null != workbook) {
-            if ("省直疫情数据服务调用统计.xls".equals(name)) {
-                list = getDataList(workbook,3);
-            } else if ("疫情桌面云.xls".equals(name)) {
-                list = getDataList(workbook, 1);
+        try{
+            inputStream =new FileInputStream(file);
+            workbook = createWorkbook(inputStream);
+            if (null != workbook) {
+                if ("省直疫情数据服务调用统计.xls".equals(name)) {
+                    list = getDataList(workbook,3);
+                } else if ("疫情桌面云.xls".equals(name)) {
+                    list = getDataList(workbook, 1);
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if(workbook!=null){
+                try {
+                    workbook.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if(inputStream != null){
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
+
         return list;
     }
 
