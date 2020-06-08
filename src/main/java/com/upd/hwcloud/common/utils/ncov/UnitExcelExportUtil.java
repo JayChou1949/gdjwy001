@@ -1,5 +1,6 @@
 package com.upd.hwcloud.common.utils.ncov;
 
+import com.google.common.collect.Lists;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -55,11 +56,34 @@ public class UnitExcelExportUtil {
      * @return
      * @throws Exception
      */
-    public static List<List<Object>> ncovDataList(String name,Integer num,Integer sheetNum) throws Exception {
+    public static List<List<Object>> ncovDataList(String name,Integer num,Integer sheetNum){
         File file = new File(rootPath+"/ncovArea/"+name);
-        InputStream inputStream=new FileInputStream(file);
-        Workbook workbook = createWorkbook(inputStream);
-        return getDataListBySheet(workbook,num,sheetNum);
+        InputStream inputStream = null;
+        Workbook workbook = null;
+        List<List<Object>> resultList = Lists.newArrayList();
+        try{
+            inputStream=new FileInputStream(file);
+            workbook = createWorkbook(inputStream);
+            resultList = getDataListBySheet(workbook,num,sheetNum);
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if(workbook != null){
+                try {
+                    workbook.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if(inputStream !=null){
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return resultList;
     }
 
     /**
