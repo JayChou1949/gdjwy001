@@ -15,6 +15,8 @@ import com.upd.hwcloud.common.utils.easypoi.ExportView;
 import com.upd.hwcloud.service.application.NcovDataAreaService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -343,8 +345,11 @@ public class NcovDataAreaController {
     @RequestMapping(value ="/homePage",method = RequestMethod.GET)
     public R homePage(){
         String  res = stringRedisTemplate.opsForValue().get(NcovKey.HOME_PAGE);
-        if(res != null){
-            return  R.ok(res);
+        if(StringUtils.isNotBlank(res)){
+            HomePageData homePageData = JSON.parseObject(res,HomePageData.class);
+            if(homePageData != null){
+                return  R.ok(homePageData);
+            }
         }
         try {
             HomePageData homePage = ncovDataAreaService.homePage();
