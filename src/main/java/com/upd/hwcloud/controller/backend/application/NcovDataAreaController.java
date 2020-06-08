@@ -48,13 +48,13 @@ public class NcovDataAreaController {
     @ApiOperation(value = "数据共享")
     @RequestMapping(value = "/dataSharing",method = RequestMethod.GET)
     public R dataSharing(){
-        String  res = stringRedisTemplate.opsForValue().get(NcovKey.HOME_PAGE);
+        String  res = stringRedisTemplate.opsForValue().get(NcovKey.DATA_SHARING);
         if(res != null){
             return  R.ok(res);
         }
         try {
             DataSharing dataSharing = ncovDataAreaService.dataSharingOverview();
-            stringRedisTemplate.opsForValue().set(NcovKey.HOME_PAGE, JSON.toJSONString(dataSharing),5, TimeUnit.HOURS);
+            stringRedisTemplate.opsForValue().set(NcovKey.DATA_SHARING, JSON.toJSONString(dataSharing),5, TimeUnit.HOURS);
             return R.ok(dataSharing);
         }catch (Exception e){
             e.printStackTrace();
@@ -105,7 +105,7 @@ public class NcovDataAreaController {
     @ApiOperation(value = "数据建模")
     @RequestMapping(value ="/dataModeling",method = RequestMethod.GET)
     public R dataModeling(){
-        String  res = stringRedisTemplate.opsForValue().get(NcovKey.HOME_PAGE);
+        String  res = stringRedisTemplate.opsForValue().get(NcovKey.DATA_MODELING);
         if(res != null){
             return  R.ok(res);
         }
@@ -183,8 +183,13 @@ public class NcovDataAreaController {
     @RequestMapping(value ="/dataGovernance",method = RequestMethod.GET)
     public R dataGovernance(@RequestParam(name = "page", required = false, defaultValue = "1") Integer pageNo,
                             @RequestParam(name = "size", required = false, defaultValue = "7") Integer pageSize){
+        String  res = stringRedisTemplate.opsForValue().get(NcovKey.DATA_MODELING);
+        if(res != null){
+            return  R.ok(res);
+        }
         try {
             DataGovernance dataGovernance = ncovDataAreaService.dataGovernance();
+            stringRedisTemplate.opsForValue().set(NcovKey.DATA_MODELING, JSON.toJSONString(dataGovernance),5, TimeUnit.HOURS);
             return R.ok(dataGovernance);
         }catch (Exception e){
             e.printStackTrace();
@@ -337,8 +342,13 @@ public class NcovDataAreaController {
     @ApiOperation(value = "首页")
     @RequestMapping(value ="/homePage",method = RequestMethod.GET)
     public R homePage(){
+        String  res = stringRedisTemplate.opsForValue().get(NcovKey.HOME_PAGE);
+        if(res != null){
+            return  R.ok(res);
+        }
         try {
             HomePageData homePage = ncovDataAreaService.homePage();
+            stringRedisTemplate.opsForValue().set(NcovKey.HOME_PAGE, JSON.toJSONString(homePage),5, TimeUnit.HOURS);
             return R.ok(homePage);
         }catch (Exception e){
             e.printStackTrace();

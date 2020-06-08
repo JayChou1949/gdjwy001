@@ -8,4 +8,5 @@ public interface NcovKey {
 
     String HOME_PAGE = "homePage";
     String DATA_MODELING = "dataModeling";
+    String DATA_SHARING = "dataSharing";
 }
