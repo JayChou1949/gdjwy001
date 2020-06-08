@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import cn.afterturn.easypoi.excel.ExcelImportUtil;
@@ -37,15 +39,25 @@ public class NcovEcsImportUtil {
      * @return
      */
     public static NcovEcsOverview getOverviewData(){
+        FileInputStream inputStream = null;
         try{
             ImportParams params = new ImportParams();
+            inputStream = new FileInputStream(new File(rootPath+"/"+sourceFileName));
             params.setStartSheetIndex(0);
-            List<NcovEcsOverview> list = ExcelImportUtil.importExcel(new FileInputStream(new File(rootPath+"/"+sourceFileName)),NcovEcsOverview.class,params);
+            List<NcovEcsOverview> list = ExcelImportUtil.importExcel(inputStream,NcovEcsOverview.class,params);
             if(CollectionUtils.isNotEmpty(list)){
                 return list.get(0);
             }
         }catch (Exception e){
             e.printStackTrace();
+        }finally {
+            if(inputStream != null){
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
         return  null;
