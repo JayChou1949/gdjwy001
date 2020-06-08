@@ -9,4 +9,7 @@ public interface NcovKey {
     String HOME_PAGE = "homePage";
     String DATA_MODELING = "dataModeling";
     String DATA_SHARING = "dataSharing";
+    String DATA_GOVERNANCE = "dataGovernance";
+    String DATA_ACCESS = "dataAccess";
+    String DATA_SERVICE = "dataService";
 }

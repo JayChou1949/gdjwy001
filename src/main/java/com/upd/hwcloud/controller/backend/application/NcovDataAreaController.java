@@ -2,6 +2,7 @@ package com.upd.hwcloud.controller.backend.application;
 
 import cn.afterturn.easypoi.excel.entity.ExportParams;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
@@ -52,7 +53,10 @@ public class NcovDataAreaController {
     public R dataSharing(){
         String  res = stringRedisTemplate.opsForValue().get(NcovKey.DATA_SHARING);
         if(res != null){
-            return  R.ok(res);
+            DataSharing sharing = JSON.parseObject(res, DataSharing.class);
+            if (sharing!=null){
+                return R.ok(sharing);
+            }
         }
         try {
             DataSharing dataSharing = ncovDataAreaService.dataSharingOverview();
@@ -109,7 +113,10 @@ public class NcovDataAreaController {
     public R dataModeling(){
         String  res = stringRedisTemplate.opsForValue().get(NcovKey.DATA_MODELING);
         if(res != null){
-            return  R.ok(res);
+            DataModeling dataModeling = JSON.parseObject(res, DataModeling.class);
+            if (dataModeling!=null){
+                return R.ok(dataModeling);
+            }
         }
         try {
             DataModeling dataModeling = ncovDataAreaService.dataModelingOverview();
@@ -185,13 +192,16 @@ public class NcovDataAreaController {
     @RequestMapping(value ="/dataGovernance",method = RequestMethod.GET)
     public R dataGovernance(@RequestParam(name = "page", required = false, defaultValue = "1") Integer pageNo,
                             @RequestParam(name = "size", required = false, defaultValue = "7") Integer pageSize){
-        String  res = stringRedisTemplate.opsForValue().get(NcovKey.DATA_MODELING);
+        String  res = stringRedisTemplate.opsForValue().get(NcovKey.DATA_GOVERNANCE);
         if(res != null){
-            return  R.ok(res);
+            DataGovernance dataGovernance = JSON.parseObject(res, DataGovernance.class);
+            if (dataGovernance!=null){
+                return R.ok(dataGovernance);
+            }
         }
         try {
             DataGovernance dataGovernance = ncovDataAreaService.dataGovernance();
-            stringRedisTemplate.opsForValue().set(NcovKey.DATA_MODELING, JSON.toJSONString(dataGovernance),5, TimeUnit.HOURS);
+            stringRedisTemplate.opsForValue().set(NcovKey.DATA_GOVERNANCE, JSON.toJSONString(dataGovernance),5, TimeUnit.HOURS);
             return R.ok(dataGovernance);
         }catch (Exception e){
             e.printStackTrace();
@@ -250,8 +260,16 @@ public class NcovDataAreaController {
     @ApiOperation(value = "数据接入")
     @RequestMapping(value ="/dataAccess",method = RequestMethod.GET)
     public R dataAccess(){
+        String res = stringRedisTemplate.opsForValue().get(NcovKey.DATA_ACCESS);
+        if (res!=null){
+            DataAccess dataAccess = JSON.parseObject(res,DataAccess.class);
+            if (dataAccess!=null){
+                return R.ok(dataAccess);
+            }
+        }
         try {
             DataAccess dataAccess = ncovDataAreaService.dataAccessOverview();
+            stringRedisTemplate.opsForValue().set(NcovKey.DATA_ACCESS, JSON.toJSONString(dataAccess),5, TimeUnit.HOURS);
             return R.ok(dataAccess);
         }catch (Exception e){
             e.printStackTrace();
@@ -305,8 +323,16 @@ public class NcovDataAreaController {
     @ApiOperation(value = "数据服务")
     @RequestMapping(value ="/dataService",method = RequestMethod.GET)
     public R dataService(){
+        String res = stringRedisTemplate.opsForValue().get(NcovKey.DATA_SERVICE);
+        if (res!=null){
+            DataService dataService = JSON.parseObject(res,DataService.class);
+            if (dataService!=null){
+                return R.ok(dataService);
+            }
+        }
         try {
             DataService dataService = ncovDataAreaService.dataService();
+            stringRedisTemplate.opsForValue().set(NcovKey.DATA_SERVICE, JSON.toJSONString(dataService),5, TimeUnit.HOURS);
             return R.ok(dataService);
         }catch (Exception e){
             e.printStackTrace();
