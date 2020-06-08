@@ -8,6 +8,7 @@ import com.google.common.collect.Maps;
 import com.upd.hwcloud.bean.entity.Dict;
 import com.upd.hwcloud.bean.entity.dm.*;
 import com.upd.hwcloud.bean.response.R;
+import com.upd.hwcloud.common.utils.BigDecimalUtil;
 import com.upd.hwcloud.service.IDictService;
 import com.upd.hwcloud.service.dm.*;
 import com.upd.hwcloud.service.dm.impl.CloudVmServiceImpl;
@@ -60,7 +61,7 @@ public class ImocCloudController {
             ImmutableMap.<String, String>builder()
                     .put("cpu", "VCPU_USAGE")
                     .put("mem", "MEMEORY_USAGE")
-                    .put("disk","EVS_DISK_USAGE")
+                    .put("disk", "EVS_DISK_USAGE")
                     .build();
 
 
@@ -68,47 +69,47 @@ public class ImocCloudController {
             ImmutableMap.<String, String>builder()
                     .put("cpu", "CPU_USAGE")
                     .put("mem", "MEMORY_USAGE")
-                    .put("disk","EVS_DISK_USAGE")
+                    .put("disk", "EVS_DISK_USAGE")
                     .build();
 
 
-
     @RequestMapping("appCount")
-    public R appCount(){
+    public R appCount() {
         return cloudBusinessTopService.applicationAccount();
     }
 
     /**
      * 警种应用数统计
+     *
      * @return
      */
     @RequestMapping("policeAppCount")
-    public R policeAppCount(){
+    public R policeAppCount() {
         return cloudBusinessTopService.policeApplicationCount();
     }
 
 
-
     /**
      * 地市应用数(目前只统计了非发达地市)
+     *
      * @return
      */
     @RequestMapping("areaAppCount")
-    public R areaAppCount(){
+    public R areaAppCount() {
 
         return cloudBusinessTopService.areaApplicationCount();
     }
 
 
-
     /**
      * 警种、地市使用率
+     *
      * @param name
      * @return
      */
     @RequestMapping("businessUsage")
-    public R businessUsage(String name){
-        if("打私".equals(name)){
+    public R businessUsage(String name) {
+        if ("打私".equals(name)) {
             name = "海关缉私";
         }
         return cloudBusinessService.usage(name);
@@ -116,20 +117,21 @@ public class ImocCloudController {
 
     //todo:还没做
     @RequestMapping("business/page")
-    public R businessPage(Page<CloudBusiness> page, String name, String type, String orderType, String cloud){
-        page = cloudBusinessService.getPage(page,name,type,orderType,cloud);
+    public R businessPage(Page<CloudBusiness> page, String name, String type, String orderType, String cloud) {
+        page = cloudBusinessService.getPage(page, name, type, orderType, cloud);
         return R.ok(page);
     }
 
 
     /**
      * 警种应用使用率
+     *
      * @param name
      * @return
      */
     @RequestMapping("appUsage")
-    public R policeAppUsage(String name){
-        if("打私".equals(name)){
+    public R policeAppUsage(String name) {
+        if ("打私".equals(name)) {
             name = "海关缉私";
         }
         return cloudBusinessTopService.policeApplicationUsage(name);
@@ -137,15 +139,14 @@ public class ImocCloudController {
 
     /**
      * 应用分页列表
-     *
      */
     @RequestMapping("app/page")
-    public R appPage(Page<CloudBusinessTop> page, String name, String type, String orderType, String cloud){
+    public R appPage(Page<CloudBusinessTop> page, String name, String type, String orderType, String cloud) {
 
-        if(type!=null && appOrderMapping.containsKey(type)){
+        if (type != null && appOrderMapping.containsKey(type)) {
             type = appOrderMapping.get(type);
         }
-        page = cloudBusinessTopService.getPage(page,name,type,orderType,cloud);
+        page = cloudBusinessTopService.getPage(page, name, type, orderType, cloud);
 
         return R.ok(page);
     }
@@ -153,16 +154,18 @@ public class ImocCloudController {
 
     /**
      * 警察列表
+     *
      * @return
      */
     @RequestMapping("policeNames")
-    public R policeNames(){
+    public R policeNames() {
         return cloudBusinessTopService.policeHasAppName();
     }
 
 
     /**
-     *  虚拟机分页
+     * 虚拟机分页
+     *
      * @param page
      * @param name
      * @param type
@@ -170,80 +173,93 @@ public class ImocCloudController {
      * @return
      */
     @RequestMapping("vm/page")
-    public R vmPage(Page<CloudVm> page, String name, String type, String orderType, String cloud){
+    public R vmPage(Page<CloudVm> page, String name, String type, String orderType, String cloud) {
 
 
-        if(type!=null && appOrderMapping.containsKey(type)){
+        if (type != null && appOrderMapping.containsKey(type)) {
             type = vmOrderMapping.get(type);
         }
 
 
-       page =  cloudVmService.getPage(page,name,type,orderType,cloud);
+        page = cloudVmService.getPage(page, name, type, orderType, cloud);
 
         return R.ok(page);
     }
 
 
     @RequestMapping("addOrSub/page")
-    public R addOrSubPage(Page<CloudVmAddSub> page,String name, Integer dataType){
+    public R addOrSubPage(Page<CloudVmAddSub> page, String name, Integer dataType) {
         //科信改大数据办
         if ("大数据办".equals(name)) {
             page = (Page<CloudVmAddSub>) cloudVmAddSubService.page(page, new QueryWrapper<CloudVmAddSub>().eq("DATA_TYPE", dataType).eq("BUSINESS_UNIT1", "科信"));
         } else {
-            page = (Page<CloudVmAddSub>) cloudVmAddSubService.page(page,new QueryWrapper<CloudVmAddSub>().eq("DATA_TYPE",dataType).eq("BUSINESS_UNIT1",name));
+            page = (Page<CloudVmAddSub>) cloudVmAddSubService.page(page, new QueryWrapper<CloudVmAddSub>().eq("DATA_TYPE", dataType).eq("BUSINESS_UNIT1", name));
         }
         return R.ok(page);
 
     }
 
     /**
-     *
      * @param page:current size
      * @param name:应用名
-     * @param type：0（全部） 1（扩容） 2（缩容）
-     * DATA_TYPE:   0:CPU扩容 1:CPU缩容 2:内存扩容 3:内存缩容
+     * @param type：0（全部）   1（扩容） 2（缩容）
+     *                     DATA_TYPE:   0:CPU扩容 1:CPU缩容 2:内存扩容 3:内存缩容
      * @return
      */
     @RequestMapping("addOrSub/pageList")
-    public R addOrSubPageList(Page<CloudVmAddSub> page,String name,Integer type){
-        if (1==type){
-            page = (Page<CloudVmAddSub>) cloudVmAddSubService.page(page,new QueryWrapper<CloudVmAddSub>().in("DATA_TYPE",0,2).like("NAME",name));
-        }else if (2==type){
-            page = (Page<CloudVmAddSub>) cloudVmAddSubService.page(page,new QueryWrapper<CloudVmAddSub>().in("DATA_TYPE",1,3).like("NAME",name));
-        }else{
-            page = (Page<CloudVmAddSub>) cloudVmAddSubService.page(page,new QueryWrapper<CloudVmAddSub>().like("NAME",name));
+    public R addOrSubPageList(Page<CloudVmAddSub> page, String name, Integer type) {
+        if (1 == type) {
+            page = (Page<CloudVmAddSub>) cloudVmAddSubService.page(page, new QueryWrapper<CloudVmAddSub>().in("DATA_TYPE", 0, 2).like("NAME", name));
+            page.getRecords().forEach(item -> {
+                item.setRamSize(BigDecimalUtil.div(item.getRamSize(),1024).doubleValue());
+                item.setDiskSize(BigDecimalUtil.div(item.getDiskSize(),1024).doubleValue());
+            });
+        } else if (2 == type) {
+            page = (Page<CloudVmAddSub>) cloudVmAddSubService.page(page, new QueryWrapper<CloudVmAddSub>().in("DATA_TYPE", 1, 3).like("NAME", name));
+            page.getRecords().forEach(item -> {
+                item.setRamSize(BigDecimalUtil.div(item.getRamSize(),1024).doubleValue());
+                item.setDiskSize(BigDecimalUtil.div(item.getDiskSize(),1024).doubleValue());
+            });
+        } else {
+            page = (Page<CloudVmAddSub>) cloudVmAddSubService.page(page, new QueryWrapper<CloudVmAddSub>().like("NAME", name));
+            page.getRecords().forEach(item -> {
+                item.setRamSize(BigDecimalUtil.div(item.getRamSize(),1024).doubleValue());
+                item.setDiskSize(BigDecimalUtil.div(item.getDiskSize(),1024).doubleValue());
+            });
         }
         return R.ok(page);
     }
 
     /**
      * 虚拟机使用详情
+     *
      * @param name
      * @return
      */
     @RequestMapping("vmDetail")
-    public R vmDetail(String name){
-        if("打私".equals(name)){
+    public R vmDetail(String name) {
+        if ("打私".equals(name)) {
             name = "海关缉私";
         }
-        return cloudVmService.vmDetail(name);}
+        return cloudVmService.vmDetail(name);
+    }
 
 
     /**
      * 地市列表
+     *
      * @return
      */
     @RequestMapping("areaNames")
-    public R areaNames(){
+    public R areaNames() {
         return cloudBusinessTopService.areaHasAppName();
     }
 
 
-
     @RequestMapping("appList")
-    public R appListByName(String name){
+    public R appListByName(String name) {
 
-        if("打私".equals(name)){
+        if ("打私".equals(name)) {
             name = "海关缉私";
         }
        /* if("梅州".equals(name) || "潮州".equals(name) || "肇庆".equals(name) || "揭阳".equals(name)){
@@ -257,39 +273,42 @@ public class ImocCloudController {
 
     /**
      * 虚拟机TOP/BOT 5
-     * @Param name
-     * @param type cpu_usage CPU 利用率 memory_usage 内存利用率 evs_disk_usage 磁盘利用率
+     *
+     * @param type      cpu_usage CPU 利用率 memory_usage 内存利用率 evs_disk_usage 磁盘利用率
      * @param orderType desc 降序 asc 升序
      * @return
+     * @Param name
      */
     @RequestMapping("vmOrder")
-    public R vmorder(String name,String type,String orderType){
-        if("打私".equals(name)){
+    public R vmorder(String name, String type, String orderType) {
+        if ("打私".equals(name)) {
             name = "海关缉私";
         }
-        List<CloudVm> vmList = cloudVmService.vmTop5(name,type,orderType);
+        List<CloudVm> vmList = cloudVmService.vmTop5(name, type, orderType);
         return R.ok(vmList);
     }
 
     /**
      * 一片云资源总览
+     *
      * @return
      */
     @RequestMapping("oneCloudOverview")
-    public R oneCloudOverview(){
+    public R oneCloudOverview() {
         return cloudResourceLevel1Service.overview();
     }
 
 
     /**
      * 二级云名字
+     *
      * @return
      */
     @RequestMapping("getLevel2Name")
-    public R level2Name(){
+    public R level2Name() {
 
         List<String> name = cloudResourceLevel2Service.resourceLevelNames();
-        name.add(0,"一片云");
+        name.add(0, "一片云");
         return R.ok(name);
 
     }
@@ -297,30 +316,31 @@ public class ImocCloudController {
 
     /**
      * 二级资源概览
+     *
      * @param name
      * @return
      */
     @RequestMapping("level2Overview")
-    public R level2Overview(String name){
+    public R level2Overview(String name) {
         return cloudResourceLevel2Service.overviewLevel2(name);
     }
 
 
-
     @RequestMapping("originOverview")
-    public R originOverview(String name){
+    public R originOverview(String name) {
         return cloudResourceLevel2Service.originOverview(name);
     }
 
     /**
      * ods库云服务种类个数
+     *
      * @return
      */
     @RequestMapping("odsDataOverview")
-    public R odsDataOverview(@RequestParam(value = "cloud",defaultValue = "一片云") String cloud,@RequestParam(value = "display",defaultValue = "0") Integer display){
+    public R odsDataOverview(@RequestParam(value = "cloud", defaultValue = "一片云") String cloud, @RequestParam(value = "display", defaultValue = "0") Integer display) {
 
 
-        List<CloudCategory> cloudCategoryList = categoryService.list(new QueryWrapper<CloudCategory>().lambda().eq(CloudCategory::getCloud,cloud).eq(CloudCategory::getDisplay,display));
+        List<CloudCategory> cloudCategoryList = categoryService.list(new QueryWrapper<CloudCategory>().lambda().eq(CloudCategory::getCloud, cloud).eq(CloudCategory::getDisplay, display));
 
         return R.ok(cloudCategoryList);
     }
@@ -328,13 +348,14 @@ public class ImocCloudController {
 
     /**
      * 虚拟机扩/缩标准字典
+     *
      * @return
      */
     @RequestMapping("vmStandard")
-    public R vmStandard(){
-        Dict dict = dictService.getOne(new QueryWrapper<Dict>().lambda().eq(Dict::getValue,"vmksbz"));
+    public R vmStandard() {
+        Dict dict = dictService.getOne(new QueryWrapper<Dict>().lambda().eq(Dict::getValue, "vmksbz"));
 
-        Map<String,String> dictMap = dictService.selectDeepMap(dict.getId());
+        Map<String, String> dictMap = dictService.selectDeepMap(dict.getId());
 
         return R.ok(dictMap);
     }
@@ -342,11 +363,12 @@ public class ImocCloudController {
 
     /**
      * 存储扩缩统计
+     *
      * @param name
      * @return
      */
     @RequestMapping("storageNeedAddAndSub")
-    public R storageNeedAddAndSub(String name){
+    public R storageNeedAddAndSub(String name) {
 
 
         Long start = System.currentTimeMillis();
@@ -354,46 +376,39 @@ public class ImocCloudController {
         .eq(CloudVm::getBusinessUnit1,name).isNotNull(CloudVm::getEvsDiskUsage));*/
 
         List<CloudVm> cloudVmList = cloudVmService.getList(name);
-        System.out.println("QueryListSpend:"+ (System.currentTimeMillis()-start)+"ms");
+        System.out.println("QueryListSpend:" + (System.currentTimeMillis() - start) + "ms");
 
         Long dictStart = System.currentTimeMillis();
-       // Dict dict = dictService.getOne(new QueryWrapper<Dict>().lambda().eq(Dict::getValue,"vmksbz"));
+        // Dict dict = dictService.getOne(new QueryWrapper<Dict>().lambda().eq(Dict::getValue,"vmksbz"));
         //Dict sub = dictService.getOne(new QueryWrapper<Dict>().lambda().eq(Dict::getName,"存储缩容利用率"));
         //Dict add = dictService.getOne(new QueryWrapper<Dict>().lambda().eq(Dict::getName,"存储扩容利用率"));
 
         List<Dict> dictList = dictService.list(new QueryWrapper<Dict>().lambda().
-                eq(Dict::getName,"存储缩容利用率").or().eq(Dict::getName,"存储扩容利用率"));
+                eq(Dict::getName, "存储缩容利用率").or().eq(Dict::getName, "存储扩容利用率"));
 
         //Map<String,String> dictMap = dictService.selectDeepMap(dict.getId());
 
-        System.out.println("dictSpend:"+ (System.currentTimeMillis()-dictStart)+"ms");
+        System.out.println("dictSpend:" + (System.currentTimeMillis() - dictStart) + "ms");
 
-        Map<String,String> dictMap = dictList.stream().collect(Collectors.toMap((key->key.getName()),(value->value.getValue())));
+        Map<String, String> dictMap = dictList.stream().collect(Collectors.toMap((key -> key.getName()), (value -> value.getValue())));
 
 
         Double subLine = Double.valueOf(dictMap.get("存储缩容利用率"));
         Double addLine = Double.valueOf(dictMap.get("存储扩容利用率"));
 
 
-
-       long filterStart = System.currentTimeMillis();
-        List<CloudVm> needAdd = cloudVmList.stream().filter(cloudVm -> cloudVm.getEvsDiskUsage()>addLine).collect(Collectors.toList());
-       // System.out.println("FilterSpend:"+ (System.currentTimeMillis()-filterStart)+"ms");
-        List<CloudVm> needSub = cloudVmList.stream().filter(cloudVm -> cloudVm.getEvsDiskUsage()<subLine).collect(Collectors.toList());
-        System.out.println("Filter2Spend:"+ (System.currentTimeMillis()-filterStart)+"ms");
-        Map<String,List<CloudVm>> resultMap = Maps.newHashMap();
-        resultMap.put("needAdd",needAdd);
-        resultMap.put("needSub",needSub);
+        long filterStart = System.currentTimeMillis();
+        List<CloudVm> needAdd = cloudVmList.stream().filter(cloudVm -> cloudVm.getEvsDiskUsage() > addLine).collect(Collectors.toList());
+        // System.out.println("FilterSpend:"+ (System.currentTimeMillis()-filterStart)+"ms");
+        List<CloudVm> needSub = cloudVmList.stream().filter(cloudVm -> cloudVm.getEvsDiskUsage() < subLine).collect(Collectors.toList());
+        System.out.println("Filter2Spend:" + (System.currentTimeMillis() - filterStart) + "ms");
+        Map<String, List<CloudVm>> resultMap = Maps.newHashMap();
+        resultMap.put("needAdd", needAdd);
+        resultMap.put("needSub", needSub);
         return R.ok(resultMap);
 
 
-
-
-
-
-
     }
-
 
 
 }

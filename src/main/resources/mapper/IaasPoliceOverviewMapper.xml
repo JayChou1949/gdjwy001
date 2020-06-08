@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.IaasPoliceOverviewMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.IaasPoliceOverview">
+        <id column="ID" property="id" />
+        <result column="NAME" property="name" />
+        <result column="POLICE" property="police" />
+        <result column="ELASTIC_CLOUD_SERVER" property="elasticCloudServer" />
+        <result column="BARE_METAL_SERVER" property="bareMetalServer" />
+        <result column="DESKTOP_CLOUD" property="desktopCloud" />
+        <result column="ELASTIC_VOLUME" property="elasticVolume" />
+        <result column="ELASTIC_SCALING" property="elasticScaling" />
+        <result column="ELASTIC_FILE" property="elasticFile" />
+        <result column="OBJECT_STORAGE" property="objectStorage" />
+        <result column="ELASTIC_LOAD_BALANCING" property="elasticLoadBalancing" />
+        <result column="SERVICE_NUM" property="serviceNum" />
+        <result column="VCPU" property="vcpu" />
+        <result column="MEMORY" property="memory" />
+        <result column="STORAGE" property="storage" />
+        <result column="VCPU_TOTAL" property="vcpuTotal" />
+        <result column="VCPU_USAGE" property="vcpuUsage" />
+        <result column="VCPU_ALLOCATED_RATIO" property="vcpuAllocatedRatio" />
+        <result column="VCPU_USED_NUM" property="vcpuUsedNum" />
+        <result column="VCPU_ALLOCATED_NUM" property="vcpuAllocatedNum" />
+        <result column="GPU_TOTAL" property="gpuTotal" />
+        <result column="GPU_USAGE" property="gpuUsage" />
+        <result column="GPU_USED_NUM" property="gpuUsedNum" />
+        <result column="GPU_ALLOCATED_RATIO" property="gpuAllocatedRatio" />
+        <result column="GPU_ALLOCATED_NUM" property="gpuAllocatedNum" />
+        <result column="MEMORY_TOTAL" property="memoryTotal" />
+        <result column="MEMORY_USAGE" property="memoryUsage" />
+        <result column="MEMORY_USED_NUM" property="memoryUsedNum" />
+        <result column="MEMORY_ALLOCATED_RATIO" property="memoryAllocatedRatio" />
+        <result column="MEMORY_ALLOCATED_NUM" property="memoryAllocatedNum" />
+        <result column="DISK_TOTAL" property="diskTotal" />
+        <result column="DISK_USAGE" property="diskUsage" />
+        <result column="DISK_USED_NUM" property="diskUsedNum" />
+        <result column="DISK_ALLOCATED_RATIO" property="diskAllocatedRatio" />
+        <result column="DISK_ALLOCATED_NUM" property="diskAllocatedNum" />
+        <result column="CREATE_TIME" property="createTime" />
+        <result column="UPDATE_TIME" property="updateTime" />
+    </resultMap>
+
+    <select id="sumAllByPolice" resultMap="BaseResultMap">
+        SELECT
+        SUM( ELASTIC_CLOUD_SERVER ) ELASTIC_CLOUD_SERVER,
+        SUM( BARE_METAL_SERVER ) BARE_METAL_SERVER,
+        SUM( DESKTOP_CLOUD ) DESKTOP_CLOUD,
+        SUM( ELASTIC_VOLUME ) ELASTIC_VOLUME,
+        SUM( ELASTIC_SCALING ) ELASTIC_SCALING,
+        SUM( ELASTIC_FILE ) ELASTIC_FILE,
+        SUM( OBJECT_STORAGE ) OBJECT_STORAGE,
+        SUM( ELASTIC_LOAD_BALANCING ) ELASTIC_LOAD_BALANCING,
+        SUM( SERVICE_NUM ) SERVICE_NUM,
+        SUM( VCPU ) VCPU,
+        SUM( MEMORY ) MEMORY,
+        SUM( STORAGE ) STORAGE,
+        SUM( VCPU_TOTAL ) VCPU_TOTAL,
+        CASE SUM( VCPU_TOTAL )
+        WHEN 0 THEN
+        0 ELSE ROUND( SUM( VCPU_TOTAL * VCPU_USAGE ) / SUM( VCPU_TOTAL ), 4 )
+        END VCPU_USAGE,
+        CASE
+        SUM( VCPU_TOTAL )
+        WHEN 0 THEN
+        0 ELSE ROUND( SUM( VCPU_TOTAL * VCPU_ALLOCATED_RATIO ) / SUM( VCPU_TOTAL ), 4 )
+        END VCPU_ALLOCATED_RATIO,
+        SUM( GPU_TOTAL ) GPU_TOTAL,
+        CASE
+        SUM( GPU_TOTAL )
+        WHEN 0 THEN
+        0 ELSE ROUND( SUM( GPU_TOTAL * GPU_USAGE ) / SUM( GPU_TOTAL ), 4 )
+        END GPU_USAGE,
+        CASE
+        SUM( GPU_TOTAL )
+        WHEN 0 THEN
+        0 ELSE ROUND( SUM( GPU_TOTAL * GPU_ALLOCATED_RATIO ) / SUM( GPU_TOTAL ), 4 )
+        END GPU_ALLOCATED_RATIO,
+        SUM( MEMORY_TOTAL ) MEMORY_TOTAL,
+        CASE
+        SUM( MEMORY_TOTAL )
+        WHEN 0 THEN
+        0 ELSE ROUND( SUM( MEMORY_TOTAL * MEMORY_USAGE ) / SUM( MEMORY_TOTAL ), 4 )
+        END MEMORY_USAGE,
+        CASE
+        SUM( MEMORY_TOTAL )
+        WHEN 0 THEN
+        0 ELSE ROUND( SUM( MEMORY_TOTAL * MEMORY_ALLOCATED_RATIO ) / SUM( MEMORY_TOTAL ), 4 )
+        END MEMORY_ALLOCATED_RATIO,
+        SUM( DISK_TOTAL ) DISK_TOTAL,
+        CASE
+        SUM( DISK_TOTAL )
+        WHEN 0 THEN
+        0 ELSE ROUND( SUM( DISK_TOTAL * DISK_USAGE ) / SUM( DISK_TOTAL ), 4 )
+        END DISK_USAGE,
+        CASE
+        SUM( DISK_TOTAL )
+        WHEN 0 THEN
+        0 ELSE ROUND( SUM( DISK_TOTAL * DISK_ALLOCATED_RATIO ) / SUM( DISK_TOTAL ), 4 )
+        END DISK_ALLOCATED_RATIO
+        FROM
+        TB_IAAS_POLICE_OVERVIEW WHERE police=#{police}
+    </select>
+
+</mapper>

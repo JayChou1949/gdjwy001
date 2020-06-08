@@ -2,20 +2,20 @@ package com.upd.hwcloud.controller.portal;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.google.common.math.LongMath;
 import com.upd.hwcloud.bean.entity.IaasOverview;
+import com.upd.hwcloud.bean.entity.IaasPoliceOverview;
 import com.upd.hwcloud.bean.response.R;
 import com.upd.hwcloud.service.IIaasOverviewService;
+import com.upd.hwcloud.service.IIaasPoliceOverviewService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang.StringUtils;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
 import org.springframework.stereotype.Controller;
-
-import java.util.Random;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * <p>
@@ -32,6 +32,9 @@ public class IaasOverviewController {
 
     @Autowired
     private IIaasOverviewService iaasOverviewService;
+
+    @Autowired
+    private IIaasPoliceOverviewService iaasPoliceOverviewService;
 
     @ApiOperation("")
     @RequestMapping(value = "/get", method = RequestMethod.GET)
@@ -58,6 +61,35 @@ public class IaasOverviewController {
             iaasOverview.setDiskAllocatedNum(Math.ceil(Double.valueOf(iaasOverview.getDiskTotal()) * iaasOverview.getDiskAllocated()) );
         }
         return R.ok(iaasOverview);
+    }
+
+    /**
+     * 警种IAAS数据总览
+     * @param name:警种全名
+     * @param police：所属警种
+     * @return
+     */
+    @ApiOperation("警种IAAS数据总览")
+    @RequestMapping(value = "/getByPolice",method = RequestMethod.GET)
+    @ResponseBody
+    public R getByPolice(@RequestParam(value = "name", required = false) String name, @RequestParam(value = "police") String police){
+        IaasPoliceOverview iaasPoliceOverview = new IaasPoliceOverview();
+        if (name == null || "广东分署缉私局".equals(name)){
+            iaasPoliceOverview = iaasPoliceOverviewService.getAllByPolice(police);
+        }else{
+            iaasPoliceOverview = iaasPoliceOverviewService.getOne(new QueryWrapper<>(new IaasPoliceOverview()).eq("police",police).eq("name",name));
+        }
+        if (iaasPoliceOverview!=null){
+            iaasPoliceOverview.setVcpuUsedNum(String.valueOf(Math.ceil(Double.valueOf(iaasPoliceOverview.getVcpuTotal()) * iaasPoliceOverview.getVcpuUsage())));
+            iaasPoliceOverview.setVcpuAllocatedNum(String.valueOf(Math.ceil(Double.valueOf(iaasPoliceOverview.getVcpuTotal()) * iaasPoliceOverview.getVcpuAllocatedRatio())));
+            iaasPoliceOverview.setGpuUsedNum(String.valueOf(Math.ceil(Double.valueOf(iaasPoliceOverview.getGpuTotal()) * iaasPoliceOverview.getGpuUsage())));
+            iaasPoliceOverview.setGpuAllocatedNum(String.valueOf(Math.ceil(Double.valueOf(iaasPoliceOverview.getGpuTotal()) * iaasPoliceOverview.getGpuAllocatedRatio())));
+            iaasPoliceOverview.setMemoryUsedNum(String.valueOf(Math.ceil(Double.valueOf(iaasPoliceOverview.getMemoryTotal()) * iaasPoliceOverview.getMemoryUsage())));
+            iaasPoliceOverview.setMemoryAllocatedNum(String.valueOf(Math.ceil(Double.valueOf(iaasPoliceOverview.getMemoryTotal()) * iaasPoliceOverview.getMemoryAllocatedRatio())));
+            iaasPoliceOverview.setDiskUsedNum(String.valueOf(Math.ceil(Double.valueOf(iaasPoliceOverview.getDiskTotal()) * iaasPoliceOverview.getDiskUsage())));
+            iaasPoliceOverview.setDiskAllocatedNum(String.valueOf(Math.ceil(Double.valueOf(iaasPoliceOverview.getDiskTotal()) * iaasPoliceOverview.getDiskAllocatedRatio())));
+        }
+        return R.ok(iaasPoliceOverview);
     }
 
 }
