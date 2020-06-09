@@ -91,6 +91,25 @@
         </trim>
         ) T
     </select>
+    <select id="appStatisticsByRequest" resultType="com.upd.hwcloud.bean.vo.daasService.ServiceRequestVo">
+        SELECT ROWNUM AS "ID",T.* FROM (
+            SELECT
+            B.NAME AS serviceName,
+            B.AREA_NAME AS serviceAreaName,
+            B.POLICE_CATEGORY AS servicePoliceCategory,
+            SUBSTR(I."ALIAS", 0, INSTR(I."ALIAS",'（')-1) AS appName,
+            I.AREA_NAME AS appAreaName,
+            I.POLICE_CATEGORY AS appPoliceCategory,
+            A.REQ_COUNT AS totalReqCount
+            FROM
+            TB_APP_STATISTICS A
+            LEFT JOIN TB_BIGDATA B ON A.PRODUCT_FAMILY_ID = B.APIPRODUCT_ID
+            LEFT JOIN TB_SERVICE_INSTANCE I ON A.ACTUAL_ID = I.ACTUAL_ID AND I.SERVICE_GUID=B.APIG_GUID
+            <trim prefix="WHERE" prefixOverrides="AND |OR ">
+                ${ew.sqlSegment}
+            </trim>
+        ) T
+       </select>
     <select id="serviceStatisticsByRequest" resultType="com.upd.hwcloud.bean.vo.daasService.ServiceRequestVo">
         SELECT ROWNUM AS "ID",T.* FROM (
             SELECT
@@ -100,11 +119,11 @@
             SUBSTR(I."ALIAS", 0, INSTR(I."ALIAS",'（')-1) AS appName,
             I.AREA_NAME AS appAreaName,
             I.POLICE_CATEGORY AS appPoliceCategory,
-            SUM(A.REQ_COUNT) AS totalReqCount
+            A.REQ_COUNT AS totalReqCount
             FROM
-            TB_APP_STATISTICS A
-            LEFT JOIN TB_BIGDATA B ON A.PRODUCT_FAMILY_ID = B.APIPRODUCT_ID
-            LEFT JOIN TB_SERVICE_INSTANCE I ON A.ACTUAL_ID = I.ACTUAL_ID AND I.SERVICE_GUID=B.APIG_GUID
+            TB_SERVICE_STATISTICS A
+            LEFT JOIN TB_SERVICE_INSTANCE I ON A.SERVICE_GUID=I.SERVICE_GUID
+            LEFT JOIN TB_BIGDATA B ON I.SERVICE_GUID = B.APIG_GUID
             <trim prefix="WHERE" prefixOverrides="AND |OR ">
                 ${ew.sqlSegment}
             </trim>
