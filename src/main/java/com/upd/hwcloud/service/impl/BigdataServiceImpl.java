@@ -198,6 +198,7 @@ public class BigdataServiceImpl extends ServiceImpl<BigdataMapper, Bigdata> impl
 
     @Override
     public Page<ServiceRequestVo> serviceStatisticsByRequest(ServiceSubscribeParam param) {
+        List<ServiceRequestVo> serviceRequestVos = new ArrayList<>();
         //设置分页参数
         Page<ServiceRequestVo> page = new Page<>();
         page.setCurrent(param.getCurrent());
@@ -234,8 +235,11 @@ public class BigdataServiceImpl extends ServiceImpl<BigdataMapper, Bigdata> impl
             if (!StringUtils.isEmpty(endDate)){
                 wrapper.le("A.CURRENT_TIME",endDate);
             }
-            wrapper.groupBy("B.NAME,SUBSTR(I.ALIAS, 0, INSTR(I.ALIAS,'（')-1),B.AREA_NAME, B.POLICE_CATEGORY,I.AREA_NAME,I.POLICE_CATEGORY");
+            wrapper.groupBy("A.REQ_COUNT,B.NAME,SUBSTR(I.ALIAS, 0, INSTR(I.ALIAS,'（')-1),B.AREA_NAME, B.POLICE_CATEGORY,I.AREA_NAME,I.POLICE_CATEGORY");
             wrapper.orderByAsc("B.NAME");
+            wrapper.isNotNull("B.NAME");
+            wrapper.isNotNull("SUBSTR(I.ALIAS, 0, INSTR(I.ALIAS,'（')-1)");
+            serviceRequestVos = bigdataMapper.serviceStatisticsByRequest(page, wrapper);
         }else if (type == 2){//应用
             if (!StringUtils.isEmpty(area)){
                 wrapper.like("I.AREA_NAME",area);
@@ -252,12 +256,12 @@ public class BigdataServiceImpl extends ServiceImpl<BigdataMapper, Bigdata> impl
             if (!StringUtils.isEmpty(endDate)){
                 wrapper.le("A.CURRENT_TIME",endDate);
             }
-            wrapper.groupBy("SUBSTR(I.ALIAS, 0, INSTR(I.ALIAS,'（')-1),B.NAME,B.AREA_NAME,B.POLICE_CATEGORY,I.AREA_NAME,I.POLICE_CATEGORY");
+            wrapper.groupBy("SUBSTR(I.ALIAS, 0, INSTR(I.ALIAS,'（')-1),A.REQ_COUNT,B.NAME,B.AREA_NAME,B.POLICE_CATEGORY,I.AREA_NAME,I.POLICE_CATEGORY");
             wrapper.orderByAsc("SUBSTR(I.ALIAS, 0, INSTR(I.ALIAS,'（')-1)");
+            wrapper.isNotNull("B.NAME");
+            wrapper.isNotNull("SUBSTR(I.ALIAS, 0, INSTR(I.ALIAS,'（')-1)");
+            serviceRequestVos = bigdataMapper.appStatisticsByRequest(page, wrapper);
         }
-        wrapper.isNotNull("B.NAME");
-        wrapper.isNotNull("SUBSTR(I.ALIAS, 0, INSTR(I.ALIAS,'（')-1)");
-        List<ServiceRequestVo> serviceRequestVos = bigdataMapper.serviceStatisticsByRequest(page, wrapper);
         page.setRecords(serviceRequestVos);
         return page;
     }
