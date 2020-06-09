@@ -78,7 +78,7 @@ public class NcovIaasController {
         String resString = stringRedisTemplate.opsForValue().get(NcovKey.NCOV_IAAS_OVERVIEW);
         if(StringUtils.isNotBlank(resString)){
             Map<String,Object> map = JSON.parseObject(resString,Map.class);
-            return R.ok(map);
+            return map;
         }
 
         NcovEcsOverview overview =  NcovEcsImportUtil.getOverviewData();
