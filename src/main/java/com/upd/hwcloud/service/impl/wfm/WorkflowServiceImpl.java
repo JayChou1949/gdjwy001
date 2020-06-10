@@ -276,7 +276,15 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             log.info("workflow ->{}",workflow);
             if (workflow == null) {
                 log.info("服务:{} 未配置警种:{}流程",serviceId,policeCategory);
-                //无
+
+                //查看服务是否配置省厅的
+                List<Workflow> workflowList = this.list(new QueryWrapper<Workflow>().lambda().in(Workflow::getId,workflowIds));
+                //该服务是否存在省厅流程(警种为空)
+                Optional<Workflow> optionalProvince = workflowList.stream().filter(wf->StringUtils.equals(wf.getArea(),"省厅")&&StringUtils.isBlank(wf.getPoliceCategory())).findFirst();
+                if(optionalProvince.isPresent()){
+                    log.info("====服务省厅流程===");
+                    return optionalProvince.get();
+                }
                 //获取该警种默认流程
                 Workflow defaultPoliceFlow  = getDefaultPoliceFlow(type,policeCategory);
                 if(defaultPoliceFlow != null){
@@ -290,6 +298,10 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             log.info("使用服务配置流程：{}",workflow);
             return workflow;
         }else {
+            Workflow defaultPoliceFlow  = getDefaultPoliceFlow(type,policeCategory);
+            if(defaultPoliceFlow != null){
+                return defaultPoliceFlow;
+            }
             log.info("未配置{}警种{}默认流程，使用省厅默认流程",policeCategory,type.toString());
             return getDefaultProvinceFlow(type);
         }
