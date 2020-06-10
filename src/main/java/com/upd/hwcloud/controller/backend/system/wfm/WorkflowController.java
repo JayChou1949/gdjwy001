@@ -47,6 +47,8 @@ public class WorkflowController {
     @Autowired
     private IUserService userService;
 
+    //todo:二级门户改造-workflow新增国家专项，对应更新修改 (省厅，警种，地市，国家专项。同一类资源只能有一个默认流程)，目前修改使用的/beta/edit
+
     @ApiOperation("新增流程配置")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public R add(@LoginUser User user, @RequestBody Workflow flow) {

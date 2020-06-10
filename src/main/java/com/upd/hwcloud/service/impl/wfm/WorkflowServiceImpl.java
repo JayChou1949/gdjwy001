@@ -130,6 +130,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
      */
     @Override
     public boolean distinctAreaCheck(List<String> workFlowIds) {
+        //todo:二级门户改造-服务配置流程 唯一性 对应修改
         //获取对应流程集合
         List<Workflow> workflowList = this.list(new QueryWrapper<Workflow>().lambda().in(Workflow::getId,workFlowIds));
         //地市去重后的数据
@@ -174,6 +175,8 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
      * @return
      */
     private Workflow IaasOrPaasHandle(ResourceType type, String area,String policeCategory,String serviceId){
+        //todo:二级门户改造-新增一个国家专项的判断，以及流程(workflow)增加国家专项维度
+
         if(StringUtils.equals(area,"省厅")){
             log.info("====IP省厅==");
             if(StringUtils.isBlank(policeCategory)){
@@ -199,6 +202,9 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
      * @return
      */
     private Workflow DaasOrSaasServiceHandle(ResourceType type,String area,String policeCategory){
+
+        //todo: 二级门户改造-新增国家专项维度
+
         if(StringUtils.equals(area,"省厅")){
             if(StringUtils.isNotBlank(policeCategory)){
                 log.debug("DaaS SaaS服务 获取默认警种流程");
@@ -439,6 +445,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     @Override
     public boolean updateFlowBeta(Workflow flow){
         if (flow.getDefaultProcess()!=null&&!"".equals(flow.getDefaultProcess())){
+            //todo:二级门户改造-默认流程更新逻辑需要修改
             dealOldDefault(flow.getDefaultProcess(),flow.getArea(),flow.getPoliceCategory(),flow.getId());
         }
         if (SPECIAL_DEFAULT_PROCESS.contains(flow.getDefaultProcess())) {
@@ -575,6 +582,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
      */
     private void dealOldDefault(String defaultProcess,String area,String policeCategory,String flowId){
         List<Workflow> defaultWorkFlowList = Lists.newArrayList();
+        //todo：二级门户改造-如果国家专项不是空,按国家流程算
         if(StringUtils.isBlank(policeCategory)){ //如果警种字段不是空，按警种处理默认流程
             defaultWorkFlowList = this.list(new QueryWrapper<Workflow>().eq("DEFAULT_PROCESS",defaultProcess).eq("area",area).ne("id",flowId));
         }else {

@@ -112,6 +112,8 @@ public class IaasZysb extends Model<IaasZysb> {
          @TableField("AREAS")
     private String areas;
 
+         //todo:二级门户改造-租户上报新增nationalProject属性
+
         /**
      * 开始时间
      */

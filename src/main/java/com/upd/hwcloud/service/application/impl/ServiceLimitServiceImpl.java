@@ -82,6 +82,8 @@ public class ServiceLimitServiceImpl extends ServiceImpl<ServiceLimitMapper, Ser
     public void increaseQuota(String appInfoId, String area, String policeCategory) {
         List<ReportIaas> iaasList =  reportIaasService.list(new QueryWrapper<ReportIaas>().lambda().eq(ReportIaas::getAppInfoId,appInfoId));
 
+        //todo:二级门户改造-新增国家专项维度
+
         if(CollectionUtils.isNotEmpty(iaasList)){
             //暂时只处理弹性云服务器
             List<ReportIaas> ecsList = iaasList.parallelStream().filter(iaas->StringUtils.equals(iaas.getResourceName(),"弹性云服务器")).collect(Collectors.toList());

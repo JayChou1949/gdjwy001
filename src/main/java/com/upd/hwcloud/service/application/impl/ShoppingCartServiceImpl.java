@@ -296,10 +296,11 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
             List<String> originFileId = fileList.stream().map(Files::getId).distinct().collect(Collectors.toList());
             filesService.removeByIds(originFileId);
         }
-
+        //IaaS 和 PaaS购物车 分单（遍历IaaS PaaS购物车）
         for (ShoppingCart shoppingCart:shoppingCartListWithoutDS){
             HandlerWrapper hw  = FormNum.getHandlerWrapperByName(context,shoppingCart.getFormNum());
             IApplicationHandler handler = hw.getHandler();
+            //根据购物车生成订单(其中包括订单选择哪个流程，用于后面的发起流程)
             ApplicationInfo info = configAndSaveBaseInfo(user,shoppingCart,baseInfo);
             updateFiles(info.getId(),shoppingCart.getId());
             infoList.add(info);
@@ -307,6 +308,7 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
                 //关联订单,清楚购物车Item及关联
                 handler.refAppInfoFromShoppingCart(shoppingCart.getId(),info.getId());
             }
+            //新生成的订单发起流程
            R r =  instanceService.launchInstanceOfWorkFlow(user.getIdcard(),info.getWorkFlowId(),info.getId());
             logger.debug("launchInstance -> {}",r);
         }
@@ -606,7 +608,7 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
         info.setServiceTypeName(shoppingCart.getServiceTypeName());
         ResourceType resourceType = hw.getFormNum().getResourceType();
         info.setFlowNew("1");
-        //流程选择
+        //流程选择（重要选择流程逻辑）
         Workflow workflow = workflowService.chooseWorkFlow(resourceType,info.getAreaName(),info.getPoliceCategory(),info.getServiceTypeId());
         if(workflow == null){
             logger.error("购物车ID:{} 资源类型:{} 地市:{} 警种: {} 服务ID:{}",shoppingCart.getId(),resourceType.toString(),info.getAreaName(),info.getPoliceCategory(),info.getServiceTypeId());
