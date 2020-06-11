@@ -1,6 +1,6 @@
 package com.upd.hwcloud.service.application.impl;
 
-import com.upd.hwcloud.bean.entity.application.PaasLibraDbWhitelist;
+import com.upd.hwcloud.bean.entity.application.paas.libra.PaasLibraDbWhitelist;
 import com.upd.hwcloud.dao.application.PaasLibraDbWhitelistMapper;
 import com.upd.hwcloud.service.application.IPaasLibraDbWhitelistService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;

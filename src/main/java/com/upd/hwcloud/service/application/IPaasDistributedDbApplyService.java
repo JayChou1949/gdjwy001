@@ -1,6 +1,6 @@
 package com.upd.hwcloud.service.application;
 
-import com.upd.hwcloud.bean.entity.application.PaasDistributedDbApply;
+import com.upd.hwcloud.bean.entity.application.paas.libra.PaasDistributedDbApply;
 
 /**
  * @author junglefisher
