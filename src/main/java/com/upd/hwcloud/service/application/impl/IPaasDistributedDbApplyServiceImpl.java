@@ -204,12 +204,12 @@ public class IPaasDistributedDbApplyServiceImpl implements IPaasDistributedDbApp
     @Transactional(rollbackFor = Throwable.class)
     @Override
     public void refAppInfoFromShoppingCart(String shoppingCartId, String appInfoId) {
-        libraInfoService.remove(new QueryWrapper<PaasLibraInfo>().lambda()
-                .eq(PaasLibraInfo::getAppInfoId, appInfoId));
-        libraAccountService.remove(new QueryWrapper<PaasLibraAccount>().lambda()
-                .eq(PaasLibraAccount::getAppInfoId,appInfoId));
-        paasLibraDbWhitelistService.remove(new QueryWrapper<PaasLibraDbWhitelist>().lambda()
-                .eq(PaasLibraDbWhitelist::getAppInfoId, appInfoId));
+        libraInfoService.update(new PaasLibraInfo(),new UpdateWrapper<PaasLibraInfo>().lambda().eq(PaasLibraInfo::getShoppingCartId,shoppingCartId)
+                .set(PaasLibraInfo::getAppInfoId,appInfoId));
+        libraAccountService.update(new PaasLibraAccount(),new UpdateWrapper<PaasLibraAccount>().lambda().eq(PaasLibraAccount::getShoppingCartId,shoppingCartId)
+                .set(PaasLibraAccount::getAppInfoId,appInfoId));
+        paasLibraDbWhitelistService.update(new PaasLibraDbWhitelist(),new UpdateWrapper<PaasLibraDbWhitelist>().lambda().eq(PaasLibraDbWhitelist::getShoppingCartId,shoppingCartId)
+                .set(PaasLibraDbWhitelist::getAppInfoId,appInfoId));
     }
 
 //    /**

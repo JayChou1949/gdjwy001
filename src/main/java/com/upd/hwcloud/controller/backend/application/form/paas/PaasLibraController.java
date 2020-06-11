@@ -39,6 +39,15 @@ public class PaasLibraController {
         List<PaasDistributedDbInfo> distributedDbInfoList = paasDistributedDbInfoService.list(new QueryWrapper<>());
         List<PaasLibraInfo> infoList = Lists.newArrayList();
         for(PaasDistributedDbInfo dbInfo : distributedDbInfoList){
+            PaasLibraInfo libraInfo = new PaasLibraInfo();
+            libraInfo.setId(null);
+            libraInfo.setCpu(dbInfo.getCpu().doubleValue());
+            libraInfo.setMemory(dbInfo.getMemory());
+            libraInfo.setStorage(dbInfo.getStorage());
+            libraInfo.setApplyReason(dbInfo.getApplyReason());
+            libraInfo.setRemark(dbInfo.getRemark());
+            libraInfo.setAppInfoId(dbInfo.getAppInfoId());
+            libraInfo.setShoppingCartId(dbInfo.getShoppingCartId());
 
         }
         return R.ok();
