@@ -59,6 +59,12 @@ public class PaasLibraAccountImpl extends Model<PaasLibraAccountImpl> {
          @TableField("CAN_DELETE")
     private Integer canDelete;
 
+    /**
+     * 模式名
+     */
+    @TableField("SCHEMA")
+    private String schema;
+
         /**
      * 备注
      */
@@ -141,6 +147,14 @@ public class PaasLibraAccountImpl extends Model<PaasLibraAccountImpl> {
     public PaasLibraAccountImpl setCanDelete(Integer canDelete) {
         this.canDelete = canDelete;
         return this;
+    }
+
+    public String getSchema() {
+        return schema;
+    }
+
+    public void setSchema(String schema) {
+        this.schema = schema;
     }
 
     public String getRemark() {
