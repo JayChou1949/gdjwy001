@@ -156,9 +156,9 @@ public class IPaasDistributedDbApplyServiceImpl implements IPaasDistributedDbApp
     @Override
     public void updateShoppingCart(ShoppingCart<PaasDistributedDbApply> shoppingCart) {
         libraInfoService.remove(new QueryWrapper<PaasLibraInfo>().lambda()
-                .eq(PaasLibraInfo::getAppInfoId, shoppingCart.getId()));
+                .eq(PaasLibraInfo::getShoppingCartId, shoppingCart.getId()));
         libraAccountService.remove(new QueryWrapper<PaasLibraAccount>().lambda()
-                .eq(PaasLibraAccount::getAppInfoId,shoppingCart.getId()));
+                .eq(PaasLibraAccount::getShoppingCartId,shoppingCart.getId()));
         paasLibraDbWhitelistService.remove(new QueryWrapper<PaasLibraDbWhitelist>().lambda()
                 .eq(PaasLibraDbWhitelist::getShoppingCartId, shoppingCart.getId()));
         saveShoppingCart(shoppingCart);
