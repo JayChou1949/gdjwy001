@@ -23,33 +23,4 @@ import java.util.List;
 @Service
 public class PaasDistributedDbImplServiceImpl extends ServiceImpl<PaasDistributedDbImplMapper, PaasDistributedDbImpl> implements IPaasDistributedDbImplService {
 
-    /**
-     * 根据申请信息 id 查询实施服务器信息列表
-     *
-     * @param appInfoId 申请信息 id
-     */
-    @Override
-    public List<PaasDistributedDbImpl> getImplServerListByAppInfoId(String appInfoId) {
-        return this.list(new QueryWrapper<PaasDistributedDbImpl>().lambda().eq(PaasDistributedDbImpl::getAppInfoId,appInfoId)
-                            .orderByDesc(PaasDistributedDbImpl::getModifiedTime));
-    }
-
-    /**
-     * 更新实施服务器信息(先删除,后添加)
-     *
-     * @param appInfoId
-     * @param serverList
-     */
-    @Transactional(rollbackFor = Throwable.class)
-    @Override
-    public void update(String appInfoId, List<PaasDistributedDbImpl> serverList) {
-        this.remove(new QueryWrapper<PaasDistributedDbImpl>().lambda().eq(PaasDistributedDbImpl::getAppInfoId,appInfoId));
-        if(CollectionUtils.isNotEmpty(serverList)){
-            for(PaasDistributedDbImpl impl:serverList){
-                impl.setId(null);
-                impl.setAppInfoId(appInfoId);
-            }
-            this.saveBatch(serverList);
-        }
-    }
 }

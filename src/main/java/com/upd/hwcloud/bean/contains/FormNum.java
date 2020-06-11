@@ -8,6 +8,7 @@ import com.upd.hwcloud.bean.entity.application.paas.dcs.PaasDcs;
 import com.upd.hwcloud.bean.entity.application.paas.dcs.PaasDcsImpl;
 import com.upd.hwcloud.bean.entity.application.paas.firewall.PaasFirewallOpen;
 import com.upd.hwcloud.bean.entity.application.paas.libra.PaasDistributedDbApply;
+import com.upd.hwcloud.bean.entity.application.paas.libra.PaasDistributedDbApplyImpl;
 import com.upd.hwcloud.bean.entity.application.paas.rdb.PaasRdbBase;
 import com.upd.hwcloud.common.exception.BaseException;
 import com.upd.hwcloud.service.application.*;
@@ -48,7 +49,7 @@ public enum FormNum {
 
     PAAS_FBSBXSJK(ResourceType.PAAS, "分布式并行数据库", PaasFbsbxsjk.class, IPaasFbsbxsjkService.class, null, null),
 
-    PAAS_DISTRIBUTED_DB(ResourceType.PAAS,"Libra+分布并行数据库",PaasDistributedDbApply.class,IPaasDistributedDbApplyService.class,PaasDistributedDbImpl.class,IPaasDistributedDbImplService.class),
+    PAAS_DISTRIBUTED_DB(ResourceType.PAAS,"Libra+分布并行数据库",PaasDistributedDbApply.class,IPaasDistributedDbApplyService.class,PaasDistributedDbApplyImpl.class,IPaasDistributedDbApplyImplService.class),
 
     DAAS(ResourceType.DAAS, "DAAS资源申请", DaasApplication.class, IDaasApplicationService.class, DaasApplication.class, IDaasApplicationService.class),
 
