@@ -1,10 +1,11 @@
 package com.upd.hwcloud.controller.backend.application.form.paas;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.google.common.collect.Lists;
-import com.upd.hwcloud.bean.entity.application.PaasDistributedDbInfo;
-import com.upd.hwcloud.bean.entity.application.paas.libra.PaasLibraInfo;
+import com.upd.hwcloud.bean.contains.ApplicationInfoStatus;
+import com.upd.hwcloud.bean.contains.FormNum;
+import com.upd.hwcloud.bean.entity.application.ApplicationInfo;
 import com.upd.hwcloud.bean.response.R;
+import com.upd.hwcloud.service.application.IApplicationInfoService;
 import com.upd.hwcloud.service.application.IPaasDistributedDbInfoService;
 import com.upd.hwcloud.service.application.IPaasLibraAccountService;
 import com.upd.hwcloud.service.application.IPaasLibraInfoService;
@@ -24,6 +25,8 @@ import java.util.List;
 @RequestMapping("/libra")
 public class PaasLibraController {
 
+    @Autowired
+    private IApplicationInfoService applicationInfoService;
 
     @Autowired
     private IPaasDistributedDbInfoService paasDistributedDbInfoService;
@@ -36,18 +39,11 @@ public class PaasLibraController {
 
     @RequestMapping(value = "/sync",method = RequestMethod.GET)
     public R  sync(){
-        List<PaasDistributedDbInfo> distributedDbInfoList = paasDistributedDbInfoService.list(new QueryWrapper<>());
-        List<PaasLibraInfo> infoList = Lists.newArrayList();
-        for(PaasDistributedDbInfo dbInfo : distributedDbInfoList){
-            PaasLibraInfo libraInfo = new PaasLibraInfo();
-            libraInfo.setId(null);
-            libraInfo.setCpu(dbInfo.getCpu().doubleValue());
-            libraInfo.setMemory(dbInfo.getMemory());
-            libraInfo.setStorage(dbInfo.getStorage());
-            libraInfo.setApplyReason(dbInfo.getApplyReason());
-            libraInfo.setRemark(dbInfo.getRemark());
-            libraInfo.setAppInfoId(dbInfo.getAppInfoId());
-            libraInfo.setShoppingCartId(dbInfo.getShoppingCartId());
+
+        List<ApplicationInfo> applicationInfoList = applicationInfoService.list(new QueryWrapper<ApplicationInfo>().lambda().eq(ApplicationInfo::getFormNum,
+                FormNum.PAAS_DISTRIBUTED_DB.toString()).ne(ApplicationInfo::getStatus, ApplicationInfoStatus.DELETE.getCode()));
+
+        for(ApplicationInfo info:applicationInfoList){
 
         }
         return R.ok();
