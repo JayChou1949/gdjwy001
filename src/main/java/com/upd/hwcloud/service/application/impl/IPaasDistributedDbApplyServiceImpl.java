@@ -4,9 +4,16 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.google.common.collect.Lists;
 import com.upd.hwcloud.bean.entity.application.*;
+import com.upd.hwcloud.bean.entity.application.paas.libra.PaasDistributedDbApply;
+import com.upd.hwcloud.bean.entity.application.paas.libra.PaasLibraAccount;
+import com.upd.hwcloud.bean.entity.application.paas.libra.PaasLibraDbWhitelist;
+import com.upd.hwcloud.bean.entity.application.paas.libra.PaasLibraInfo;
 import com.upd.hwcloud.service.application.IPaasDistributedDbApplyService;
 import com.upd.hwcloud.service.application.IPaasDistributedDbInfoService;
+import com.upd.hwcloud.service.application.IPaasLibraAccountService;
 import com.upd.hwcloud.service.application.IPaasLibraDbWhitelistService;
+import com.upd.hwcloud.service.application.IPaasLibraInfoService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +28,12 @@ import java.util.List;
 public class IPaasDistributedDbApplyServiceImpl implements IPaasDistributedDbApplyService {
 
     @Autowired
+    private IPaasLibraInfoService libraInfoService;
+
+    @Autowired
+    private IPaasLibraAccountService libraAccountService;
+
+    @Autowired
     private IPaasDistributedDbInfoService paasDistributedDbInfoService;
     @Autowired
     private IPaasLibraDbWhitelistService paasLibraDbWhitelistService;
@@ -30,12 +43,18 @@ public class IPaasDistributedDbApplyServiceImpl implements IPaasDistributedDbApp
     public void saveShoppingCart(ShoppingCart<PaasDistributedDbApply> shoppingCart) {
         List<PaasDistributedDbApply> serverList = shoppingCart.getServerList();
         for (PaasDistributedDbApply paasDistributedDbApply : serverList) {
-            List<PaasDistributedDbInfo> paasDistributedDbInfos = paasDistributedDbApply.getPaasDistributedDbInfos();
-            for (PaasDistributedDbInfo dbInfo : paasDistributedDbInfos) {
-                dbInfo.setId(null);
-                dbInfo.setShoppingCartId(shoppingCart.getId());
-                paasDistributedDbInfoService.save(dbInfo);
+            PaasLibraInfo libraInfo = paasDistributedDbApply.getPaasLibraInfo();
+            libraInfo.setId(null);
+            libraInfo.setShoppingCartId(shoppingCart.getId());
+            libraInfoService.save(libraInfo);
+
+            List<PaasLibraAccount> accountList = paasDistributedDbApply.getPaasLibraAccountList();
+            for(PaasLibraAccount account:accountList){
+                account.setId(null);
+                account.setShoppingCartId(shoppingCart.getId());
             }
+            libraAccountService.saveBatch(accountList);
+
             List<PaasLibraDbWhitelist> paasLibraDbWhitelists = paasDistributedDbApply.getPaasLibraDbWhitelists();
             for (PaasLibraDbWhitelist dbWhitelist : paasLibraDbWhitelists) {
                 dbWhitelist.setId(null);
@@ -50,17 +69,25 @@ public class IPaasDistributedDbApplyServiceImpl implements IPaasDistributedDbApp
     public void save(ApplicationInfo<PaasDistributedDbApply, Object> info) {
         List<PaasDistributedDbApply> serverList = info.getServerList();
         for (PaasDistributedDbApply paasDistributedDbApply : serverList) {
-            List<PaasDistributedDbInfo> paasDistributedDbInfos = paasDistributedDbApply.getPaasDistributedDbInfos();
-            for (PaasDistributedDbInfo dbInfo : paasDistributedDbInfos) {
-                dbInfo.setId(null);
-                dbInfo.setAppInfoId(info.getId());
-                paasDistributedDbInfoService.save(dbInfo);
-            }
-            List<PaasLibraDbWhitelist> paasLibraDbWhitelists = paasDistributedDbApply.getPaasLibraDbWhitelists();
-            for (PaasLibraDbWhitelist dbWhitelist : paasLibraDbWhitelists) {
-                dbWhitelist.setId(null);
-                dbWhitelist.setAppInfoId(info.getId());
-                paasLibraDbWhitelistService.save(dbWhitelist);
+            {
+                PaasLibraInfo libraInfo = paasDistributedDbApply.getPaasLibraInfo();
+                libraInfo.setId(null);
+                libraInfo.setAppInfoId(info.getId());
+                libraInfoService.save(libraInfo);
+
+                List<PaasLibraAccount> accountList = paasDistributedDbApply.getPaasLibraAccountList();
+                for(PaasLibraAccount account:accountList){
+                    account.setId(null);
+                    account.setAppInfoId(info.getId());
+                }
+                libraAccountService.saveBatch(accountList);
+
+                List<PaasLibraDbWhitelist> paasLibraDbWhitelists = paasDistributedDbApply.getPaasLibraDbWhitelists();
+                for (PaasLibraDbWhitelist dbWhitelist : paasLibraDbWhitelists) {
+                    dbWhitelist.setId(null);
+                    dbWhitelist.setAppInfoId(info.getId());
+                    paasLibraDbWhitelistService.save(dbWhitelist);
+                }
             }
         }
     }
@@ -72,14 +99,19 @@ public class IPaasDistributedDbApplyServiceImpl implements IPaasDistributedDbApp
      */
     @Override
     public List<PaasDistributedDbApply> getByAppInfoId(String appInfoId) {
-        List<PaasDistributedDbInfo> distributedDbInfos = paasDistributedDbInfoService.list(new QueryWrapper<PaasDistributedDbInfo>().lambda()
-                .eq(PaasDistributedDbInfo::getAppInfoId, appInfoId)
-                .orderByAsc(PaasDistributedDbInfo::getModifiedTime));
+        PaasLibraInfo libraInfo = libraInfoService.getOne(new QueryWrapper<PaasLibraInfo>().lambda()
+                .eq(PaasLibraInfo::getAppInfoId, appInfoId)
+                .orderByAsc(PaasLibraInfo::getModifiedTime));
+
+        List<PaasLibraAccount> libraAccountList = libraAccountService.list(new QueryWrapper<PaasLibraAccount>().lambda()
+                .eq(PaasLibraAccount::getAppInfoId, appInfoId)
+                .orderByAsc(PaasLibraAccount::getModifiedTime));
         List<PaasLibraDbWhitelist> libraDbWhitelists = paasLibraDbWhitelistService.list(new QueryWrapper<PaasLibraDbWhitelist>().lambda()
                 .eq(PaasLibraDbWhitelist::getAppInfoId, appInfoId)
                 .orderByAsc(PaasLibraDbWhitelist::getModifiedTime));
         PaasDistributedDbApply apply = new PaasDistributedDbApply();
-        apply.setPaasDistributedDbInfos(distributedDbInfos);
+        apply.setPaasLibraInfo(libraInfo);
+        apply.setPaasLibraAccountList(libraAccountList);
         apply.setPaasLibraDbWhitelists(libraDbWhitelists);
         List<PaasDistributedDbApply> paasDistributedDbApplies = Lists.newArrayList();
         paasDistributedDbApplies.add(apply);
@@ -88,16 +120,21 @@ public class IPaasDistributedDbApplyServiceImpl implements IPaasDistributedDbApp
 
     @Override
     public List<PaasDistributedDbApply> getByShoppingCartId(String shoppingCartId) {
-        List<PaasDistributedDbApply> paasDistributedDbApplies = Lists.newArrayList();
-        PaasDistributedDbApply apply = new PaasDistributedDbApply();
-        List<PaasDistributedDbInfo> distributedDbInfos = paasDistributedDbInfoService.list(new QueryWrapper<PaasDistributedDbInfo>().lambda()
-                .eq(PaasDistributedDbInfo::getShoppingCartId, shoppingCartId)
-                .orderByAsc(PaasDistributedDbInfo::getModifiedTime));
+        PaasLibraInfo libraInfo = libraInfoService.getOne(new QueryWrapper<PaasLibraInfo>().lambda()
+                .eq(PaasLibraInfo::getShoppingCartId, shoppingCartId)
+                .orderByAsc(PaasLibraInfo::getModifiedTime));
+
+        List<PaasLibraAccount> libraAccountList = libraAccountService.list(new QueryWrapper<PaasLibraAccount>().lambda()
+                .eq(PaasLibraAccount::getShoppingCartId, shoppingCartId)
+                .orderByAsc(PaasLibraAccount::getModifiedTime));
         List<PaasLibraDbWhitelist> libraDbWhitelists = paasLibraDbWhitelistService.list(new QueryWrapper<PaasLibraDbWhitelist>().lambda()
                 .eq(PaasLibraDbWhitelist::getShoppingCartId, shoppingCartId)
                 .orderByAsc(PaasLibraDbWhitelist::getModifiedTime));
-        apply.setPaasDistributedDbInfos(distributedDbInfos);
+        PaasDistributedDbApply apply = new PaasDistributedDbApply();
+        apply.setPaasLibraInfo(libraInfo);
+        apply.setPaasLibraAccountList(libraAccountList);
         apply.setPaasLibraDbWhitelists(libraDbWhitelists);
+        List<PaasDistributedDbApply> paasDistributedDbApplies = Lists.newArrayList();
         paasDistributedDbApplies.add(apply);
         return paasDistributedDbApplies;
     }
@@ -106,8 +143,10 @@ public class IPaasDistributedDbApplyServiceImpl implements IPaasDistributedDbApp
     @Transactional(rollbackFor = Throwable.class)
     @Override
     public void update(ApplicationInfo<PaasDistributedDbApply, Object> info) {
-        paasDistributedDbInfoService.remove(new QueryWrapper<PaasDistributedDbInfo>().lambda()
-                .eq(PaasDistributedDbInfo::getAppInfoId, info.getId()));
+        libraInfoService.remove(new QueryWrapper<PaasLibraInfo>().lambda()
+                .eq(PaasLibraInfo::getAppInfoId, info.getId()));
+        libraAccountService.remove(new QueryWrapper<PaasLibraAccount>().lambda()
+                .eq(PaasLibraAccount::getAppInfoId,info.getId()));
         paasLibraDbWhitelistService.remove(new QueryWrapper<PaasLibraDbWhitelist>().lambda()
                 .eq(PaasLibraDbWhitelist::getAppInfoId, info.getId()));
         save(info);
@@ -116,8 +155,10 @@ public class IPaasDistributedDbApplyServiceImpl implements IPaasDistributedDbApp
     @Transactional(rollbackFor = Throwable.class)
     @Override
     public void updateShoppingCart(ShoppingCart<PaasDistributedDbApply> shoppingCart) {
-        paasDistributedDbInfoService.remove(new QueryWrapper<PaasDistributedDbInfo>().lambda()
-                .eq(PaasDistributedDbInfo::getShoppingCartId, shoppingCart.getId()));
+        libraInfoService.remove(new QueryWrapper<PaasLibraInfo>().lambda()
+                .eq(PaasLibraInfo::getShoppingCartId, shoppingCart.getId()));
+        libraAccountService.remove(new QueryWrapper<PaasLibraAccount>().lambda()
+                .eq(PaasLibraAccount::getShoppingCartId,shoppingCart.getId()));
         paasLibraDbWhitelistService.remove(new QueryWrapper<PaasLibraDbWhitelist>().lambda()
                 .eq(PaasLibraDbWhitelist::getShoppingCartId, shoppingCart.getId()));
         saveShoppingCart(shoppingCart);
@@ -146,8 +187,10 @@ public class IPaasDistributedDbApplyServiceImpl implements IPaasDistributedDbApp
     @Transactional(rollbackFor = Throwable.class)
     @Override
     public void deleteByShoppingCart(String shoppingCartId) {
-        paasDistributedDbInfoService.remove(new QueryWrapper<PaasDistributedDbInfo>().lambda()
-                .eq(PaasDistributedDbInfo::getShoppingCartId, shoppingCartId));
+        libraInfoService.remove(new QueryWrapper<PaasLibraInfo>().lambda()
+                .eq(PaasLibraInfo::getAppInfoId, shoppingCartId));
+        libraAccountService.remove(new QueryWrapper<PaasLibraAccount>().lambda()
+                .eq(PaasLibraAccount::getAppInfoId,shoppingCartId));
         paasLibraDbWhitelistService.remove(new QueryWrapper<PaasLibraDbWhitelist>().lambda()
                 .eq(PaasLibraDbWhitelist::getShoppingCartId, shoppingCartId));
     }
@@ -161,8 +204,10 @@ public class IPaasDistributedDbApplyServiceImpl implements IPaasDistributedDbApp
     @Transactional(rollbackFor = Throwable.class)
     @Override
     public void refAppInfoFromShoppingCart(String shoppingCartId, String appInfoId) {
-        paasDistributedDbInfoService.update(new PaasDistributedDbInfo(),new UpdateWrapper<PaasDistributedDbInfo>().lambda().eq(PaasDistributedDbInfo::getShoppingCartId,shoppingCartId)
-                .set(PaasDistributedDbInfo::getAppInfoId,appInfoId));
+        libraInfoService.update(new PaasLibraInfo(),new UpdateWrapper<PaasLibraInfo>().lambda().eq(PaasLibraInfo::getShoppingCartId,shoppingCartId)
+                .set(PaasLibraInfo::getAppInfoId,appInfoId));
+        libraAccountService.update(new PaasLibraAccount(),new UpdateWrapper<PaasLibraAccount>().lambda().eq(PaasLibraAccount::getShoppingCartId,shoppingCartId)
+                .set(PaasLibraAccount::getAppInfoId,appInfoId));
         paasLibraDbWhitelistService.update(new PaasLibraDbWhitelist(),new UpdateWrapper<PaasLibraDbWhitelist>().lambda().eq(PaasLibraDbWhitelist::getShoppingCartId,shoppingCartId)
                 .set(PaasLibraDbWhitelist::getAppInfoId,appInfoId));
     }

@@ -58,7 +58,7 @@ public class MpGenerator {
         strategy.setNaming(NamingStrategy.underline_to_camel);// 表名生成策略
 //        strategy.setCapitalMode(false);//全局大写命名 ORACLE 注意
         strategy.setEntityBuilderModel(true);
-        strategy.setInclude(new String[]{"TB_PAAS_FIREWALL_OPEN","TB_PAAS_FIREWALL_OPEN_EXT"}); // 需要生成的表
+        strategy.setInclude(new String[]{"TB_PAAS_LIBRA_INFO","TB_PAAS_LIBRA_INFO_IMPL","TB_PAAS_LIBRA_ACCOUNT","TB_PAAS_LIBRA_ACCOUNT_IMPL","TB_PAAS_LIBRA_WHITELIST_IMPL"}); // 需要生成的表
         // strategy.setExclude(new String[]{"test"}); // 排除生成的表
         // 自定义实体父类
         // strategy.setSuperEntityClass("com.baomidou.authentication.TestEntity");
@@ -83,8 +83,8 @@ public class MpGenerator {
         // 包配置
         PackageConfig pc = new PackageConfig();
         pc.setParent("com.upd.hwcloud");
-        pc.setController("controller.paas.firewall");
-        pc.setEntity("bean.entity.application.paas.firewall");
+        pc.setController("controller.paas.libra");
+        pc.setEntity("bean.entity.application.paas.libra");
         pc.setMapper("dao.application");
         pc.setService("service.application");
         //pc.setModuleName("test");

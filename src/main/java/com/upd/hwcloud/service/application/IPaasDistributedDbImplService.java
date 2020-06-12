@@ -11,6 +11,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @author yyc
  * @since 2020-05-11
  */
-public interface IPaasDistributedDbImplService extends IService<PaasDistributedDbImpl>,IImplHandler<PaasDistributedDbImpl> {
+public interface IPaasDistributedDbImplService extends IService<PaasDistributedDbImpl> {
 
 }
