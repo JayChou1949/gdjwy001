@@ -27,7 +27,7 @@ import io.swagger.annotations.ApiOperation;
  * @author wuc
  * @date 2020/3/3
  */
-@Api("服务限额")
+@Api(description = "服务限额")
 @RestController
 @RequestMapping("/service-limit")
 public class ServiceLimitController {
@@ -42,8 +42,7 @@ public class ServiceLimitController {
     @ApiOperation("获取总配额")
     @RequestMapping(value = "/quota",method = RequestMethod.GET)
     public R quota(String formNum,String area,String policeCategory){
-        //todo:二级门户改造-新增国家专项（新增参数）
-            return R.ok(serviceLimitService.getQuota(formNum,area,policeCategory)) ;
+            return R.ok(serviceLimitService.getQuota(formNum,area,policeCategory));
     }
 
     @ApiOperation("新增或更新")

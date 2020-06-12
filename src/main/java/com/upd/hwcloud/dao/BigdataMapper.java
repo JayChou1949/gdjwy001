@@ -37,6 +37,8 @@ public interface BigdataMapper extends BaseMapper<Bigdata> {
 
     List<ServiceSubscribeVo> serviceStatisticsBySubscribe(Page page, @Param("ew") Wrapper<Bigdata> wrapper);
 
+    List<ServiceRequestVo> appStatisticsByRequest(Page page, @Param("ew") Wrapper<Bigdata> wrapper);
+
     List<ServiceRequestVo> serviceStatisticsByRequest(Page page, @Param("ew") Wrapper<Bigdata> wrapper);
 
     List<ServiceQualityVo> serviceStatisticsByQuality(Page page, @Param("ew") Wrapper<Bigdata> wrapper);
