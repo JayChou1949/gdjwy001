@@ -84,6 +84,20 @@ public class PaasComponentDetail extends Model<PaasComponentDetail> {
     @TableField("REMARK")
     private String remark;
 
+    /**
+     * 存储周期
+     */
+    @TableField("STORAGE_CYCLE")
+    private Integer storageCycle;
+
+    public Integer getStorageCycle() {
+        return storageCycle;
+    }
+
+    public void setStorageCycle(Integer storageCycle) {
+        this.storageCycle = storageCycle;
+    }
+
     public String getRemark() {
         return remark;
     }
