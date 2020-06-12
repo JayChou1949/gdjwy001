@@ -7,7 +7,7 @@
         <id column="ID" property="id" />
         <result column="INSTANCEID" property="instanceid" />
         <result column="MODELID" property="modelid" />
-        <result column="CREATETIME" property="createtime" />
+        <result column="CREATETIME" property="createtime" jdbcType="TIMESTAMP"/>
         <result column="CREATEPERSONID" property="createpersonid" />
         <result column="RECIVETIME" property="recivetime" />
         <result column="HANDLETIME" property="handletime" />

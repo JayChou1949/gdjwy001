@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.upd.hwcloud.bean.entity.IaasOverview;
 import com.upd.hwcloud.bean.entity.IaasPoliceOverview;
 import com.upd.hwcloud.bean.response.R;
+import com.upd.hwcloud.common.utils.BigDecimalUtil;
 import com.upd.hwcloud.service.IIaasOverviewService;
 import com.upd.hwcloud.service.IIaasPoliceOverviewService;
 import io.swagger.annotations.Api;
@@ -80,14 +81,15 @@ public class IaasOverviewController {
             iaasPoliceOverview = iaasPoliceOverviewService.getOne(new QueryWrapper<>(new IaasPoliceOverview()).eq("police",police).eq("name",name));
         }
         if (iaasPoliceOverview!=null){
-            iaasPoliceOverview.setVcpuUsedNum(String.valueOf(Math.ceil(Double.valueOf(iaasPoliceOverview.getVcpuTotal()) * iaasPoliceOverview.getVcpuUsage())));
-            iaasPoliceOverview.setVcpuAllocatedNum(String.valueOf(Math.ceil(Double.valueOf(iaasPoliceOverview.getVcpuTotal()) * iaasPoliceOverview.getVcpuAllocatedRatio())));
-            iaasPoliceOverview.setGpuUsedNum(String.valueOf(Math.ceil(Double.valueOf(iaasPoliceOverview.getGpuTotal()) * iaasPoliceOverview.getGpuUsage())));
-            iaasPoliceOverview.setGpuAllocatedNum(String.valueOf(Math.ceil(Double.valueOf(iaasPoliceOverview.getGpuTotal()) * iaasPoliceOverview.getGpuAllocatedRatio())));
-            iaasPoliceOverview.setMemoryUsedNum(String.valueOf(Math.ceil(Double.valueOf(iaasPoliceOverview.getMemoryTotal()) * iaasPoliceOverview.getMemoryUsage())));
-            iaasPoliceOverview.setMemoryAllocatedNum(String.valueOf(Math.ceil(Double.valueOf(iaasPoliceOverview.getMemoryTotal()) * iaasPoliceOverview.getMemoryAllocatedRatio())));
-            iaasPoliceOverview.setDiskUsedNum(String.valueOf(Math.ceil(Double.valueOf(iaasPoliceOverview.getDiskTotal()) * iaasPoliceOverview.getDiskUsage())));
-            iaasPoliceOverview.setDiskAllocatedNum(String.valueOf(Math.ceil(Double.valueOf(iaasPoliceOverview.getDiskTotal()) * iaasPoliceOverview.getDiskAllocatedRatio())));
+            iaasPoliceOverview.setDiskTotal(String.valueOf(BigDecimalUtil.div(Double.valueOf(iaasPoliceOverview.getDiskTotal()),1024)));
+            iaasPoliceOverview.setVcpuUsedNum(String.valueOf(Math.ceil(Double.valueOf(iaasPoliceOverview.getVcpuTotal()) * iaasPoliceOverview.getVcpuUsage()*0.01)));
+            iaasPoliceOverview.setVcpuAllocatedNum(String.valueOf(Math.ceil(Double.valueOf(iaasPoliceOverview.getVcpuTotal()) * iaasPoliceOverview.getVcpuAllocatedRatio()*0.01)));
+            iaasPoliceOverview.setGpuUsedNum(String.valueOf(Math.ceil(Double.valueOf(iaasPoliceOverview.getGpuTotal()) * iaasPoliceOverview.getGpuUsage()*0.01)));
+            iaasPoliceOverview.setGpuAllocatedNum(String.valueOf(Math.ceil(Double.valueOf(iaasPoliceOverview.getGpuTotal()) * iaasPoliceOverview.getGpuAllocatedRatio()*0.01)));
+            iaasPoliceOverview.setMemoryUsedNum(String.valueOf(Math.ceil(Double.valueOf(iaasPoliceOverview.getMemoryTotal()) * iaasPoliceOverview.getMemoryUsage()*0.01)));
+            iaasPoliceOverview.setMemoryAllocatedNum(String.valueOf(Math.ceil(Double.valueOf(iaasPoliceOverview.getMemoryTotal()) * iaasPoliceOverview.getMemoryAllocatedRatio()*0.01)));
+            iaasPoliceOverview.setDiskUsedNum(String.valueOf(Math.ceil(Double.valueOf(iaasPoliceOverview.getDiskTotal()) * iaasPoliceOverview.getDiskUsage()*0.01)));
+            iaasPoliceOverview.setDiskAllocatedNum(String.valueOf(Double.valueOf(iaasPoliceOverview.getDiskTotal())*iaasPoliceOverview.getDiskAllocatedRatio()*0.01));
         }
         return R.ok(iaasPoliceOverview);
     }
