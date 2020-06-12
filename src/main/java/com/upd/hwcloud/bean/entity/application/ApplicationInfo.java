@@ -242,6 +242,12 @@ public class ApplicationInfo<S, I> extends Model<ApplicationInfo> {
     private String govPrincipalIdcard;
 
     /**
+     * 国家专项
+     */
+    @TableField("NATIONAL_SPECIAL_PROJECT")
+    private String nationalSpecialProject;
+
+    /**
      * 承建单位输入类型 0:选择输入 1:手动输入
      */
     @TableField("CJ_INPUT_TYPE")
@@ -966,6 +972,14 @@ public class ApplicationInfo<S, I> extends Model<ApplicationInfo> {
 
     public void setGovPrincipalIdcard(String govPrincipalIdcard) {
         this.govPrincipalIdcard = govPrincipalIdcard;
+    }
+
+    public String getNationalSpecialProject() {
+        return nationalSpecialProject;
+    }
+
+    public void setNationalSpecialProject(String nationalSpecialProject) {
+        this.nationalSpecialProject = nationalSpecialProject;
     }
 
     public String getBuildMode() {

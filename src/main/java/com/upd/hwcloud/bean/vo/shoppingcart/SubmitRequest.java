@@ -125,6 +125,9 @@ public class SubmitRequest {
     @ApiModelProperty(value = "地市")
     private String areaName;
 
+    @ApiModelProperty(value = "国家专项")
+    private String nationalSpecialProject;
+
     @ApiModelProperty(value = "应用名称输入类型 0:选择输入 1:手动输入")
     private String appNameInputType;
 

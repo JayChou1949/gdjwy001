@@ -609,10 +609,10 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
         ResourceType resourceType = hw.getFormNum().getResourceType();
         info.setFlowNew("1");
         //流程选择（重要选择流程逻辑）
-        Workflow workflow = workflowService.chooseWorkFlow(resourceType,info.getAreaName(),info.getPoliceCategory(),info.getServiceTypeId());
+        Workflow workflow = workflowService.chooseWorkFlow(resourceType,info.getAreaName(),info.getPoliceCategory(),info.getServiceTypeId(),info.getNationalSpecialProject());
         if(workflow == null){
-            logger.error("购物车ID:{} 资源类型:{} 地市:{} 警种: {} 服务ID:{}",shoppingCart.getId(),resourceType.toString(),info.getAreaName(),info.getPoliceCategory(),info.getServiceTypeId());
-            throw  new BaseException("资源类型: "+resourceType.toString()+ "地市: "+ info.getAreaName()+"警种: "+info.getPoliceCategory()+ "服务ID: "+info.getServiceTypeId()+"无匹配流程");
+            logger.error("购物车ID:{} 资源类型:{} 地市:{} 警种: {} 服务ID:{} 国家专项:{}",shoppingCart.getId(),resourceType.toString(),info.getAreaName(),info.getPoliceCategory(),info.getServiceTypeId(),info.getNationalSpecialProject());
+            throw  new BaseException("资源类型: "+resourceType.toString()+ "地市: "+ info.getAreaName()+"警种: "+info.getPoliceCategory()+ "服务ID: "+info.getServiceTypeId()+"国家专项: "+info.getNationalSpecialProject()+"无匹配流程");
         }
         info.setWorkFlowId(workflow.getId());
         info.setResourceType(resourceType.getCode());

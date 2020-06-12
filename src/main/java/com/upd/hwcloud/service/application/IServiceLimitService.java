@@ -24,7 +24,8 @@ public interface IServiceLimitService extends IService<ServiceLimit> {
      * @param appInfoId 上报订单号
      * @param area  地市
      * @param policeCategory 警种
+     * @param nationalSpecialProject 国家专项
      */
-    void increaseQuota(String appInfoId,String area,String policeCategory);
+    void increaseQuota(String appInfoId,String area,String policeCategory,String nationalSpecialProject);
 
 }

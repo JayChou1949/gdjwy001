@@ -21,7 +21,7 @@ public interface IWorkflowService extends IService<Workflow> {
     public Workflow saveFlow(User user, Workflow flow);
 
     //实例流程设置
-    Workflow chooseWorkFlow(ResourceType type,String area,String policeCategory,String serviceId);
+    Workflow chooseWorkFlow(ResourceType type,String area,String policeCategory,String serviceId,String nationalSpecialProject);
 
     //地区唯一性确认
     boolean distinctAreaCheck(List<String> workFlowIds);
