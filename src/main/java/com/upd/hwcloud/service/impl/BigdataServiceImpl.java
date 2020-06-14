@@ -378,6 +378,12 @@ public class BigdataServiceImpl extends ServiceImpl<BigdataMapper, Bigdata> impl
     }
 
     @Override
+    public Bigdata getServiceByServiceId(String serviceId) {
+        Bigdata bigdata = bigdataMapper.selectOne(new QueryWrapper<Bigdata>().lambda().eq(Bigdata::getApigGuid, serviceId));
+        return bigdata;
+    }
+
+    @Override
     public List<YqStatistics> areaOrder(String label) {
         //  模糊查询
         StringBuffer stringBuffer=new StringBuffer("%").append(label).append("%");
