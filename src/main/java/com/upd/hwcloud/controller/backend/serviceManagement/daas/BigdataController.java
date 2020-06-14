@@ -113,5 +113,20 @@ public class BigdataController {
         ExcelUtil.export(request, response, "DaaS服务表", workbook);
     }
 
+    /**
+     * 根据服务ID查询服务详情
+     * @param serviceId
+     * @return
+     */
+    @RequestMapping(value = "/getByServiceId/{serviceId}",method = RequestMethod.GET)
+    public R getServiceByServiceId(@PathVariable("serviceId") String serviceId){
+        try {
+            Bigdata bigdata = bigdataService.getServiceByServiceId(serviceId);
+            return R.ok(bigdata);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return R.error();
+    }
 }
 

@@ -79,4 +79,6 @@ public interface IBigdataService extends IService<Bigdata> {
     List<YqStatistics> serviceByOrder(String label);
 
     Integer yqdy(String label, String serviceName, String appName);
+
+    Bigdata getServiceByServiceId(String serviceId);
 }
