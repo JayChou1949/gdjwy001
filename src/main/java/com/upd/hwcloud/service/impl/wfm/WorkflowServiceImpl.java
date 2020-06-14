@@ -134,7 +134,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         //获取对应流程集合
         List<Workflow> workflowList = this.list(new QueryWrapper<Workflow>().lambda().in(Workflow::getId,workFlowIds));
         //地市去重后的数据
-        long area = workflowList.stream().filter(item->StringUtils.isBlank(item.getPoliceCategory())).map(Workflow::getArea).distinct().count();
+        long area = workflowList.stream().filter(item->StringUtils.isBlank(item.getPoliceCategory())&&StringUtils.isBlank(item.getNationalSpecialProject())).map(Workflow::getArea).distinct().count();
         log.debug("area num -> {}",area);
         long police = workflowList.stream().map(Workflow::getPoliceCategory).filter(item->StringUtils.isNotBlank(item)).distinct().count();
         log.debug("police num ->{}",police);
