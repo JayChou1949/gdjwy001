@@ -132,7 +132,7 @@ public class PaasBigdataComponentServiceImpl extends ServiceImpl<PaasBigdataComp
         }
         this.remove(new QueryWrapper<PaasBigdataComponent>()
                 .lambda()
-                .eq(PaasBigdataComponent::getAppInfoId,shoppingCart.getId()));
+                .eq(PaasBigdataComponent::getShoppingCartId,shoppingCart.getId()));
         saveShoppingCart(shoppingCart);
     }
 
