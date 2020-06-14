@@ -13,11 +13,4 @@ public interface AreaDaasDataService {
      * @param areaDaasData
      */
     void importDaasData(AreaDaasData areaDaasData);
-
-    /**
-     * 获取地市数据服务数据
-     * @param name
-     * @return
-     */
-    AreaDaasData getDaasData(String name);
 }
