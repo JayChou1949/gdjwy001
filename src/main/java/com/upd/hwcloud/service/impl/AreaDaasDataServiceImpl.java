@@ -1,12 +1,10 @@
 package com.upd.hwcloud.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.upd.hwcloud.bean.dto.AreaDaasData;
 import com.upd.hwcloud.bean.entity.ThreePartyInterface;
+import com.upd.hwcloud.bean.response.R;
 import com.upd.hwcloud.service.AreaDaasDataService;
-import com.upd.hwcloud.service.IThreePartyInterfaceService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -18,28 +16,15 @@ import java.util.Date;
 @Service
 public class AreaDaasDataServiceImpl implements AreaDaasDataService {
 
-    @Autowired
-    private IThreePartyInterfaceService threePartyInterfaceService;
-
     @Override
     public void importDaasData(AreaDaasData areaDaasData) {
         ThreePartyInterface threePartyInterface = new ThreePartyInterface();
         // 插入或更新
-        String data = JSON.toJSONString(areaDaasData);
+        String data = JSON.toJSONString(R.ok(areaDaasData));
         threePartyInterface.setCreateTime(new Date());
         threePartyInterface.setData(data);
-        threePartyInterface.setId(areaDaasData.getAreaNameEn()+"DaasData");
-        threePartyInterface.setLabel(areaDaasData.getAreaName()+"数据服务");
+        threePartyInterface.setId(areaDaasData.getAreaNameEn()+"DaasOverview");
+        threePartyInterface.setLabel(areaDaasData.getAreaName()+"DaaS总览");
         threePartyInterface.insertOrUpdate();
-    }
-
-    @Override
-    public AreaDaasData getDaasData(String name) {
-        ThreePartyInterface one = threePartyInterfaceService.getOne(new QueryWrapper<ThreePartyInterface>().lambda().eq(ThreePartyInterface::getId, name + "DaasData"));
-        if (one!=null){
-            AreaDaasData areaDaasData = JSON.parseObject(one.getData(), AreaDaasData.class);
-            return areaDaasData;
-        }
-        return null;
     }
 }

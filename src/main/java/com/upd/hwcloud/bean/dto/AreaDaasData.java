@@ -20,40 +20,52 @@ public class AreaDaasData {
     private String areaNameEn;
 
     /**
-     * 资源总量
+     * 资源总量-表数
      */
-    private TotalResources totalResources;
+    private String countValue;
     /**
-     * 上报省厅资源总量
+     * 资源总量-数据量
      */
-    private ReportToUp reportToUp;
+    private String sumValue;
     /**
-     * 省厅资源总量
+     * 上报省厅资源总量-表数
      */
-    private UpResources upResources;
+    private String toProvinceCountValue;
+    /**
+     * 上报省厅资源总量-数据量
+     */
+    private String toProvinceValue;
+    /**
+     * 省厅资源总量-表数
+     */
+    private String provinceValue;
+    /**
+     * 省厅资源总量-表数据量
+     */
+    private String provinceSumValue;
     /**
      * 区县上报
      */
-    private DistrictReport districtReport;
+    private DistrictReport area;
     /**
      * 警种及行业公安共享
      */
-    private PoliceShare policeShare;
+    private PoliceShare police;
     /**
      * 政府部门及企事业单位共享
      */
-    private GovShare govShare;
+    private GovShare government;
 
     @Data
     public static class TotalResources {
         /**
          * 表数
          */
-        private Integer tabelNum;
+        private String count;
         /**
          * 数据量
          */
-        private Long dataNum;
+        private String sum;
     }
 
     @Data
@@ -61,11 +73,11 @@ public class AreaDaasData {
         /**
          * 表数
          */
-        private Integer tabelNum;
+        private String count;
         /**
          * 数据量
          */
-        private Long dataNum;
+        private String sum;
     }
 
     @Data
@@ -73,11 +85,11 @@ public class AreaDaasData {
         /**
          * 表数
          */
-        private Integer tabelNum;
+        private String count;
         /**
          * 数据量
          */
-        private Long dataNum;
+        private String sum;
     }
 
     @Data
@@ -85,19 +97,19 @@ public class AreaDaasData {
         /**
          * 表数
          */
-        private Integer tabelNum;
+        private String count;
         /**
          * 昨日新增表数
          */
-        private Integer addTable;
+        private String countIncrement;
         /**
          * 数据量
          */
-        private Long dataNum;
+        private String sum;
         /**
          * 昨日新增数据量
          */
-        private Long addData;
+        private String sumIncrement;
     }
 
     @Data
@@ -105,19 +117,19 @@ public class AreaDaasData {
         /**
          * 表数
          */
-        private Integer tabelNum;
+        private String count;
         /**
          * 昨日新增表数
          */
-        private Integer addTable;
+        private String countIncrement;
         /**
          * 数据量
          */
-        private Long dataNum;
+        private String sum;
         /**
          * 昨日新增数据量
          */
-        private Long addData;
+        private String sumIncrement;
     }
 
     @Data
@@ -125,18 +137,18 @@ public class AreaDaasData {
         /**
          * 表数
          */
-        private Integer tabelNum;
+        private String count;
         /**
          * 昨日新增表数
          */
-        private Integer addTable;
+        private String countIncrement;
         /**
          * 数据量
          */
-        private Long dataNum;
+        private String sum;
         /**
          * 昨日新增数据量
          */
-        private Long addData;
+        private String sumIncrement;
     }
 }
