@@ -16,7 +16,7 @@ import org.apache.commons.lang3.tuple.Triple;
  */
 public interface IServiceLimitService extends IService<ServiceLimit> {
 
-    ServiceLimit getQuota(String formNum,String area,String policeCategory);
+    ServiceLimit getQuota(String formNum,String area,String policeCategory,String nationalSpecialProject);
 
 
     /**

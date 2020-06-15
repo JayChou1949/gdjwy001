@@ -4,10 +4,12 @@ package com.upd.hwcloud.controller.portal;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.upd.hwcloud.bean.entity.IaasOverview;
 import com.upd.hwcloud.bean.entity.IaasPoliceOverview;
+import com.upd.hwcloud.bean.entity.IaasSpecialProOverview;
 import com.upd.hwcloud.bean.response.R;
 import com.upd.hwcloud.common.utils.BigDecimalUtil;
 import com.upd.hwcloud.service.IIaasOverviewService;
 import com.upd.hwcloud.service.IIaasPoliceOverviewService;
+import com.upd.hwcloud.service.IIaasSpecialProOverviewService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang.StringUtils;
@@ -36,6 +38,9 @@ public class IaasOverviewController {
 
     @Autowired
     private IIaasPoliceOverviewService iaasPoliceOverviewService;
+
+    @Autowired
+    private IIaasSpecialProOverviewService iaasSpecialProOverviewService;
 
     @ApiOperation("")
     @RequestMapping(value = "/get", method = RequestMethod.GET)
@@ -92,6 +97,19 @@ public class IaasOverviewController {
             iaasPoliceOverview.setDiskAllocatedNum(String.valueOf(Double.valueOf(iaasPoliceOverview.getDiskTotal())*iaasPoliceOverview.getDiskAllocatedRatio()*0.01));
         }
         return R.ok(iaasPoliceOverview);
+    }
+
+    @ApiOperation("国家专项IAAS数据总览")
+    @RequestMapping(value = "/getByNationalSpecialProject",method = RequestMethod.GET)
+    @ResponseBody
+    public R getByNationalSpecialProject(@RequestParam(value = "nationalSpecialProject") String nationalSpecialProject){
+        IaasSpecialProOverview iaasSpecialProOverview = new IaasSpecialProOverview();
+        iaasSpecialProOverview = iaasSpecialProOverviewService.getOne(new QueryWrapper<IaasSpecialProOverview>().eq("NATIONAL_SPECIAL_PROJECT", nationalSpecialProject));
+        if (iaasSpecialProOverview!=null){
+            iaasSpecialProOverview.setMemoryTotal(String.valueOf(BigDecimalUtil.div(Double.valueOf(iaasSpecialProOverview.getMemoryTotal()),1024)));
+            iaasSpecialProOverview.setDiskTotal(String.valueOf(BigDecimalUtil.div(Double.valueOf(iaasSpecialProOverview.getDiskTotal()),1024)));
+        }
+        return R.ok(iaasSpecialProOverview);
     }
 
 }

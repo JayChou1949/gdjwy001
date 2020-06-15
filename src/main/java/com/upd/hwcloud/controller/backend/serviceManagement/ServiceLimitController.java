@@ -41,8 +41,8 @@ public class ServiceLimitController {
 
     @ApiOperation("获取总配额")
     @RequestMapping(value = "/quota",method = RequestMethod.GET)
-    public R quota(String formNum,String area,String policeCategory){
-            return R.ok(serviceLimitService.getQuota(formNum,area,policeCategory));
+    public R quota(String formNum,String area,String policeCategory,@RequestParam(value = "nationalSpecialProject",required = false) String nationalSpecialProject){
+            return R.ok(serviceLimitService.getQuota(formNum,area,policeCategory,nationalSpecialProject));
     }
 
     @ApiOperation("新增或更新")

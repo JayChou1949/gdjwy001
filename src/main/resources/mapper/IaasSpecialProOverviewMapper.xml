@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.IaasSpecialProOverviewMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.IaasSpecialProOverview">
+        <id column="ID" property="id" />
+        <result column="NAME" property="name" />
+        <result column="NATIONAL_SPECIAL_PROJECT" property="nationalSpecialProject" />
+        <result column="ELASTIC_CLOUD_SERVER" property="elasticCloudServer" />
+        <result column="BARE_METAL_SERVER" property="bareMetalServer" />
+        <result column="DESKTOP_CLOUD" property="desktopCloud" />
+        <result column="ELASTIC_VOLUME" property="elasticVolume" />
+        <result column="ELASTIC_SCALING" property="elasticScaling" />
+        <result column="ELASTIC_FILE" property="elasticFile" />
+        <result column="OBJECT_STORAGE" property="objectStorage" />
+        <result column="ELASTIC_LOAD_BALANCING" property="elasticLoadBalancing" />
+        <result column="SERVICE_NUM" property="serviceNum" />
+        <result column="VCPU" property="vcpu" />
+        <result column="MEMORY" property="memory" />
+        <result column="STORAGE" property="storage" />
+        <result column="VCPU_TOTAL" property="vcpuTotal" />
+        <result column="VCPU_USAGE" property="vcpuUsage" />
+        <result column="VCPU_USED_NUM" property="vcpuUsedNum" />
+        <result column="VCPU_ALLOCATED_RATIO" property="vcpuAllocatedRatio" />
+        <result column="VCPU_ALLOCATED_NUM" property="vcpuAllocatedNum" />
+        <result column="GPU_TOTAL" property="gpuTotal" />
+        <result column="GPU_USAGE" property="gpuUsage" />
+        <result column="GPU_USED_NUM" property="gpuUsedNum" />
+        <result column="GPU_ALLOCATED_RATIO" property="gpuAllocatedRatio" />
+        <result column="GPU_ALLOCATED_NUM" property="gpuAllocatedNum" />
+        <result column="MEMORY_TOTAL" property="memoryTotal" />
+        <result column="MEMORY_USAGE" property="memoryUsage" />
+        <result column="MEMORY_USED_NUM" property="memoryUsedNum" />
+        <result column="MEMORY_ALLOCATED_RATIO" property="memoryAllocatedRatio" />
+        <result column="MEMORY_ALLOCATED_NUM" property="memoryAllocatedNum" />
+        <result column="DISK_TOTAL" property="diskTotal" />
+        <result column="DISK_USAGE" property="diskUsage" />
+        <result column="DISK_USED_NUM" property="diskUsedNum" />
+        <result column="DISK_ALLOCATED_RATIO" property="diskAllocatedRatio" />
+        <result column="DISK_ALLOCATED_NUM" property="diskAllocatedNum" />
+        <result column="CREATE_TIME" property="createTime" />
+        <result column="UPDATE_TIME" property="updateTime" />
+    </resultMap>
+
+</mapper>

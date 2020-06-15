@@ -1,0 +1,16 @@
+package com.upd.hwcloud.dao;
+
+import com.upd.hwcloud.bean.entity.IaasSpecialProOverview;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+/**
+ * <p>
+ * 国家专项IaaS数据总览 Mapper 接口
+ * </p>
+ *
+ * @author xqp
+ * @since 2020-06-14
+ */
+public interface IaasSpecialProOverviewMapper extends BaseMapper<IaasSpecialProOverview> {
+
+}
