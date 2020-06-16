@@ -219,7 +219,6 @@ public class ResourceRecoverAppInfoServiceImpl extends ServiceImpl<ResourceRecov
             //查出其中一个缩配资源的缩配时间
             ResourceRecover resourceRecover=resourceRecoverService.getOne(new QueryWrapper<ResourceRecover>().eq("ref_Id",info.getId()));
             //时间分割
-            System.out.println("resourceRecover:"+resourceRecover.getId());
             String[] shrinkTime=null;
             String month = "";
             String day = "";
@@ -236,7 +235,7 @@ public class ResourceRecoverAppInfoServiceImpl extends ServiceImpl<ResourceRecov
             //1.开启定时器，48小时后执行
             //2.检查工单状态，如果未处理，则进行短信发送
             try{
-                String expendTime="00:01:00";
+                String expendTime="48:00:00";
                 timer.startRecoverCheck(DateUtil.dateAdd(info.getCreateTime(),expendTime),user,info);//发到定时器进行检查状态
             }catch (Exception e){
                e.printStackTrace();
@@ -610,6 +609,7 @@ public class ResourceRecoverAppInfoServiceImpl extends ServiceImpl<ResourceRecov
      */
     public void queryUntreatedRecover(){
 //        System.out.println("开始处理");
+        logger.debug("开始执行查询未被回收负责人处理的工单");
         List<ResourceRecoverAppInfo> recoverList = resourceRecoverAppInfoMapper.queryUntreatedRecover();
         //存放被负责人，减少数据库查询
         ConcurrentMap<String,User> userMap=new ConcurrentHashMap<String,User>();
@@ -626,17 +626,24 @@ public class ResourceRecoverAppInfoServiceImpl extends ServiceImpl<ResourceRecov
             //查出其中一个缩配资源的缩配时间
             ResourceRecover resourceRecover=resourceRecoverService.getOne(new QueryWrapper<ResourceRecover>().eq("ref_Id",entry.getId()));
             //时间分割
+            //时间分割
             String[] shrinkTime=null;
+            String month = "";
+            String day = "";
             if(resourceRecover.getShrinkTime()!=null){
                 shrinkTime=resourceRecover.getShrinkTime().split(" ")[0].split("-");
+                month = shrinkTime[1];
+                day = shrinkTime[2];
+            }else{
+                month = "0";
+                day = "0";
             }
-            String month = shrinkTime[1];
-            String day = shrinkTime[2];
             messageProvider.sendMessageAsync(messageProvider.buildRecoverMessage(user, BusinessName.RECOVER, entry.getOrderNumber(),month,day));
             //更新状态
             entry.setStatus(ApplicationInfoStatus.RESENT.getCode());
             this.updateById(entry);
-            System.out.println("更新数据成功");
+//            System.out.println("更新数据成功");
+            logger.debug("更新数据成功,id:"+entry.getId());
         });
     }
 
