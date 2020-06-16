@@ -46,7 +46,7 @@
                     and ai.STATUS != 4
                 </when>
                 <when test="p.status == 1">
-                    and ai.STATUS in (1,7,101,102)
+                    and ai.STATUS in (1,7,101,102,103)
                 </when>
                 <otherwise>
                    and ai.STATUS = #{p.status}
@@ -58,5 +58,15 @@
         </where>
 	  ) r Left join ( SELECT REF_ID, count( * ) NUM FROM TB_RESOURCE_RECOVER WHERE  REF_ID IS NOT NULL GROUP BY REF_ID ) n ON n.REF_ID = r.ID
     ORDER BY r.MODIFIED_TIME DESC
+    </select>
+    <!--计算超过2天未被负责人处理的回收工单，状态为初始的部门内待审核状态-->
+    <select id="queryUntreatedRecover" resultType="com.upd.hwcloud.bean.entity.application.ResourceRecoverAppInfo">
+        <![CDATA[
+        select info.* from TB_RESOURCE_RECOVER_APP_INFO info
+        where info.status='7'
+        and info.RECOVERED_AGREE is null
+        and ROUND (TO_NUMBER (TO_DATE (TO_CHAR (SYSDATE,'yyyy-mm-dd hh24:mi:ss'),'yyyy-mm-dd hh24:mi:ss') - TO_DATE (TO_CHAR (create_TIME,'yyyy-mm-dd hh24:mi:ss'),'YYYY-MM-DD HH24:mi:ss')) * 24 * 60 * 60) > 60*60*48
+        and ROUND (TO_NUMBER (TO_DATE (TO_CHAR (SYSDATE,'yyyy-mm-dd hh24:mi:ss'),'yyyy-mm-dd hh24:mi:ss') - TO_DATE (TO_CHAR (create_TIME,'yyyy-mm-dd hh24:mi:ss'),'YYYY-MM-DD HH24:mi:ss')) * 24 * 60 * 60) < 60*60*120
+        ]]>
     </select>
 </mapper>

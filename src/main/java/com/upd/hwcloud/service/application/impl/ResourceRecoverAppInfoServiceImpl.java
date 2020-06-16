@@ -28,6 +28,7 @@ import com.upd.hwcloud.bean.response.R;
 import com.upd.hwcloud.bean.vo.resourceRecover.ResourceRecoverSubmit;
 import com.upd.hwcloud.common.exception.BaseException;
 import com.upd.hwcloud.common.lock.DistributeLock;
+import com.upd.hwcloud.common.utils.DateUtil;
 import com.upd.hwcloud.common.utils.OrderNum;
 import com.upd.hwcloud.common.utils.UUIDUtil;
 import com.upd.hwcloud.dao.application.ResourceRecoverAppInfoMapper;
@@ -44,8 +45,10 @@ import com.upd.hwcloud.service.wfm.IInstanceService;
 import com.upd.hwcloud.service.wfm.IWorkflowService;
 import com.upd.hwcloud.service.wfm.IWorkflowmodelService;
 
+import com.upd.hwcloud.timer.Timer;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTimeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +61,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
 /**
@@ -116,6 +121,9 @@ public class ResourceRecoverAppInfoServiceImpl extends ServiceImpl<ResourceRecov
     @Autowired
     private IUserService userService;
 
+    @Autowired
+    private Timer timer;
+
 
     @Override
     @Transactional(rollbackFor = Throwable.class)
@@ -151,6 +159,7 @@ public class ResourceRecoverAppInfoServiceImpl extends ServiceImpl<ResourceRecov
             info.setCreatorIdCard(user.getIdcard());
             info.setStatus(ApplicationInfoStatus.INNER_REVIEW.getCode());
             info.setOrderNumber(OrderNum.gen(stringRedisTemplate, RedisKey.KEY_RESOURCE_RECOVER));
+//            info.set
 
             info.setRecoveredPerson(recoveredUserInfo.getApplicant());
             info.setRecoveredPersonPhone(recoveredUserInfo.getApplicantPhone());
@@ -205,7 +214,16 @@ public class ResourceRecoverAppInfoServiceImpl extends ServiceImpl<ResourceRecov
             map.put("name", BusinessName.RECOVER);
             map.put("order", info.getOrderNumber());
             activityService.advanceCurrentActivity(advanceBeanVO, map);
-            messageProvider.sendMessageAsync(messageProvider.buildSuccessMessage(user, BusinessName.RECOVER, info.getOrderNumber()));
+            sendMsg(user,info);
+            //放入定时器，超过48小时未处理工单，重新发送短信
+            //1.开启定时器，48小时后执行
+            //2.检查工单状态，如果未处理，则进行短信发送
+            try{
+                String expendTime="48:00:00";
+                timer.startRecoverCheck(DateUtil.dateAdd(info.getCreateTime(),expendTime),user,info);//发到定时器进行检查状态
+            }catch (Exception e){
+               e.printStackTrace();
+            }
         }
 
         return R.ok();
@@ -444,27 +462,33 @@ public class ResourceRecoverAppInfoServiceImpl extends ServiceImpl<ResourceRecov
             if (ModelName.CARRY.getName().equals(model)){
                 info.setStatus(ApplicationInfoStatus.IMPL.getCode());
             }else {
-                info.setStatus(ApplicationInfoStatus.REVIEW.getCode());
+                info.setStatus(ApplicationInfoStatus.RESENT.getCode());
             }
         }else if(StringUtils.equals(ModelName.APPROVE.getName(),currentModel.getModelname())){ //大数据办
             //只有在被回收资源人不同意回收时，才发生流程流转
             if(info.getRecoveredAgree()==0){
                 //大数据办处理结果为回收,只在被回收资源不同意回收时发生回退
                 if("1".equals(approve.getResult())){
-                    Workflowmodel fallbackModel = workflowmodelService.getById(vo.getFallBackModelIds());
-                    if(StringUtils.equals(ModelName.RECOVERED.getName(),fallbackModel.getModelname())){
-                        activityService.fallbackOnApproveNotPass(vo, null);
-                        info.setStatus(ApplicationInfoStatus.REVIEW_REJECT.getCode());
-                        messageProvider.sendMessageAsync(messageProvider.buildRejectMessage(info.getCreator(), BusinessName.RECOVER));
-                    }
-                }else if("0".equals(approve.getResult())){ //大数据办不回收,流转到业务办理
+//                    Workflowmodel fallbackModel = workflowmodelService.getById(vo.getFallBackModelIds());
+//                    if(StringUtils.equals(ModelName.RECOVERED.getName(),fallbackModel.getModelname())){
+//                        activityService.fallbackOnApproveNotPass(vo, null);
+//                        info.setStatus(ApplicationInfoStatus.REVIEW_REJECT.getCode());
+//
+//                        messageProvider.sendMessageAsync(messageProvider.buildRejectMessage(info.getCreator(), BusinessName.RECOVER));
+//                    }
                     R r = activityService.advanceCurrentActivity(vo.getCurrentActivityId(), approve,map);
                     Object model = r.get("data");
                     if (ModelName.CARRY.getName().equals(model)){
                         info.setStatus(ApplicationInfoStatus.IMPL.getCode());
                     }else {
-                        info.setStatus(ApplicationInfoStatus.REVIEW.getCode());
+                        info.setStatus(ApplicationInfoStatus.RESENT.getCode());
                     }
+                }else if("0".equals(approve.getResult())){ //大数据办不回收,流转到业务办理
+                    //最新修改，大数据办不回收，进行回退
+                    activityService.fallbackOnApproveNotPass(vo, null);
+                    info.setStatus(ApplicationInfoStatus.REVIEW_REJECT.getCode());
+                    sendMsg(user,info);
+
                 }
             }
         }
@@ -530,7 +554,8 @@ public class ResourceRecoverAppInfoServiceImpl extends ServiceImpl<ResourceRecov
         if ("1".equals(implRequest.getResult())){
             //ServiceReturnBean returnBean = getTestReturnBean(false);
             activityService.advanceCurrentActivity(activity,info.getCreator());
-            messageProvider.sendMessageAsync(messageProvider.buildCompleteMessage(info.getCreator(), BusinessName.RECOVER, info.getOrderNumber()));
+            sendMsg(user,info);
+//            messageProvider.sendMessageAsync(messageProvider.buildCompleteMessage(info.getCreator(), BusinessName.RECOVER, info.getOrderNumber()));
         }else {
             if (modelId==null||modelId.trim().equals("")) {
                 return R.error(201, "回退环节ID不能为空,回退失败");
@@ -564,6 +589,58 @@ public class ResourceRecoverAppInfoServiceImpl extends ServiceImpl<ResourceRecov
                             .set(ResourceRecoverAppInfo::getStatus,ApplicationInfoStatus.DELETE.getCode()));
        activityService.terminationInstanceOfWorkFlow(id);
        return R.ok();
+    }
+
+    /**
+     * 获取未被负责人处理的回收资源工单
+     */
+    public void queryUntreatedRecover(){
+//        System.out.println("开始处理");
+        logger.debug("开始执行查询未被回收负责人处理的工单");
+        List<ResourceRecoverAppInfo> recoverList = resourceRecoverAppInfoMapper.queryUntreatedRecover();
+        //存放被负责人，减少数据库查询
+        ConcurrentMap<String,User> userMap=new ConcurrentHashMap<String,User>();
+        //循环未被负责责任处理的工单，再次发送短信，更新工单状态为已发送短信状态
+        recoverList.stream().forEach(entry->{
+            User user=null;
+            if(userMap.get(entry.getRecoveredPersonIdCard())!=null){
+                user=userMap.get(entry.getRecoveredPersonIdCard());
+            }else{
+                user=userService.getById(entry.getRecoveredPersonIdCard());
+                userMap.put(user.getIdcard(),user);
+            }
+            user.setNotifyType("0");//只重新发短信，不发送邮件等其他消息
+            //再次发提醒短信
+            sendMsg(user,entry);
+            //更新状态
+            entry.setStatus(ApplicationInfoStatus.RESENT.getCode());
+            this.updateById(entry);
+//            System.out.println("更新数据成功");
+            logger.debug("更新数据成功,id:"+entry.getId());
+        });
+    }
+
+    /**
+     * 通用发送回收资源短信
+     * @param user
+     * @param info
+     */
+    public void sendMsg(User user,ResourceRecoverAppInfo info){
+        //查出其中一个缩配资源的缩配时间
+        ResourceRecover resourceRecover=resourceRecoverService.getOne(new QueryWrapper<ResourceRecover>().eq("ref_Id",info.getId()));
+        //时间分割
+        String[] shrinkTime=null;
+        String month = "";
+        String day = "";
+        if(resourceRecover.getShrinkTime()!=null){
+            shrinkTime=resourceRecover.getShrinkTime().split(" ")[0].split("-");
+        }else{
+            shrinkTime=DateUtil.formateDate(info.getCreateTime(),"yyyy-MM-dd").split("-");
+        }
+        month = shrinkTime[1];
+        day = shrinkTime[2];
+        //发送短信
+        messageProvider.sendMessageAsync(messageProvider.buildRecoverMessage(user, BusinessName.RECOVER, info.getOrderNumber(),month,day));
     }
 
 
