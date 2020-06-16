@@ -43,6 +43,8 @@ public class MessageProvider {
     private String msgReject;
     @Value("${msg.template.complete}")
     private String msgComplete;
+    @Value("${msg.template.recover}")
+    private String msgRecover;
 
     public void sendMessageAsync(Message... message) {
         if (message == null) {
@@ -238,6 +240,20 @@ public class MessageProvider {
         message.setContent(String.format(msgReject, user.getName(), bizName));
         message.setUser(user);
         return message;
+    }
+
+    /**
+     * 构造缩配短信通知消息
+     */
+    public Message buildRecoverMessage(User submitor, String bizName, String orderNum,String month,String day) {
+        if (submitor == null) {
+            logger.error("to send user is null");
+            return null;
+        }
+        Message toUser = new Message();
+        toUser.setContent(String.format(msgRecover, submitor.getName(), bizName, orderNum, month,day));
+        toUser.setUser(submitor);
+        return toUser;
     }
 
 

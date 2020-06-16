@@ -18,6 +18,7 @@ public enum ApplicationInfoStatus {
      *  8:部门内驳回 --> 审核驳回
      *  101:加办(属于科信待审核的一种类型) --> 待审核
      *  102:转发(属于科信待审核的一种类型,当部门内审核时发生转发,不改变其状态,直接置换审核人) --> 待审核
+     *  103：短信重发(被回收资源负责人超过2天未处理工单，进行短信重发)-->待审核
      */
 
     SHOPPING_CART_DEL("-1", "购物车删除"), SHOPPING_CART("0", "购物车"),
@@ -30,7 +31,9 @@ public enum ApplicationInfoStatus {
 
     INNER_REVIEW("7", "部门内待审核"), INNER_REJECT("8", "部门内驳回"),
 
-    ADD("101", "加办"), FORWARD("102", "转发");
+    ADD("101", "加办"), FORWARD("102", "转发"),
+
+    RESENT("103", "短信重发");
 
     private final String code;
     private final String des;

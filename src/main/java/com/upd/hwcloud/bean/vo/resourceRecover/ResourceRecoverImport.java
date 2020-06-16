@@ -21,6 +21,11 @@ import lombok.Data;
 @Data
 public class ResourceRecoverImport {
 
+    /**
+     * 缩配时间
+     */
+    @Excel(name = "缩配时间",format = "yyyy-MM-dd HH:mm")
+    private Date shrinkDate;
 
     /**
      * 缩配类型
@@ -206,6 +211,7 @@ public class ResourceRecoverImport {
             resourceRecover.setInstanceCreatedTime(DateUtil.formateDate(resourceRecoverImport.getInstanceCreatedDate(),"yyyy-MM-dd"));
             resourceRecover.setImportTimeStr(DateUtil.formateDate(date,"yyyy-MM-dd HH:mm"));
             resourceRecover.setStatus(ResourceRecoverStatus.UN_PROCESSED.getCode());
+            resourceRecover.setShrinkTime(DateUtil.formateDate(resourceRecoverImport.getShrinkDate(),"yyyy-MM-dd HH:mm"));
             return resourceRecover;
         }
 

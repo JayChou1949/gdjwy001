@@ -29,6 +29,12 @@ public class ResourceRecover extends Model<ResourceRecover> {
          @TableId(value = "ID",type = IdType.UUID)
     private String id;
 
+    /**
+     * 缩配时间
+     */
+    @TableField("SHRINK_TIME")
+    private String shrinkTime;
+
         /**
      * 缩配类型
      */
@@ -246,6 +252,15 @@ public class ResourceRecover extends Model<ResourceRecover> {
 
     public ResourceRecover setId(String id) {
         this.id = id;
+        return this;
+    }
+
+    public String getShrinkTime() {
+        return shrinkTime;
+    }
+
+    public ResourceRecover setShrinkTime(String shrinkTime) {
+        this.shrinkTime = shrinkTime;
         return this;
     }
 
@@ -568,6 +583,7 @@ public class ResourceRecover extends Model<ResourceRecover> {
     public String toString() {
         return "ResourceRecover{" +
         "id=" + id +
+        ", shrinkTime=" + shrinkTime +
         ", shrinkType=" + shrinkType +
         ", availablePartition=" + availablePartition +
         ", policeCategory=" + policeCategory +
