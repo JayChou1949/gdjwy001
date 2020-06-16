@@ -76,6 +76,8 @@ public interface IResourceRecoverAppInfoService extends IService<ResourceRecover
      */
     R delete(String id);
 
+    void queryUntreatedRecover();
+
 
 
 

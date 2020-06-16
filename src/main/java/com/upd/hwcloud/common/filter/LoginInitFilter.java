@@ -44,7 +44,12 @@ public class LoginInitFilter extends DcucTicketValidationFilter {
         if (EnvironmentUtils.ONLINE_PROFILES.contains(profile)) {
             user = dcucHttpEngin.getUserInfoById(userId);
             if (user == null || StringUtils.isEmpty(user.getIdcard())) {
-                throw new BaseException("用户信息不存在");
+                User govUser = dcucHttpEngin.getGovUserInfoById(userId);
+                if (govUser == null || StringUtils.isEmpty(govUser.getIdcard())){
+                    throw new BaseException("用户信息不存在");
+                }else {
+                    user = govUser;
+                }
             }
             // 保存用户信息到本地数据库
             userService.saveOrUpdateFromRemote(user);
