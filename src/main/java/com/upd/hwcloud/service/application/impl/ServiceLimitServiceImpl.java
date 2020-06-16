@@ -122,40 +122,57 @@ public class ServiceLimitServiceImpl extends ServiceImpl<ServiceLimitMapper, Ser
      * @param nationalSpecialProject
      */
     private void dealPaas(List<ReportPaas> paasList,String area,String policeCategory,String nationalSpecialProject){
-        double totalCpu = paasList.parallelStream().filter(item->item.getCpu() != null).map(ReportPaas::getCpu).reduce(Double::sum).get();
-        double totalMemory = paasList.parallelStream().filter(item->item.getMemory() != null).map(ReportPaas::getMemory).reduce(Double::sum).get();
-        double totalStorage = paasList.parallelStream().filter(item->item.getDisk() != null).map(ReportPaas::getDisk).reduce(Double::sum).get();
-        ServiceLimit serviceLimit = new ServiceLimit();
-        if (StringUtils.isNotBlank(nationalSpecialProject)){//国家专项限额
-            serviceLimit = this.getOne(new QueryWrapper<ServiceLimit>().lambda().eq(ServiceLimit::getNationalSpecialProject,nationalSpecialProject)
-                    .eq(ServiceLimit::getResourceType,ResourceType.PAAS.getCode()));
-        }else {
-            serviceLimit = this.getOne(new QueryWrapper<ServiceLimit>().lambda().eq(ServiceLimit::getArea,area)
-                    .eq(ServiceLimit::getPoliceCategory,policeCategory)
-                    .eq(ServiceLimit::getResourceType,ResourceType.PAAS.getCode()));
-        }
-        if(serviceLimit == null){
-            ServiceLimit newVo = new ServiceLimit();
-            if (StringUtils.isNotBlank(nationalSpecialProject)){
-                newVo.setNationalSpecialProject(nationalSpecialProject);
+
+        paasList.forEach(paas ->{
+            double paasCpu = paas.getCpu();
+            double paasMemory = paas.getMemory();
+            double paasStorage = paas.getDisk();
+            String description = null;
+            if (StringUtils.startsWith(paas.getResourceName(),"Redis")) {
+                description = "Redis";
+            }else if (StringUtils.startsWith(paas.getResourceName(),"ElasticSearch")) {
+                description = "ElasticSearch";
+            }else if (StringUtils.startsWith(paas.getResourceName(),"Libra")) {
+                description = "Libra";
             }else {
-                newVo.setArea(area);
-                newVo.setPoliceCategory(policeCategory);
+                description = "YARN";
             }
-            newVo.setCpu(totalCpu);
-            newVo.setMemory(totalMemory);
-            newVo.setStorage(totalStorage);
-            newVo.setResourceType(ResourceType.PAAS.getCode());
-            newVo.insert();
-        }else {
-            double cpu = serviceLimit.getCpu() + totalCpu;
-            double memory = serviceLimit.getMemory() + totalMemory;
-            double storage = serviceLimit.getStorage() + totalStorage;
-            this.update(new ServiceLimit(),new UpdateWrapper<ServiceLimit>().lambda().eq(ServiceLimit::getId,serviceLimit.getId())
-                    .set(ServiceLimit::getCpu,cpu)
-                    .set(ServiceLimit::getMemory,memory)
-                    .set(ServiceLimit::getStorage,storage));
-        }
+//            double totalCpu = paasList.parallelStream().filter(item->item.getCpu() != null).map(ReportPaas::getCpu).reduce(Double::sum).get();
+//            double totalMemory = paasList.parallelStream().filter(item->item.getMemory() != null).map(ReportPaas::getMemory).reduce(Double::sum).get();
+//            double totalStorage = paasList.parallelStream().filter(item->item.getDisk() != null).map(ReportPaas::getDisk).reduce(Double::sum).get();
+            ServiceLimit serviceLimit = new ServiceLimit();
+            if (StringUtils.isNotBlank(nationalSpecialProject)){//国家专项限额
+                serviceLimit = this.getOne(new QueryWrapper<ServiceLimit>().lambda().eq(ServiceLimit::getNationalSpecialProject,nationalSpecialProject)
+                        .eq(ServiceLimit::getResourceType,ResourceType.PAAS.getCode()).eq(ServiceLimit::getDescription,description));
+            }else {
+                serviceLimit = this.getOne(new QueryWrapper<ServiceLimit>().lambda().eq(ServiceLimit::getArea,area)
+                        .eq(ServiceLimit::getPoliceCategory,policeCategory)
+                        .eq(ServiceLimit::getResourceType,ResourceType.PAAS.getCode()).eq(ServiceLimit::getDescription,description));
+            }
+            if(serviceLimit == null){
+                ServiceLimit newVo = new ServiceLimit();
+                if (StringUtils.isNotBlank(nationalSpecialProject)){
+                    newVo.setNationalSpecialProject(nationalSpecialProject);
+                }else {
+                    newVo.setArea(area);
+                    newVo.setPoliceCategory(policeCategory);
+                }
+                newVo.setCpu(paasCpu);
+                newVo.setMemory(paasMemory);
+                newVo.setStorage(paasStorage);
+                newVo.setResourceType(ResourceType.PAAS.getCode());
+                newVo.setDescription(description);
+                newVo.insert();
+            }else {
+                double cpu = serviceLimit.getCpu() + paasCpu;
+                double memory = serviceLimit.getMemory() + paasMemory;
+                double storage = serviceLimit.getStorage() + paasStorage;
+                this.update(new ServiceLimit(),new UpdateWrapper<ServiceLimit>().lambda().eq(ServiceLimit::getId,serviceLimit.getId()).eq(ServiceLimit::getDescription,description)
+                        .set(ServiceLimit::getCpu,cpu)
+                        .set(ServiceLimit::getMemory,memory)
+                        .set(ServiceLimit::getStorage,storage));
+            }
+        });
     }
 
     /**
