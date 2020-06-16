@@ -42,29 +42,44 @@ public class ServiceLimitServiceImpl extends ServiceImpl<ServiceLimitMapper, Ser
 
 
     @Override
-    public ServiceLimit getQuota(String formNum, String area, String policeCategory) {
+    public ServiceLimit getQuota(String formNum, String area, String policeCategory, String nationalSpecialProject,String clusterName) {
 
         ServiceLimit quota = null;
         if(StringUtils.equals(formNum,"IAAS_TXYFWXG")){
             formNum = "IAAS_TXYFW";
         }
-        if(!StringUtils.equals(area,"省厅")){
+        if (StringUtils.isNotEmpty(nationalSpecialProject)){
             if(StringUtils.equals("PAAS",formNum)){
                 quota = this.getOne(new QueryWrapper<ServiceLimit>().select("sum(CPU) cpu,sum(MEMORY) memory,sum(STORAGE) storage").eq("RESOURCE_TYPE", ResourceType.PAAS.getCode())
-                        .eq("AREA",area));
+                        .eq("NATIONAL_SPECIAL_PROJECT",nationalSpecialProject));
             }else {
                 quota = this.getOne(new QueryWrapper<ServiceLimit>().select("sum(CPU) cpu,sum(MEMORY) memory,sum(STORAGE) storage").eq("FORM_NUM",formNum)
-                        .eq("AREA",area));
+                        .eq("NATIONAL_SPECIAL_PROJECT",nationalSpecialProject));
             }
         }else {
-            if(StringUtils.equals("PAAS",formNum)){
-                quota = this.getOne(new QueryWrapper<ServiceLimit>().lambda().eq(ServiceLimit::getArea,"省厅")
-                        .eq(ServiceLimit::getPoliceCategory,policeCategory)
-                        .eq(ServiceLimit::getResourceType,ResourceType.PAAS.getCode()));
+            if(!StringUtils.equals(area,"省厅")){
+                if(StringUtils.equals("PAAS",formNum)){
+                    if (StringUtils.equals("ElasticSearch",clusterName)||StringUtils.equals("Redis",clusterName)||StringUtils.equals("Libra",clusterName)) {
+                        quota = this.getOne(new QueryWrapper<ServiceLimit>().select("sum(CPU) cpu,sum(MEMORY) memory,sum(STORAGE) storage").eq("RESOURCE_TYPE", ResourceType.PAAS.getCode())
+                                .eq("AREA",area).eq("DESCRIPTION",clusterName));
+                    }else {
+                        quota = this.getOne(new QueryWrapper<ServiceLimit>().select("sum(CPU) cpu,sum(MEMORY) memory,sum(STORAGE) storage").eq("RESOURCE_TYPE", ResourceType.PAAS.getCode())
+                                .eq("AREA",area).eq("DESCRIPTION","YARN"));
+                    }
+                }else {
+                    quota = this.getOne(new QueryWrapper<ServiceLimit>().select("sum(CPU) cpu,sum(MEMORY) memory,sum(STORAGE) storage").eq("FORM_NUM",formNum)
+                            .eq("AREA",area));
+                }
             }else {
-                quota = this.getOne(new QueryWrapper<ServiceLimit>().lambda().eq(ServiceLimit::getArea,"省厅")
-                        .eq(ServiceLimit::getPoliceCategory,policeCategory)
-                        .eq(ServiceLimit::getFormNum,formNum));
+                if(StringUtils.equals("PAAS",formNum)){
+                    quota = this.getOne(new QueryWrapper<ServiceLimit>().lambda().eq(ServiceLimit::getArea,"省厅")
+                            .eq(ServiceLimit::getPoliceCategory,policeCategory)
+                            .eq(ServiceLimit::getResourceType,ResourceType.PAAS.getCode()));
+                }else {
+                    quota = this.getOne(new QueryWrapper<ServiceLimit>().lambda().eq(ServiceLimit::getArea,"省厅")
+                            .eq(ServiceLimit::getPoliceCategory,policeCategory)
+                            .eq(ServiceLimit::getFormNum,formNum));
+                }
             }
         }
         return quota;
