@@ -37,15 +37,15 @@ public class PaasZhzyServiceImpl extends ServiceImpl<PaasZhzyMapper, PaasZhzy> i
         paasYarn.setMemoryTotal(BigDecimalUtil.div(paasYarn.getMemoryTotal(),1024).doubleValue());
         paasYarn.setMemoryUsed(BigDecimalUtil.div(paasYarn.getMemoryUsed(),1024).doubleValue());
 
-        PaasZhzy paasElasticSearch = paasZhzyMapper.getPaasElasticSearch(area, police);
-        paasElasticSearch.setElasticsearchCpuUsed(Double.parseDouble(df.format(paasElasticSearch.getElasticsearchCpuTotal()*paasElasticSearch.getElasticsearchCpuUsage()*0.01)));
-        paasElasticSearch.setElasticsearchMemoryTotal(BigDecimalUtil.div(paasElasticSearch.getElasticsearchMemoryTotal(),1024).doubleValue());
-        if (paasElasticSearch.getElasticsearchMemoryTotal()!=0) {
-            paasElasticSearch.setElasticsearchMemoryUsage(BigDecimalUtil.div(paasElasticSearch.getElasticsearchMemoryUsed(),paasElasticSearch.getElasticsearchMemoryTotal()).doubleValue());
+        PaasZhzy paasElasticsearch = paasZhzyMapper.getPaasElasticsearch(area, police);
+        paasElasticsearch.setElasticsearchCpuUsed(Double.parseDouble(df.format(paasElasticsearch.getElasticsearchCpuTotal()*paasElasticsearch.getElasticsearchCpuUsage()*0.01)));
+        paasElasticsearch.setElasticsearchMemoryTotal(BigDecimalUtil.div(paasElasticsearch.getElasticsearchMemoryTotal(),1024).doubleValue());
+        if (paasElasticsearch.getElasticsearchMemoryTotal()!=0) {
+            paasElasticsearch.setElasticsearchMemoryUsage(BigDecimalUtil.div(paasElasticsearch.getElasticsearchMemoryUsed(),paasElasticsearch.getElasticsearchMemoryTotal()).doubleValue());
         }
-        paasElasticSearch.setElasticsearchDiskAvailable(BigDecimalUtil.div(paasElasticSearch.getElasticsearchDiskAvailable(),1024*1024*1024).doubleValue());
-        if (paasElasticSearch.getElasticsearchDiskAvailable()!=0) {
-            paasElasticSearch.setElasticsearchDiskUsage(BigDecimalUtil.div(paasElasticSearch.getElasticsearchDiskUsed(),paasElasticSearch.getElasticsearchDiskAvailable()).doubleValue());
+        paasElasticsearch.setElasticsearchDiskAvailable(BigDecimalUtil.div(paasElasticsearch.getElasticsearchDiskAvailable(),1024*1024*1024).doubleValue());
+        if (paasElasticsearch.getElasticsearchDiskAvailable()!=0) {
+            paasElasticsearch.setElasticsearchDiskUsage(BigDecimalUtil.div(paasElasticsearch.getElasticsearchDiskUsed(),paasElasticsearch.getElasticsearchDiskAvailable()).doubleValue());
         }
 
         PaasZhzy paasRedis = paasZhzyMapper.getPaasRedis(area, police);
@@ -56,7 +56,7 @@ public class PaasZhzyServiceImpl extends ServiceImpl<PaasZhzyMapper, PaasZhzy> i
         paasLibra.setMemoryUsed(BigDecimalUtil.div(paasLibra.getMemoryUsed(),1024).doubleValue());
 
         paasZhzyMap.put("YARN资源",paasYarn);
-        paasZhzyMap.put("ElasticSearch",paasElasticSearch);
+        paasZhzyMap.put("Elasticsearch",paasElasticsearch);
         paasZhzyMap.put("Redis",paasRedis);
         paasZhzyMap.put("Libra集群",paasLibra);
         return paasZhzyMap;
@@ -80,8 +80,8 @@ public class PaasZhzyServiceImpl extends ServiceImpl<PaasZhzyMapper, PaasZhzy> i
             }
             paasZhzy.setMemoryTotal(BigDecimalUtil.div(paasZhzy.getMemoryTotal(),1024).doubleValue());
             paasZhzy.setMemoryUsed(BigDecimalUtil.div(paasZhzy.getMemoryUsed(),1024).doubleValue());
-        }else if (StringUtils.equals("ElasticSearch",clusterName)) {
-            paasZhzy = paasZhzyMapper.appClusterDetailsByElasticSearch(appName);
+        }else if (StringUtils.equals("Elasticsearch",clusterName)) {
+            paasZhzy = paasZhzyMapper.appClusterDetailsByElasticsearch(appName);
             if (paasZhzy.getElasticsearchCpuTotal()!=null) {
                 paasZhzy.setElasticsearchCpuUsed(Double.parseDouble(df.format(paasZhzy.getElasticsearchCpuTotal()*paasZhzy.getElasticsearchCpuUsage()*0.01)));
             }

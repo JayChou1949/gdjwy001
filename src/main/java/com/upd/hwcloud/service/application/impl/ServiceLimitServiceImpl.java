@@ -59,7 +59,7 @@ public class ServiceLimitServiceImpl extends ServiceImpl<ServiceLimitMapper, Ser
         }else {
             if(!StringUtils.equals(area,"省厅")){
                 if(StringUtils.equals("PAAS",formNum)){
-                    if (StringUtils.equals("ElasticSearch",clusterName)||StringUtils.equals("Redis",clusterName)||StringUtils.equals("Libra",clusterName)) {
+                    if (StringUtils.equals("Elasticsearch",clusterName)||StringUtils.equals("Redis",clusterName)||StringUtils.equals("Libra",clusterName)) {
                         quota = this.getOne(new QueryWrapper<ServiceLimit>().select("sum(CPU) cpu,sum(MEMORY) memory,sum(STORAGE) storage").eq("RESOURCE_TYPE", ResourceType.PAAS.getCode())
                                 .eq("AREA",area).eq("DESCRIPTION",clusterName));
                     }else {
@@ -130,8 +130,8 @@ public class ServiceLimitServiceImpl extends ServiceImpl<ServiceLimitMapper, Ser
             String description = null;
             if (StringUtils.startsWith(paas.getResourceName(),"Redis")) {
                 description = "Redis";
-            }else if (StringUtils.startsWith(paas.getResourceName(),"ElasticSearch")) {
-                description = "ElasticSearch";
+            }else if (StringUtils.startsWith(paas.getResourceName(),"Elasticsearch")) {
+                description = "Elasticsearch";
             }else if (StringUtils.startsWith(paas.getResourceName(),"Libra")) {
                 description = "Libra";
             }else {
