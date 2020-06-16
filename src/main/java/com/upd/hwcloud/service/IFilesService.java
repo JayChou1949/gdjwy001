@@ -50,4 +50,6 @@ public interface IFilesService extends IService<Files> {
    void refFiles(List<Files> files, String refId);
 
     List<Files> getFilesByRefId(String refId);
+
+    void hotfix();
 }

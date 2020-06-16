@@ -104,9 +104,11 @@ public class DaasApigServiceImpl implements IDaasApigService {
             Response userLoginResponse = OkHttpUtils.postJson(client, loginUrl, JSONObject.toJSONString(userRequest));
             String userJsonStr = userLoginResponse.body().string();
             if (!userLoginResponse.isSuccessful()) {
+                userLoginResponse.close();
                 throw new BaseException("发布失败,失败原因:用户登录失败");
             }
             final String userToken = userLoginResponse.header("x-subject-token");
+            userLoginResponse.close();
             LoginResponse user = JSONObject.parseObject(userJsonStr, LoginResponse.class);
             // 带有用户token的OkHttpClient
             OkHttpClient userClient = initOkHttpClient();
@@ -123,9 +125,11 @@ public class DaasApigServiceImpl implements IDaasApigService {
         String managerJsonStr = managerLoginResponse.body().string();
         if (!managerLoginResponse.isSuccessful()) {
             logger.error("管理员登录失败: {}", managerJsonStr);
+            managerLoginResponse.close();
             throw new BaseException(401, "订购失败,失败原因:管理员登录失败");
         }
         final String managerToken = managerLoginResponse.header("x-subject-token");
+        managerLoginResponse.close();
         // 带有管理员token的OkHttpClient
         OkHttpClient managerClient = initOkHttpClient();
         managerClient = managerClient.newBuilder().addInterceptor(new TokenInterceptor(managerToken)).build();
@@ -233,9 +237,11 @@ public class DaasApigServiceImpl implements IDaasApigService {
         String managerJsonStr = managerLoginResponse.body().string();
         if (!managerLoginResponse.isSuccessful()) {
             logger.info(managerJsonStr);
+            managerLoginResponse.close();
             throw new BaseException(401, "订购失败,失败原因:管理员登录失败");
         }
         final String managerToken = managerLoginResponse.header("x-subject-token");
+        managerLoginResponse.close();
         // 带有管理员token的OkHttpClient
         OkHttpClient managerClient = initOkHttpClient();
         managerClient = managerClient.newBuilder().addInterceptor(new TokenInterceptor(managerToken)).build();
@@ -259,8 +265,10 @@ public class DaasApigServiceImpl implements IDaasApigService {
         logger.error("获取登录用户的userId======="+resultStr);
         if (!response.isSuccessful()) {
             logger.error(resultStr);
+            response.close();
             throw new BaseException(401, "订购失败,失败原因:获取用户id失败");
         }
+        response.close();
         ProjectListNew projectListNew = JSONObject.parseObject(resultStr, ProjectListNew.class);
         if (projectListNew.getTotal() > 1) {
             throw new BaseException(401, "订购失败,失败原因:获取用户id数量不正常");
@@ -273,8 +281,10 @@ public class DaasApigServiceImpl implements IDaasApigService {
         logger.error("获取个人所有projectid======"+resultStr1);
         if (!response1.isSuccessful()) {
             logger.error(resultStr1);
+            response1.close();
             throw new BaseException(401, "订购失败,失败原因:获取状态正常的项目失败");
         }
+        response1.close();
         ProjectList projectList = JSONObject.parseObject(resultStr1, ProjectList.class);
         List<ProjectList.Project> projects = projectList.getProjects();
         List<ProjectList.Project> projectsNormal = new ArrayList<>();
@@ -309,9 +319,11 @@ public class DaasApigServiceImpl implements IDaasApigService {
             daasApplication.setErrorMsg("绑定失败");
             daasApplication.setErrorJson(resultStr);
             daasApplication.updateById();
+            response.close();
             throw new BaseException("订购失败,失败原因:绑定失败");
         }
         ServiceBindingResponse binding = JSONObject.parseObject(resultStr, ServiceBindingResponse.class);
+        response.close();
         return binding;
     }
 
@@ -324,9 +336,11 @@ public class DaasApigServiceImpl implements IDaasApigService {
             daasApplication.setErrorMsg("审核失败");
             daasApplication.setErrorJson(resultStr);
             daasApplication.updateById();
+            response.close();
             throw new BaseException("订购失败,失败原因:审核失败");
         }
         ServiceInstance instance = JSONObject.parseObject(resultStr, ServiceInstance.class);
+        response.close();
         return instance;
     }
 
@@ -360,8 +374,10 @@ public class DaasApigServiceImpl implements IDaasApigService {
             daasApplication.setErrorMsg("订购服务失败");
             daasApplication.setErrorJson(resultStr);
             daasApplication.updateById();
+            response.close();
             throw new BaseException("订购服务失败");
         }
+        response.close();
         // 保存实例id
         ServiceInstance instance = JSONObject.parseObject(resultStr, ServiceInstance.class);
         daasApplication.setInstanceGuid(instance.getInstance_guid());
@@ -374,8 +390,9 @@ public class DaasApigServiceImpl implements IDaasApigService {
      */
     private void saveUserData(OkHttpClient client, DaasApplication daasApplication, String instanceGuid) {
         String url = cscBaseUrlV2 + "/service_instances/" + instanceGuid;
+        Response response = null;
         try {
-            Response response = OkHttpUtils.get(client, url, null);
+            response = OkHttpUtils.get(client, url, null);
             String resultStr = response.body().string();
             if (!response.isSuccessful()) {
                 logger.error("获取api列表失败: {}", resultStr);
@@ -387,6 +404,10 @@ public class DaasApigServiceImpl implements IDaasApigService {
             daasApplication.updateById();
         } catch (Exception e) {
             logger.error("获取api列表失败", e);
+        } finally {
+            if (response!=null){
+                response.close();
+            }
         }
     }
 
@@ -407,8 +428,10 @@ public class DaasApigServiceImpl implements IDaasApigService {
             daasApplication.setErrorMsg("创建应用失败");
             daasApplication.setErrorJson(resultStr);
             daasApplication.updateById();
+            response.close();
             throw new BaseException("订购失败,失败原因:创建应用失败");
         }
+        response.close();
         AppDetail appDetail = JSONObject.parseObject(resultStr, AppDetail.class);
         return appDetail;
     }
@@ -423,9 +446,11 @@ public class DaasApigServiceImpl implements IDaasApigService {
             daasApplication.setErrorMsg("获取应用列表失败");
             daasApplication.setErrorJson(resultStr);
             daasApplication.updateById();
+            response.close();
             throw new BaseException("订购失败,失败原因:获取应用列表失败");
         }
         AppList appList = JSONObject.parseObject(resultStr, AppList.class);
+        response.close();
         return appList;
     }
 
@@ -437,9 +462,11 @@ public class DaasApigServiceImpl implements IDaasApigService {
             daasApplication.setErrorMsg("获取服务详情失败");
             daasApplication.setErrorJson(resultStr);
             daasApplication.updateById();
+            response.close();
             throw new BaseException("订购失败,失败原因:获取服务详情失败");
         }
         ServiceDetail detail = JSONObject.parseObject(resultStr, ServiceDetail.class);
+        response.close();
         return detail;
     }
 

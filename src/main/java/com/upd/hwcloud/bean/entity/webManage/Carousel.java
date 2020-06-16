@@ -82,6 +82,12 @@ public class Carousel extends Model<Carousel> {
     private String imageUrl;
 
     /**
+     * 通过nginx获取地址
+     */
+    @TableField(exist = false)
+    private String realUrl;
+
+    /**
      * 展示级别：1-省厅首页,2-地市首页 ,3-警种首页，4-国家专项'
      */
     @TableField("PROVINCIAL")
@@ -243,6 +249,14 @@ public class Carousel extends Model<Carousel> {
 
     public void setProject(String project) {
         this.project = project;
+    }
+
+    public String getRealUrl() {
+        return realUrl;
+    }
+
+    public void setRealUrl(String realUrl) {
+        this.realUrl = realUrl;
     }
 
     @Override

@@ -155,8 +155,10 @@ public class PaasApigServiceImpl implements IPaasApigService {
         GovDto govDto = JSONObject.parseObject(resultStr, GovDto.class);
         if (!response.isSuccessful()) {
             logger.error(govDto.toString());
+            response.close();
             throw new BaseException("查询机构id失败");
         }
+        response.close();
         return govDto.getId();
     }
 
@@ -181,10 +183,12 @@ public class PaasApigServiceImpl implements IPaasApigService {
         ResponseStatus responseStatus = JSONObject.parseObject(resultStr, ResponseStatus.class);
         if (!response.isSuccessful()) {
             logger.error(responseStatus.getMessage());
+            response.close();
             throw new BaseException("添加政务人员失败");
         }else {
             logger.error("添加政务人员: {}",responseStatus.getMessage());
         }
+        response.close();
     }
 
     private void addGovern(OkHttpClient okHttpClient,PassTyyhUser passTyyhUser) throws IOException {
@@ -200,10 +204,12 @@ public class PaasApigServiceImpl implements IPaasApigService {
         ResponseStatus responseStatus = JSONObject.parseObject(resultStr, ResponseStatus.class);
         if (!response.isSuccessful()) {
             logger.error(responseStatus.getMessage());
+            response.close();
             throw new BaseException("添加政务机构失败");
         }else {
             logger.error("添加政务机构: {}",responseStatus.getMessage());
         }
+        response.close();
     }
 
     private App getAppCode(String appName){
@@ -230,10 +236,12 @@ public class PaasApigServiceImpl implements IPaasApigService {
         ResponseStatus responseStatus = JSONObject.parseObject(resultStr, ResponseStatus.class);
         if (!response.isSuccessful()) {
             logger.error(responseStatus.getMessage());
+            response.close();
             throw new BaseException("添加服务商人员失败");
         }else {
             logger.error("添加服务商人员: {}",responseStatus.getMessage());
         }
+        response.close();
     }
     // 添加厂商
     private void addVentor(OkHttpClient okHttpClient,ApplicationInfo info) throws IOException {
@@ -251,10 +259,12 @@ public class PaasApigServiceImpl implements IPaasApigService {
         ResponseStatus responseStatus = JSONObject.parseObject(resultStr, ResponseStatus.class);
         if (!response.isSuccessful()) {
             logger.error(responseStatus.getMessage());
+            response.close();
             throw new BaseException("添加厂商失败");
         }else {
             logger.error("添加厂商: {}",responseStatus.getMessage());
         }
+        response.close();
     }
     //  添加应用
     private String addApp(OkHttpClient okHttpClient,ApplicationInfo info) throws IOException {
@@ -280,10 +290,12 @@ public class PaasApigServiceImpl implements IPaasApigService {
         ResponseStatus responseStatus = JSONObject.parseObject(resultStr, ResponseStatus.class);
         if (!response.isSuccessful()) {
             logger.error(responseStatus.getMessage());
+            response.close();
             throw new BaseException("添加应用失败");
         }else {
             logger.error("添加应用: {}",responseStatus.getMessage());
         }
+        response.close();
         return responseStatus.getResult();
     }
 
@@ -329,9 +341,11 @@ public class PaasApigServiceImpl implements IPaasApigService {
             String userJsonStr = userLoginResponse.body().string();
             if (!userLoginResponse.isSuccessful()) {
                 errorLog(formNum, "用户登录失败", userJsonStr, info.getId(), implHandler);
+                userLoginResponse.close();
                 throw new BaseException("发布失败,失败原因:用户登录失败");
             }
             final String userToken = userLoginResponse.header("x-subject-token");
+            userLoginResponse.close();
             LoginResponse user = JSONObject.parseObject(userJsonStr, LoginResponse.class);
             // 带有用户token的OkHttpClient
             OkHttpClient userClient = initOkHttpClient();
@@ -348,10 +362,11 @@ public class PaasApigServiceImpl implements IPaasApigService {
         String managerJsonStr = managerLoginResponse.body().string();
         if (!managerLoginResponse.isSuccessful()) {
             errorLog(formNum, "管理员登录失败", managerJsonStr, info.getId(), implHandler);
+            managerLoginResponse.close();
             throw new BaseException("发布失败,失败原因:管理员登录失败");
         }
         final String managerToken = managerLoginResponse.header("x-subject-token");
-
+        managerLoginResponse.close();
         // 带有管理员token的OkHttpClient
         OkHttpClient managerClient = initOkHttpClient();
         managerClient = managerClient.newBuilder().addInterceptor(new TokenInterceptor(managerToken)).build();
@@ -472,9 +487,11 @@ public class PaasApigServiceImpl implements IPaasApigService {
         String userJsonStr = userLoginResponse.body().string();
         if (!userLoginResponse.isSuccessful()) {
             logger.error("用户登录失败: {}", userJsonStr);
+            userLoginResponse.close();
             throw new BaseException(401, "订购失败,失败原因:用户登录失败");
         }
         final String userToken = userLoginResponse.header("x-subject-token");
+        userLoginResponse.close();
         LoginResponse user = JSONObject.parseObject(userJsonStr, LoginResponse.class);
 
         // 2.管理员用户登录
@@ -483,10 +500,11 @@ public class PaasApigServiceImpl implements IPaasApigService {
         String managerJsonStr = managerLoginResponse.body().string();
         if (!managerLoginResponse.isSuccessful()) {
             logger.error("管理员登录失败: {}", managerJsonStr);
+            managerLoginResponse.close();
             throw new BaseException(401, "订购失败,失败原因:管理员登录失败");
         }
         final String managerToken = managerLoginResponse.header("x-subject-token");
-
+        managerLoginResponse.close();
         // 带有用户token的OkHttpClient
         OkHttpClient userClient = initOkHttpClient();
         userClient = userClient.newBuilder().addInterceptor(new TokenInterceptor(userToken)).build();
@@ -577,9 +595,11 @@ public class PaasApigServiceImpl implements IPaasApigService {
             serviceReturnBean.setError(true);
             serviceReturnBean.setErrorMessage("用户信息验证失败");
             logger.error("用户登录失败: {}", userJsonStr);
+            userLoginResponse.close();
             throw new BaseException(401, "发布服务,失败原因:用户登录失败");
         }
         final String userToken = userLoginResponse.header("x-subject-token");
+        userLoginResponse.close();
         // 2.管理员用户登录
         LoginRequest managerRequest = this.buildManagerRequest2();
         Response managerLoginResponse = OkHttpUtils.postJson(client, loginUrl, JSONObject.toJSONString(managerRequest));
@@ -588,9 +608,11 @@ public class PaasApigServiceImpl implements IPaasApigService {
             serviceReturnBean.setError(true);
             serviceReturnBean.setErrorMessage("管理员信息验证失败");
             logger.error("管理员登录失败: {}", managerJsonStr);
+            managerLoginResponse.close();
             throw new BaseException(401, "发布服务,失败原因:管理员登录失败");
         }
         final String managerToken = managerLoginResponse.header("x-subject-token");
+        managerLoginResponse.close();
         // 带有用户token的OkHttpClient
         OkHttpClient userClient = initOkHttpClient();
         userClient = userClient.newBuilder().addInterceptor(new TokenInterceptor(userToken)).build();
@@ -681,12 +703,14 @@ public class PaasApigServiceImpl implements IPaasApigService {
             serviceReturnBean.setError(true);
             serviceReturnBean.setErrorMessage("查询后端服务失败");
             logger.error("查询后端服务: {}", resultStr);
+            response.close();
             throw new BaseException("查询后端服务失败");
         } else {
             Map<String, Object> returnMap = JSONObject.parseObject(resultStr, new TypeReference<Map<String, Object>>() {
             });
             returnList.add(returnMap);
         }
+        response.close();
         return returnList;
     }
 
@@ -711,6 +735,7 @@ public class PaasApigServiceImpl implements IPaasApigService {
                     logger.error("删除api产品: {}", resultStr);
                     logger.error("删除失败的api产品ID:" + apiProductId);
                 }
+                response.close();
             }
         }
         //  获取创建好的api
@@ -727,6 +752,7 @@ public class PaasApigServiceImpl implements IPaasApigService {
                     logger.error("删除api: {}", resultStr);
                     logger.error("删除失败的apiID:" + apiId);
                 }
+                response.close();
             }
         }
         //  获取创建好的后端服务
@@ -743,6 +769,7 @@ public class PaasApigServiceImpl implements IPaasApigService {
                     logger.error("删除后端服务: {}", resultStr);
                     logger.error("删除失败的后端服务ID:" + serviceId);
                 }
+                response.close();
             }
         }
     }
@@ -767,8 +794,10 @@ public class PaasApigServiceImpl implements IPaasApigService {
             serviceReturnBean.setError(true);
             serviceReturnBean.setErrorMessage("用户信息验证失败");
             logger.error("服务失败,失败原因:用户登录失败");
+            userLoginResponse.close();
             throw new BaseException(401, "订购失败,失败原因:用户登录失败");
         }
+        userLoginResponse.close();
         LoginResponse user = JSONObject.parseObject(userJsonStr, LoginResponse.class);
         // 2.管理员用户登录
         LoginRequest managerRequest = this.buildManagerRequest();
@@ -778,9 +807,11 @@ public class PaasApigServiceImpl implements IPaasApigService {
             serviceReturnBean.setError(true);
             serviceReturnBean.setErrorMessage("管理员信息验证失败");
             logger.error("发布服务失败,失败原因:管理员登录失败:{}", managerJsonStr);
+            managerLoginResponse.close();
             throw new BaseException(401, "发布服务失败,失败原因:管理员登录失败");
         }
         final String managerToken = managerLoginResponse.header("x-subject-token");
+        managerLoginResponse.close();
         // 带有管理员token的OkHttpClient
         OkHttpClient managerClient = initOkHttpClient();
         managerClient = managerClient.newBuilder().addInterceptor(new TokenInterceptor(managerToken)).build();
@@ -803,8 +834,10 @@ public class PaasApigServiceImpl implements IPaasApigService {
             serviceReturnBean.setError(true);
             serviceReturnBean.setErrorMessage("管理员信息验证失败");
             logger.error("发布服务失败,失败原因:管理员登录失败");
+            response.close();
             throw new BaseException(401, "订购失败,失败原因:获取状态正常的项目失败");
         }
+        response.close();
         ProjectList projectList = JSONObject.parseObject(resultStr, ProjectList.class);
         List<ProjectList.Project> projects = projectList.getProjects();
         if (projects == null || projects.isEmpty()) {
@@ -838,11 +871,13 @@ public class PaasApigServiceImpl implements IPaasApigService {
             serviceReturnBean.setError(true);
             serviceReturnBean.setErrorMessage("服务审核失败");
             logger.error("服务审核: {}", resultStr);
+            response.close();
             throw new BaseException("服务审核");
         } else {
             returnMap = JSONObject.parseObject(resultStr, new TypeReference<Map<String, Object>>() {
             });
         }
+        response.close();
         return returnMap;
     }
 
@@ -856,8 +891,10 @@ public class PaasApigServiceImpl implements IPaasApigService {
             serviceReturnBean.setError(true);
             serviceReturnBean.setErrorMessage("查询api产品详情失败");
             logger.error("查询api产品详情: {}", resultStr);
+            response.close();
             throw new BaseException("查询api产品详情失败");
         }
+        response.close();
         JSONObject jsonObject = JSONObject.parseObject(resultStr);
         List<Map<String, String>> plans = (List<Map<String, String>>) jsonObject.get("plans");
         return plans.get(0);
@@ -891,6 +928,7 @@ public class PaasApigServiceImpl implements IPaasApigService {
                     reqpublishService.put("sdk_url", upFileUrl);
                 }
             }
+            fileResponse.close();
         }
 
         //  添加请求参数
@@ -951,12 +989,14 @@ public class PaasApigServiceImpl implements IPaasApigService {
             serviceReturnBean.setError(true);
             serviceReturnBean.setErrorMessage("服务发布失败");
             logger.error("服务发布: {}", resultStr);
+            response.close();
             deleteCreated(userClient, okId);
             throw new BaseException("服务发布失败");
         } else {
             returnMap = JSONObject.parseObject(resultStr, new TypeReference<Map<String, Object>>() {
             });
         }
+        response.close();
         return returnMap;
     }
 
@@ -983,8 +1023,10 @@ public class PaasApigServiceImpl implements IPaasApigService {
             serviceReturnBean.setError(true);
             serviceReturnBean.setErrorMessage("发布API产品失败");
             logger.error("发布API产品: {}", resultStr);
+            response.close();
             return false;
         }
+        response.close();
         return true;
     }
 
@@ -1022,6 +1064,7 @@ public class PaasApigServiceImpl implements IPaasApigService {
         if (!response.isSuccessful()) {
             serviceReturnBean.setError(true);
             serviceReturnBean.setErrorMessage("部署API产品失败");
+            response.close();
             deleteCreated(userClient, okId);
             logger.error("部署API产品: {}", resultStr);
             throw new BaseException("部署API产品失败");
@@ -1029,6 +1072,7 @@ public class PaasApigServiceImpl implements IPaasApigService {
             returnMap = JSONObject.parseObject(resultStr, new TypeReference<Map<String, Object>>() {
             });
         }
+        response.close();
         return returnMap;
     }
 
@@ -1068,12 +1112,14 @@ public class PaasApigServiceImpl implements IPaasApigService {
             serviceReturnBean.setError(true);
             serviceReturnBean.setErrorMessage("绑定API失败");
             logger.error("为API产品绑定API: {}", resultStr);
+            response.close();
             deleteCreated(userClient, okId);
             throw new BaseException("为API产品绑定API失败");
         } else {
             returnMap = JSONObject.parseObject(resultStr, new TypeReference<Map<String, Object>>() {
             });
         }
+        response.close();
         return returnMap;
     }
 
@@ -1103,6 +1149,7 @@ public class PaasApigServiceImpl implements IPaasApigService {
             serviceReturnBean.setError(true);
             serviceReturnBean.setErrorMessage("创建api产品失败");
             logger.error("创建api产品: {}", resultStr);
+            response.close();
             deleteCreated(userClient, okId);
             throw new BaseException("创建api产品失败");
         } else {
@@ -1112,6 +1159,7 @@ public class PaasApigServiceImpl implements IPaasApigService {
             idList.add(id);
         }
         okId.put("api产品", idList);
+        response.close();
         return returnMap;
     }
 
@@ -1154,9 +1202,11 @@ public class PaasApigServiceImpl implements IPaasApigService {
                 serviceReturnBean.setError(true);
                 serviceReturnBean.setErrorMessage("创建api失败");
                 logger.error("创建api: {}", resultStr);
+                response.close();
                 deleteCreated(userClient, okId);
                 throw new BaseException("创建api失败");
             } else {
+                response.close();
                 Map<String, Object> returnCreateApi = JSONObject.parseObject(resultStr, new TypeReference<Map<String, Object>>() {
                 });
                 returnList.add(returnCreateApi);
@@ -1228,12 +1278,14 @@ public class PaasApigServiceImpl implements IPaasApigService {
                     serviceReturnBean.setError(true);
                     serviceReturnBean.setErrorMessage("为api添加操作失败");
                     logger.error("为api添加操作: {}", resultStr);
+                    response.close();
                     deleteCreated(userClient, okId);
                     throw new BaseException("为api添加操作失败");
                 } else {
                     returnList.add(JSONObject.parseObject(resultStr, new TypeReference<Map<String, Object>>() {
                     }));
                 }
+                response.close();
             } else {
                 serviceReturnBean.setError(true);
                 serviceReturnBean.setErrorMessage("为api添加操作失败");
@@ -1374,6 +1426,7 @@ public class PaasApigServiceImpl implements IPaasApigService {
                 serviceReturnBean.setError(true);
                 serviceReturnBean.setErrorMessage("创建后端服务失败");
                 logger.error("创建后端服务: {}", resultStr);
+                response.close();
                 deleteCreated(userClient, okId);
                 throw new BaseException("创建后端服务失败");
             } else {
@@ -1384,6 +1437,7 @@ public class PaasApigServiceImpl implements IPaasApigService {
                 returnList.add(returnMap);
                 okId.put("后端服务", idList);
             }
+            response.close();
         }
         return returnList;
     }
@@ -1405,6 +1459,7 @@ public class PaasApigServiceImpl implements IPaasApigService {
             serviceReturnBean.setError(true);
             serviceReturnBean.setErrorMessage("获取微服务Id失败");
             logger.error("获取微服务Id: {}", resultStr);
+            response.close();
             throw new BaseException("获取微服务Id失败");
         } else {
             Map<String, Object> returnMap = JSONObject.parseObject(resultStr, new TypeReference<Map<String, Object>>() {
@@ -1415,10 +1470,12 @@ public class PaasApigServiceImpl implements IPaasApigService {
                 String name = (String) map.get("name");
                 if (microgw.equals(name)) {
                     String id = (String) map.get("id");
+                    response.close();
                     return id;
                 }
             }
         }
+        response.close();
         return null;
     }
 
@@ -1435,8 +1492,10 @@ public class PaasApigServiceImpl implements IPaasApigService {
             logger.error("===resultStr===:" + resultStr);
             if (!response.isSuccessful()) {
                 logger.error("获取api列表失败: {}", resultStr);
+                response.close();
                 return;
             }
+            response.close();
             InstanceDetail instanceDetail = JSONObject.parseObject(resultStr, InstanceDetail.class);
             String userData = instanceDetail.getUser_data();
             if (implHandler instanceof IPaasFseqsqmImplService) {
@@ -1533,8 +1592,10 @@ public class PaasApigServiceImpl implements IPaasApigService {
         //todo:普通用户请求token失败处理
         if (!userLoginResponse.isSuccessful()) {
             errorLog(formNum, "用户登录失败", userJsonStr, info.getId(), implHandler);
+            userLoginResponse.close();
             throw new BaseException(401, "订购失败,失败原因:用户登录失败");
         }
+        userLoginResponse.close();
         LoginResponse user = JSONObject.parseObject(userJsonStr, LoginResponse.class);
         // 2.管理员用户登录
         LoginRequest managerRequest = this.buildManagerRequest();
@@ -1542,10 +1603,11 @@ public class PaasApigServiceImpl implements IPaasApigService {
         String managerJsonStr = managerLoginResponse.body().string();
         if (!managerLoginResponse.isSuccessful()) {
             errorLog(formNum, "管理员登录失败", managerJsonStr, info.getId(), implHandler);
+            managerLoginResponse.close();
             throw new BaseException(401, "订购失败,失败原因:管理员登录失败");
         }
         final String managerToken = managerLoginResponse.header("x-subject-token");
-
+        managerLoginResponse.close();
         // 带有管理员token的OkHttpClient
         OkHttpClient managerClient = initOkHttpClient();
         managerClient = managerClient.newBuilder().addInterceptor(new TokenInterceptor(managerToken)).build();
@@ -1567,8 +1629,10 @@ public class PaasApigServiceImpl implements IPaasApigService {
         if (!response.isSuccessful()) {
             logger.error(resultStr);
             errorLog(formNum, "获取状态正常的项目失败", resultStr, infoId,implHandler);
+            response.close();
             throw new BaseException(401, "订购失败,失败原因:获取状态正常的项目失败");
         }
+        response.close();
         ProjectList projectList = JSONObject.parseObject(resultStr, ProjectList.class);
         List<ProjectList.Project> projects = projectList.getProjects();
         if (projects == null || projects.isEmpty()) {
@@ -1601,10 +1665,11 @@ public class PaasApigServiceImpl implements IPaasApigService {
         String managerJsonStr = managerLoginResponse.body().string();
         if (!managerLoginResponse.isSuccessful()) {
             errorLog(formNum, "管理员登录失败", managerJsonStr, info.getId(), implHandler);
+            managerLoginResponse.close();
             throw new BaseException(401, "订购失败,失败原因:管理员登录失败");
         }
         final String managerToken = managerLoginResponse.header("x-subject-token");
-
+        managerLoginResponse.close();
         // 带有管理员token的OkHttpClient
         OkHttpClient managerClient = initOkHttpClient();
         managerClient = managerClient.newBuilder().addInterceptor(new TokenInterceptor(managerToken)).build();
@@ -1632,8 +1697,10 @@ public class PaasApigServiceImpl implements IPaasApigService {
         if (!response.isSuccessful()) {
             logger.error(resultStr);
             errorLog(formNum, "获取用户id失败", resultStr, infoId, implHandler);
+            response.close();
             throw new BaseException(401, "订购失败,失败原因:获取用户id失败");
         }
+        response.close();
         ProjectListNew projectListNew = JSONObject.parseObject(resultStr, ProjectListNew.class);
         if (projectListNew.getTotal() > 1) {
             errorLog(formNum, "total返回数量不正常", resultStr, infoId, implHandler);
@@ -1648,8 +1715,10 @@ public class PaasApigServiceImpl implements IPaasApigService {
         if (!response1.isSuccessful()) {
             logger.error(resultStr1);
             errorLog(formNum, "获取状态正常的项目失败", resultStr1, infoId, implHandler);
+            response1.close();
             throw new BaseException(401, "订购失败,失败原因:获取状态正常的项目失败");
         }
+        response1.close();
         ProjectList projectList = JSONObject.parseObject(resultStr1, ProjectList.class);
         List<ProjectList.Project> projects = projectList.getProjects();
         List<ProjectList.Project> projectsNormal = new ArrayList<>();
@@ -1697,9 +1766,11 @@ public class PaasApigServiceImpl implements IPaasApigService {
         if (!response.isSuccessful()) {
             FormNum formNum = FormNum.getFormNumByInfo(info);
             errorLog(formNum, "绑定失败", resultStr, info.getId(), implHandler);
+            response.close();
             throw new BaseException("订购失败,失败原因:绑定失败");
         }
         ServiceBindingResponse binding = JSONObject.parseObject(resultStr, ServiceBindingResponse.class);
+        response.close();
         return binding;
     }
 
@@ -1729,9 +1800,10 @@ public class PaasApigServiceImpl implements IPaasApigService {
         String resultStr = response.body().string();
         if (!response.isSuccessful()) {
             errorLog(formNum, "绑定失败", resultStr, infoId, implHandler);
+            response.close();
             throw new BaseException("订购失败,失败原因:绑定失败");
         }
-
+        response.close();
         JSONObject resultJson = JSONObject.parseObject(resultStr);
         JSONObject credentials = resultJson.getJSONObject("credentials");
         return credentials.toJSONString();
@@ -1745,9 +1817,11 @@ public class PaasApigServiceImpl implements IPaasApigService {
         String resultStr = response.body().string();
         if (!response.isSuccessful()) {
             errorLog(formNum, "审核失败", resultStr, infoId, implHandler);
+            response.close();
             throw new BaseException("订购失败,失败原因:审核失败");
         }
         ServiceInstance instance = JSONObject.parseObject(resultStr, ServiceInstance.class);
+        response.close();
         return instance;
     }
 
@@ -1859,8 +1933,10 @@ public class PaasApigServiceImpl implements IPaasApigService {
             logger.error("response:" + response.toString() + ";response body:" + response.body().toString());
             logger.error("responseCode:" + response.code());
             errorLog(formNum, "订购失败", resultStr, info.getId(), implHandler);
+            response.close();
             throw new BaseException("订购失败");
         }
+        response.close();
         ServiceInstance instance = JSONObject.parseObject(resultStr, ServiceInstance.class);
         this.saveInstanceGuid(formNum, info.getId(), instance, implHandler);
         return instance;
@@ -1881,8 +1957,10 @@ public class PaasApigServiceImpl implements IPaasApigService {
         String resultStr = response.body().string();
         if (!response.isSuccessful()) {
             errorLog(formNum, "创建应用失败", resultStr, info.getId(), implHandler);
+            response.close();
             throw new BaseException("订购失败,失败原因:创建应用失败");
         }
+        response.close();
         AppDetail appDetail = JSONObject.parseObject(resultStr, AppDetail.class);
         return appDetail;
     }
@@ -1912,9 +1990,11 @@ public class PaasApigServiceImpl implements IPaasApigService {
         String resultStr = response.body().string();
         if (!response.isSuccessful()) {
             errorLog(formNum, "获取应用列表失败", resultStr, infoId,implHandler);
+            response.close();
             throw new BaseException("订购失败,失败原因:获取应用列表失败");
         }
         AppList appList = JSONObject.parseObject(resultStr, AppList.class);
+        response.close();
         return appList;
     }
 
@@ -1924,9 +2004,11 @@ public class PaasApigServiceImpl implements IPaasApigService {
         String resultStr = response.body().string();
         if (!response.isSuccessful()) {
             errorLog(formNum, "获取服务详情失败", resultStr, infoId,implHandler);
+            response.close();
             throw new BaseException("订购失败,失败原因:获取服务详情失败");
         }
         ServiceDetail detail = JSONObject.parseObject(resultStr, ServiceDetail.class);
+        response.close();
         return detail;
     }
 

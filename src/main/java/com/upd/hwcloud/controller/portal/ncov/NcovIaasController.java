@@ -1,24 +1,28 @@
 package com.upd.hwcloud.controller.portal.ncov;
 
+import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Maps;
+import com.upd.hwcloud.bean.contains.NcovKey;
 import com.upd.hwcloud.bean.response.R;
 import com.upd.hwcloud.bean.vo.ncov.NcovEcsOverview;
 import com.upd.hwcloud.bean.vo.ncov.NcovIaasVo;
 import com.upd.hwcloud.common.utils.easypoi.NcovEcsImportUtil;
 import com.upd.hwcloud.service.application.IApplicationInfoService;
 import com.upd.hwcloud.service.application.IIaasTxyfwImplService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Map;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author wuc
@@ -34,6 +38,9 @@ public class NcovIaasController {
 
     @Autowired
     private IIaasTxyfwImplService iaasTxyfwImplService;
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
 
     @Value("${ncov.iaas.start.time}")
     private String startTime;
@@ -68,6 +75,11 @@ public class NcovIaasController {
      * @return
      */
     private Map<String,Object> getOverview(){
+        String resString = stringRedisTemplate.opsForValue().get(NcovKey.NCOV_IAAS_OVERVIEW);
+        if(StringUtils.isNotBlank(resString)){
+            Map<String,Object> map = JSON.parseObject(resString,Map.class);
+            return map;
+        }
 
         NcovEcsOverview overview =  NcovEcsImportUtil.getOverviewData();
         Map<String,Object> res = Maps.newHashMapWithExpectedSize(7);
@@ -75,6 +87,7 @@ public class NcovIaasController {
         res.put("cpuNum",overview.getCpu());
         res.put("memoryNum",overview.getMemory());
         res.put("storageNum", overview.getStorage());
+        stringRedisTemplate.opsForValue().set(NcovKey.NCOV_IAAS_OVERVIEW,JSON.toJSONString(res),5, TimeUnit.HOURS);
         return  res;
 
     }

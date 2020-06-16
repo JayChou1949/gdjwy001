@@ -6,6 +6,8 @@ import com.upd.hwcloud.bean.vo.ncov.NcovClusterResource;
 import com.upd.hwcloud.bean.vo.ncov.NcovExcelSheetOneVo;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,9 +21,17 @@ import cn.afterturn.easypoi.excel.entity.ImportParams;
  * @author wuc
  * @date 2020/3/3
  */
+@Component
 public class NcovClusterImportUtil {
 
     private final static  String sourceFileName = "ncovCluster.xlsx";
+
+    private static String rootPath;
+
+    @Value("${file.path}")
+    public void setRootPath(String rootPath) {
+        NcovClusterImportUtil.rootPath = rootPath;
+    }
 
     /**
      * 获取第一个sheet概览数据
@@ -31,9 +41,7 @@ public class NcovClusterImportUtil {
         try{
             ImportParams params = new ImportParams();
             params.setStartSheetIndex(0);
-            List<NcovClusterOverview> list = ExcelImportUtil.importExcel(new FileInputStream(new File("E:/hwyFiles/"+sourceFileName)),NcovClusterOverview.class,params);
-            System.out.println(list);
-            System.out.println(list.size());
+            List<NcovClusterOverview> list = ExcelImportUtil.importExcel(new FileInputStream(new File(rootPath+"/"+sourceFileName)),NcovClusterOverview.class,params);
             if(CollectionUtils.isEmpty(list)){
                 return null;
             }else {
@@ -53,9 +61,7 @@ public class NcovClusterImportUtil {
     try{
         ImportParams params = new ImportParams();
         params.setStartSheetIndex(1);
-        List<NcovClusterResource> list = ExcelImportUtil.importExcel(new FileInputStream(new File("E:/hwyFiles/"+sourceFileName)),NcovClusterResource.class,params);
-        System.out.println(list);
-        System.out.println(list.size());
+        List<NcovClusterResource> list = ExcelImportUtil.importExcel(new FileInputStream(new File(rootPath+"/"+sourceFileName)),NcovClusterResource.class,params);
         return list;
     }catch (Exception e){
         e.printStackTrace();
@@ -68,9 +74,7 @@ public class NcovClusterImportUtil {
         try{
             ImportParams params = new ImportParams();
             params.setStartSheetIndex(2);
-            List<NcovClusterApp> list = ExcelImportUtil.importExcel(new FileInputStream(new File("E:/hwyFiles/"+sourceFileName)),NcovClusterApp.class,params);
-            System.out.println(list);
-            System.out.println(list.size());
+            List<NcovClusterApp> list = ExcelImportUtil.importExcel(new FileInputStream(new File(rootPath+"/"+sourceFileName)),NcovClusterApp.class,params);
             return list;
         }catch (Exception e){
             e.printStackTrace();

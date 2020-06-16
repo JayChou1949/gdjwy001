@@ -3,6 +3,7 @@ package com.upd.hwcloud.controller.portal.front;
 
 import cn.afterturn.easypoi.excel.entity.ExportParams;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.parser.Feature;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -10,6 +11,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.upd.hwcloud.bean.contains.NcovKey;
 import com.upd.hwcloud.bean.dto.*;
 import com.upd.hwcloud.bean.dto.cov.*;
 import com.upd.hwcloud.bean.entity.Bigdata;
@@ -32,10 +34,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 
+import okhttp3.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -51,6 +55,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -70,6 +75,8 @@ public class ThreePartyInterfaceController {
     IThreePartyInterfaceService threePartyInterfaceService;
     @Autowired
     IBigdataService bigdataService;
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
 
     @Autowired
     private IFilesService filesService;
@@ -1555,7 +1562,9 @@ public class ThreePartyInterfaceController {
     @ResponseBody
     public Object wdkSubPageType(String resourceFirstClass) throws Exception {
         String url = "http://15.40.3.71:8000/services/serviceInvoke/queryDataService/foreign/statisticsSecond/getSecondClass?resourceFirstClass=" + resourceFirstClass;
-        String res = OkHttpUtils.get(url, null).body().string();
+        Response response = OkHttpUtils.get(url, null);
+        String res = response.body().string();
+        response.close();
         return JSONObject.parseObject(res);
     }
 
@@ -1564,7 +1573,9 @@ public class ThreePartyInterfaceController {
     @ResponseBody
     public Object wdkSubPageInfo(String resourceFirstClass, String resourceSecondClass) throws Exception {
         String url = "http://15.40.3.71:8000/services/serviceInvoke/queryDataService/foreign/statisticsSecond/getSecondClassCount?resourceFirstClass=" + resourceFirstClass + "&resourceSecondClass=" + resourceSecondClass;
-        String res = OkHttpUtils.get(url, null).body().string();
+        Response response = OkHttpUtils.get(url, null);
+        String res = response.body().string();
+        response.close();
         return JSONObject.parseObject(res);
     }
 
@@ -2008,9 +2019,15 @@ public class ThreePartyInterfaceController {
     @RequestMapping("/epidemicDesktopNum")
     @ResponseBody
     public R epidemicDesktopNum() {
+        String res = stringRedisTemplate.opsForValue().get(NcovKey.EPIC_DESKTOP);
+        if(StringUtils.isNotBlank(res)){
+            DeskTopNum deskTopNum = JSON.parseObject(res,DeskTopNum.class);
+            return R.ok(deskTopNum);
+        }
         try {
             List<EpidemicDesktop> epidemicDesktops = threePartyInterfaceService.epidemicExcl();
             DeskTopNum deskTopNum = threePartyInterfaceService.epidemicExclNum(epidemicDesktops);
+            stringRedisTemplate.opsForValue().set(NcovKey.EPIC_DESKTOP,JSON.toJSONString(deskTopNum),5, TimeUnit.HOURS);
             return R.ok(deskTopNum);
         } catch (Exception e) {
             e.printStackTrace();

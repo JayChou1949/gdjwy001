@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Maps;
+import com.upd.hwcloud.bean.contains.NcovKey;
 import com.upd.hwcloud.bean.dto.*;
 import com.upd.hwcloud.bean.dto.cov.*;
 import com.upd.hwcloud.bean.entity.ThreePartyInterface;
@@ -13,12 +14,15 @@ import com.upd.hwcloud.common.utils.OkHttpUtils;
 import com.upd.hwcloud.common.utils.ncov.UnitExcelExportUtil;
 import com.upd.hwcloud.dao.ThreePartyInterfaceMapper;
 import com.upd.hwcloud.service.IThreePartyInterfaceService;
+import okhttp3.Response;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -45,6 +49,16 @@ public class ThreePartyInterfaceServiceImpl extends ServiceImpl<ThreePartyInterf
     @Autowired
     private ThreePartyInterfaceMapper threePartyInterfaceMapper;
 
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
+    private static String rootPath;
+
+    @Value("${file.path}")
+    public void setRootPath(String rootPath) {
+        ThreePartyInterfaceServiceImpl.rootPath = rootPath;
+    }
+
 
     @Override
     public void saveOrUpdateData(ThreePartyInterface threePartyInterface) {
@@ -65,8 +79,10 @@ public class ThreePartyInterfaceServiceImpl extends ServiceImpl<ThreePartyInterf
     @Override
     public void getOrUpdateData(String url, String id, String label) {
         String data = null;
+        Response response = null;
         try {
-            data = OkHttpUtils.get(url, null).body().string();
+            response = OkHttpUtils.get(url, null);
+            data = response.body().string();
             if (JSONObject.parseObject(data).getInteger("code") != 0) {
                 return;
             }
@@ -83,11 +99,16 @@ public class ThreePartyInterfaceServiceImpl extends ServiceImpl<ThreePartyInterf
             }
         } catch (IOException e) {
             logger.debug(label + "接口获取数据失败");
+        } finally {
+            if (response!=null){
+                response.close();
+            }
         }
     }
 
     @Override
     public void postOrUpdateData(String url, String id, String label, Map<String, String> map) {
+        Response response = null;
         try {
             if ("模型超市按模型上线时间排行".equals(label)) {
                 map = new HashMap<>();
@@ -96,7 +117,8 @@ public class ThreePartyInterfaceServiceImpl extends ServiceImpl<ThreePartyInterf
                 map = new HashMap<>();
                 map.put("type", "2");
             }
-            String data = OkHttpUtils.post(url, map).body().string();
+            response = OkHttpUtils.post(url, map);
+            String data = response.body().string();
             ThreePartyInterface threePartyInterface = threePartyInterfaceMapper.selectById(id);
             if (threePartyInterface == null) {
                 threePartyInterface = new ThreePartyInterface();
@@ -110,13 +132,19 @@ public class ThreePartyInterfaceServiceImpl extends ServiceImpl<ThreePartyInterf
             }
         } catch (IOException e) {
             logger.debug(label + "接口获取数据失败");
+        } finally {
+            if (response!=null){
+                response.close();
+            }
         }
     }
 
     @Override
     public void postJsonUpdateData(String url, String id, String label, String json) {
+        Response response = null;
         try {
-            String data = OkHttpUtils.postJson(url, json).body().string();
+            response = OkHttpUtils.postJson(url, json);
+            String data = response.body().string();
             if (JSONObject.parseObject(data).getInteger("code") != 0) {
                 return;
             }
@@ -133,6 +161,10 @@ public class ThreePartyInterfaceServiceImpl extends ServiceImpl<ThreePartyInterf
             }
         } catch (IOException e) {
             logger.debug(label + "接口获取数据失败");
+        } finally {
+            if (response!=null){
+                response.close();
+            }
         }
     }
 
@@ -278,7 +310,7 @@ public class ThreePartyInterfaceServiceImpl extends ServiceImpl<ThreePartyInterf
     }
 
     private void downFile(HttpServletResponse response, String name) throws IOException {
-        File file = new File("E:/hwyFiles/" + name);
+        File file = new File(rootPath+"/" + name);
         if (file.exists()) {
             // 设置强制下载不打开
             response.setContentType("application/force-download");
@@ -295,7 +327,7 @@ public class ThreePartyInterfaceServiceImpl extends ServiceImpl<ThreePartyInterf
     }
 
     private void upFile(MultipartFile file, String name) throws IOException {
-        File targetFile = new File("E:/hwyFiles/" + name);
+        File targetFile = new File(rootPath+"/" + name);
         targetFile.exists();
         FileOutputStream fileOutputStream = new FileOutputStream(targetFile);
         InputStream inputStream = file.getInputStream();

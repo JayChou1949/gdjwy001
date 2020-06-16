@@ -363,7 +363,8 @@ public class WorkbenchController {
 
     @RequestMapping(value = "/tenant/iaas/ecs/{ecsId}",method = RequestMethod.GET)
     public R ecsDetail(@PathVariable("ecsId") String ecsId){
-        EcsVO ecsVO = iaasTxyfwService.getiMocEcsDetail(ecsId);
+        //停用
+       EcsVO ecsVO = new EcsVO();
 
 
         return R.ok(ecsVO);

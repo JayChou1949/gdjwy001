@@ -2,17 +2,22 @@ package com.upd.hwcloud.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.upd.hwcloud.bean.entity.Files;
 import com.upd.hwcloud.bean.entity.application.PaasTyyh;
 import com.upd.hwcloud.common.exception.BaseException;
+import com.upd.hwcloud.common.utils.easypoi.NcovEcsImportUtil;
 import com.upd.hwcloud.dao.FilesMapper;
 import com.upd.hwcloud.service.IFilesService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
@@ -37,8 +42,12 @@ public class FilesServiceImpl extends ServiceImpl<FilesMapper, Files> implements
 
     @Autowired
     FilesMapper filesMapper;
+    private static String filePath;
+
     @Value("${file.path}")
-    private String filePath;
+    public void setRootPath(String rootPath) {
+        FilesServiceImpl.filePath = rootPath;
+    }
 
     private final static  String sourceFileName = "ncovSource.xlsx";
 
@@ -240,6 +249,7 @@ public class FilesServiceImpl extends ServiceImpl<FilesMapper, Files> implements
         File targetFile = new File(path, newFileName);
         FileUtils.copyInputStreamToFile(file.getInputStream(), targetFile);
         files.setUrl("/files/download/"+newFileName);
+        files.setRealURL("/"+folder+"/"+time+"/"+newFileName);
         return files;
     }
 
@@ -260,6 +270,7 @@ public class FilesServiceImpl extends ServiceImpl<FilesMapper, Files> implements
         File targetFile = new File(path,name);
         FileUtils.copyInputStreamToFile(file.getInputStream(),targetFile);
         files.setUrl("/files/download/"+name);
+        //files.setRealURL("/"+folder+"/"+time+"/"+newFileName+"."+suffix);
         return files;
     }
     private Files updateNcovDataFile(MultipartFile file,String id,String path,String name,String title) throws IOException{
@@ -328,5 +339,33 @@ public class FilesServiceImpl extends ServiceImpl<FilesMapper, Files> implements
         return files;
     }
 
-
+    @Transactional(rollbackFor = Throwable.class)
+    @Override
+    public void hotfix() {
+        List<Files> allFiles = this.list(new QueryWrapper<>());
+        List<Files> updateFiles = Lists.newArrayList();
+        for(Files files:allFiles){
+            //文件记录 名、路劲、后缀不为空
+            if(StringUtils.isNotBlank(files.getName()) && StringUtils.isNotBlank(files.getPath())
+                    && StringUtils.isNotBlank(files.getSuffix())){
+                String path = files.getPath();
+                if(path.startsWith(filePath)){
+                    Files updateFile = new Files();
+                    //去掉路劲前缀 拼接名和后缀
+                    List<String> pList = Splitter.on("hwyFiles").splitToList(path);
+                    String sufPath = pList.get(1);
+                    StringBuilder sb = new StringBuilder(sufPath);
+                    sb.append("/").append(files.getName()).append(files.getSuffix());
+                    files.setRealURL(sb.toString());
+                    BeanUtils.copyProperties(files,updateFile);
+                    if(updateFile != null){
+                        updateFiles.add(updateFile);
+                    }else {
+                        System.out.println("origin file "+files);
+                    }
+                }
+            }
+        }
+        this.updateBatchById(updateFiles,3000);
+    }
 }

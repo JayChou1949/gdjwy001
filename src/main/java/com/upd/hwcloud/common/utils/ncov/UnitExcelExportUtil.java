@@ -1,10 +1,13 @@
 package com.upd.hwcloud.common.utils.ncov;
 
+import com.google.common.collect.Lists;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.NumberToTextConverter;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.text.DateFormat;
@@ -17,9 +20,14 @@ import java.util.List;
  * @author junglefisher
  * @date 2020/2/28 17:26
  */
+@Component
 public class UnitExcelExportUtil {
 
-    private UnitExcelExportUtil() {
+    private static String rootPath;
+
+    @Value("${file.path}")
+    public void setRootPath(String rootPath) {
+        UnitExcelExportUtil.rootPath = rootPath;
     }
 
     /**
@@ -27,19 +35,41 @@ public class UnitExcelExportUtil {
      * @return
      * @throws Exception
      */
-    public static List<List<Object>> list(String name) throws Exception {
+    public static List<List<Object>> list(String name){
         List<List<Object>> list=null;
-        File file = new File("E:/hwyFiles/"+name);
+        InputStream inputStream =null;
+        Workbook workbook = null;
+        File file = new File(rootPath+"/"+name);
 //        File file = new File("E:/hwyFiles/省直疫情数据服务调用统计.xls");//song本地测试用
-        InputStream inputStream=new FileInputStream(file);
-        Workbook workbook = createWorkbook(inputStream);
-        if (null != workbook) {
-            if ("省直疫情数据服务调用统计.xls".equals(name)) {
-                list = getDataList(workbook,3);
-            } else if ("疫情桌面云.xls".equals(name)) {
-                list = getDataList(workbook, 1);
+        try{
+            inputStream =new FileInputStream(file);
+            workbook = createWorkbook(inputStream);
+            if (null != workbook) {
+                if ("省直疫情数据服务调用统计.xls".equals(name)) {
+                    list = getDataList(workbook,3);
+                } else if ("疫情桌面云.xls".equals(name)) {
+                    list = getDataList(workbook, 1);
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if(workbook!=null){
+                try {
+                    workbook.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if(inputStream != null){
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
+
         return list;
     }
 
@@ -48,11 +78,34 @@ public class UnitExcelExportUtil {
      * @return
      * @throws Exception
      */
-    public static List<List<Object>> ncovDataList(String name,Integer num,Integer sheetNum) throws Exception {
-        File file = new File("E:\\hwyFiles\\ncovArea\\"+name);
-        InputStream inputStream=new FileInputStream(file);
-        Workbook workbook = createWorkbook(inputStream);
-        return getDataListBySheet(workbook,num,sheetNum);
+    public static List<List<Object>> ncovDataList(String name,Integer num,Integer sheetNum){
+        File file = new File(rootPath+"/ncovArea/"+name);
+        InputStream inputStream = null;
+        Workbook workbook = null;
+        List<List<Object>> resultList = Lists.newArrayList();
+        try{
+            inputStream=new FileInputStream(file);
+            workbook = createWorkbook(inputStream);
+            resultList = getDataListBySheet(workbook,num,sheetNum);
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if(workbook != null){
+                try {
+                    workbook.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if(inputStream !=null){
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return resultList;
     }
 
     /**
