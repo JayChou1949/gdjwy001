@@ -214,23 +214,7 @@ public class ResourceRecoverAppInfoServiceImpl extends ServiceImpl<ResourceRecov
             map.put("name", BusinessName.RECOVER);
             map.put("order", info.getOrderNumber());
             activityService.advanceCurrentActivity(advanceBeanVO, map);
-
-//            messageProvider.sendMessageAsync(messageProvider.buildSuccessMessage(user, BusinessName.RECOVER, info.getOrderNumber())); //旧发送消息
-            //查出其中一个缩配资源的缩配时间
-            ResourceRecover resourceRecover=resourceRecoverService.getOne(new QueryWrapper<ResourceRecover>().eq("ref_Id",info.getId()));
-            //时间分割
-            String[] shrinkTime=null;
-            String month = "";
-            String day = "";
-            if(resourceRecover.getShrinkTime()!=null){
-                shrinkTime=resourceRecover.getShrinkTime().split(" ")[0].split("-");
-                month = shrinkTime[1];
-                day = shrinkTime[2];
-            }else{
-                month = "0";
-                day = "0";
-            }
-            messageProvider.sendMessageAsync(messageProvider.buildRecoverMessage(user, BusinessName.RECOVER, info.getOrderNumber(),month,day));
+            sendMsg(user,info);
             //放入定时器，超过48小时未处理工单，重新发送短信
             //1.开启定时器，48小时后执行
             //2.检查工单状态，如果未处理，则进行短信发送
@@ -485,24 +469,26 @@ public class ResourceRecoverAppInfoServiceImpl extends ServiceImpl<ResourceRecov
             if(info.getRecoveredAgree()==0){
                 //大数据办处理结果为回收,只在被回收资源不同意回收时发生回退
                 if("1".equals(approve.getResult())){
-                    Workflowmodel fallbackModel = workflowmodelService.getById(vo.getFallBackModelIds());
-                    if(StringUtils.equals(ModelName.RECOVERED.getName(),fallbackModel.getModelname())){
-                        activityService.fallbackOnApproveNotPass(vo, null);
-                        info.setStatus(ApplicationInfoStatus.REVIEW_REJECT.getCode());
-                        messageProvider.sendMessageAsync(messageProvider.buildRejectMessage(info.getCreator(), BusinessName.RECOVER));
+//                    Workflowmodel fallbackModel = workflowmodelService.getById(vo.getFallBackModelIds());
+//                    if(StringUtils.equals(ModelName.RECOVERED.getName(),fallbackModel.getModelname())){
+//                        activityService.fallbackOnApproveNotPass(vo, null);
+//                        info.setStatus(ApplicationInfoStatus.REVIEW_REJECT.getCode());
+//
+//                        messageProvider.sendMessageAsync(messageProvider.buildRejectMessage(info.getCreator(), BusinessName.RECOVER));
+//                    }
+                    R r = activityService.advanceCurrentActivity(vo.getCurrentActivityId(), approve,map);
+                    Object model = r.get("data");
+                    if (ModelName.CARRY.getName().equals(model)){
+                        info.setStatus(ApplicationInfoStatus.IMPL.getCode());
+                    }else {
+                        info.setStatus(ApplicationInfoStatus.RESENT.getCode());
                     }
                 }else if("0".equals(approve.getResult())){ //大数据办不回收,流转到业务办理
                     //最新修改，大数据办不回收，进行回退
-                    activityService.fallbackOnApproveNotPass(vo, map);
-                    info.setStatus(ApplicationInfoStatus.RESENT.getCode());
-//                    R r = activityService.advanceCurrentActivity(vo.getCurrentActivityId(), approve,map);
-//                    Object model = r.get("data");
-//                    if (ModelName.CARRY.getName().equals(model)){
-////                        info.setStatus(ApplicationInfoStatus.IMPL.getCode());
-//                        info.setStatus(ApplicationInfoStatus.RESENT.getCode());
-//                    }else {
-//                        info.setStatus(ApplicationInfoStatus.RESENT.getCode());
-//                    }
+                    activityService.fallbackOnApproveNotPass(vo, null);
+                    info.setStatus(ApplicationInfoStatus.REVIEW_REJECT.getCode());
+                    sendMsg(user,info);
+
                 }
             }
         }
@@ -568,7 +554,8 @@ public class ResourceRecoverAppInfoServiceImpl extends ServiceImpl<ResourceRecov
         if ("1".equals(implRequest.getResult())){
             //ServiceReturnBean returnBean = getTestReturnBean(false);
             activityService.advanceCurrentActivity(activity,info.getCreator());
-            messageProvider.sendMessageAsync(messageProvider.buildCompleteMessage(info.getCreator(), BusinessName.RECOVER, info.getOrderNumber()));
+            sendMsg(user,info);
+//            messageProvider.sendMessageAsync(messageProvider.buildCompleteMessage(info.getCreator(), BusinessName.RECOVER, info.getOrderNumber()));
         }else {
             if (modelId==null||modelId.trim().equals("")) {
                 return R.error(201, "回退环节ID不能为空,回退失败");
@@ -620,31 +607,40 @@ public class ResourceRecoverAppInfoServiceImpl extends ServiceImpl<ResourceRecov
                 user=userMap.get(entry.getRecoveredPersonIdCard());
             }else{
                 user=userService.getById(entry.getRecoveredPersonIdCard());
+                userMap.put(user.getIdcard(),user);
             }
             user.setNotifyType("0");//只重新发短信，不发送邮件等其他消息
             //再次发提醒短信
-            //查出其中一个缩配资源的缩配时间
-            ResourceRecover resourceRecover=resourceRecoverService.getOne(new QueryWrapper<ResourceRecover>().eq("ref_Id",entry.getId()));
-            //时间分割
-            //时间分割
-            String[] shrinkTime=null;
-            String month = "";
-            String day = "";
-            if(resourceRecover.getShrinkTime()!=null){
-                shrinkTime=resourceRecover.getShrinkTime().split(" ")[0].split("-");
-                month = shrinkTime[1];
-                day = shrinkTime[2];
-            }else{
-                month = "0";
-                day = "0";
-            }
-            messageProvider.sendMessageAsync(messageProvider.buildRecoverMessage(user, BusinessName.RECOVER, entry.getOrderNumber(),month,day));
+            sendMsg(user,entry);
             //更新状态
             entry.setStatus(ApplicationInfoStatus.RESENT.getCode());
             this.updateById(entry);
 //            System.out.println("更新数据成功");
             logger.debug("更新数据成功,id:"+entry.getId());
         });
+    }
+
+    /**
+     * 通用发送回收资源短信
+     * @param user
+     * @param info
+     */
+    public void sendMsg(User user,ResourceRecoverAppInfo info){
+        //查出其中一个缩配资源的缩配时间
+        ResourceRecover resourceRecover=resourceRecoverService.getOne(new QueryWrapper<ResourceRecover>().eq("ref_Id",info.getId()));
+        //时间分割
+        String[] shrinkTime=null;
+        String month = "";
+        String day = "";
+        if(resourceRecover.getShrinkTime()!=null){
+            shrinkTime=resourceRecover.getShrinkTime().split(" ")[0].split("-");
+        }else{
+            shrinkTime=DateUtil.formateDate(info.getCreateTime(),"yyyy-MM-dd").split("-");
+        }
+        month = shrinkTime[1];
+        day = shrinkTime[2];
+        //发送短信
+        messageProvider.sendMessageAsync(messageProvider.buildRecoverMessage(user, BusinessName.RECOVER, info.getOrderNumber(),month,day));
     }
 
 
