@@ -42,7 +42,7 @@ public class ServiceLimitServiceImpl extends ServiceImpl<ServiceLimitMapper, Ser
 
 
     @Override
-    public ServiceLimit getQuota(String formNum, String area, String policeCategory, String nationalSpecialProject) {
+    public ServiceLimit getQuota(String formNum, String area, String policeCategory, String nationalSpecialProject,String clusterName) {
 
         ServiceLimit quota = null;
         if(StringUtils.equals(formNum,"IAAS_TXYFWXG")){
@@ -59,8 +59,13 @@ public class ServiceLimitServiceImpl extends ServiceImpl<ServiceLimitMapper, Ser
         }else {
             if(!StringUtils.equals(area,"省厅")){
                 if(StringUtils.equals("PAAS",formNum)){
-                    quota = this.getOne(new QueryWrapper<ServiceLimit>().select("sum(CPU) cpu,sum(MEMORY) memory,sum(STORAGE) storage").eq("RESOURCE_TYPE", ResourceType.PAAS.getCode())
-                            .eq("AREA",area));
+                    if (StringUtils.equals("ElasticSearch",clusterName)||StringUtils.equals("Redis",clusterName)||StringUtils.equals("Libra",clusterName)) {
+                        quota = this.getOne(new QueryWrapper<ServiceLimit>().select("sum(CPU) cpu,sum(MEMORY) memory,sum(STORAGE) storage").eq("RESOURCE_TYPE", ResourceType.PAAS.getCode())
+                                .eq("AREA",area).eq("DESCRIPTION",clusterName));
+                    }else {
+                        quota = this.getOne(new QueryWrapper<ServiceLimit>().select("sum(CPU) cpu,sum(MEMORY) memory,sum(STORAGE) storage").eq("RESOURCE_TYPE", ResourceType.PAAS.getCode())
+                                .eq("AREA",area).eq("DESCRIPTION","YARN"));
+                    }
                 }else {
                     quota = this.getOne(new QueryWrapper<ServiceLimit>().select("sum(CPU) cpu,sum(MEMORY) memory,sum(STORAGE) storage").eq("FORM_NUM",formNum)
                             .eq("AREA",area));
