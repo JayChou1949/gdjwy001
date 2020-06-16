@@ -73,13 +73,10 @@ public class PaasZhzyServiceImpl extends ServiceImpl<PaasZhzyMapper, PaasZhzy> i
         DecimalFormat df = new DecimalFormat("#.00");
         if (StringUtils.equals("YARN",clusterName)) {
             paasZhzy = paasZhzyMapper.appClusterDetailsByTypeSite(appName, "hadoop");
-            if (paasZhzy == null) {
-                PaasZhzy paasZhzyYarn = new PaasZhzy();
-                paasZhzyYarn.setApplyName(appName);
-                return paasZhzyYarn;
+            if (paasZhzy != null) {
+                paasZhzy.setMemoryTotal(BigDecimalUtil.div(paasZhzy.getMemoryTotal(),1024).doubleValue());
+                paasZhzy.setMemoryUsed(BigDecimalUtil.div(paasZhzy.getMemoryUsed(),1024).doubleValue());
             }
-            paasZhzy.setMemoryTotal(BigDecimalUtil.div(paasZhzy.getMemoryTotal(),1024).doubleValue());
-            paasZhzy.setMemoryUsed(BigDecimalUtil.div(paasZhzy.getMemoryUsed(),1024).doubleValue());
         }else if (StringUtils.equals("Elasticsearch",clusterName)) {
             paasZhzy = paasZhzyMapper.appClusterDetailsByElasticsearch(appName);
             if (paasZhzy.getElasticsearchCpuTotal()!=null) {
@@ -102,13 +99,10 @@ public class PaasZhzyServiceImpl extends ServiceImpl<PaasZhzyMapper, PaasZhzy> i
             }
         }else if (StringUtils.equals("Libra",clusterName)) {
             paasZhzy = paasZhzyMapper.appClusterDetailsByTypeSite(appName,clusterName);
-            if (paasZhzy == null) {
-                PaasZhzy paasZhzyLibra = new PaasZhzy();
-                paasZhzyLibra.setApplyName(appName);
-                return paasZhzyLibra;
+            if (paasZhzy != null) {
+                paasZhzy.setMemoryTotal(BigDecimalUtil.div(paasZhzy.getMemoryTotal(),1024).doubleValue());
+                paasZhzy.setMemoryUsed(BigDecimalUtil.div(paasZhzy.getMemoryUsed(),1024).doubleValue());
             }
-            paasZhzy.setMemoryTotal(BigDecimalUtil.div(paasZhzy.getMemoryTotal(),1024).doubleValue());
-            paasZhzy.setMemoryUsed(BigDecimalUtil.div(paasZhzy.getMemoryUsed(),1024).doubleValue());
         }else if (StringUtils.equals("关系型数据库",clusterName)) {
 
         }
