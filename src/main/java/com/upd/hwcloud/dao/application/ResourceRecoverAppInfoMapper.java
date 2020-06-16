@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,5 +20,7 @@ import java.util.Map;
 public interface ResourceRecoverAppInfoMapper extends BaseMapper<ResourceRecoverAppInfo> {
 
     IPage<ResourceRecoverAppInfo> getPage(IPage<ResourceRecoverAppInfo> page, @Param("p")Map<String,String> params);
+
+    List<ResourceRecoverAppInfo> queryUntreatedRecover();
 
 }

@@ -1,6 +1,7 @@
 package com.upd.hwcloud.common.utils;
 
 import com.alibaba.fastjson.JSONObject;
+import com.upd.hwcloud.bean.dto.UserDto;
 import com.upd.hwcloud.bean.dto.IamResponse;
 import com.upd.hwcloud.bean.entity.User;
 import com.upd.hwcloud.common.exception.BaseException;
@@ -42,12 +43,31 @@ public class DCUCHttpEngin implements InitializingBean {
 
     public User getUserInfoById(String userId) {
         Response response = null;
+        String res = null;
         try {
             response = OkHttpUtils.get(okHttpClient, businessUrl + "/users/id/" + userId + ".action", null);
-            String res = response.body().string();
+            res = response.body().string();
             return JSONObject.parseObject(res, User.class);
         } catch (Exception e) {
-            logger.error("", e);
+            logger.error("登录获取用户信息失败！");
+            return null;
+        } finally {
+            if (response!=null){
+                response.close();
+            }
+        }
+    }
+
+    public User getGovUserInfoById(String userId) {
+        Response response = null;
+        String res = null;
+        try {
+            response = OkHttpUtils.get(okHttpClient, businessUrl + "/govusers/id/" + userId, null);
+            res = response.body().string();
+            UserDto userDto = JSONObject.parseObject(res, UserDto.class);
+            return userDtoToUser(userDto);
+        } catch (Exception e) {
+            logger.error("登录获取政务人员信息: {}", res);
             return null;
         } finally {
             if (response!=null){
@@ -75,6 +95,38 @@ public class DCUCHttpEngin implements InitializingBean {
             return;
         }
         throw new BaseException(iamResponse.getMessage());
+    }
+
+    private User userDtoToUser(UserDto userDto){
+        User user=new User();
+        user.setId(userDto.getId());
+        user.setName(userDto.getName());
+        user.setIdcard(userDto.getIdcard());
+        user.setNation(userDto.getNation());
+        user.setSex(userDto.getSex());
+        user.setPhoto(userDto.getPhoto());
+        user.setOrgId(userDto.getGovId());
+        user.setGovCode(userDto.getGovCode());
+        user.setOrgName(userDto.getGovName());
+        user.setAddress(userDto.getAddress());
+        user.setUserNumber(userDto.getUserNumber());
+        user.setProject(userDto.getProject());
+        user.setDeleted(userDto.getDeleted());
+        user.setPostType(userDto.getPost());
+        user.setMobileWork(userDto.getMobileWork());
+        user.setPersonMobile(userDto.getMobilePrivate());
+        user.setPhone(userDto.getPhone());
+        user.setQqAccount(userDto.getQqAccount());
+        user.setEmail(userDto.getEmail());
+        user.setWxAccount(userDto.getWxAccount());
+        user.setCreateTimeStr(userDto.getCreateTimeStr());
+        user.setTitle(userDto.getTitle());
+        user.setRank(userDto.getRank());
+        user.setDeleted(userDto.getDeleted());
+        user.setDeleteTime(userDto.getDeleteTime());
+        user.setPoliceCategory(userDto.getPoliceCategory());
+        user.setUserType(userDto.getUserType());
+        return user;
     }
 
 }
