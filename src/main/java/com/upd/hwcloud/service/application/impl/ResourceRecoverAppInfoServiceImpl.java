@@ -598,20 +598,27 @@ public class ResourceRecoverAppInfoServiceImpl extends ServiceImpl<ResourceRecov
 //        System.out.println("开始处理");
         logger.debug("开始执行查询未被回收负责人处理的工单");
         List<ResourceRecoverAppInfo> recoverList = resourceRecoverAppInfoMapper.queryUntreatedRecover();
+        if(recoverList==null||recoverList.size()==0){return ;}
         //存放被负责人，减少数据库查询
-        ConcurrentMap<String,User> userMap=new ConcurrentHashMap<String,User>();
+//        ConcurrentMap<String,User> userMap=new ConcurrentHashMap<String,User>();
         //循环未被负责责任处理的工单，再次发送短信，更新工单状态为已发送短信状态
         recoverList.stream().forEach(entry->{
-            User user=null;
-            if(userMap.get(entry.getRecoveredPersonIdCard())!=null){
-                user=userMap.get(entry.getRecoveredPersonIdCard());
-            }else{
-                user=userService.getById(entry.getRecoveredPersonIdCard());
-                userMap.put(user.getIdcard(),user);
+            User user=userService.getById(entry.getRecoveredPersonIdCard());
+//            if(userMap.get(entry.getRecoveredPersonIdCard())!=null){
+//                user=userMap.get(entry.getRecoveredPersonIdCard());
+//            }else{
+//                user=userService.getById(entry.getRecoveredPersonIdCard());
+//                if(user!=null){
+//                    userMap.put(user.getIdcard(),user);
+//                }
+//
+//            }
+            if(user!=null) {
+                user.setNotifyType("0");//只重新发短信，不发送邮件等其他消息
+                //再次发提醒短信
+                sendMsg(user,entry);
             }
-            user.setNotifyType("0");//只重新发短信，不发送邮件等其他消息
-            //再次发提醒短信
-            sendMsg(user,entry);
+
             //更新状态
             entry.setStatus(ApplicationInfoStatus.RESENT.getCode());
             this.updateById(entry);
