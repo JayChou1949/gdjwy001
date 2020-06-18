@@ -235,7 +235,7 @@ public class BigdataServiceImpl extends ServiceImpl<BigdataMapper, Bigdata> impl
             if (!StringUtils.isEmpty(endDate)){
                 wrapper.le("A.CURRENT_TIME",endDate);
             }
-            wrapper.groupBy("A.REQ_COUNT,B.NAME,B.AREA_NAME,I.POLICE_CATEGORY");
+            wrapper.groupBy("A.REQ_COUNT,A.CURRENT_TIME,B.NAME,B.AREA_NAME,B.POLICE_CATEGORY");
             wrapper.orderByDesc("A.CURRENT_TIME");
             wrapper.isNotNull("B.NAME");
             wrapper.isNotNull("SUBSTR(I.ALIAS, 0, INSTR(I.ALIAS,'（')-1)");
