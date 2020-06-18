@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -90,8 +91,6 @@ public class PaasZhzyServiceImpl extends ServiceImpl<PaasZhzyMapper, PaasZhzy> i
                 paasZhzy.setElasticsearchDiskAvailable(BigDecimalUtil.div(paasZhzy.getElasticsearchDiskAvailable(),1024*1024*1024).doubleValue());
                 paasZhzy.setElasticsearchDiskUsage(BigDecimalUtil.div(paasZhzy.getElasticsearchDiskUsed(),paasZhzy.getElasticsearchDiskAvailable()).doubleValue());
             }
-        }else if (StringUtils.equals("Kafka",clusterName)) {
-
         }else if (StringUtils.equals("Redis",clusterName)) {
             paasZhzy = paasZhzyMapper.appClusterDetailsByRedis(appName);
             if (paasZhzy.getRedisMemoryTotal()!=null) {
@@ -103,9 +102,27 @@ public class PaasZhzyServiceImpl extends ServiceImpl<PaasZhzyMapper, PaasZhzy> i
                 paasZhzy.setMemoryTotal(BigDecimalUtil.div(paasZhzy.getMemoryTotal(),1024).doubleValue());
                 paasZhzy.setMemoryUsed(BigDecimalUtil.div(paasZhzy.getMemoryUsed(),1024).doubleValue());
             }
-        }else if (StringUtils.equals("关系型数据库",clusterName)) {
-
         }
         return paasZhzy;
+    }
+
+    @Override
+    public List<String> clusterTabs(String appName) {
+        List<String> clusterList = new ArrayList<>();
+        PaasZhzy typeSite = paasZhzyMapper.getClusterByTypeSite(appName);
+        PaasZhzy elasticsearch = paasZhzyMapper.getClusterByElasticsearch(appName);
+        PaasZhzy redis = paasZhzyMapper.getClusterByRedis(appName);
+        if (StringUtils.equals("hadoop",typeSite.getTypeSite())) {
+            clusterList.add("YARN");
+        }else {
+            clusterList.add(typeSite.getTypeSite());
+        }
+        if (elasticsearch != null) {
+            clusterList.add("Elasticsearch");
+        }
+        if (redis != null) {
+            clusterList.add("Redis");
+        }
+        return clusterList;
     }
 }

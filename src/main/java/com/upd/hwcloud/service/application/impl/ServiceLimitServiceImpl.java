@@ -59,7 +59,7 @@ public class ServiceLimitServiceImpl extends ServiceImpl<ServiceLimitMapper, Ser
         }else {
             if(!StringUtils.equals(area,"省厅")){
                 if(StringUtils.equals("PAAS",formNum)){
-                    if (StringUtils.equals("Elasticsearch",clusterName)||StringUtils.equals("Redis",clusterName)||StringUtils.equals("Libra",clusterName)) {
+                    if (StringUtils.equals("Elasticsearch",clusterName)||StringUtils.equals("Redis",clusterName)||StringUtils.equals("Libra",clusterName)||StringUtils.equals("关系型数据库",clusterName)) {
                         quota = this.getOne(new QueryWrapper<ServiceLimit>().select("sum(CPU) cpu,sum(MEMORY) memory,sum(STORAGE) storage").eq("RESOURCE_TYPE", ResourceType.PAAS.getCode())
                                 .eq("AREA",area).eq("DESCRIPTION",clusterName));
                     }else {

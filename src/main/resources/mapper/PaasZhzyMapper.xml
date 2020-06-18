@@ -120,4 +120,16 @@
         SELECT APPLY_NAME,REDIS_MEMORY_TOTAL,REDIS_MEMORY_USAGE FROM TB_PAAS_ZHZY WHERE APPLY_NAME=#{appName}
     </select>
 
+    <select id="getClusterByTypeSite" resultMap="BaseResultMap">
+        SELECT TYPE_SITE FROM TB_PAAS_ZHZY WHERE APPLY_NAME=#{appName}
+    </select>
+
+    <select id="getClusterByElasticsearch" resultMap="BaseResultMap">
+        SELECT ELASTICSEARCH_STORAGE_SPACE FROM TB_PAAS_ZHZY WHERE APPLY_NAME=#{appName}
+    </select>
+
+    <select id="getClusterByRedis" resultMap="BaseResultMap">
+        SELECT REDIS_CLUSTER_NAME FROM TB_PAAS_ZHZY WHERE APPLY_NAME=#{appName}
+    </select>
+
 </mapper>
