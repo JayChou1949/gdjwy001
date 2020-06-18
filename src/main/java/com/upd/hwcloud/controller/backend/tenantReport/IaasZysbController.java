@@ -340,8 +340,9 @@ public class IaasZysbController {
             R r = activityService.advanceCurrentActivity(vo.getCurrentActivityId(), approve, map);
             Object model = r.get("data");
             if ("finished".equals(model)){
+                //todo:二级门户改造-新增国家专项维度(比如：nationalProject字段不为空，就作为国家专项来使用)
                 //添加到限额
-                serviceLimitService.increaseQuota(info.getId(),info.getAreas(),info.getPoliceCategory());
+                serviceLimitService.increaseQuota(info.getId(),info.getAreas(),info.getPoliceCategory(),info.getNationalSpecialProject());
                 info.setStatus(ApplicationInfoStatus.USE.getCode());
                 messageProvider.sendMessageAsync(messageProvider.buildCompleteMessage(info.getCreator(), getBusinessName(), info.getOrderNumber()));
             }else {

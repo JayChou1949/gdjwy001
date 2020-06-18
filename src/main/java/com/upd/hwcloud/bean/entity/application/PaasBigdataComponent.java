@@ -70,6 +70,12 @@ public class PaasBigdataComponent extends Model<PaasBigdataComponent> {
      private String string;
 
     /**
+     * 服务类型 0-新增 1-扩容
+     */
+    @TableField("SERVICE_TYPE")
+     private Integer serviceType;
+
+    /**
      * 组件详情列表
      * @return
      */
@@ -99,6 +105,14 @@ public class PaasBigdataComponent extends Model<PaasBigdataComponent> {
     public PaasBigdataComponent setId(String id) {
         this.id = id;
         return this;
+    }
+
+    public Integer getServiceType() {
+        return serviceType;
+    }
+
+    public void setServiceType(Integer serviceType) {
+        this.serviceType = serviceType;
     }
 
     public String getAppInfoId() {

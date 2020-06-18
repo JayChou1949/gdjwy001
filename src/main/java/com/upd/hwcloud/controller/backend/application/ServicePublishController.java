@@ -200,12 +200,7 @@ public class ServicePublishController {
        }
        info.setWorkFlowId(workFlow.getId());
        info.setWorkFlowVersion(workFlow.getVersion());
-        if (!"2".equals(info.getWhereFrom())){
-            info.setWhereFrom("1");
-            servicePublishService.save(user,info);
-        }else {
-            servicePublishService.update(info,new QueryWrapper<ServicePublish>().lambda().eq(ServicePublish::getId,info.getId()));
-        }
+       servicePublishService.save(user,info);
         R r= instanceService.launchInstanceOfWorkFlow(user.getIdcard(), info.getWorkFlowId(), info.getId());
 
        // Workflowmodel workflowmodel = workflowmodelService.getOne(new QueryWrapper<Workflowmodel>().eq("WORKFLOWID",workflow.getId()).eq("modelname", ModelName.DEP_APPROVE.getName()));
@@ -593,6 +588,8 @@ public class ServicePublishController {
         User user=new User();
         user.setName(info.getCreatorName());
         user.setIdcard(info.getCreator());
+        info.updateById();
+        info.setWhereFrom("1");
         create(user,info,userId);
         return R.ok();
     }

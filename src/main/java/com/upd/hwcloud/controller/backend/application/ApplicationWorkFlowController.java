@@ -122,7 +122,7 @@ public class ApplicationWorkFlowController {
         info.setFlowNew("1");
         ResourceType resType = hw.getFormNum().getResourceType();
         //流程选择
-        Workflow workflow = workflowService.chooseWorkFlow(resType,info.getAreaName(),info.getPoliceCategory(),info.getServiceTypeId());
+        Workflow workflow = workflowService.chooseWorkFlow(resType,info.getAreaName(),info.getPoliceCategory(),info.getServiceTypeId(),info.getNationalSpecialProject());
         if(workflow == null){
             return R.error("流程未配置");
         }
@@ -147,7 +147,7 @@ public class ApplicationWorkFlowController {
         info.setFlowNew("1");
         ResourceType resType = hw.getFormNum().getResourceType();
         //流程选择
-        Workflow workflow = workflowService.chooseWorkFlow(resType,info.getAreaName(),info.getPoliceCategory(),info.getServiceTypeId());
+        Workflow workflow = workflowService.chooseWorkFlow(resType,info.getAreaName(),info.getPoliceCategory(),info.getServiceTypeId(),info.getNationalSpecialProject());
         if(workflow == null){
             return R.error("流程未配置");
         }

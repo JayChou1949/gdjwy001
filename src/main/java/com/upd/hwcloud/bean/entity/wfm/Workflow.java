@@ -83,6 +83,12 @@ public class Workflow extends Model<Workflow> {
     private String policeCategory;
 
     /**
+     * 流程所属国家专项
+     */
+    @TableField("NATIONAL_SPECIAL_PROJECT")
+    private String nationalSpecialProject;
+
+    /**
      * 业务办理
      */
     @TableField(exist = false)
@@ -305,6 +311,14 @@ public class Workflow extends Model<Workflow> {
 
     public void setPoliceCategory(String policeCategory) {
         this.policeCategory = policeCategory;
+    }
+
+    public String getNationalSpecialProject() {
+        return nationalSpecialProject;
+    }
+
+    public void setNationalSpecialProject(String nationalSpecialProject) {
+        this.nationalSpecialProject = nationalSpecialProject;
     }
 
     @Override

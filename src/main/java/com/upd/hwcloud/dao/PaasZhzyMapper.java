@@ -23,13 +23,13 @@ public interface PaasZhzyMapper extends BaseMapper<PaasZhzy> {
 
     PaasZhzy appClusterDetailsByTypeSite(@Param("appName") String appName, @Param("typeSite") String typeSite);
 
-    PaasZhzy appClusterDetailsByElasticSearch(@Param("appName") String appName);
+    PaasZhzy appClusterDetailsByElasticsearch(@Param("appName") String appName);
 
     PaasZhzy appClusterDetailsByRedis(@Param("appName") String appName);
 
     PaasZhzy getPaasYarn(@Param("area")String area,@Param("police") String police);
 
-    PaasZhzy getPaasElasticSearch(@Param("area")String area, @Param("police")String police);
+    PaasZhzy getPaasElasticsearch(@Param("area")String area, @Param("police")String police);
 
     PaasZhzy getPaasRedis(@Param("area")String area, @Param("police")String police);
 }

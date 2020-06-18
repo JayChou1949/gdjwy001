@@ -1,23 +1,25 @@
-package com.upd.hwcloud.bean.entity.application;
+package com.upd.hwcloud.bean.entity.application.paas.libra;
 
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import org.springframework.format.annotation.DateTimeFormat;
-
+import com.baomidou.mybatisplus.annotation.TableId;
+import java.time.LocalDateTime;
+import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
 import java.util.Date;
 
 /**
  * <p>
- * Libra+分布式并行数据库白名单
+ * 
  * </p>
  *
- * @author junglefisher
- * @since 2020-05-09
+ * @author yyc
+ * @since 2020-06-11
  */
-@TableName("TB_PAAS_LIBRA_DB_WHITELIST")
-public class PaasLibraDbWhitelist extends Model<PaasLibraDbWhitelist> {
+@TableName("TB_PAAS_LIBRA_WHITELIST_IMPL")
+public class PaasLibraWhitelistImpl extends Model<PaasLibraWhitelistImpl> {
 
     private static final long serialVersionUID = 1L;
 
@@ -70,9 +72,7 @@ public class PaasLibraDbWhitelist extends Model<PaasLibraDbWhitelist> {
      * 申请时间
      */
          @TableField("APPLY_TIME")
-         @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-         @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss",timezone="GMT+8")
-    private Date applyTime;
+    private LocalDateTime applyTime;
 
         /**
      * 数据库账号
@@ -92,16 +92,16 @@ public class PaasLibraDbWhitelist extends Model<PaasLibraDbWhitelist> {
          @TableField("SHOPPING_CART_ID")
     private String shoppingCartId;
 
-        /**
+    /**
      * 创建时间
      */
-         @TableField(value = "CREATE_TIME", fill = FieldFill.INSERT)
+    @TableField(value = "CREATE_TIME", fill = FieldFill.INSERT)
     private Date createTime;
 
-        /**
+    /**
      * 修改时间
      */
-         @TableField(value = "MODIFIED_TIME", fill = FieldFill.INSERT_UPDATE)
+    @TableField(value = "MODIFIED_TIME", fill = FieldFill.INSERT_UPDATE)
     private Date modifiedTime;
 
 
@@ -109,7 +109,7 @@ public class PaasLibraDbWhitelist extends Model<PaasLibraDbWhitelist> {
         return id;
     }
 
-    public PaasLibraDbWhitelist setId(String id) {
+    public PaasLibraWhitelistImpl setId(String id) {
         this.id = id;
         return this;
     }
@@ -118,7 +118,7 @@ public class PaasLibraDbWhitelist extends Model<PaasLibraDbWhitelist> {
         return userName;
     }
 
-    public PaasLibraDbWhitelist setUserName(String userName) {
+    public PaasLibraWhitelistImpl setUserName(String userName) {
         this.userName = userName;
         return this;
     }
@@ -127,7 +127,7 @@ public class PaasLibraDbWhitelist extends Model<PaasLibraDbWhitelist> {
         return ipAddress;
     }
 
-    public PaasLibraDbWhitelist setIpAddress(String ipAddress) {
+    public PaasLibraWhitelistImpl setIpAddress(String ipAddress) {
         this.ipAddress = ipAddress;
         return this;
     }
@@ -136,7 +136,7 @@ public class PaasLibraDbWhitelist extends Model<PaasLibraDbWhitelist> {
         return macAddress;
     }
 
-    public PaasLibraDbWhitelist setMacAddress(String macAddress) {
+    public PaasLibraWhitelistImpl setMacAddress(String macAddress) {
         this.macAddress = macAddress;
         return this;
     }
@@ -145,7 +145,7 @@ public class PaasLibraDbWhitelist extends Model<PaasLibraDbWhitelist> {
         return ipType;
     }
 
-    public PaasLibraDbWhitelist setIpType(String ipType) {
+    public PaasLibraWhitelistImpl setIpType(String ipType) {
         this.ipType = ipType;
         return this;
     }
@@ -154,7 +154,7 @@ public class PaasLibraDbWhitelist extends Model<PaasLibraDbWhitelist> {
         return applyReason;
     }
 
-    public PaasLibraDbWhitelist setApplyReason(String applyReason) {
+    public PaasLibraWhitelistImpl setApplyReason(String applyReason) {
         this.applyReason = applyReason;
         return this;
     }
@@ -163,7 +163,7 @@ public class PaasLibraDbWhitelist extends Model<PaasLibraDbWhitelist> {
         return db;
     }
 
-    public PaasLibraDbWhitelist setDb(String db) {
+    public PaasLibraWhitelistImpl setDb(String db) {
         this.db = db;
         return this;
     }
@@ -172,16 +172,16 @@ public class PaasLibraDbWhitelist extends Model<PaasLibraDbWhitelist> {
         return dbIpAddress;
     }
 
-    public PaasLibraDbWhitelist setDbIpAddress(String dbIpAddress) {
+    public PaasLibraWhitelistImpl setDbIpAddress(String dbIpAddress) {
         this.dbIpAddress = dbIpAddress;
         return this;
     }
 
-    public Date getApplyTime() {
+    public LocalDateTime getApplyTime() {
         return applyTime;
     }
 
-    public PaasLibraDbWhitelist setApplyTime(Date applyTime) {
+    public PaasLibraWhitelistImpl setApplyTime(LocalDateTime applyTime) {
         this.applyTime = applyTime;
         return this;
     }
@@ -190,7 +190,7 @@ public class PaasLibraDbWhitelist extends Model<PaasLibraDbWhitelist> {
         return dbAccounts;
     }
 
-    public PaasLibraDbWhitelist setDbAccounts(String dbAccounts) {
+    public PaasLibraWhitelistImpl setDbAccounts(String dbAccounts) {
         this.dbAccounts = dbAccounts;
         return this;
     }
@@ -199,7 +199,7 @@ public class PaasLibraDbWhitelist extends Model<PaasLibraDbWhitelist> {
         return appInfoId;
     }
 
-    public PaasLibraDbWhitelist setAppInfoId(String appInfoId) {
+    public PaasLibraWhitelistImpl setAppInfoId(String appInfoId) {
         this.appInfoId = appInfoId;
         return this;
     }
@@ -208,27 +208,26 @@ public class PaasLibraDbWhitelist extends Model<PaasLibraDbWhitelist> {
         return shoppingCartId;
     }
 
-    public PaasLibraDbWhitelist setShoppingCartId(String shoppingCartId) {
+    public PaasLibraWhitelistImpl setShoppingCartId(String shoppingCartId) {
         this.shoppingCartId = shoppingCartId;
         return this;
     }
+
 
     public Date getCreateTime() {
         return createTime;
     }
 
-    public PaasLibraDbWhitelist setCreateTime(Date createTime) {
+    public void setCreateTime(Date createTime) {
         this.createTime = createTime;
-        return this;
     }
 
     public Date getModifiedTime() {
         return modifiedTime;
     }
 
-    public PaasLibraDbWhitelist setModifiedTime(Date modifiedTime) {
+    public void setModifiedTime(Date modifiedTime) {
         this.modifiedTime = modifiedTime;
-        return this;
     }
 
     @Override
@@ -238,7 +237,7 @@ public class PaasLibraDbWhitelist extends Model<PaasLibraDbWhitelist> {
 
     @Override
     public String toString() {
-        return "PaasLibraDbWhitelist{" +
+        return "PaasLibraWhitelistImpl{" +
         "id=" + id +
         ", userName=" + userName +
         ", ipAddress=" + ipAddress +

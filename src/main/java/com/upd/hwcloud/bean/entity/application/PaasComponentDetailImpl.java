@@ -97,6 +97,13 @@ public class PaasComponentDetailImpl extends Model<PaasComponentDetailImpl> {
      */
          @TableField("REMARK")
     private String remark;
+    /**
+     * 存储周期
+     */
+    @TableField("STORAGE_CYCLE")
+    private Integer storageCycle;
+
+
 
         /**
      * 订单ID
@@ -105,6 +112,14 @@ public class PaasComponentDetailImpl extends Model<PaasComponentDetailImpl> {
     private String appInfoId;
 
 
+
+    public Integer getStorageCycle() {
+        return storageCycle;
+    }
+
+    public void setStorageCycle(Integer storageCycle) {
+        this.storageCycle = storageCycle;
+    }
     public String getId() {
         return id;
     }

@@ -61,6 +61,12 @@ public class IaasZysb extends Model<IaasZysb> {
     private Integer workFlowVersion;
 
     /**
+     * 国家专项
+     */
+    @TableField("NATIONAL_SPECIAL_PROJECT")
+    private String nationalSpecialProject;
+
+    /**
      * 申请单号
      */
     @Excel(name = "工单号")
@@ -111,6 +117,8 @@ public class IaasZysb extends Model<IaasZysb> {
      */
          @TableField("AREAS")
     private String areas;
+
+         //todo:二级门户改造-租户上报新增nationalProject属性
 
         /**
      * 开始时间
@@ -425,6 +433,14 @@ public class IaasZysb extends Model<IaasZysb> {
 
     public void setWorkFlowVersion(Integer workFlowVersion) {
         this.workFlowVersion = workFlowVersion;
+    }
+
+    public String getNationalSpecialProject() {
+        return nationalSpecialProject;
+    }
+
+    public void setNationalSpecialProject(String nationalSpecialProject) {
+        this.nationalSpecialProject = nationalSpecialProject;
     }
 
     @Override

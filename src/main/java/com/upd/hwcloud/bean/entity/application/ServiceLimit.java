@@ -85,6 +85,12 @@ public class ServiceLimit extends Model<ServiceLimit> {
     @TableField(value = "MODIFIED_TIME", fill = FieldFill.INSERT_UPDATE)
     private Date modifiedTime;
 
+    /**
+     * 国家专项
+     */
+    @TableField("NATIONAL_SPECIAL_PROJECT")
+    private String nationalSpecialProject;
+
 
     public String getId() {
         return id;
@@ -187,6 +193,14 @@ public class ServiceLimit extends Model<ServiceLimit> {
 
     public void setFormNum(String formNum) {
         this.formNum = formNum;
+    }
+
+    public String getNationalSpecialProject() {
+        return nationalSpecialProject;
+    }
+
+    public void setNationalSpecialProject(String nationalSpecialProject) {
+        this.nationalSpecialProject = nationalSpecialProject;
     }
 
     @Override

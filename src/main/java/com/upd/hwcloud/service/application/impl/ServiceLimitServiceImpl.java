@@ -59,7 +59,7 @@ public class ServiceLimitServiceImpl extends ServiceImpl<ServiceLimitMapper, Ser
         }else {
             if(!StringUtils.equals(area,"省厅")){
                 if(StringUtils.equals("PAAS",formNum)){
-                    if (StringUtils.equals("ElasticSearch",clusterName)||StringUtils.equals("Redis",clusterName)||StringUtils.equals("Libra",clusterName)) {
+                    if (StringUtils.equals("Elasticsearch",clusterName)||StringUtils.equals("Redis",clusterName)||StringUtils.equals("Libra",clusterName)) {
                         quota = this.getOne(new QueryWrapper<ServiceLimit>().select("sum(CPU) cpu,sum(MEMORY) memory,sum(STORAGE) storage").eq("RESOURCE_TYPE", ResourceType.PAAS.getCode())
                                 .eq("AREA",area).eq("DESCRIPTION",clusterName));
                     }else {
@@ -91,23 +91,26 @@ public class ServiceLimitServiceImpl extends ServiceImpl<ServiceLimitMapper, Ser
      * @param appInfoId      上报订单号
      * @param area           地市
      * @param policeCategory 警种
+     * @param nationalSpecialProject 国家专项
      */
     @Transactional(rollbackFor = Throwable.class)
     @Override
-    public void increaseQuota(String appInfoId, String area, String policeCategory) {
+    public void increaseQuota(String appInfoId, String area, String policeCategory, String nationalSpecialProject) {
         List<ReportIaas> iaasList =  reportIaasService.list(new QueryWrapper<ReportIaas>().lambda().eq(ReportIaas::getAppInfoId,appInfoId));
+
+        //todo:二级门户改造-新增国家专项维度
 
         if(CollectionUtils.isNotEmpty(iaasList)){
             //暂时只处理弹性云服务器
             List<ReportIaas> ecsList = iaasList.parallelStream().filter(iaas->StringUtils.equals(iaas.getResourceName(),"弹性云服务器")).collect(Collectors.toList());
            if(CollectionUtils.isNotEmpty(ecsList)){
-               dealEcs(ecsList,area,policeCategory);
+               dealEcs(ecsList,area,policeCategory,nationalSpecialProject);
            }
         }
 
         List<ReportPaas> paasList = reportPaasService.list(new QueryWrapper<ReportPaas>().lambda().eq(ReportPaas::getAppInfoId,appInfoId));
         if(CollectionUtils.isNotEmpty(paasList)){
-            dealPaas(paasList,area,policeCategory);
+            dealPaas(paasList,area,policeCategory,nationalSpecialProject);
         }
     }
 
@@ -116,32 +119,60 @@ public class ServiceLimitServiceImpl extends ServiceImpl<ServiceLimitMapper, Ser
      * @param paasList
      * @param area
      * @param policeCategory
+     * @param nationalSpecialProject
      */
-    private void dealPaas(List<ReportPaas> paasList,String area,String policeCategory){
-        double totalCpu = paasList.parallelStream().filter(item->item.getCpu() != null).map(ReportPaas::getCpu).reduce(Double::sum).get();
-        double totalMemory = paasList.parallelStream().filter(item->item.getMemory() != null).map(ReportPaas::getMemory).reduce(Double::sum).get();
-        double totalStorage = paasList.parallelStream().filter(item->item.getDisk() != null).map(ReportPaas::getDisk).reduce(Double::sum).get();
-        ServiceLimit serviceLimit = this.getOne(new QueryWrapper<ServiceLimit>().lambda().eq(ServiceLimit::getArea,area)
-                                                .eq(ServiceLimit::getPoliceCategory,policeCategory)
-                                                .eq(ServiceLimit::getResourceType,ResourceType.PAAS.getCode()));
-        if(serviceLimit == null){
-            ServiceLimit newVo = new ServiceLimit();
-            newVo.setArea(area);
-            newVo.setCpu(totalCpu);
-            newVo.setMemory(totalMemory);
-            newVo.setStorage(totalStorage);
-            newVo.setPoliceCategory(policeCategory);
-            newVo.setResourceType(ResourceType.PAAS.getCode());
-            newVo.insert();
-        }else {
-            double cpu = serviceLimit.getCpu() + totalCpu;
-            double memory = serviceLimit.getMemory() + totalMemory;
-            double storage = serviceLimit.getStorage() + totalStorage;
-            this.update(new ServiceLimit(),new UpdateWrapper<ServiceLimit>().lambda().eq(ServiceLimit::getId,serviceLimit.getId())
-                    .set(ServiceLimit::getCpu,cpu)
-                    .set(ServiceLimit::getMemory,memory)
-                    .set(ServiceLimit::getStorage,storage));
-        }
+    private void dealPaas(List<ReportPaas> paasList,String area,String policeCategory,String nationalSpecialProject){
+
+        paasList.forEach(paas ->{
+            double paasCpu = paas.getCpu();
+            double paasMemory = paas.getMemory();
+            double paasStorage = paas.getDisk();
+            String description = null;
+            if (StringUtils.startsWith(paas.getResourceName(),"Redis")) {
+                description = "Redis";
+            }else if (StringUtils.startsWith(paas.getResourceName(),"Elasticsearch")) {
+                description = "Elasticsearch";
+            }else if (StringUtils.startsWith(paas.getResourceName(),"Libra")) {
+                description = "Libra";
+            }else {
+                description = "YARN";
+            }
+//            double totalCpu = paasList.parallelStream().filter(item->item.getCpu() != null).map(ReportPaas::getCpu).reduce(Double::sum).get();
+//            double totalMemory = paasList.parallelStream().filter(item->item.getMemory() != null).map(ReportPaas::getMemory).reduce(Double::sum).get();
+//            double totalStorage = paasList.parallelStream().filter(item->item.getDisk() != null).map(ReportPaas::getDisk).reduce(Double::sum).get();
+            ServiceLimit serviceLimit = new ServiceLimit();
+            if (StringUtils.isNotBlank(nationalSpecialProject)){//国家专项限额
+                serviceLimit = this.getOne(new QueryWrapper<ServiceLimit>().lambda().eq(ServiceLimit::getNationalSpecialProject,nationalSpecialProject)
+                        .eq(ServiceLimit::getResourceType,ResourceType.PAAS.getCode()).eq(ServiceLimit::getDescription,description));
+            }else {
+                serviceLimit = this.getOne(new QueryWrapper<ServiceLimit>().lambda().eq(ServiceLimit::getArea,area)
+                        .eq(ServiceLimit::getPoliceCategory,policeCategory)
+                        .eq(ServiceLimit::getResourceType,ResourceType.PAAS.getCode()).eq(ServiceLimit::getDescription,description));
+            }
+            if(serviceLimit == null){
+                ServiceLimit newVo = new ServiceLimit();
+                if (StringUtils.isNotBlank(nationalSpecialProject)){
+                    newVo.setNationalSpecialProject(nationalSpecialProject);
+                }else {
+                    newVo.setArea(area);
+                    newVo.setPoliceCategory(policeCategory);
+                }
+                newVo.setCpu(paasCpu);
+                newVo.setMemory(paasMemory);
+                newVo.setStorage(paasStorage);
+                newVo.setResourceType(ResourceType.PAAS.getCode());
+                newVo.setDescription(description);
+                newVo.insert();
+            }else {
+                double cpu = serviceLimit.getCpu() + paasCpu;
+                double memory = serviceLimit.getMemory() + paasMemory;
+                double storage = serviceLimit.getStorage() + paasStorage;
+                this.update(new ServiceLimit(),new UpdateWrapper<ServiceLimit>().lambda().eq(ServiceLimit::getId,serviceLimit.getId()).eq(ServiceLimit::getDescription,description)
+                        .set(ServiceLimit::getCpu,cpu)
+                        .set(ServiceLimit::getMemory,memory)
+                        .set(ServiceLimit::getStorage,storage));
+            }
+        });
     }
 
     /**
@@ -149,17 +180,29 @@ public class ServiceLimitServiceImpl extends ServiceImpl<ServiceLimitMapper, Ser
      * @param ecsList
      * @param area
      * @param policeCategory
+     * @param nationalSpecialProject
      */
-    private void dealEcs(List<ReportIaas> ecsList,String area,String policeCategory){
+    private void dealEcs(List<ReportIaas> ecsList,String area,String policeCategory,String nationalSpecialProject){
         double totalCpu = ecsList.parallelStream().map(ReportIaas::getCpu).reduce(Double::sum).get();
         double totalMemory = ecsList.parallelStream().map(ReportIaas::getMemory).reduce(Double::sum).get();
         double totalStorage = ecsList.parallelStream().map(ReportIaas::getDisk).reduce(Double::sum).get();
-        ServiceLimit serviceLimit = this.getOne(new QueryWrapper<ServiceLimit>().lambda().eq(ServiceLimit::getArea,area).eq(ServiceLimit::getPoliceCategory,policeCategory)
-                .eq(ServiceLimit::getServiceName,"弹性云服务器")
-                .eq(ServiceLimit::getResourceType,ResourceType.IAAS.getCode()));
+        ServiceLimit serviceLimit = new ServiceLimit();
+        if (StringUtils.isNotBlank(nationalSpecialProject)){//国家专项限额
+            serviceLimit = this.getOne(new QueryWrapper<ServiceLimit>().lambda().eq(ServiceLimit::getNationalSpecialProject, nationalSpecialProject)
+                    .eq(ServiceLimit::getServiceName, "弹性云服务器")
+                    .eq(ServiceLimit::getResourceType, ResourceType.IAAS.getCode()));
+        }else {
+            serviceLimit = this.getOne(new QueryWrapper<ServiceLimit>().lambda().eq(ServiceLimit::getArea,area).eq(ServiceLimit::getPoliceCategory,policeCategory)
+                    .eq(ServiceLimit::getServiceName,"弹性云服务器")
+                    .eq(ServiceLimit::getResourceType,ResourceType.IAAS.getCode()));
+        }
         if(serviceLimit == null){
             ServiceLimit newVo = new ServiceLimit();
-            newVo.setArea(area);
+            if (StringUtils.isNotBlank(nationalSpecialProject)){
+                newVo.setNationalSpecialProject(nationalSpecialProject);
+            }else{
+                newVo.setArea(area);
+            }
             newVo.setCpu(totalCpu);
             newVo.setMemory(totalMemory);
             newVo.setStorage(totalStorage);

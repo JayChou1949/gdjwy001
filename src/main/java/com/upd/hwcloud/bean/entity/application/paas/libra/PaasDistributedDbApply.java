@@ -1,4 +1,6 @@
-package com.upd.hwcloud.bean.entity.application;
+package com.upd.hwcloud.bean.entity.application.paas.libra;
+
+import com.upd.hwcloud.bean.entity.application.PaasDistributedDbInfo;
 
 import lombok.Data;
 
@@ -13,7 +15,9 @@ public class PaasDistributedDbApply {
     /**
      * 数据库信息
      */
-    private List<PaasDistributedDbInfo> paasDistributedDbInfos;
+    private PaasLibraInfo paasLibraInfo;
+
+    private List<PaasLibraAccount> paasLibraAccountList;
     /**
      * 白名单信息
      */

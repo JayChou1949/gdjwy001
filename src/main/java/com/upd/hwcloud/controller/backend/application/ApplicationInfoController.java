@@ -131,7 +131,7 @@ public class ApplicationInfoController {
             //不使用前端传的ID,统一后端处理
             //Workflow workflow = workflowService.getById(info.getWorkFlowId());
 
-            Workflow workflow = workflowService.chooseWorkFlow(resType,info.getAreaName(),info.getPoliceCategory(),info.getServiceTypeId());
+            Workflow workflow = workflowService.chooseWorkFlow(resType,info.getAreaName(),info.getPoliceCategory(),info.getServiceTypeId(),info.getNationalSpecialProject());
 
             info.setWorkFlowId(workflow.getId());
             String workFlowId = info.getWorkFlowId();

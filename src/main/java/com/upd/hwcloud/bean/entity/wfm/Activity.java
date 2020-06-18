@@ -16,7 +16,7 @@ import java.util.Date;
  * @author zwb
  * @since 2019-04-10
  */
-@TableName("TB_WFM_ACTIVITY")
+@TableName(value = "TB_WFM_ACTIVITY",resultMap = "BaseResultMap")
 public class Activity extends Model<Activity> {
 
     private static final long serialVersionUID = 1L;

@@ -74,7 +74,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         //如果是新增默认流程
         if (flow.getDefaultProcess()!=null&&!"".equals(flow.getDefaultProcess())){
 
-            dealOldDefault(flow.getDefaultProcess(),flow.getArea(),flow.getPoliceCategory(),flowId);
+            dealOldDefault(flow.getDefaultProcess(),flow.getArea(),flow.getPoliceCategory(),flowId,flow.getNationalSpecialProject());
         }
         this.save(flow);
         List<Workflowmodel> models = new ArrayList<>();
@@ -130,14 +130,18 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
      */
     @Override
     public boolean distinctAreaCheck(List<String> workFlowIds) {
+        //todo:二级门户改造-服务配置流程 唯一性 对应修改
         //获取对应流程集合
         List<Workflow> workflowList = this.list(new QueryWrapper<Workflow>().lambda().in(Workflow::getId,workFlowIds));
         //地市去重后的数据
-        long area = workflowList.stream().filter(item->StringUtils.isBlank(item.getPoliceCategory())).map(Workflow::getArea).distinct().count();
+        long area = workflowList.stream().filter(item->StringUtils.isBlank(item.getPoliceCategory())&&StringUtils.isBlank(item.getNationalSpecialProject())).map(Workflow::getArea).distinct().count();
         log.debug("area num -> {}",area);
         long police = workflowList.stream().map(Workflow::getPoliceCategory).filter(item->StringUtils.isNotBlank(item)).distinct().count();
         log.debug("police num ->{}",police);
-        return area + police == workFlowIds.size()?true:false;
+        //国家专项去重后的数据
+        long nationalSpecialProject = workflowList.stream().map(Workflow::getNationalSpecialProject).filter(item->StringUtils.isNotBlank(item)).distinct().count();
+        log.debug("nationalSpecialProject num ->{}",nationalSpecialProject);
+        return area + police + nationalSpecialProject == workFlowIds.size()?true:false;
     }
 
     /**
@@ -148,21 +152,33 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
      * @return
      */
     @Override
-    public Workflow chooseWorkFlow(ResourceType type, String area,String policeCategory,String serviceId) {
+    public Workflow chooseWorkFlow(ResourceType type, String area,String policeCategory,String serviceId,String nationalSpecialProject) {
 
-        //默认省厅流程
-        if(StringUtils.isBlank(area)){
-            area =  "省厅";
-        }
-
-        //如果ServiceId不为空=>说明是Iaas或Paas服务，服务可配置单独流程
-        if(serviceId != null){
-            log.info("==IaasOrPaas==");
-            return IaasOrPaasHandle(type,area,policeCategory,serviceId);
+        if (StringUtils.isNotBlank(nationalSpecialProject)){//国家专项不为空走国家专项
+            //如果ServiceId不为空=>说明是Iaas或Paas服务，服务可配置单独流程
+            if(serviceId != null){
+                log.info("==IaasOrPaas==");
+                return IaasOrPaasHandle(type,area,policeCategory,serviceId,nationalSpecialProject);
+            }else {
+                //Daas或SaasService => 只有国家专项默认流程
+                log.info("DaasOrSaasService");
+                return DaasOrSaasServiceHandle(type,area,policeCategory,nationalSpecialProject);
+            }
         }else {
-            //Daas或SaasService => 只有地市或省厅默认流程
-            log.info("DaasOrSaasService");
-            return DaasOrSaasServiceHandle(type,area,policeCategory);
+            //默认省厅流程
+            if(StringUtils.isBlank(area)){
+                area =  "省厅";
+            }
+
+            //如果ServiceId不为空=>说明是Iaas或Paas服务，服务可配置单独流程
+            if(serviceId != null){
+                log.info("==IaasOrPaas==");
+                return IaasOrPaasHandle(type,area,policeCategory,serviceId,nationalSpecialProject);
+            }else {
+                //Daas或SaasService => 只有地市或省厅默认流程
+                log.info("DaasOrSaasService");
+                return DaasOrSaasServiceHandle(type,area,policeCategory,nationalSpecialProject);
+            }
         }
     }
 
@@ -173,23 +189,32 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
      * @param serviceId
      * @return
      */
-    private Workflow IaasOrPaasHandle(ResourceType type, String area,String policeCategory,String serviceId){
-        if(StringUtils.equals(area,"省厅")){
-            log.info("====IP省厅==");
-            if(StringUtils.isBlank(policeCategory)){
-                log.debug("进入省厅PaaS IaaS处理流程");
-                return  handleProvinceOfPaasOrIaas(type,serviceId);
-            }else {
-                log.debug("进入警种PaaS IaaS处理流程");
-                return handlerPoliceOfPaasOrIaas(type,policeCategory,serviceId);
-            }
+    private Workflow IaasOrPaasHandle(ResourceType type, String area,String policeCategory,String serviceId,String nationalSpecialProject){
+        //todo:二级门户改造-新增一个国家专项的判断，以及流程(workflow)增加国家专项维度
+
+        if (StringUtils.isNotBlank(nationalSpecialProject)){
+            log.info("====IP国家专项==");
+            log.debug("进入国家专项PaaS IaaS处理流程");
+            return handleNationalSpecialProjectOfPaasOrIaas(type,nationalSpecialProject,serviceId);
         }else {
-            if(StringUtils.isBlank(area)){
-                throw  new BaseException("地区名为空,请确认订单信息");
+            if(StringUtils.equals(area,"省厅")){
+                log.info("====IP省厅==");
+                if(StringUtils.isBlank(policeCategory)){
+                    log.debug("进入省厅PaaS IaaS处理流程");
+                    return  handleProvinceOfPaasOrIaas(type,serviceId);
+                }else {
+                    log.debug("进入警种PaaS IaaS处理流程");
+                    return handlerPoliceOfPaasOrIaas(type,policeCategory,serviceId);
+                }
+            }else {
+                if(StringUtils.isBlank(area)){
+                    throw  new BaseException("地区名为空,请确认订单信息");
+                }
+                log.info("===IP地市:{}===",area);
+                return handleAreaOfPaasOrIaas(type,serviceId,area);
             }
-            log.info("===IP地市:{}===",area);
-            return handleAreaOfPaasOrIaas(type,serviceId,area);
         }
+
     }
 
     /**
@@ -198,33 +223,68 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
      * @param area
      * @return
      */
-    private Workflow DaasOrSaasServiceHandle(ResourceType type,String area,String policeCategory){
-        if(StringUtils.equals(area,"省厅")){
-            if(StringUtils.isNotBlank(policeCategory)){
-                log.debug("DaaS SaaS服务 获取默认警种流程");
-                Workflow defaultPoliceFlow =  getDefaultPoliceFlow(type,policeCategory);
-                if(defaultPoliceFlow == null){
-                    log.debug("未配置警种默认流程，使用省厅默认流程");
+    private Workflow DaasOrSaasServiceHandle(ResourceType type,String area,String policeCategory,String nationalSpecialProject){
+
+        //todo: 二级门户改造-新增国家专项维度
+        if (StringUtils.isNotBlank(nationalSpecialProject)){
+            log.debug("DaaS SaaS服务 获取默认国家专项流程");
+            return getDefaultNationalSpecialProjectFlow(type,nationalSpecialProject);
+        }else {
+            if(StringUtils.equals(area,"省厅")){
+                if(StringUtils.isNotBlank(policeCategory)){
+                    log.debug("DaaS SaaS服务 获取默认警种流程");
+                    Workflow defaultPoliceFlow =  getDefaultPoliceFlow(type,policeCategory);
+                    if(defaultPoliceFlow == null){
+                        log.debug("未配置警种默认流程，使用省厅默认流程");
+                        return getDefaultProvinceFlow(type);
+                    }
+                    log.debug("配置为警种默认流程");
+                    return defaultPoliceFlow;
+                }
+                return  getDefaultProvinceFlow(type);
+            }else {
+                if(StringUtils.isBlank(area)){
+                    throw  new BaseException("地区名为空,请确认订单信息");
+                }
+                Workflow areaDefault = getDefaultAreaFlow(type,area);
+                if(areaDefault == null) {
                     return getDefaultProvinceFlow(type);
                 }
-                log.debug("配置为警种默认流程");
-                return defaultPoliceFlow;
+                return areaDefault;
             }
-            return  getDefaultProvinceFlow(type);
-        }else {
-            if(StringUtils.isBlank(area)){
-                throw  new BaseException("地区名为空,请确认订单信息");
-            }
-            Workflow areaDefault = getDefaultAreaFlow(type,area);
-            if(areaDefault == null) {
-                return getDefaultProvinceFlow(type);
-            }
-            return areaDefault;
         }
     }
 
+    /**
+     * 国家专项流程处理
+     * @param type  资源类型
+     * @param nationalSpecialProject    国家专项
+     * @param serviceId     资源ID
+     * @return
+     */
+    private Workflow handleNationalSpecialProjectOfPaasOrIaas(ResourceType type,String nationalSpecialProject,String serviceId){
 
+        //查询服务是否有配置流程
+        List<ServiceWorkFlow> result = serviceWorkFlowService.list(new QueryWrapper<ServiceWorkFlow>().lambda().eq(ServiceWorkFlow::getServiceId,serviceId));
+        //有
+        if(CollectionUtils.isNotEmpty(result)){
+            //获取流程ID集合
+            List<String> workflowIds = result.stream().map(ServiceWorkFlow::getWorkFlowId).collect(Collectors.toList());
+            //判断是否有国家专项流程
+            Workflow workflow = this.getOne(new QueryWrapper<Workflow>().lambda().in(Workflow::getId,workflowIds).eq(Workflow::getNationalSpecialProject,nationalSpecialProject));
+            log.info("workflow -> {}",workflow);
+            if(workflow == null){
+                //无 则使用国家专项该资源默认流程
+                return getDefaultNationalSpecialProjectFlow(type,nationalSpecialProject);
+            }
+            log.info("===服务配置国家专项流程===");
+            return workflow;
+        }else {
+            //服务没有配置流程 直接使用国家专项该类资源的默认流程
+            return getDefaultNationalSpecialProjectFlow(type,nationalSpecialProject);
+        }
 
+    }
 
 
     /**
@@ -381,6 +441,12 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         return defaultFlow;
     }
 
+    private Workflow getDefaultNationalSpecialProjectFlow(ResourceType type,String nationalSpecialProject){
+        log.info("获取{}国家专项 {} 默认流程 ->",nationalSpecialProject,type.toString());
+        Workflow defaultFlow  = this.getOne(new QueryWrapper<Workflow>().lambda().eq(Workflow::getFlowStatus,0).eq(Workflow::getDefaultProcess,type.toString()).eq(Workflow::getNationalSpecialProject,nationalSpecialProject));
+        return defaultFlow;
+    }
+
 
 
     @Override
@@ -414,7 +480,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     @Override
     public Workflow updateFlow(User user, Workflow flow) {
         if (flow.getDefaultProcess()!=null&&!"".equals(flow.getDefaultProcess())){
-            dealOldDefault(flow.getDefaultProcess(),flow.getArea(),flow.getPoliceCategory(),flow.getId());
+            dealOldDefault(flow.getDefaultProcess(),flow.getArea(),flow.getPoliceCategory(),flow.getId(),flow.getNationalSpecialProject());
         }
         if (SPECIAL_DEFAULT_PROCESS.contains(flow.getDefaultProcess())) {
             flow.setFlowStatus(1);
@@ -439,7 +505,8 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
     @Override
     public boolean updateFlowBeta(Workflow flow){
         if (flow.getDefaultProcess()!=null&&!"".equals(flow.getDefaultProcess())){
-            dealOldDefault(flow.getDefaultProcess(),flow.getArea(),flow.getPoliceCategory(),flow.getId());
+            //todo:二级门户改造-默认流程更新逻辑需要修改
+            dealOldDefault(flow.getDefaultProcess(),flow.getArea(),flow.getPoliceCategory(),flow.getId(),flow.getNationalSpecialProject());
         }
         if (SPECIAL_DEFAULT_PROCESS.contains(flow.getDefaultProcess())) {
             flow.setFlowStatus(1);
@@ -573,12 +640,17 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
      * @param area
      * @param flowId
      */
-    private void dealOldDefault(String defaultProcess,String area,String policeCategory,String flowId){
+    private void dealOldDefault(String defaultProcess,String area,String policeCategory,String flowId,String nationalSpecialProject){
         List<Workflow> defaultWorkFlowList = Lists.newArrayList();
-        if(StringUtils.isBlank(policeCategory)){ //如果警种字段不是空，按警种处理默认流程
-            defaultWorkFlowList = this.list(new QueryWrapper<Workflow>().eq("DEFAULT_PROCESS",defaultProcess).eq("area",area).ne("id",flowId));
+        //todo：二级门户改造-如果国家专项不是空,按国家流程算
+        if (StringUtils.isNotBlank(nationalSpecialProject)){//如果国家专项字段不是空，按国家专项处理默认流程
+            defaultWorkFlowList = this.list(new QueryWrapper<Workflow>().eq("DEFAULT_PROCESS",defaultProcess).eq("NATIONAL_SPECIAL_PROJECT",nationalSpecialProject).ne("ID",flowId));
         }else {
-            defaultWorkFlowList = this.list(new QueryWrapper<Workflow>().eq("DEFAULT_PROCESS",defaultProcess).eq("POLICE_CATEGORY",policeCategory).ne("ID",flowId));
+            if(StringUtils.isBlank(policeCategory)){ //如果警种字段不是空，按警种处理默认流程
+                defaultWorkFlowList = this.list(new QueryWrapper<Workflow>().eq("DEFAULT_PROCESS",defaultProcess).eq("area",area).ne("id",flowId));
+            }else {
+                defaultWorkFlowList = this.list(new QueryWrapper<Workflow>().eq("DEFAULT_PROCESS",defaultProcess).eq("POLICE_CATEGORY",policeCategory).ne("ID",flowId));
+            }
         }
         if(CollectionUtils.isNotEmpty(defaultWorkFlowList)){
             defaultWorkFlowList.forEach(item->{

@@ -286,7 +286,7 @@
                     and tsp.STATUS = '8'
                 </when>
                 <otherwise>
-                    and tsp.STATUS != '8'
+                    and tsp.STATUS != '8' and tsp.STATUS != '4'
                 </otherwise>
             </choose>
         </where>
