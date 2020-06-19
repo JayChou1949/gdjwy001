@@ -112,9 +112,10 @@ public class ResourceRecoverImplServiceImpl extends ServiceImpl<ResourceRecoverI
 
             //被回收人不同意回收的情况下 业务办理
             if(info.getRecoveredAgree().equals(0)){
-                for(ResourceRecoverImpl impl:implList){
-                    impl.setProcessResult("暂不缩配");
-                }
+                //最新修改，无论被回收人是否同意，只要业务办理选择缩配，就按照选择的类型保存数据
+//                for(ResourceRecoverImpl impl:implList){
+//                    impl.setProcessResult("暂不缩配");
+//                }
             }
             for(ResourceRecoverImpl impl:implList){
                 impl.setId(null);
