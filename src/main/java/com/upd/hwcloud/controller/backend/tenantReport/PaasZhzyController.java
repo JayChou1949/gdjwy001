@@ -58,7 +58,7 @@ public class PaasZhzyController {
         return R.ok(apps);
     }
 
-    @ApiOperation(value = "应用集群概览")
+    @ApiOperation(value = "应用集群概览详细信息")
     @RequestMapping(value = "/appClusterDetails",method = RequestMethod.GET)
     public R appClusterDetails(@RequestParam(value = "appName") String appName,@RequestParam(value = "clusterName") String clusterName){
         PaasZhzy paasZhzy = new PaasZhzy();
@@ -68,6 +68,18 @@ public class PaasZhzyController {
             return R.error();
         }
         return R.ok(paasZhzy);
+    }
+
+    @ApiOperation(value = "应用集群概览tab")
+    @RequestMapping(value = "/clusterTabs",method = RequestMethod.GET)
+    public R clusterTabs(@RequestParam(value = "appName") String appName){
+        List<String> clusterList;
+        try {
+            clusterList = paasZhzyService.clusterTabs(appName);
+        }catch (Exception e) {
+            return R.error();
+        }
+        return R.ok(clusterList);
     }
 
 

@@ -39,4 +39,7 @@ public class ServiceRequestVo {
 
     @Excel(name = "被调用总数(次)",orderNum = "7",width = 15,type = 10)
     private Integer totalReqCount;//被调用总数
+
+    @Excel(name = "时间",orderNum = "8",width = 15)
+    private String currentTime;//时间
 }

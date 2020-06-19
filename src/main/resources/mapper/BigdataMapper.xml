@@ -94,6 +94,7 @@
     <select id="appStatisticsByRequest" resultType="com.upd.hwcloud.bean.vo.daasService.ServiceRequestVo">
         SELECT ROWNUM AS "ID",T.* FROM (
             SELECT
+            A.CURRENT_TIME AS currentTime,
             B.NAME AS serviceName,
             B.AREA_NAME AS serviceAreaName,
             B.POLICE_CATEGORY AS servicePoliceCategory,
@@ -113,12 +114,10 @@
     <select id="serviceStatisticsByRequest" resultType="com.upd.hwcloud.bean.vo.daasService.ServiceRequestVo">
         SELECT ROWNUM AS "ID",T.* FROM (
             SELECT
+            A.CURRENT_TIME AS currentTime,
             B.NAME AS serviceName,
             B.AREA_NAME AS serviceAreaName,
             B.POLICE_CATEGORY AS servicePoliceCategory,
-            SUBSTR(I."ALIAS", 0, INSTR(I."ALIAS",'（')-1) AS appName,
-            I.AREA_NAME AS appAreaName,
-            I.POLICE_CATEGORY AS appPoliceCategory,
             A.REQ_COUNT AS totalReqCount
             FROM
             TB_SERVICE_STATISTICS A

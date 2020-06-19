@@ -59,7 +59,7 @@ public class ServiceLimitServiceImpl extends ServiceImpl<ServiceLimitMapper, Ser
         }else {
             if(!StringUtils.equals(area,"省厅")){
                 if(StringUtils.equals("PAAS",formNum)){
-                    if (StringUtils.equals("Elasticsearch",clusterName)||StringUtils.equals("Redis",clusterName)||StringUtils.equals("Libra",clusterName)) {
+                    if (StringUtils.equals("Elasticsearch",clusterName)||StringUtils.equals("Redis",clusterName)||StringUtils.equals("Libra",clusterName)||StringUtils.equals("关系型数据库",clusterName)) {
                         quota = this.getOne(new QueryWrapper<ServiceLimit>().select("sum(CPU) cpu,sum(MEMORY) memory,sum(STORAGE) storage").eq("RESOURCE_TYPE", ResourceType.PAAS.getCode())
                                 .eq("AREA",area).eq("DESCRIPTION",clusterName));
                     }else {
@@ -122,11 +122,19 @@ public class ServiceLimitServiceImpl extends ServiceImpl<ServiceLimitMapper, Ser
      * @param nationalSpecialProject
      */
     private void dealPaas(List<ReportPaas> paasList,String area,String policeCategory,String nationalSpecialProject){
-
-        paasList.forEach(paas ->{
-            double paasCpu = paas.getCpu();
-            double paasMemory = paas.getMemory();
-            double paasStorage = paas.getDisk();
+        for(ReportPaas paas:paasList) {
+            double paasCpu = 0;
+            double paasMemory = 0;
+            double paasStorage = 0;
+            if (paas.getCpu() != null) {
+                paasCpu = paas.getCpu();
+            }
+            if (paas.getMemory() != null) {
+                paasMemory = paas.getMemory();
+            }
+            if (paas.getDisk() != null) {
+                paasStorage = paas.getDisk();
+            }
             String description = null;
             if (StringUtils.startsWith(paas.getResourceName(),"Redis")) {
                 description = "Redis";
@@ -134,6 +142,8 @@ public class ServiceLimitServiceImpl extends ServiceImpl<ServiceLimitMapper, Ser
                 description = "Elasticsearch";
             }else if (StringUtils.startsWith(paas.getResourceName(),"Libra")) {
                 description = "Libra";
+            }else if (StringUtils.startsWith(paas.getResourceName(),"数据库")) {
+                description = "关系型数据库";
             }else {
                 description = "YARN";
             }
@@ -172,7 +182,7 @@ public class ServiceLimitServiceImpl extends ServiceImpl<ServiceLimitMapper, Ser
                         .set(ServiceLimit::getMemory,memory)
                         .set(ServiceLimit::getStorage,storage));
             }
-        });
+        }
     }
 
     /**
