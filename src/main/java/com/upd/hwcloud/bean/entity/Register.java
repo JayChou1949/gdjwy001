@@ -30,6 +30,14 @@ public class Register<T extends Register> extends Model<T> {
          @ApiModelProperty(value = "服务名称")
     protected String name;
 
+    /**
+     * 项目名称
+     */
+    @TableField("PROJECT_NAME")
+    @ApiModelProperty(value = "项目名称")
+    protected String projectName;
+
+
         /**
      * 状态 ：1建设中；0 建设完成
      */
@@ -759,6 +767,14 @@ public class Register<T extends Register> extends Model<T> {
     public Register setJsPrincipalIdcard(String jsPrincipalIdcard) {
         this.jsPrincipalIdcard = jsPrincipalIdcard;
         return this;
+    }
+
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
     }
 
     @Override
