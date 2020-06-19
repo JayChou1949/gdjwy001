@@ -35,12 +35,16 @@ public class PaasZhzyServiceImpl extends ServiceImpl<PaasZhzyMapper, PaasZhzy> i
         DecimalFormat df = new DecimalFormat("#.00");
 
         PaasZhzy paasYarn = paasZhzyMapper.getPaasYarn(area, police);
-        paasYarn.setMemoryTotal(BigDecimalUtil.div(paasYarn.getMemoryTotal(),1024).doubleValue());
-        paasYarn.setMemoryUsed(BigDecimalUtil.div(paasYarn.getMemoryUsed(),1024).doubleValue());
+        if (paasYarn != null) {
+            paasYarn.setMemoryTotal(BigDecimalUtil.div(paasYarn.getMemoryTotal(),1024).doubleValue());
+            paasYarn.setMemoryUsed(BigDecimalUtil.div(paasYarn.getMemoryUsed(),1024).doubleValue());
+        }
 
         PaasZhzy paasElasticsearch = paasZhzyMapper.getPaasElasticsearch(area, police);
-        paasElasticsearch.setElasticsearchCpuUsed(Double.parseDouble(df.format(paasElasticsearch.getElasticsearchCpuTotal()*paasElasticsearch.getElasticsearchCpuUsage()*0.01)));
-        paasElasticsearch.setElasticsearchMemoryTotal(BigDecimalUtil.div(paasElasticsearch.getElasticsearchMemoryTotal(),1024).doubleValue());
+        if (paasElasticsearch != null) {
+            paasElasticsearch.setElasticsearchCpuUsed(Double.parseDouble(df.format(paasElasticsearch.getElasticsearchCpuTotal()*paasElasticsearch.getElasticsearchCpuUsage()*0.01)));
+            paasElasticsearch.setElasticsearchMemoryTotal(BigDecimalUtil.div(paasElasticsearch.getElasticsearchMemoryTotal(),1024).doubleValue());
+        }
         if (paasElasticsearch.getElasticsearchMemoryTotal()!=0) {
             paasElasticsearch.setElasticsearchMemoryUsage(BigDecimalUtil.div(paasElasticsearch.getElasticsearchMemoryUsed(),paasElasticsearch.getElasticsearchMemoryTotal()).doubleValue());
         }
@@ -50,11 +54,15 @@ public class PaasZhzyServiceImpl extends ServiceImpl<PaasZhzyMapper, PaasZhzy> i
         }
 
         PaasZhzy paasRedis = paasZhzyMapper.getPaasRedis(area, police);
-        paasRedis.setRedisMemoryUsed(Double.parseDouble(df.format(paasRedis.getRedisMemoryTotal()*paasRedis.getRedisMemoryUsage()*0.01)));
+        if (paasRedis != null) {
+            paasRedis.setRedisMemoryUsed(Double.parseDouble(df.format(paasRedis.getRedisMemoryTotal()*paasRedis.getRedisMemoryUsage()*0.01)));
+        }
 
         PaasZhzy paasLibra = paasZhzyMapper.getPaasLibra(area, police);
-        paasLibra.setMemoryTotal(BigDecimalUtil.div(paasLibra.getMemoryTotal(),1024).doubleValue());
-        paasLibra.setMemoryUsed(BigDecimalUtil.div(paasLibra.getMemoryUsed(),1024).doubleValue());
+        if (paasLibra != null) {
+            paasLibra.setMemoryTotal(BigDecimalUtil.div(paasLibra.getMemoryTotal(),1024).doubleValue());
+            paasLibra.setMemoryUsed(BigDecimalUtil.div(paasLibra.getMemoryUsed(),1024).doubleValue());
+        }
 
         paasZhzyMap.put("YARN资源",paasYarn);
         paasZhzyMap.put("Elasticsearch",paasElasticsearch);
