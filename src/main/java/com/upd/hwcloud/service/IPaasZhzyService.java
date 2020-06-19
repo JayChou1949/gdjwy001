@@ -21,4 +21,6 @@ public interface IPaasZhzyService extends IService<PaasZhzy> {
     List<String> appFromAreaOrPolice(String area, String police);
 
     PaasZhzy appClusterDetails(String appName, String clusterName);
+
+    List<String> clusterTabs(String appName);
 }

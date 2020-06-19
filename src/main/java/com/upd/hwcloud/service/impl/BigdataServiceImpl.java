@@ -235,8 +235,8 @@ public class BigdataServiceImpl extends ServiceImpl<BigdataMapper, Bigdata> impl
             if (!StringUtils.isEmpty(endDate)){
                 wrapper.le("A.CURRENT_TIME",endDate);
             }
-            wrapper.groupBy("A.REQ_COUNT,B.NAME,SUBSTR(I.ALIAS, 0, INSTR(I.ALIAS,'（')-1),B.AREA_NAME, B.POLICE_CATEGORY,I.AREA_NAME,I.POLICE_CATEGORY");
-            wrapper.orderByAsc("B.NAME");
+            wrapper.groupBy("A.REQ_COUNT,A.CURRENT_TIME,B.NAME,B.AREA_NAME,B.POLICE_CATEGORY");
+            wrapper.orderByDesc("A.CURRENT_TIME");
             wrapper.isNotNull("B.NAME");
             wrapper.isNotNull("SUBSTR(I.ALIAS, 0, INSTR(I.ALIAS,'（')-1)");
             serviceRequestVos = bigdataMapper.serviceStatisticsByRequest(page, wrapper);
@@ -256,8 +256,8 @@ public class BigdataServiceImpl extends ServiceImpl<BigdataMapper, Bigdata> impl
             if (!StringUtils.isEmpty(endDate)){
                 wrapper.le("A.CURRENT_TIME",endDate);
             }
-            wrapper.groupBy("SUBSTR(I.ALIAS, 0, INSTR(I.ALIAS,'（')-1),A.REQ_COUNT,B.NAME,B.AREA_NAME,B.POLICE_CATEGORY,I.AREA_NAME,I.POLICE_CATEGORY");
-            wrapper.orderByAsc("SUBSTR(I.ALIAS, 0, INSTR(I.ALIAS,'（')-1)");
+            wrapper.groupBy("SUBSTR(I.ALIAS, 0, INSTR(I.ALIAS,'（')-1),A.REQ_COUNT,A.CURRENT_TIME,B.NAME,B.AREA_NAME,B.POLICE_CATEGORY,I.AREA_NAME,I.POLICE_CATEGORY");
+            wrapper.orderByDesc("A.CURRENT_TIME");
             wrapper.isNotNull("B.NAME");
             wrapper.isNotNull("SUBSTR(I.ALIAS, 0, INSTR(I.ALIAS,'（')-1)");
             serviceRequestVos = bigdataMapper.appStatisticsByRequest(page, wrapper);

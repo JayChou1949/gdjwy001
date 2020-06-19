@@ -73,18 +73,7 @@ import com.upd.hwcloud.service.ISaasRegisterService;
 import com.upd.hwcloud.service.ISaasService;
 import com.upd.hwcloud.service.IServicePublishService;
 import com.upd.hwcloud.service.IUserService;
-import com.upd.hwcloud.service.application.IAppReviewInfoService;
-import com.upd.hwcloud.service.application.IApplicationFeedbackService;
-import com.upd.hwcloud.service.application.IApplicationHandler;
-import com.upd.hwcloud.service.application.IApplicationInfoService;
-import com.upd.hwcloud.service.application.IDaasApigService;
-import com.upd.hwcloud.service.application.IImplHandler;
-import com.upd.hwcloud.service.application.IInnerReviewUserService;
-import com.upd.hwcloud.service.application.IPaasApigService;
-import com.upd.hwcloud.service.application.IPaasFseqsqmImplService;
-import com.upd.hwcloud.service.application.IPaasRdbBaseService;
-import com.upd.hwcloud.service.application.IPaasTyyhService;
-import com.upd.hwcloud.service.application.ISpeedUpService;
+import com.upd.hwcloud.service.application.*;
 import com.upd.hwcloud.service.msg.MessageProvider;
 import com.upd.hwcloud.service.workbench.impl.CommonHandler;
 
@@ -173,6 +162,8 @@ public class ApplicationInfoServiceImpl extends ServiceImpl<ApplicationInfoMappe
     @Autowired
     private IPaasApigService paasApigService;
     @Autowired
+    private ISaasApigService saasApigService;
+    @Autowired
     private ISaasRegisterService saasRegisterService;
 
     @Autowired
@@ -200,6 +191,8 @@ public class ApplicationInfoServiceImpl extends ServiceImpl<ApplicationInfoMappe
     private boolean daasAutoEnable;
     @Value("${paas.auto.enable}")
     private boolean paasAutoEnable;
+    @Value("${saas.auto.enable}")
+    private boolean saasAutoEnable;
 
     @Value("${iMoc.pre.url}")
     private String iMocPreURL;
@@ -1368,6 +1361,14 @@ public class ApplicationInfoServiceImpl extends ServiceImpl<ApplicationInfoMappe
                     logger.info("统一消息自动订购");
                     orderMap = paasApigService.orderService(info, implHandler);
 //                    paasApigService.addTYXXMessage(info);
+                }
+            }
+            if (saasAutoEnable) {
+                FormNum formNum = FormNum.getFormNumByInfo(info);
+                if (formNum == FormNum.SAAS_SERVICE) { // saas服务 自动订购
+
+                    saasApigService.orderService(info);
+
                 }
             }
             // 发送通知消息
