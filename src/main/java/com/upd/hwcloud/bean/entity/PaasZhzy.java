@@ -77,7 +77,7 @@ public class PaasZhzy extends Model<PaasZhzy> {
      * 入库时间
      */
          @TableField("ODS_TIME")
-    private LocalDateTime odsTime;
+    private Double odsTime;
 
         /**
      * 分配给租户的CPU总配额(vCores)
@@ -303,11 +303,11 @@ public class PaasZhzy extends Model<PaasZhzy> {
         return this;
     }
 
-    public LocalDateTime getOdsTime() {
+    public Double getOdsTime() {
         return odsTime;
     }
 
-    public PaasZhzy setOdsTime(LocalDateTime odsTime) {
+    public PaasZhzy setOdsTime(Double odsTime) {
         this.odsTime = odsTime;
         return this;
     }
