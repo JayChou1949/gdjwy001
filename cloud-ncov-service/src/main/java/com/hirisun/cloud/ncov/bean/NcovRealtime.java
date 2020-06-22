@@ -2,27 +2,43 @@ package com.hirisun.cloud.ncov.bean;
 
 import java.util.Date;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+
+@TableName("T_NCOV_REALTIME")
 public class NcovRealtime {
 
+	@TableId(value = "ID", type = IdType.UUID)
 	private String id;
 
-    private String regionName;
+	@TableField("REGION_NAME")
+    private String regionName; //区域名称
 
-    private Integer diagnosis;
+	@TableField("DIAGNOSIS")
+    private Integer diagnosis; //确诊
 
-    private Integer suspected;
+	@TableField("SUSPECTED")
+    private Integer suspected; //疑似
 
-    private Integer death;
+	@TableField("DEATH")
+    private Integer death; //死亡
 
-    private Integer cure;
+	@TableField("CURE")
+    private Integer cure; //治愈
 
-    private Date createDate;
+	@TableField("CREATE_DATE")
+    private Date createDate; //创建日期
 
-    private String createUser;
+	@TableField("CREATE_USER")
+    private String createUser; //创建人
 
-    private Integer provinceCode;
+	@TableField("PROVINCE_CODE")
+    private Integer provinceCode; //省份号码 广东=44
 
-    private Integer regionType;
+	@TableField("REGION_TYPE")
+    private Integer regionType; //1=省，2=市
 
     public String getId() {
         return id;

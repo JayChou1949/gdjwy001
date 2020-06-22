@@ -1,15 +1,13 @@
 package com.hirisun.cloud.ncov;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-import org.springframework.cloud.netflix.hystrix.EnableHystrix;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-@EnableCircuitBreaker
-@EnableHystrix
+@MapperScan("com.hirisun.cloud.ncov.mapper")
 public class NcovApplication {
 
 	public static void main(String[] args) {

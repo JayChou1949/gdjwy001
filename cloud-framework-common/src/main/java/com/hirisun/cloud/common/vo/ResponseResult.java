@@ -12,10 +12,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class ResponseResult implements Response {
-    int code = SUCCESS_CODE;
+	Integer code = SUCCESS_CODE;
     String msg = SUCCESS_MSG;
 
-    public ResponseResult(int code, String msg) {
+    public ResponseResult(Integer code, String msg) {
         this.code = code;
         this.msg = msg;
     }

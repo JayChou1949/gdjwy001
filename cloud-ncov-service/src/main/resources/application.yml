@@ -1,19 +1,4 @@
-server:
-   port: 8000
-
 spring:
-  main:
-    allow-bean-definition-overriding: true
-  application: 
-     name: cloud-ncov-service-dev
-  cloud:
-    nacos:
-        discovery:
-          # 配置Nacos地址
-          server-addr: 192.168.11.66:8848
-        #config:
-          #server-addr: 192.168.11.66:8848
-          #file-extension: yml
   datasource:
     url: jdbc:oracle:thin:@139.9.242.131:1521/jwymh
     username: gd_jwymh
@@ -55,7 +40,7 @@ ribbon:
 
 # ====================MybatisPlus====================
 mybatis-plus:
-  mapper-locations: classpath*:/mapper/*Mapper.xml
+  mapper-locations: classpath*:/mapper/ncov/*Mapper.xml
   typeAliasesPackage: com.hirisun.cloud.model.**.vo,com.hirisun.cloud.**.bean
   global-config:
     #刷新mapper 调试神器
@@ -80,4 +65,5 @@ mybatis-plus:
     jdbc-type-for-null: 'null'
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
     database-id: oracle
+
 

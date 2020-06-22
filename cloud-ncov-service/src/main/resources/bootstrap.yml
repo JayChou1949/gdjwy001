@@ -1,3 +1,16 @@
+server:
+   port: 8000
+
 spring:
-  profiles:
-    active: dev
+  main:
+    allow-bean-definition-overriding: true
+  application: 
+     name: cloud-ncov-service
+  cloud:
+    nacos:
+        discovery:
+          # 配置Nacos地址
+          server-addr: 192.168.11.100:8848
+        #config:
+          #server-addr: 192.168.11.66:8848
+          #file-extension: yml

@@ -1,18 +1,11 @@
 package com.hirisun.cloud.ncov.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.hirisun.cloud.ncov.bean.NcovRealtime;
 
-public interface NcovRealtimeMapper {
+public interface NcovRealtimeMapper extends BaseMapper<NcovRealtime>{
 	
-    int deleteByPrimaryKey(String id);
-
-    int insert(NcovRealtime record);
-
-    int insertSelective(NcovRealtime record);
-
-    NcovRealtime selectByPrimaryKey(String id);
-
-    int updateByPrimaryKeySelective(NcovRealtime record);
-
-    int updateByPrimaryKey(NcovRealtime record);
+	
+	
+	
 }

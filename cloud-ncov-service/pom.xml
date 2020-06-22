@@ -11,9 +11,8 @@
         <maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
     </properties>
   
-  <!--分别设置开发，测试，生产环境-->
+  <!--分别设置开发，测试，生产环境
 	<profiles>
-		<!-- 开发环境 -->
 		<profile>
 			<id>dev</id>
 			<activation>
@@ -23,25 +22,22 @@
 				<profiles.active>dev</profiles.active>
 			</properties>
 		</profile>
-		<!-- 测试环境 -->
 		<profile>
 			<id>test</id>
 			<properties>
 				<profiles.active>test</profiles.active>
 			</properties>
 		</profile>
-		<!-- 生产环境 -->
 		<profile>
 			<id>pro</id>
 			<properties>
 				<profiles.active>pro</profiles.active>
 			</properties>
 		</profile>
-	</profiles>
+	</profiles>-->
   
   <dependencies>
-  
-  	<dependency>
+  		<dependency>
 		    <groupId>com.baomidou</groupId>
 		    <artifactId>mybatis-plus-boot-starter</artifactId>
 		</dependency>
@@ -104,14 +100,14 @@
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-commons</artifactId>
 		</dependency>
-			    <dependency>
+			    <!-- <dependency>
 			        <groupId>org.springframework.cloud</groupId>
 			        <artifactId>spring-cloud-starter-feign</artifactId>
-			    </dependency>
+			    </dependency> 
 			    <dependency>
 			        <groupId>org.springframework.cloud</groupId>
 			        <artifactId>spring-cloud-starter-hystrix</artifactId>
-			    </dependency>
+			    </dependency>-->
 				<dependency>
 					<groupId>org.springframework.boot</groupId>
 					<artifactId>spring-boot-starter-web</artifactId>
@@ -170,11 +166,6 @@
 			
 			<resource>
                 <directory>src/main/resources</directory>
-                <excludes>
-					<exclude>dev/*</exclude>
-					<exclude>test/*</exclude>
-					<exclude>pro/*</exclude>
-				</excludes>
                 <includes>
                     <include>**/*.*</include>
                 </includes>
