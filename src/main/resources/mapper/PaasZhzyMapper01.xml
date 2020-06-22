@@ -72,9 +72,9 @@
         <include refid="commom"></include>
 
     </select>
-    <!--    查询yarn的cpu 峰值-->
-    <select id="maxYarnCpu" resultMap="BaseResultMap">
-        SELECT max(CPU_USAGE) FROM TB_PAAS_ZHZY
+    <!--    查询yarn的内存 峰值-->
+    <select id="maxYarnMemory" resultMap="BaseResultMap">
+        SELECT max(MEMORY_USAGE) FROM TB_PAAS_ZHZY
         WHERE TYPE_SITE='hadoop'  and APPLY_NAME=#{appName}
         <include refid="commom"></include>
     </select>
