@@ -55,67 +55,67 @@ public class PaasZhzyServiceImpl01 extends ServiceImpl<PaasZhzyMapper01, PaasZhz
     }
 
     @Override
-    public int maxYarnCpu(String appName, String area, String police, Integer day) {
+    public PaasZhzy maxYarnCpu(String appName, String area, String police, Integer day) {
         return paasZhzyMapper01.maxYarnCpu(appName,area,police,day);
     }
 
     @Override
-    public int maxYarnMemory(String appName, String area, String police, Integer day) {
+    public PaasZhzy maxYarnMemory(String appName, String area, String police, Integer day) {
         return paasZhzyMapper01.maxYarnMemory(appName,area,police,day);
     }
 
     @Override
-    public int totalYarnCpu(String appName, String area, String police, Integer day) {
+    public PaasZhzy totalYarnCpu(String appName, String area, String police, Integer day) {
         return paasZhzyMapper01.totalYarnCpu(appName,area,police,day);
     }
 
     @Override
-    public int maxLibraCpu(String appName, String area, String police, Integer day) {
+    public PaasZhzy maxLibraCpu(String appName, String area, String police, Integer day) {
         return paasZhzyMapper01.maxLibraCpu(appName,area,police,day);
     }
 
     @Override
-    public int totalLibraMemary(String appName, String area, String police, Integer day) {
+    public PaasZhzy totalLibraMemary(String appName, String area, String police, Integer day) {
         return paasZhzyMapper01.totalLibraMemary(appName,area,police,day);
     }
 
     @Override
-    public int maxLibraMemary(String appName, String area, String police, Integer day) {
+    public PaasZhzy maxLibraMemary(String appName, String area, String police, Integer day) {
         return paasZhzyMapper01.maxLibraMemary(appName,area,police,day);
     }
 
     @Override
-    public int maxLibraStorage(String appName, String area, String police, Integer day) {
+    public PaasZhzy maxLibraStorage(String appName, String area, String police, Integer day) {
         return paasZhzyMapper01.maxLibraStorage(appName,area,police,day);
     }
 
     @Override
-    public int maxEsStorage(String appName, String area, String police, Integer day) {
+    public PaasZhzy maxEsStorage(String appName, String area, String police, Integer day) {
         return paasZhzyMapper01.maxEsStorage(appName,area,police,day);
     }
 
     @Override
-    public int maxEsMemary(String appName, String area, String police, Integer day) {
+    public PaasZhzy maxEsMemary(String appName, String area, String police, Integer day) {
         return paasZhzyMapper01.maxEsMemary(appName,area,police,day);
     }
 
     @Override
-    public int maxEsCpu(String appName, String area, String police, Integer day) {
+    public PaasZhzy maxEsCpu(String appName, String area, String police, Integer day) {
         return paasZhzyMapper01.maxEsMemary(appName,area,police,day);
     }
 
     @Override
-    public int totalEsMemary(String appName, String area, String police, Integer day) {
+    public PaasZhzy totalEsMemary(String appName, String area, String police, Integer day) {
         return paasZhzyMapper01.totalEsMemary(appName,area,police,day);
     }
 
     @Override
-    public int totalRedisMemary(String appName, String area, String police, Integer day) {
+    public PaasZhzy totalRedisMemary(String appName, String area, String police, Integer day) {
         return paasZhzyMapper01.totalRedisMemary(appName,area,police,day);
     }
 
     @Override
-    public int maxRedisMemary(String appName, String area, String police, Integer day) {
+    public PaasZhzy maxRedisMemary(String appName, String area, String police, Integer day) {
         return paasZhzyMapper01.maxRedisMemary(appName,area,police,day);
     }
 }
