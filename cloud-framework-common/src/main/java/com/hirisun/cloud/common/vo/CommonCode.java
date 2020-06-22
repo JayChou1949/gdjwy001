@@ -15,9 +15,13 @@ public enum CommonCode implements ResultCode{
     NO_ACCESS_TOKEN(1004,"Token错误或已失效"),
     SERVICE_QUEST_ERROR(1005,"服务调用失败"),
     SERVER_ERROR(9999,"系统繁忙，稍后重试");
-    //状态码
+    /**
+     * 状态码
+     */
     private Integer code;
-    //状态信息
+    /**
+     * 状态信息
+     */
     private String msg;
 
     CommonCode(Integer code, String msg) {
