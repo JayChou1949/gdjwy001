@@ -211,6 +211,16 @@ public class PaasZhzy extends Model<PaasZhzy> {
          @TableField("KAFKA_STORAGE_SPACE_NAME")
     private String kafkaStorageSpaceName;
 
+    /**
+     * elastricsearch是否为共享(1:共享 0：非共享)
+     */
+    private String elastricsearchIsShare;
+
+    /**
+     * elastricsearch对应的主机数
+     */
+    private String elastricsearchHostsNumber;
+
 
     public String getId() {
         return id;
@@ -494,6 +504,22 @@ public class PaasZhzy extends Model<PaasZhzy> {
 
     public void setRedisMemoryUsed(Double redisMemoryUsed) {
         this.redisMemoryUsed = redisMemoryUsed;
+    }
+
+    public String getElastricsearchIsShare() {
+        return elastricsearchIsShare;
+    }
+
+    public void setElastricsearchIsShare(String elastricsearchIsShare) {
+        this.elastricsearchIsShare = elastricsearchIsShare;
+    }
+
+    public String getElastricsearchHostsNumber() {
+        return elastricsearchHostsNumber;
+    }
+
+    public void setElastricsearchHostsNumber(String elastricsearchHostsNumber) {
+        this.elastricsearchHostsNumber = elastricsearchHostsNumber;
     }
 
     @Override

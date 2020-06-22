@@ -32,6 +32,8 @@
         <result column="REDIS_MEMORY_TOTAL" property="redisMemoryTotal" />
         <result column="REDIS_MEMORY_USAGE" property="redisMemoryUsage" />
         <result column="KAFKA_STORAGE_SPACE_NAME" property="kafkaStorageSpaceName" />
+        <result column="elastricsearch_is_share" property="elastricsearchIsShare" />
+        <result column="elastricsearch_hosts_number" property="elastricsearchHostsNumber" />
     </resultMap>
 
     <select id="getPaasYarn" resultMap="BaseResultMap">
