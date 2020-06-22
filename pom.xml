@@ -8,7 +8,6 @@
         <module>cloud-framework-common</module>
         <module>cloud-framework-model</module>
         <module>cloud-ncov-service</module>
-        <module>cloud-order-service</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
