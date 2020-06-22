@@ -1,0 +1,83 @@
+server:
+   port: 8000
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  application: 
+     name: cloud-ncov-service-dev
+  cloud:
+    nacos:
+        discovery:
+          # 配置Nacos地址
+          server-addr: 192.168.11.66:8848
+        #config:
+          #server-addr: 192.168.11.66:8848
+          #file-extension: yml
+  datasource:
+    url: jdbc:oracle:thin:@139.9.242.131:1521/jwymh
+    username: gd_jwymh
+    password: gdjwymh
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      pool-name: Retail_HikariCP
+      minimum-idle: 5 
+      idle-timeout: 180000
+      maximum-pool-size: 10
+      auto-commit: true
+      max-lifetime: 1800000
+      connection-timeout: 30000
+      connection-test-query: SELECT 1
+
+hystrix:
+   threadpool:
+    default:
+      coreSize: 100
+      maxQueueSize: 200
+      queueSizeRejectionThreshold: 200
+
+feign:
+  hystrix:
+    enabled: false
+  client:
+    config:
+      default:
+        connectTimeout: 60000
+        readTimeout: 60000
+
+ribbon:
+  MaxAutoRetries: 1
+  MaxAutoRetriesNextServer: 1
+  OkToRetryOnAllOperations: false
+  ConnectTimeout: 30000
+  ReadTimeout: 30000
+
+# ====================MybatisPlus====================
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/*Mapper.xml
+  typeAliasesPackage: com.hirisun.cloud.model.**.vo,com.hirisun.cloud.**.bean
+  global-config:
+    #刷新mapper 调试神器
+    db-config:
+      #主键类型  0:"数据库ID自增", 1:"用户输入ID",2:"全局唯一ID (数字类型唯一ID)", 3:"全局唯一ID UUID";
+      id-type: UUID
+      #字段策略 0:"忽略判断",1:"非 NULL 判断"),2:"非空判断"
+      field-strategy: 2
+      #驼峰下划线转换
+      column-underline: true
+      #数据库大写下划线转换
+      capital-mode: true
+      #逻辑删除配置
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+    refresh: true
+  configuration:
+    #配置返回数据库(column下划线命名&&返回java实体是驼峰命名)，自动匹配无需as（没开启这个，SQL需要写as： select user_id as userId）
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+    #配置JdbcTypeForNull, oracle数据库必须配置
+    jdbc-type-for-null: 'null'
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    database-id: oracle
+
