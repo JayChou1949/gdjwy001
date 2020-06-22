@@ -214,12 +214,23 @@ public class PaasZhzy extends Model<PaasZhzy> {
     /**
      * elastricsearch是否为共享(1:共享 0：非共享)
      */
+    @TableField("ELASTICSEARCH_IS_SHARE")
     private String elastricsearchIsShare;
 
     /**
      * elastricsearch对应的主机数
      */
-    private String elastricsearchHostsNumber;
+    @TableField("ELASTICSEARCH_HOSTS_NUMBER")
+    private String elasticsearchHostsNumber;
+
+    @TableField("STORAGE_TOTAL")
+    private Double storageTotal;
+
+    @TableField("STORAGE_USAGE")
+    private Double storageUsage;
+
+    @TableField("STORAGE_USED")
+    private Double storageUsed;
 
 
     public String getId() {
@@ -514,12 +525,36 @@ public class PaasZhzy extends Model<PaasZhzy> {
         this.elastricsearchIsShare = elastricsearchIsShare;
     }
 
-    public String getElastricsearchHostsNumber() {
-        return elastricsearchHostsNumber;
+    public String getElasticsearchHostsNumber() {
+        return elasticsearchHostsNumber;
     }
 
-    public void setElastricsearchHostsNumber(String elastricsearchHostsNumber) {
-        this.elastricsearchHostsNumber = elastricsearchHostsNumber;
+    public void setElasticsearchHostsNumber(String elasticsearchHostsNumber) {
+        this.elasticsearchHostsNumber = elasticsearchHostsNumber;
+    }
+
+    public Double getStorageTotal() {
+        return storageTotal;
+    }
+
+    public void setStorageTotal(Double storageTotal) {
+        this.storageTotal = storageTotal;
+    }
+
+    public Double getStorageUsage() {
+        return storageUsage;
+    }
+
+    public void setStorageUsage(Double storageUsage) {
+        this.storageUsage = storageUsage;
+    }
+
+    public Double getStorageUsed() {
+        return storageUsed;
+    }
+
+    public void setStorageUsed(Double storageUsed) {
+        this.storageUsed = storageUsed;
     }
 
     @Override
