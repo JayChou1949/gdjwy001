@@ -38,6 +38,7 @@
         <commons-io.version>2.7</commons-io.version>
         <feign.version>1.4.7.RELEASE</feign.version>
         <mybatis-plus.version>3.3.2</mybatis-plus.version>
+        <swagger-spring-boot.version>2.1.5-RELEASE</swagger-spring-boot.version>
     </properties>
 
     <dependencyManagement>
