@@ -219,11 +219,11 @@
 
         <if test="day==7">
             and TO_CHAR(SYSDATE,'YYYYMMDD')-TO_CHAR(ODS_TIME,'YYYYMMDD') &lt; 6
-            and TO_CHAR(ODS_TIME,'hh24:mi')='01:00'
+            and TO_CHAR(ODS_TIME,'hh24:mi')='00:00'
         </if>
         <if test="day==30">
             and TO_CHAR(SYSDATE,'YYYYMMDD')-TO_CHAR(ODS_TIME,'YYYYMMDD') &lt; 29
-            and TO_CHAR(ODS_TIME,'hh24:mi')='01:00'
+            and TO_CHAR(ODS_TIME,'hh24:mi')='00:00'
         </if>
         <if test="clusterName != null and clusterName != ''">
             and SUPER_CLUSTER_EN=#{clusterName}
@@ -301,6 +301,7 @@
         SELECT ODS_TIME,CPU_USAGE,CPU_USED,MEMORY_USAGE,MEMORY_USED,STORAGE_USAGE,STORAGE_USED FROM TB_PAAS_ZHZY
         WHERE TYPE_SITE='hadoop'
         <include refid="commom"></include>
+        ORDER BY ODS_TIME ASC
     </select>
 
     <!--    查询Libra的 使用情况-->
@@ -308,6 +309,7 @@
         SELECT ODS_TIME,CPU_USAGE,CPU_USED,MEMORY_USAGE,MEMORY_USED,STORAGE_USAGE,STORAGE_USED FROM TB_PAAS_ZHZY
         WHERE TYPE_SITE='Libra'
         <include refid="commom"></include>
+        ORDER BY ODS_TIME ASC
     </select>
 
     <!--    查询Elasticsearch的 使用情况-->
@@ -316,6 +318,7 @@
         <where>
             <include refid="paas"></include>
         </where>
+        ORDER BY ODS_TIME ASC
     </select>
 
     <!--    查询Elasticsearch的 使用情况-->
@@ -324,6 +327,7 @@
         <where>
             <include refid="commom"></include>
         </where>
+        ORDER BY ODS_TIME ASC
     </select>
 
 
