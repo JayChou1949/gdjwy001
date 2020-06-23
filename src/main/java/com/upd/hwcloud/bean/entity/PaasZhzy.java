@@ -9,6 +9,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * <p>
@@ -78,7 +79,7 @@ public class PaasZhzy extends Model<PaasZhzy> {
      * 入库时间
      */
          @TableField("ODS_TIME")
-    private Double odsTime;
+    private Date odsTime;
 
         /**
      * 分配给租户的CPU总配额(vCores)
@@ -216,7 +217,7 @@ public class PaasZhzy extends Model<PaasZhzy> {
      * elastricsearch是否为共享(1:共享 0：非共享)
      */
     @TableField("ELASTICSEARCH_IS_SHARE")
-    private String elastricsearchIsShare;
+    private String elasticsearchIsShare;
 
     /**
      * elastricsearch对应的主机数
@@ -315,11 +316,11 @@ public class PaasZhzy extends Model<PaasZhzy> {
         return this;
     }
 
-    public Double getOdsTime() {
+    public Date getOdsTime() {
         return odsTime;
     }
 
-    public PaasZhzy setOdsTime(Double odsTime) {
+    public PaasZhzy setOdsTime(Date odsTime) {
         this.odsTime = odsTime;
         return this;
     }
@@ -518,12 +519,12 @@ public class PaasZhzy extends Model<PaasZhzy> {
         this.redisMemoryUsed = redisMemoryUsed;
     }
 
-    public String getElastricsearchIsShare() {
-        return elastricsearchIsShare;
+    public String getElasticsearchIsShare() {
+        return elasticsearchIsShare;
     }
 
-    public void setElastricsearchIsShare(String elastricsearchIsShare) {
-        this.elastricsearchIsShare = elastricsearchIsShare;
+    public void setElasticsearchIsShare(String elasticsearchIsShare) {
+        this.elasticsearchIsShare = elasticsearchIsShare;
     }
 
     public String getElasticsearchHostsNumber() {
