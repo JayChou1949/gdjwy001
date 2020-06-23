@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.upd.hwcloud.dao.PaasZhzyMapper">
+<mapper namespace="com.upd.hwcloud.dao.PaasZhzyMapper01">
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.PaasZhzy">
@@ -34,6 +34,9 @@
         <result column="KAFKA_STORAGE_SPACE_NAME" property="kafkaStorageSpaceName" />
         <result column="elastricsearch_is_share" property="elastricsearchIsShare" />
         <result column="elastricsearch_hosts_number" property="elastricsearchHostsNumber" />
+        <result column="STORAGE_TOTAL" property="storageTotal" />
+        <result column="STORAGE_USAGE" property="storageUsage" />
+        <result column="STORAGE_USED" property="storageUsed" />
     </resultMap>
 
 <!--    拼接条件语句-->

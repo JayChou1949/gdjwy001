@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.upd.hwcloud.bean.entity.PaasZhzy;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
 
 /**
  * <p>

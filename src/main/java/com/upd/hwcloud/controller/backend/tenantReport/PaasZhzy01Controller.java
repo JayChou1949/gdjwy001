@@ -38,7 +38,7 @@ public class PaasZhzy01Controller {
 
 
     @ApiOperation(value = "应用列表")
-    @RequestMapping(value = "/appFromAreaOrPolice",method = RequestMethod.GET)
+    @RequestMapping(value = "/v1/appFromAreaOrPolice",method = RequestMethod.GET)
     public R appFromAreaOrPolice(@RequestParam(value = "area",required = false) String area,@RequestParam(value = "police",required = false) String police){
         List<String> apps;
         try {
@@ -50,7 +50,7 @@ public class PaasZhzy01Controller {
     }
 
     @ApiOperation(value = "应用集群概览tab")
-    @RequestMapping(value = "/clusterTabs",method = RequestMethod.GET)
+    @RequestMapping(value = "/v1/clusterTabs",method = RequestMethod.GET)
     public R clusterTabs(@RequestParam(value = "appName") String appName){
         List<String> clusterList;
         try {
@@ -66,7 +66,6 @@ public class PaasZhzy01Controller {
     public R getPaasYarnResource(@RequestParam(value = "appName") String appName,@RequestParam(value = "area") String area,@RequestParam(value = "police") String police,
                            @RequestParam(value = "day") Integer day){
         Map map=new HashMap();
-
         try {
             PaasZhzy paasYarnResource = paasZhzyService01.getPaasYarnResource(appName, area, police, day);
             map.put("paasYarnResource",paasYarnResource);
@@ -75,7 +74,8 @@ public class PaasZhzy01Controller {
             PaasZhzy totalYarnCpu = paasZhzyService01.totalYarnCpu(appName, area, police, day);
             map.put("maxCpu",maxCpu.getCpuUsage());
             map.put("maxMemory",maxMemory.getMemoryUsage());
-            map.put("totalYarnCpu",totalYarnCpu);
+            map.put("totalYarnCpu",totalYarnCpu.getCpuTotal());
+            map.put("totalYarnMermory",totalYarnCpu.getMemoryTotal());
         }catch (Exception e) {
             return R.error();
         }
@@ -93,10 +93,11 @@ public class PaasZhzy01Controller {
             PaasZhzy maxCpu = paasZhzyService01.maxLibraCpu(appName, area, police, day);
             PaasZhzy  maxMemory = paasZhzyService01.maxLibraMemary(appName, area, police, day);
             PaasZhzy  maxStorage = paasZhzyService01.maxLibraStorage(appName, area, police, day);
-            PaasZhzy totalYarnCpu = paasZhzyService01.totalLibraMemary(appName, area, police, day);
+            PaasZhzy totalLibraCpu = paasZhzyService01.totalLibraMemary(appName, area, police, day);
             map.put("maxCpu",maxCpu.getCpuUsage());
             map.put("maxMemory",maxMemory.getMemoryUsage());
-            map.put("totalYarnCpu",totalYarnCpu);
+            map.put("totalLibraCpu",totalLibraCpu.getCpuTotal());
+            map.put("totalLibraMemory",totalLibraCpu.getMemoryTotal());
             map.put("maxStorage",maxStorage);
         }catch (Exception e) {
             return R.error();
@@ -114,12 +115,14 @@ public class PaasZhzy01Controller {
             map.put("paasEsResource",paasEsResource);
             PaasZhzy maxCpu = paasZhzyService01.maxEsCpu(appName, area, police, day);
             PaasZhzy  maxMemory = paasZhzyService01.maxEsMemary(appName, area, police, day);
-            PaasZhzy totalYarnCpu = paasZhzyService01.totalEsMemary(appName, area, police, day);
+            PaasZhzy totalEsCpu = paasZhzyService01.totalEsMemary(appName, area, police, day);
             PaasZhzy  maxStorage = paasZhzyService01.maxEsStorage(appName, area, police, day);
             map.put("maxCpu",maxCpu.getCpuUsage());
             map.put("maxMemory",maxMemory.getMemoryUsage());
-            map.put("totalYarnCpu",totalYarnCpu);
-            map.put("maxStorage",maxStorage);
+            map.put("totalEsCpu",totalEsCpu.getCpuTotal());
+            map.put("totalEsMemory",totalEsCpu.getMemoryTotal());
+            map.put("totalEsStorage",totalEsCpu.getStorageTotal());
+            map.put("maxStorage",maxStorage.getStorageUsage());
         }catch (Exception e) {
             return R.error();
         }
@@ -136,9 +139,9 @@ public class PaasZhzy01Controller {
             PaasZhzy paasRedisResource = paasZhzyService01.getPaasRedisResource(appName, area, police, day);
             map.put("paasRedisResource",paasRedisResource);
             PaasZhzy  maxMemory = paasZhzyService01.maxRedisMemary(appName, area, police, day);
-            PaasZhzy totalYarnCpu = paasZhzyService01.totalRedisMemary(appName, area, police, day);
+            PaasZhzy totalRedisMemary = paasZhzyService01.totalRedisMemary(appName, area, police, day);
             map.put("maxMemory",maxMemory.getMemoryUsage());
-            map.put("totalYarnCpu",totalYarnCpu);
+            map.put("totalRedisMemary",totalRedisMemary.getMemoryTotal());
         }catch (Exception e) {
             return R.error();
         }
