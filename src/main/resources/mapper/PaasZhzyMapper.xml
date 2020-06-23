@@ -103,14 +103,13 @@
 
     <select id="appFromAreaOrPolice" resultType="java.lang.String">
         SELECT APPLY_NAME FROM TB_PAAS_ZHZY
-        <where>
+        WHERE ODS_TIME=(SELECT MAX(ODS_TIME) FROM TB_PAAS_ZHZY)
             <if test="area != null and area != ''">
-                AREA=#{area}
+                AND AREA=#{area}
             </if>
             <if test="police != null and police != ''">
                 AND POLICE=#{police}
             </if>
-        </where>
     </select>
 
     <select id="appClusterDetailsByTypeSite" resultMap="BaseResultMap">
@@ -126,15 +125,15 @@
     </select>
 
     <select id="getClusterByTypeSite" resultMap="BaseResultMap">
-        SELECT TYPE_SITE FROM TB_PAAS_ZHZY WHERE APPLY_NAME=#{appName}
+        SELECT TYPE_SITE FROM TB_PAAS_ZHZY WHERE APPLY_NAME=#{appName} AND ODS_TIME=(SELECT MAX(ODS_TIME) FROM TB_PAAS_ZHZY)
     </select>
 
     <select id="getClusterByElasticsearch" resultMap="BaseResultMap">
-        SELECT ELASTICSEARCH_STORAGE_SPACE FROM TB_PAAS_ZHZY WHERE APPLY_NAME=#{appName}
+        SELECT ELASTICSEARCH_STORAGE_SPACE FROM TB_PAAS_ZHZY WHERE APPLY_NAME=#{appName} AND ODS_TIME=(SELECT MAX(ODS_TIME) FROM TB_PAAS_ZHZY)
     </select>
 
     <select id="getClusterByRedis" resultMap="BaseResultMap">
-        SELECT REDIS_CLUSTER_NAME FROM TB_PAAS_ZHZY WHERE APPLY_NAME=#{appName}
+        SELECT REDIS_CLUSTER_NAME FROM TB_PAAS_ZHZY WHERE APPLY_NAME=#{appName} AND ODS_TIME=(SELECT MAX(ODS_TIME) FROM TB_PAAS_ZHZY)
     </select>
 
     <select id="paasOverviewByYarn" resultMap="BaseResultMap">
@@ -328,12 +327,18 @@
         ORDER BY ODS_TIME ASC
     </select>
 
-    <!--    查询Elasticsearch的 使用情况-->
+    <!--    查询Redis的 使用情况-->
     <select id="situationByRedis" resultMap="BaseResultMap">
-        SELECT ODS_TIME,REDIS_MEMORY_TOTAL,REDIS_MEMORY_USAGE FROM TB_PAAS_ZHZY
+        SELECT ODS_TIME,SUM( REDIS_MEMORY_TOTAL ) REDIS_MEMORY_TOTAL,
+        CASE SUM( REDIS_MEMORY_TOTAL )
+        WHEN 0 THEN
+        0 ELSE ROUND( SUM( REDIS_MEMORY_TOTAL * REDIS_MEMORY_USAGE ) / SUM( REDIS_MEMORY_TOTAL ), 4 )
+        END REDIS_MEMORY_USAGE
+        FROM TB_PAAS_ZHZY
         <where>
             <include refid="commom"></include>
         </where>
+        GROUP BY ODS_TIME
         ORDER BY ODS_TIME ASC
     </select>
 
