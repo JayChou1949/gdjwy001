@@ -325,10 +325,13 @@ public class PaasZhzyController {
 
             PaasZhzy  maxStorage = paasZhzyService.maxEsStorage(appName, area, police, day);
             PaasZhzy cpuTotal = paasZhzyService.cpuTotal(appName, area, police, day);
-            map.put("cpuToal",cpuTotal.getElasticsearchCpuTotal());
-            map.put("cluserNameEn",cpuTotal.getSuperClusterEn());
-            map.put("cluserNameCn",cpuTotal.getSuperClusterCn());
-            map.put("cluserNumber",cpuTotal.getElasticsearchHostsNumber());
+            if(cpuTotal!=null){
+                map.put("cpuToal",cpuTotal.getElasticsearchCpuTotal());
+                map.put("cluserNameEn",cpuTotal.getSuperClusterEn());
+                map.put("cluserNameCn",cpuTotal.getSuperClusterCn());
+                map.put("cluserNumber",cpuTotal.getElasticsearchHostsNumber());
+            }
+
             if(null!=maxCpu){
                 map.put("maxCpu",maxCpu.getElasticsearchCpuUsage());
             }else{

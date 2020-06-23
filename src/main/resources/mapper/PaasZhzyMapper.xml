@@ -229,6 +229,16 @@
         </if>
     </sql>
 
+    <sql id="passCommon">
+        <if test="area != null and area != ''">
+            AND AREA=#{area}
+        </if>
+        <if test="police != null and police != ''">
+            AND POLICE=#{police}
+        </if>
+    </sql>
+
+
     <!--    查询yarn的cpu 峰值-->
     <select id="cpuMaxByYarn" resultMap="BaseResultMap">
         SELECT max(CPU_USAGE) CPU_USAGE FROM TB_PAAS_ZHZY
@@ -408,7 +418,7 @@
     <select id="totalLibraMemary" resultMap="BaseResultMap">
         SELECT sum(MEMORY_TOTAL) MEMORY_TOTAL,sum(CPU_TOTAL) CPU_TOTAL ,NVL(sum(STORAGE_TOTAL),0) STORAGE_TOTAL FROM TB_PAAS_ZHZY
         WHERE TYPE_SITE='Libra'  and APPLY_NAME=#{appName}
-        <include refid="commom"></include>
+        <include refid="passCommon"></include>
     </select>
 
 
@@ -416,7 +426,8 @@
 
     <select id="getPaasEsResource" resultMap="BaseResultMap">
         SELECT ELASTICSEARCH_CPU_TOTAL,ELASTICSEARCH_CPU_USAGE,ELASTICSEARCH_MEMORY_TOTAL,ELASTICSEARCH_MEMORY_USED,ODS_TIME,
-        SUPER_CLUSTER_CN,SUPER_CLUSTER_EN,ELASTICSEARCH_HOSTS_NUMBER
+        SUPER_CLUSTER_CN,SUPER_CLUSTER_EN,ELASTICSEARCH_HOSTS_NUMBER,NVL(ELASTICSEARCH_DISK_AVAILABLE,0) ELASTICSEARCH_DISK_AVAILABLE,
+        NVL(ELASTICSEARCH_DISK_USED,0) ELASTICSEARCH_DISK_USED
         FROM TB_PAAS_ZHZY
         WHERE APPLY_NAME=#{appName}
         <include refid="commom"></include>
@@ -447,7 +458,7 @@
     <select id="totalEsMemary" resultMap="BaseResultMap">
         SELECT sum(ELASTICSEARCH_MEMORY_TOTAL) ELASTICSEARCH_MEMORY_TOTAL,sum(ELASTICSEARCH_CPU_TOTAL) ELASTICSEARCH_CPU_TOTAL,NVL(sum(STORAGE_TOTAL),0) STORAGE_TOTAL FROM TB_PAAS_ZHZY
         WHERE APPLY_NAME=#{appName}
-        <include refid="commom"></include>
+        <include refid="passCommon"></include>
     </select>
 
 
@@ -463,7 +474,7 @@
     <select id="totalRedisMemary" resultMap="BaseResultMap">
         SELECT sum(REDIS_MEMORY_TOTAL) REDIS_MEMORY_TOTAL FROM TB_PAAS_ZHZY
         WHERE APPLY_NAME=#{appName}
-        <include refid="commom"></include>
+        <include refid="passCommon"></include>
     </select>
 
     <!--    redis内存最高使用率-->
@@ -477,7 +488,7 @@
     <select id="cpuTotal" resultMap="BaseResultMap">
         SELECT SUPER_CLUSTER_CN,SUPER_CLUSTER_EN,NVL(ELASTICSEARCH_HOSTS_NUMBER,0) ELASTICSEARCH_HOSTS_NUMBER,NVL(ELASTICSEARCH_HOSTS_NUMBER,0)*NVL(ELASTICSEARCH_CPU_TOTAL,0) ELASTICSEARCH_CPU_TOTAL FROM TB_PAAS_ZHZY
         WHERE APPLY_NAME=#{appName}
-        <include refid="commom"></include>
-        order by ODS_TIME desc limit 1
+        <include refid="passCommon"></include>
+         and ODS_TIME=(SELECT max(ODS_TIME)  from TB_PAAS_ZHZY)
     </select>
 </mapper>

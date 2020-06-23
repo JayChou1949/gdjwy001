@@ -322,9 +322,9 @@ public class PaasZhzyServiceImpl extends ServiceImpl<PaasZhzyMapper, PaasZhzy> i
         List<PaasZhzy> list = paasZhzyMapper.getPaasEsResource(appName, area, police, day);
         DecimalFormat df = new DecimalFormat("#.00");
         for (PaasZhzy paasZhzy : list) {
-            if (paasZhzy.getStorageTotal() != 0) {
-                paasZhzy.setStorageUsed(BigDecimalUtil.div(paasZhzy.getStorageUsed(),1024*1024).doubleValue());
-                paasZhzy.setStorageUsage(Double.valueOf(df.format(paasZhzy.getStorageUsed()/paasZhzy.getStorageTotal())));
+            if (paasZhzy.getElasticsearchDiskAvailable()!=0) {
+                paasZhzy.setElasticsearchDiskAvailable(BigDecimalUtil.div(paasZhzy.getElasticsearchDiskAvailable(),1024*1024*1024).doubleValue());
+                paasZhzy.setElasticsearchDiskUsage(BigDecimalUtil.div(paasZhzy.getElasticsearchDiskUsed(),paasZhzy.getElasticsearchDiskAvailable()).doubleValue());
             }
         }
         return list;
