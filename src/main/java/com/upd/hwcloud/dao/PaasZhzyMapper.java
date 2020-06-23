@@ -226,4 +226,6 @@ public interface PaasZhzyMapper extends BaseMapper<PaasZhzy> {
      * @return
      */
     PaasZhzy maxRedisMemary(@Param("appName") String appName,@Param("area") String area,@Param("police") String police,@Param("day") Integer day);
+
+    PaasZhzy cpuTotal(@Param("appName") String appName,@Param("area") String area,@Param("police") String police,@Param("day") Integer day);
 }

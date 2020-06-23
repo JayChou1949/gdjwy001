@@ -270,10 +270,7 @@ public class PaasZhzyServiceImpl extends ServiceImpl<PaasZhzyMapper, PaasZhzy> i
                 paasZhzy.setElasticsearchMemoryTotal(BigDecimalUtil.div(paasZhzy.getElasticsearchMemoryTotal(),1024).doubleValue());
                 paasZhzy.setElasticsearchMemoryUsage(BigDecimalUtil.div(paasZhzy.getElasticsearchMemoryUsed(),paasZhzy.getElasticsearchMemoryTotal()).doubleValue());
             }
-            if (paasZhzy.getStorageTotal() != 0) {
-                paasZhzy.setStorageUsed(BigDecimalUtil.div(paasZhzy.getStorageUsed(),1024*1024).doubleValue());
-                paasZhzy.setStorageUsage(Double.valueOf(df.format(paasZhzy.getStorageUsed()/paasZhzy.getStorageTotal())));
-            }
+
             if (paasZhzy.getElasticsearchDiskAvailable()!=null) {
                 paasZhzy.setElasticsearchDiskAvailable(BigDecimalUtil.div(paasZhzy.getElasticsearchDiskAvailable(),1024*1024*1024).doubleValue());
                 paasZhzy.setElasticsearchDiskUsage(BigDecimalUtil.div(paasZhzy.getElasticsearchDiskUsed(),paasZhzy.getElasticsearchDiskAvailable()).doubleValue());
@@ -305,6 +302,13 @@ public class PaasZhzyServiceImpl extends ServiceImpl<PaasZhzyMapper, PaasZhzy> i
         List<PaasZhzy> paasLibraResource = paasZhzyMapper.getPaasLibraResource(appName, area, police, day);
         DecimalFormat df = new DecimalFormat("#.00");
         for (PaasZhzy paasZhzy : paasLibraResource) {
+            if (paasZhzy.getElasticsearchCpuTotal()!=null) {
+                paasZhzy.setElasticsearchCpuUsed(Double.parseDouble(df.format(paasZhzy.getElasticsearchCpuTotal()*paasZhzy.getElasticsearchCpuUsage()*0.01)));
+            }
+            if (paasZhzy.getElasticsearchMemoryTotal()!=null) {
+                paasZhzy.setElasticsearchMemoryTotal(BigDecimalUtil.div(paasZhzy.getElasticsearchMemoryTotal(),1024).doubleValue());
+                paasZhzy.setElasticsearchMemoryUsage(BigDecimalUtil.div(paasZhzy.getElasticsearchMemoryUsed(),paasZhzy.getElasticsearchMemoryTotal()).doubleValue());
+            }
             if (paasZhzy.getStorageTotal() != 0) {
                 paasZhzy.setStorageUsed(BigDecimalUtil.div(paasZhzy.getStorageUsed(),1024*1024).doubleValue());
                 paasZhzy.setStorageUsage(Double.valueOf(df.format(paasZhzy.getStorageUsed()/paasZhzy.getStorageTotal())));
@@ -317,7 +321,12 @@ public class PaasZhzyServiceImpl extends ServiceImpl<PaasZhzyMapper, PaasZhzy> i
     public List<PaasZhzy>  getPaasEsResource(String appName, String area, String police, Integer day) {
         List<PaasZhzy> list = paasZhzyMapper.getPaasEsResource(appName, area, police, day);
         DecimalFormat df = new DecimalFormat("#.00");
-        parseEsResource(list, df);
+        for (PaasZhzy paasZhzy : list) {
+            if (paasZhzy.getStorageTotal() != 0) {
+                paasZhzy.setStorageUsed(BigDecimalUtil.div(paasZhzy.getStorageUsed(),1024*1024).doubleValue());
+                paasZhzy.setStorageUsage(Double.valueOf(df.format(paasZhzy.getStorageUsed()/paasZhzy.getStorageTotal())));
+            }
+        }
         return list;
     }
 
@@ -374,7 +383,13 @@ public class PaasZhzyServiceImpl extends ServiceImpl<PaasZhzyMapper, PaasZhzy> i
 
     @Override
     public PaasZhzy maxLibraStorage(String appName, String area, String police, Integer day) {
-        return paasZhzyMapper.maxLibraStorage(appName,area,police,day);
+        PaasZhzy paasZhzy = paasZhzyMapper.maxLibraStorage(appName, area, police, day);
+        if (paasZhzy.getStorageTotal() != 0) {
+            DecimalFormat df = new DecimalFormat("#.00");
+            paasZhzy.setStorageUsed(BigDecimalUtil.div(paasZhzy.getStorageUsed(),1024*1024).doubleValue());
+            paasZhzy.setStorageUsage(Double.valueOf(df.format(paasZhzy.getStorageUsed()/paasZhzy.getStorageTotal())));
+        }
+        return paasZhzy;
     }
 
     @Override
@@ -435,5 +450,10 @@ public class PaasZhzyServiceImpl extends ServiceImpl<PaasZhzyMapper, PaasZhzy> i
     @Override
     public PaasZhzy maxRedisMemary(String appName, String area, String police, Integer day) {
         return paasZhzyMapper.maxRedisMemary(appName,area,police,day);
+    }
+
+    @Override
+    public PaasZhzy cpuTotal(String appName, String area, String police, Integer day) {
+        return paasZhzyMapper.cpuTotal(appName,area,police,day);
     }
 }

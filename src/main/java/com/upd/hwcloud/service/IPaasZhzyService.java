@@ -190,4 +190,6 @@ public interface IPaasZhzyService extends IService<PaasZhzy> {
      */
     PaasZhzy maxRedisMemary(String appName, String area, String police, Integer day);
 
+    PaasZhzy cpuTotal(String appName, String area, String police, Integer day);
+
 }

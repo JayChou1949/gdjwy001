@@ -473,4 +473,11 @@
         <include refid="commom"></include>
     </select>
 
+<!--    查询最新时间es集群节点的CPU总量-->
+    <select id="cpuTotal" resultMap="BaseResultMap">
+        SELECT SUPER_CLUSTER_CN,SUPER_CLUSTER_EN,NVL(ELASTICSEARCH_HOSTS_NUMBER,0) ELASTICSEARCH_HOSTS_NUMBER,NVL(ELASTICSEARCH_HOSTS_NUMBER,0)*NVL(ELASTICSEARCH_CPU_TOTAL,0) ELASTICSEARCH_CPU_TOTAL FROM TB_PAAS_ZHZY
+        WHERE APPLY_NAME=#{appName}
+        <include refid="commom"></include>
+        order by ODS_TIME desc limit 1
+    </select>
 </mapper>
