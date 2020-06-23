@@ -170,7 +170,7 @@ public class PaasZhzyServiceImpl extends ServiceImpl<PaasZhzyMapper, PaasZhzy> i
         PaasZhzy memory = paasZhzyMapper.memoryMaxByYarn(area, police, day);
         zhzyMap.put("memory",memory.getMemoryUsage());
         PaasZhzy storage = paasZhzyMapper.storageMaxByYarn(area, police, day);
-        if (storage.getStorageTotal() != null) {
+        if (storage.getStorageTotal() != 0) {
             storage.setStorageUsage(Double.valueOf(df.format(storage.getStorageUsed()/storage.getStorageTotal())));
         }
         zhzyMap.put("storage",storage.getStorageUsage());
@@ -186,7 +186,7 @@ public class PaasZhzyServiceImpl extends ServiceImpl<PaasZhzyMapper, PaasZhzy> i
         PaasZhzy memory = paasZhzyMapper.memoryMaxByLibra(area, police, day);
         zhzyMap.put("memory",memory.getMemoryUsage());
         PaasZhzy storage = paasZhzyMapper.storageMaxByLibra(area, police, day);
-        if (storage.getStorageTotal() != null) {
+        if (storage.getStorageTotal() != 0) {
             storage.setStorageUsage(Double.valueOf(df.format(storage.getStorageUsed()/storage.getStorageTotal())));
         }
         zhzyMap.put("storage",storage.getStorageUsage());
