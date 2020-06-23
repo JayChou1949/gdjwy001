@@ -47,4 +47,147 @@ public interface IPaasZhzyService extends IService<PaasZhzy> {
     List<PaasZhzy> situationByElasticsearch(String area,String police,String day,String clusterName);
 
     List<PaasZhzy> situationByRedis(String area,String police,String day);
+
+
+    List<PaasZhzy> getPaasYarnResource(String appName, String area, String police, Integer day);
+
+
+    List<PaasZhzy>  getPaasLibraResource( String appName, String area, String police, Integer day);
+
+    List<PaasZhzy>  getPaasEsResource( String appName, String area, String police, Integer day);
+
+    List<PaasZhzy>  getPaasRedisResource(String appName, String area, String police, Integer day);
+
+
+    /**
+     * 查询Yarn  CPU的峰值
+     * @param appName
+     * @param area
+     * @param police
+     * @param day
+     * @return
+     */
+    PaasZhzy maxYarnCpu(String appName, String area, String police, Integer day);
+
+    /**
+     * yarn  内存峰值
+     * @param appName
+     * @param area
+     * @param police
+     * @param day
+     * @return
+     */
+    PaasZhzy maxYarnMemory(String appName, String area, String police, Integer day);
+
+    /**
+     * yarn  总cpu
+     * @param appName
+     * @param area
+     * @param police
+     * @param day
+     * @return
+     */
+    PaasZhzy totalYarnCpu(String appName, String area, String police, Integer day);
+
+    /**
+     * libra  cpu峰值
+     * @param appName
+     * @param area
+     * @param police
+     * @param day
+     * @return
+     */
+    PaasZhzy maxLibraCpu(String appName, String area, String police, Integer day);
+
+
+    /**
+     * libra 总内存
+     * @param appName
+     * @param area
+     * @param police
+     * @param day
+     * @return
+     */
+    PaasZhzy totalLibraMemary(String appName, String area, String police, Integer day);
+
+    /**
+     * libra  内存峰值
+     * @param appName
+     * @param area
+     * @param police
+     * @param day
+     * @return
+     */
+    PaasZhzy maxLibraMemary(String appName, String area, String police, Integer day);
+
+    /**
+     * libra 存储峰值
+     * @param appName
+     * @param area
+     * @param police
+     * @param day
+     * @return
+     */
+    PaasZhzy maxLibraStorage(String appName, String area, String police, Integer day);
+
+    /**
+     * es  存储峰值
+     * @param appName
+     * @param area
+     * @param police
+     * @param day
+     * @return
+     */
+    PaasZhzy maxEsStorage(String appName, String area, String police, Integer day);
+
+    /**
+     * es 内存峰值
+     * @param appName
+     * @param area
+     * @param police
+     * @param day
+     * @return
+     */
+    Double maxEsMemary(String appName, String area, String police, Integer day);
+
+    /**
+     * es cpu峰值
+     * @param appName
+     * @param area
+     * @param police
+     * @param day
+     * @return
+     */
+    PaasZhzy maxEsCpu(String appName, String area, String police, Integer day);
+
+    /**
+     * es 内存总数
+     * @param appName
+     * @param area
+     * @param police
+     * @param day
+     * @return
+     */
+    PaasZhzy totalEsMemary(String appName, String area, String police, Integer day);
+
+    /**
+     * redis 内存总数
+     * @param appName
+     * @param area
+     * @param police
+     * @param day
+     * @return
+     */
+    PaasZhzy totalRedisMemary(String appName, String area, String police, Integer day);
+
+    /**
+     * redis 内存峰值
+     * @param appName
+     * @param area
+     * @param police
+     * @param day
+     * @return
+     */
+    PaasZhzy maxRedisMemary(String appName, String area, String police, Integer day);
+
 }

@@ -331,6 +331,134 @@
     </select>
 
 
+    <!--查询Yarn资源-->
+    <select id="getPaasYarnResource" resultMap="BaseResultMap">
+        SELECT CPU_TOTAL,CPU_USAGE,CPU_USED,MEMORY_TOTAL,MEMORY_USAGE,MEMORY_USED,ODS_TIME FROM TB_PAAS_ZHZY
+        WHERE TYPE_SITE='hadoop'  and APPLY_NAME=#{appName}
+        <include refid="commom"></include>
+        order by ODS_TIME
+    </select>
 
+    <!--    查询yarn的cpu 峰值-->
+    <select id="maxYarnCpu" resultMap="BaseResultMap">
+        SELECT NVL(max(CPU_USAGE),0) CPU_USAGE FROM TB_PAAS_ZHZY
+        WHERE TYPE_SITE='hadoop'  and APPLY_NAME=#{appName}
+        <include refid="commom"></include>
+
+    </select>
+    <!--    查询yarn的内存 峰值-->
+    <select id="maxYarnMemory" resultMap="BaseResultMap">
+        SELECT NVL(max(MEMORY_USAGE),0) MEMORY_USAGE FROM TB_PAAS_ZHZY
+        WHERE TYPE_SITE='hadoop'  and APPLY_NAME=#{appName}
+        <include refid="commom"></include>
+    </select>
+
+    <!--    查询yarn的cpu,内存的总量-->
+    <select id="totalYarnCpu" resultMap="BaseResultMap">
+        SELECT sum(CPU_TOTAL) CPU_TOTAL ,sum(MEMORY_TOTAL) MEMORY_TOTAL FROM TB_PAAS_ZHZY
+        WHERE TYPE_SITE='hadoop'  and APPLY_NAME=#{appName}
+        <include refid="commom"></include>
+    </select>
+
+    <!--查询Libra资源-->
+    <select id="getPaasLibraResource" resultMap="BaseResultMap">
+        SELECT CPU_TOTAL,CPU_USAGE,CPU_USED,MEMORY_TOTAL,MEMORY_USAGE,MEMORY_USED,ODS_TIME,STORAGE_TOTAL FROM TB_PAAS_ZHZY
+        WHERE TYPE_SITE='Libra'  and APPLY_NAME=#{appName}
+        <include refid="commom"></include>
+        order by ODS_TIME
+    </select>
+
+
+
+    <!--    查询Libra的cpu 峰值-->
+    <select id="maxLibraCpu" resultMap="BaseResultMap">
+        SELECT NVL(max(CPU_USAGE),0) CPU_USAGE FROM TB_PAAS_ZHZY
+        WHERE TYPE_SITE='Libra'  and APPLY_NAME=#{appName}
+        <include refid="commom"></include>
+
+    </select>
+
+    <!--    查询Libra的 存储 峰值-->
+    <select id="maxLibraStorage" resultMap="BaseResultMap">
+        SELECT NVL(max(STORAGE_USAGE),0) STORAGE_USAGE FROM TB_PAAS_ZHZY
+        WHERE TYPE_SITE='Libra'  and APPLY_NAME=#{appName}
+        <include refid="commom"></include>
+    </select>
+
+    <!--    查询Libra的 内存峰值-->
+    <select id="maxLibraMemary" resultMap="BaseResultMap">
+        SELECT NVL(max(MEMORY_USAGE),0) MEMORY_USAGE FROM TB_PAAS_ZHZY
+        WHERE TYPE_SITE='Libra'  and APPLY_NAME=#{appName}
+        <include refid="commom"></include>
+    </select>
+
+    <!--    查询Libra的 内存,cpu,存储总数-->
+    <select id="totalLibraMemary" resultMap="BaseResultMap">
+        SELECT sum(MEMORY_TOTAL) ,sum(CPU_TOTAL) ,sum(STORAGE_TOTAL)  FROM TB_PAAS_ZHZY
+        WHERE TYPE_SITE='Libra'  and APPLY_NAME=#{appName}
+        <include refid="commom"></include>
+    </select>
+
+
+    <!--    es内存，cpu存储使用情况-->
+
+    <select id="getPaasEsResource" resultMap="BaseResultMap">
+        SELECT ELASTICSEARCH_CPU_TOTAL,ELASTICSEARCH_CPU_USAGE,ELASTICSEARCH_MEMORY_TOTAL,ELASTICSEARCH_MEMORY_USED,ODS_TIME,
+        SUPER_CLUSTER_CN,SUPER_CLUSTER_EN,ELASTICSEARCH_HOSTS_NUMBER
+        FROM TB_PAAS_ZHZY
+        WHERE APPLY_NAME=#{appName}
+        <include refid="commom"></include>
+        order by ODS_TIME
+    </select>
+
+    <!--    es存储峰值-->
+    <select id="maxEsStorage" resultMap="BaseResultMap">
+        SELECT NVL(max(STORAGE_USAGE),0) STORAGE_USAGE  FROM TB_PAAS_ZHZY
+        WHERE APPLY_NAME=#{appName}
+        <include refid="commom"></include>
+    </select>
+
+    <!--    es内存峰值-->
+    <select id="maxEsMemary" resultMap="BaseResultMap">
+        SELECT NVL(ELASTICSEARCH_MEMORY_TOTAL,0),NVL(ELASTICSEARCH_MEMORY_USED,0)  FROM TB_PAAS_ZHZY
+        WHERE APPLY_NAME=#{appName}
+        <include refid="commom"></include>
+    </select>
+
+    <!--    es  cpu峰值-->
+    <select id="maxEsCpu" resultMap="BaseResultMap">
+        SELECT NVL(max(ELASTICSEARCH_CPU_USAGE),0) ELASTICSEARCH_CPU_USAGE FROM TB_PAAS_ZHZY
+        WHERE APPLY_NAME=#{appName}
+        <include refid="commom"></include>
+    </select>
+
+    <select id="totalEsMemary" resultMap="BaseResultMap">
+        SELECT sum(ELASTICSEARCH_MEMORY_TOTAL) ,sum(ELASTICSEARCH_CPU_TOTAL) ,sum(STORAGE_TOTAL)  FROM TB_PAAS_ZHZY
+        WHERE APPLY_NAME=#{appName}
+        <include refid="commom"></include>
+    </select>
+
+
+    <!--    redis  的cpu，内存，使用情况-->
+    <select id="getPaasRedisResource" resultMap="BaseResultMap">
+        SELECT REDIS_MEMORY_USAGE,ODS_TIME FROM TB_PAAS_ZHZY
+        WHERE    APPLY_NAME=#{appName}
+        <include refid="commom"></include>
+        order by ODS_TIME
+    </select>
+
+    <!--    redis内存总量-->
+    <select id="totalRedisMemary" resultMap="BaseResultMap">
+        SELECT sum(REDIS_MEMORY_TOTAL) FROM TB_PAAS_ZHZY
+        WHERE APPLY_NAME=#{appName}
+        <include refid="commom"></include>
+    </select>
+
+    <!--    redis内存最高使用率-->
+    <select id="maxRedisMemary" resultMap="BaseResultMap">
+        SELECT max(REDIS_MEMORY_USAGE) FROM TB_PAAS_ZHZY
+        WHERE APPLY_NAME=#{appName}
+        <include refid="commom"></include>
+    </select>
 
 </mapper>

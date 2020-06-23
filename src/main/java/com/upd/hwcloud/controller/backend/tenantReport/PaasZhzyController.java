@@ -228,6 +228,95 @@ public class PaasZhzyController {
     }
 
 
+    @ApiOperation(value = "paas资源yarn")
+    @RequestMapping(value = "/v1/getPaasYarnResource",method = RequestMethod.GET)
+    public R getPaasYarnResource(@RequestParam(value = "appName") String appName,@RequestParam(value = "area" ,required = false) String area,@RequestParam(value = "police" ,required = false) String police,
+                                 @RequestParam(value = "day") Integer day){
+        Map map=new HashMap();
+        try {
+            List<PaasZhzy>  paasYarnResource = paasZhzyService.getPaasYarnResource(appName, area, police, day);
+            map.put("paasYarnResource",paasYarnResource);
+            PaasZhzy maxCpu = paasZhzyService.maxYarnCpu(appName, area, police, day);
+            PaasZhzy  maxMemory = paasZhzyService.maxYarnMemory(appName, area, police, day);
+            PaasZhzy totalYarnCpu = paasZhzyService.totalYarnCpu(appName, area, police, day);
+            map.put("maxCpu",maxCpu.getCpuUsage());
+            map.put("maxMemory",maxMemory.getMemoryUsage());
+            map.put("totalYarnCpu",totalYarnCpu.getCpuTotal());
+            map.put("totalYarnMermory",totalYarnCpu.getMemoryTotal());
+        }catch (Exception e) {
+            return R.error();
+        }
+        return R.ok(map);
+    }
+    @ApiOperation(value = "paas资源Libra")
+    @RequestMapping(value = "/v1/getPaasLibraResource",method = RequestMethod.GET)
+    public R getPaasLibraResource(@RequestParam(value = "appName") String appName,@RequestParam(value = "area",required = false) String area,@RequestParam(value = "police",required = false) String police,
+                                  @RequestParam(value = "day") Integer day){
+        Map map=new HashMap();
+
+        try {
+            List<PaasZhzy>  paasLibraResource = paasZhzyService.getPaasLibraResource(appName, area, police, day);
+            map.put("paasLibraResource",paasLibraResource);
+            PaasZhzy maxCpu = paasZhzyService.maxLibraCpu(appName, area, police, day);
+            PaasZhzy  maxMemory = paasZhzyService.maxLibraMemary(appName, area, police, day);
+            PaasZhzy  maxStorage = paasZhzyService.maxLibraStorage(appName, area, police, day);
+            PaasZhzy totalLibraCpu = paasZhzyService.totalLibraMemary(appName, area, police, day);
+            map.put("maxCpu",maxCpu.getCpuUsage());
+            map.put("maxMemory",maxMemory.getMemoryUsage());
+            map.put("totalLibraCpu",totalLibraCpu.getCpuTotal());
+            map.put("totalLibraMemory",totalLibraCpu.getMemoryTotal());
+            map.put("totalLibraStorage",totalLibraCpu.getStorageTotal());
+            map.put("maxStorage",maxStorage);
+        }catch (Exception e) {
+            return R.error();
+        }
+        return R.ok(map);
+    }
+    @ApiOperation(value = "paas资源ES")
+    @RequestMapping(value = "/v1/getPaasEsResource",method = RequestMethod.GET)
+    public R getPaasEsResource(@RequestParam(value = "appName") String appName,@RequestParam(value = "area" ,required = false) String area,@RequestParam(value = "police" ,required = false) String police,
+                               @RequestParam(value = "day") Integer day){
+        Map map=new HashMap();
+
+        try {
+            List<PaasZhzy>  paasEsResource = paasZhzyService.getPaasEsResource(appName, area, police, day);
+            map.put("paasEsResource",paasEsResource);
+            PaasZhzy maxCpu = paasZhzyService.maxEsCpu(appName, area, police, day);
+            Double  maxMemory = paasZhzyService.maxEsMemary(appName, area, police, day);
+
+            PaasZhzy totalEsCpu = paasZhzyService.totalEsMemary(appName, area, police, day);
+
+            PaasZhzy  maxStorage = paasZhzyService.maxEsStorage(appName, area, police, day);
+            map.put("maxCpu",maxCpu.getCpuUsage());
+            map.put("maxMemory",maxMemory);
+            map.put("totalEsCpu",totalEsCpu.getCpuTotal());
+            map.put("totalEsMemory",totalEsCpu.getMemoryTotal());
+            map.put("totalEsStorage",totalEsCpu.getStorageTotal());
+            map.put("maxStorage",maxStorage.getStorageUsage());
+        }catch (Exception e) {
+            return R.error();
+        }
+        return R.ok(map);
+    }
+
+    @ApiOperation(value = "paas资源redis")
+    @RequestMapping(value = "/v1/getPaasRedisResource",method = RequestMethod.GET)
+    public R getPaasRedisResource(@RequestParam(value = "appName") String appName,@RequestParam(value = "area",required = false) String area,@RequestParam(value = "police",required = false) String police,
+                                  @RequestParam(value = "day") Integer day){
+        Map map=new HashMap();
+
+        try {
+            List<PaasZhzy>  paasRedisResource = paasZhzyService.getPaasRedisResource(appName, area, police, day);
+            map.put("paasRedisResource",paasRedisResource);
+            PaasZhzy  maxMemory = paasZhzyService.maxRedisMemary(appName, area, police, day);
+            PaasZhzy totalRedisMemary = paasZhzyService.totalRedisMemary(appName, area, police, day);
+            map.put("maxMemory",maxMemory.getMemoryUsage());
+            map.put("totalRedisMemary",totalRedisMemary.getMemoryTotal());
+        }catch (Exception e) {
+            return R.error();
+        }
+        return R.ok(map);
+    }
 
 
 
