@@ -135,6 +135,9 @@ public class PaasZhzyServiceImpl extends ServiceImpl<PaasZhzyMapper, PaasZhzy> i
     public PaasZhzy paasOverviewByYarn(String area, String police) {
         PaasZhzy paasZhzy = paasZhzyMapper.paasOverviewByYarn(area, police);
         paasZhzy.setMemoryTotal(BigDecimalUtil.div(paasZhzy.getMemoryTotal(),1024).doubleValue());
+        if (paasZhzy.getStorageTotal() != null) {
+            paasZhzy.setStorageTotal(BigDecimalUtil.div(paasZhzy.getStorageTotal(),1024*1024).doubleValue());
+        }
         return paasZhzy;
     }
 
@@ -152,27 +155,40 @@ public class PaasZhzyServiceImpl extends ServiceImpl<PaasZhzyMapper, PaasZhzy> i
     public PaasZhzy paasOverviewByLibra(String area, String police) {
         PaasZhzy paasZhzy = paasZhzyMapper.paasOverviewByLibra(area, police);
         paasZhzy.setMemoryTotal(BigDecimalUtil.div(paasZhzy.getMemoryTotal(),1024).doubleValue());
+        if (paasZhzy.getStorageTotal() != null) {
+            paasZhzy.setStorageTotal(BigDecimalUtil.div(paasZhzy.getStorageTotal(),1024*1024).doubleValue());
+        }
         return paasZhzy;
     }
 
     @Override
     public Map<String, Double> paasMaxByYarn(String area, String police,String day) {
         Map<String,Double> zhzyMap = new HashMap<>();
+        DecimalFormat df = new DecimalFormat("#.00");
         PaasZhzy cpu = paasZhzyMapper.cpuMaxByYarn(area, police, day);
         zhzyMap.put("cpu",cpu.getCpuUsage());
         PaasZhzy memory = paasZhzyMapper.memoryMaxByYarn(area, police, day);
         zhzyMap.put("memory",memory.getMemoryUsage());
+        PaasZhzy storage = paasZhzyMapper.storageMaxByYarn(area, police, day);
+        if (storage.getStorageTotal() != null) {
+            storage.setStorageUsage(Double.valueOf(df.format(storage.getStorageUsed()/storage.getStorageTotal())));
+        }
+        zhzyMap.put("storage",storage.getStorageUsage());
         return zhzyMap;
     }
 
     @Override
     public Map<String, Double> paasMaxByLibra(String area, String police,String day) {
         Map<String,Double> zhzyMap = new HashMap<>();
+        DecimalFormat df = new DecimalFormat("#.00");
         PaasZhzy cpu = paasZhzyMapper.cpuMaxByLibra(area, police, day);
         zhzyMap.put("cpu",cpu.getCpuUsage());
         PaasZhzy memory = paasZhzyMapper.memoryMaxByLibra(area, police, day);
         zhzyMap.put("memory",memory.getMemoryUsage());
         PaasZhzy storage = paasZhzyMapper.storageMaxByLibra(area, police, day);
+        if (storage.getStorageTotal() != null) {
+            storage.setStorageUsage(Double.valueOf(df.format(storage.getStorageUsed()/storage.getStorageTotal())));
+        }
         zhzyMap.put("storage",storage.getStorageUsage());
         return zhzyMap;
     }
@@ -205,10 +221,15 @@ public class PaasZhzyServiceImpl extends ServiceImpl<PaasZhzyMapper, PaasZhzy> i
 
     @Override
     public List<PaasZhzy> situationByYarn(String area, String police, String day) {
+        DecimalFormat df = new DecimalFormat("#.00");
         List<PaasZhzy> paasZhzyList = paasZhzyMapper.situationByYarn(area, police, day);
         for (PaasZhzy paasZhzy:paasZhzyList) {
             if (paasZhzy != null) {
                 paasZhzy.setMemoryUsed(BigDecimalUtil.div(paasZhzy.getMemoryUsed(),1024).doubleValue());
+                if (paasZhzy.getStorageTotal() != 0) {
+                    paasZhzy.setStorageUsed(BigDecimalUtil.div(paasZhzy.getStorageUsed(),1024*1024).doubleValue());
+                    paasZhzy.setStorageUsage(Double.valueOf(df.format(paasZhzy.getStorageUsed()/paasZhzy.getStorageTotal())));
+                }
             }
         }
         return paasZhzyList;
@@ -216,10 +237,15 @@ public class PaasZhzyServiceImpl extends ServiceImpl<PaasZhzyMapper, PaasZhzy> i
 
     @Override
     public List<PaasZhzy> situationByLibra(String area, String police, String day) {
+        DecimalFormat df = new DecimalFormat("#.00");
         List<PaasZhzy> paasZhzyList = paasZhzyMapper.situationByLibra(area, police, day);
         for (PaasZhzy paasZhzy:paasZhzyList) {
             if (paasZhzy != null) {
                 paasZhzy.setMemoryUsed(BigDecimalUtil.div(paasZhzy.getMemoryUsed(),1024).doubleValue());
+                if (paasZhzy.getStorageTotal() != 0) {
+                    paasZhzy.setStorageUsed(BigDecimalUtil.div(paasZhzy.getStorageUsed(),1024*1024).doubleValue());
+                    paasZhzy.setStorageUsage(Double.valueOf(df.format(paasZhzy.getStorageUsed()/paasZhzy.getStorageTotal())));
+                }
             }
         }
         return paasZhzyList;

@@ -138,7 +138,7 @@
     </select>
 
     <select id="paasOverviewByYarn" resultMap="BaseResultMap">
-        SELECT SUM(CPU_TOTAL) CPU_TOTAL,SUM(MEMORY_TOTAL) MEMORY_TOTAL FROM TB_PAAS_ZHZY
+        SELECT SUM(CPU_TOTAL) CPU_TOTAL,SUM(MEMORY_TOTAL) MEMORY_TOTAL,SUM(STORAGE_TOTAL) STORAGE_TOTAL FROM TB_PAAS_ZHZY
         WHERE TYPE_SITE='hadoop' AND ODS_TIME=(SELECT MAX(ODS_TIME) FROM TB_PAAS_ZHZY)
         <if test="area != null and area != ''">
             AND AREA=#{area}
@@ -171,7 +171,7 @@
     </select>
 
     <select id="paasOverviewByLibra" resultMap="BaseResultMap">
-        SELECT SUM(CPU_TOTAL) CPU_TOTAL,SUM(MEMORY_TOTAL) MEMORY_TOTAL FROM TB_PAAS_ZHZY
+        SELECT SUM(CPU_TOTAL) CPU_TOTAL,SUM(MEMORY_TOTAL) MEMORY_TOTAL,SUM(STORAGE_TOTAL) STORAGE_TOTAL FROM TB_PAAS_ZHZY
         WHERE TYPE_SITE='Libra' AND ODS_TIME=(SELECT MAX(ODS_TIME) FROM TB_PAAS_ZHZY)
         <if test="area != null and area != ''">
             AND AREA=#{area}
@@ -196,11 +196,11 @@
 
         <if test="day==7">
             and TO_CHAR(SYSDATE,'YYYYMMDD')-TO_CHAR(ODS_TIME,'YYYYMMDD') &lt; 6
-            and TO_CHAR(ODS_TIME,'hh24:mi')='01:00'
+            and TO_CHAR(ODS_TIME,'hh24:mi')='00:00'
         </if>
         <if test="day==30">
             and TO_CHAR(SYSDATE,'YYYYMMDD')-TO_CHAR(ODS_TIME,'YYYYMMDD') &lt; 29
-            and TO_CHAR(ODS_TIME,'hh24:mi')='01:00'
+            and TO_CHAR(ODS_TIME,'hh24:mi')='00:00'
         </if>
     </sql>
 
@@ -242,6 +242,13 @@
         WHERE TYPE_SITE='hadoop'
         <include refid="commom"></include>
     </select>
+
+    <!--    查询yarn的storage 峰值-->
+    <select id="storageMaxByYarn" resultMap="BaseResultMap">
+        SELECT NVL(max(STORAGE_TOTAL),0) STORAGE_TOTAL,NVL(max(STORAGE_USED),0) STORAGE_USED FROM TB_PAAS_ZHZY
+        WHERE TYPE_SITE='hadoop'
+        <include refid="commom"></include>
+    </select>
     <!--    查询Libra的cpu 峰值-->
     <select id="cpuMaxByLibra" resultMap="BaseResultMap">
         SELECT NVL(max(CPU_USAGE),0) CPU_USAGE FROM TB_PAAS_ZHZY
@@ -249,16 +256,16 @@
         <include refid="commom"></include>
 
     </select>
-    <!--    查询Libra的 内存峰值-->
+    <!--    查询Libra的 memory峰值-->
     <select id="memoryMaxByLibra" resultMap="BaseResultMap">
         SELECT NVL(max(MEMORY_USAGE),0) MEMORY_USAGE FROM TB_PAAS_ZHZY
         WHERE TYPE_SITE='Libra'
         <include refid="commom"></include>
     </select>
 
-    <!--    查询Libra的 存储 峰值-->
+    <!--    查询Libra的 storage 峰值-->
     <select id="storageMaxByLibra" resultMap="BaseResultMap">
-        SELECT NVL(max(STORAGE_USAGE),0) STORAGE_USAGE FROM TB_PAAS_ZHZY
+        SELECT NVL(max(STORAGE_TOTAL),0) STORAGE_TOTAL,NVL(max(STORAGE_USED),0) STORAGE_USED FROM TB_PAAS_ZHZY
         WHERE TYPE_SITE='Libra'
         <include refid="commom"></include>
     </select>
@@ -298,7 +305,7 @@
 
     <!--    查询Yarn的 使用情况-->
     <select id="situationByYarn" resultMap="BaseResultMap">
-        SELECT ODS_TIME,CPU_USAGE,CPU_USED,MEMORY_USAGE,MEMORY_USED,STORAGE_USAGE,STORAGE_USED FROM TB_PAAS_ZHZY
+        SELECT ODS_TIME,CPU_USAGE,CPU_USED,MEMORY_USAGE,MEMORY_USED,NVL(STORAGE_TOTAL,0) STORAGE_TOTAL,NVL(STORAGE_USED,0) STORAGE_USED FROM TB_PAAS_ZHZY
         WHERE TYPE_SITE='hadoop'
         <include refid="commom"></include>
         ORDER BY ODS_TIME ASC
@@ -306,7 +313,7 @@
 
     <!--    查询Libra的 使用情况-->
     <select id="situationByLibra" resultMap="BaseResultMap">
-        SELECT ODS_TIME,CPU_USAGE,CPU_USED,MEMORY_USAGE,MEMORY_USED,STORAGE_USAGE,STORAGE_USED FROM TB_PAAS_ZHZY
+        SELECT ODS_TIME,CPU_USAGE,CPU_USED,MEMORY_USAGE,MEMORY_USED,NVL(STORAGE_TOTAL,0) STORAGE_TOTAL,NVL(STORAGE_USED,0) STORAGE_USED FROM TB_PAAS_ZHZY
         WHERE TYPE_SITE='Libra'
         <include refid="commom"></include>
         ORDER BY ODS_TIME ASC

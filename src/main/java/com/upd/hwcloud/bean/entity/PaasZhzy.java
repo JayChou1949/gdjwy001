@@ -225,12 +225,18 @@ public class PaasZhzy extends Model<PaasZhzy> {
     @TableField("ELASTICSEARCH_HOSTS_NUMBER")
     private String elasticsearchHostsNumber;
 
+    /**
+     * mppdb的存储总量(KB)
+     */
     @TableField("STORAGE_TOTAL")
     private Double storageTotal;
 
     @TableField("STORAGE_USAGE")
     private Double storageUsage;
 
+    /**
+     * mppdb的存储已使用量(KB)
+     */
     @TableField("STORAGE_USED")
     private Double storageUsed;
 

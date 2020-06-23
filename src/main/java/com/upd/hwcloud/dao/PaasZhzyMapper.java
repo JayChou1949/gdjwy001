@@ -51,6 +51,8 @@ public interface PaasZhzyMapper extends BaseMapper<PaasZhzy> {
 
     PaasZhzy memoryMaxByYarn(@Param("area") String area,@Param("police") String police,@Param("day") String day);
 
+    PaasZhzy storageMaxByYarn(@Param("area") String area,@Param("police") String police,@Param("day") String day);
+
     PaasZhzy cpuMaxByLibra(@Param("area") String area,@Param("police") String police,@Param("day") String day);
 
     PaasZhzy memoryMaxByLibra(@Param("area") String area,@Param("police") String police,@Param("day") String day);
