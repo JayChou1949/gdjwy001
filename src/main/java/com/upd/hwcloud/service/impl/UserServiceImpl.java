@@ -154,6 +154,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Override
     public List<User> findUserByOrgIds(List<String> orgIds) {
         LambdaQueryWrapper<User> qw = new QueryWrapper<User>().lambda();
+        qw.ne(User::getDeleted,1);
         qw.ne(User::getUserType, UnifledUserType.WB.getCode());
         qw.ne(User::getJobType,"15");
         qw.in(User::getOrgId, orgIds);
