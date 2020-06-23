@@ -5,9 +5,11 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * <p>
@@ -77,7 +79,7 @@ public class PaasZhzy extends Model<PaasZhzy> {
      * 入库时间
      */
          @TableField("ODS_TIME")
-    private LocalDateTime odsTime;
+    private Date odsTime;
 
         /**
      * 分配给租户的CPU总配额(vCores)
@@ -211,6 +213,33 @@ public class PaasZhzy extends Model<PaasZhzy> {
          @TableField("KAFKA_STORAGE_SPACE_NAME")
     private String kafkaStorageSpaceName;
 
+    /**
+     * elastricsearch是否为共享(1:共享 0：非共享)
+     */
+    @TableField("ELASTICSEARCH_IS_SHARE")
+    private String elasticsearchIsShare;
+
+    /**
+     * elastricsearch对应的主机数
+     */
+    @TableField("ELASTICSEARCH_HOSTS_NUMBER")
+    private String elasticsearchHostsNumber;
+
+    /**
+     * mppdb的存储总量(KB)
+     */
+    @TableField("STORAGE_TOTAL")
+    private Double storageTotal;
+
+    @TableField("STORAGE_USAGE")
+    private Double storageUsage;
+
+    /**
+     * mppdb的存储已使用量(KB)
+     */
+    @TableField("STORAGE_USED")
+    private Double storageUsed;
+
 
     public String getId() {
         return id;
@@ -293,11 +322,11 @@ public class PaasZhzy extends Model<PaasZhzy> {
         return this;
     }
 
-    public LocalDateTime getOdsTime() {
+    public Date getOdsTime() {
         return odsTime;
     }
 
-    public PaasZhzy setOdsTime(LocalDateTime odsTime) {
+    public PaasZhzy setOdsTime(Date odsTime) {
         this.odsTime = odsTime;
         return this;
     }
@@ -494,6 +523,46 @@ public class PaasZhzy extends Model<PaasZhzy> {
 
     public void setRedisMemoryUsed(Double redisMemoryUsed) {
         this.redisMemoryUsed = redisMemoryUsed;
+    }
+
+    public String getElasticsearchIsShare() {
+        return elasticsearchIsShare;
+    }
+
+    public void setElasticsearchIsShare(String elasticsearchIsShare) {
+        this.elasticsearchIsShare = elasticsearchIsShare;
+    }
+
+    public String getElasticsearchHostsNumber() {
+        return elasticsearchHostsNumber;
+    }
+
+    public void setElasticsearchHostsNumber(String elasticsearchHostsNumber) {
+        this.elasticsearchHostsNumber = elasticsearchHostsNumber;
+    }
+
+    public Double getStorageTotal() {
+        return storageTotal;
+    }
+
+    public void setStorageTotal(Double storageTotal) {
+        this.storageTotal = storageTotal;
+    }
+
+    public Double getStorageUsage() {
+        return storageUsage;
+    }
+
+    public void setStorageUsage(Double storageUsage) {
+        this.storageUsage = storageUsage;
+    }
+
+    public Double getStorageUsed() {
+        return storageUsed;
+    }
+
+    public void setStorageUsed(Double storageUsed) {
+        this.storageUsed = storageUsed;
     }
 
     @Override
