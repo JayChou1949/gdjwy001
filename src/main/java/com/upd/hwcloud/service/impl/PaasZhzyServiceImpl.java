@@ -115,16 +115,16 @@ public class PaasZhzyServiceImpl extends ServiceImpl<PaasZhzyMapper, PaasZhzy> i
     public List<String> clusterTabs(String appName) {
         List<String> clusterList = new ArrayList<>();
         PaasZhzy typeSite = paasZhzyMapper.getClusterByTypeSite(appName);
-        PaasZhzy elasticsearch = paasZhzyMapper.getClusterByElasticsearch(appName);
+//        PaasZhzy elasticsearch = paasZhzyMapper.getClusterByElasticsearch(appName);
         PaasZhzy redis = paasZhzyMapper.getClusterByRedis(appName);
         if (StringUtils.equals("hadoop",typeSite.getTypeSite())) {
             clusterList.add("YARN");
         }else {
             clusterList.add(typeSite.getTypeSite());
         }
-        if (elasticsearch != null) {
-            clusterList.add("Elasticsearch");
-        }
+//        if (elasticsearch != null) {
+        clusterList.add("Elasticsearch");
+//        }
         if (redis != null) {
             clusterList.add("Redis");
         }
@@ -355,8 +355,8 @@ public class PaasZhzyServiceImpl extends ServiceImpl<PaasZhzyMapper, PaasZhzy> i
     @Override
     public PaasZhzy totalYarnCpu(String appName, String area, String police, Integer day) {
         PaasZhzy paasZhzy = paasZhzyMapper.totalYarnCpu(appName, area, police, day);
-            if (paasZhzy != null&&paasZhzy.getMemoryUsed()!=null) {
-                paasZhzy.setMemoryUsed(BigDecimalUtil.div(paasZhzy.getMemoryUsed(),1024).doubleValue());
+            if (paasZhzy != null&&paasZhzy.getMemoryTotal()!=null) {
+                paasZhzy.setMemoryTotal(BigDecimalUtil.div(paasZhzy.getMemoryTotal(),1024).doubleValue());
             }
         return paasZhzy;
     }
@@ -369,9 +369,10 @@ public class PaasZhzyServiceImpl extends ServiceImpl<PaasZhzyMapper, PaasZhzy> i
     @Override
     public PaasZhzy totalLibraMemary(String appName, String area, String police, Integer day) {
         PaasZhzy paasZhzy = paasZhzyMapper.totalLibraMemary(appName, area, police, day);
-        if (paasZhzy != null&&paasZhzy.getMemoryUsed()!=null) {
-            paasZhzy.setMemoryUsed(BigDecimalUtil.div(paasZhzy.getMemoryUsed(),1024).doubleValue());
-            paasZhzy.setStorageTotal(BigDecimalUtil.div(paasZhzy.getStorageTotal(),1024).doubleValue());
+        if (paasZhzy != null&&paasZhzy.getMemoryTotal()!=null) {
+           // paasZhzy.setMemoryUsed(BigDecimalUtil.div(paasZhzy.getMemoryUsed(),1024).doubleValue());
+            paasZhzy.setMemoryTotal(BigDecimalUtil.div(paasZhzy.getMemoryTotal(),1024).doubleValue());
+            paasZhzy.setStorageTotal(BigDecimalUtil.div(paasZhzy.getStorageTotal(),1024*1024).doubleValue());
         }
         return paasZhzy;
     }
@@ -384,11 +385,6 @@ public class PaasZhzyServiceImpl extends ServiceImpl<PaasZhzyMapper, PaasZhzy> i
     @Override
     public PaasZhzy maxLibraStorage(String appName, String area, String police, Integer day) {
         PaasZhzy paasZhzy = paasZhzyMapper.maxLibraStorage(appName, area, police, day);
-        if (paasZhzy.getStorageTotal() != 0) {
-            DecimalFormat df = new DecimalFormat("#.00");
-            paasZhzy.setStorageUsed(BigDecimalUtil.div(paasZhzy.getStorageUsed(),1024*1024).doubleValue());
-            paasZhzy.setStorageUsage(Double.valueOf(df.format(paasZhzy.getStorageUsed()/paasZhzy.getStorageTotal())));
-        }
         return paasZhzy;
     }
 
@@ -431,7 +427,7 @@ public class PaasZhzyServiceImpl extends ServiceImpl<PaasZhzyMapper, PaasZhzy> i
         PaasZhzy paasZhzy=  paasZhzyMapper.totalEsMemary(appName,area,police,day);
         if(paasZhzy!=null&&paasZhzy.getElasticsearchMemoryTotal()!=null){
             paasZhzy.setElasticsearchMemoryTotal(BigDecimalUtil.div(paasZhzy.getElasticsearchMemoryTotal(),1024).doubleValue());
-            paasZhzy.setStorageTotal(BigDecimalUtil.div(paasZhzy.getStorageTotal(),1024).doubleValue());
+            paasZhzy.setStorageTotal(BigDecimalUtil.div(paasZhzy.getStorageTotal(),1024*1024).doubleValue());
         }
 
         return paasZhzy;
