@@ -64,7 +64,7 @@ public class SaasApigServiceImpl implements ISaasApigService {
 
     private void order(ApplicationInfo info, List<SaasServiceApplication> serverList) throws Exception {
         FormNum formNum = FormNum.getFormNumByInfo(info);
-        if (formNum != FormNum.SAAS) {
+        if (formNum != FormNum.SAAS_SERVICE) {
             throw new BaseException("必须为SaaS申请");
         }
         if (StringUtils.isEmpty(info.getCreator())) {
