@@ -308,7 +308,7 @@ public class PaasZhzyServiceImpl extends ServiceImpl<PaasZhzyMapper, PaasZhzy> i
     @Override
     public PaasZhzy totalYarnCpu(String appName, String area, String police, Integer day) {
         PaasZhzy paasZhzy = paasZhzyMapper.totalYarnCpu(appName, area, police, day);
-            if (paasZhzy != null) {
+            if (paasZhzy != null&&paasZhzy.getMemoryUsed()!=null) {
                 paasZhzy.setMemoryUsed(BigDecimalUtil.div(paasZhzy.getMemoryUsed(),1024).doubleValue());
             }
         return paasZhzy;
@@ -322,7 +322,7 @@ public class PaasZhzyServiceImpl extends ServiceImpl<PaasZhzyMapper, PaasZhzy> i
     @Override
     public PaasZhzy totalLibraMemary(String appName, String area, String police, Integer day) {
         PaasZhzy paasZhzy = paasZhzyMapper.totalLibraMemary(appName, area, police, day);
-        if (paasZhzy != null) {
+        if (paasZhzy != null&&paasZhzy.getMemoryUsed()!=null) {
             paasZhzy.setMemoryUsed(BigDecimalUtil.div(paasZhzy.getMemoryUsed(),1024).doubleValue());
         }
         return paasZhzy;
@@ -348,12 +348,21 @@ public class PaasZhzyServiceImpl extends ServiceImpl<PaasZhzyMapper, PaasZhzy> i
         List<PaasZhzy> maxMemory =paasZhzyMapper.maxEsMemary(appName,area,police,day);
         List<Double> list=new ArrayList();
         //es无内存使用率  需要通过计算获得
-        DecimalFormat df = new DecimalFormat("#.00");
-        parseEsResource(maxMemory, df);
+
         for (PaasZhzy paasZhzy : maxMemory) {
+            if (paasZhzy.getElasticsearchMemoryTotal()!=null) {
+                paasZhzy.setElasticsearchMemoryTotal(BigDecimalUtil.div(paasZhzy.getElasticsearchMemoryTotal(),1024).doubleValue());
+                if(paasZhzy.getElasticsearchMemoryUsed()!=null){
+                    paasZhzy.setElasticsearchMemoryUsage(BigDecimalUtil.div(paasZhzy.getElasticsearchMemoryUsed(),paasZhzy.getElasticsearchMemoryTotal()).doubleValue());
+                }
+            }
             if(paasZhzy.getElasticsearchMemoryUsage()!=null){
                 list.add(paasZhzy.getElasticsearchMemoryUsage());
             }
+        }
+
+        if(list.size()==0){
+            return 0.0;
         }
         Double max= Collections.max(list);
         return max;
@@ -367,14 +376,20 @@ public class PaasZhzyServiceImpl extends ServiceImpl<PaasZhzyMapper, PaasZhzy> i
     @Override
     public PaasZhzy totalEsMemary(String appName, String area, String police, Integer day) {
         PaasZhzy paasZhzy=  paasZhzyMapper.totalEsMemary(appName,area,police,day);
-        paasZhzy.setElasticsearchMemoryTotal(BigDecimalUtil.div(paasZhzy.getElasticsearchMemoryTotal(),1024).doubleValue());
+        if(paasZhzy!=null&&paasZhzy.getElasticsearchMemoryTotal()!=null){
+            paasZhzy.setElasticsearchMemoryTotal(BigDecimalUtil.div(paasZhzy.getElasticsearchMemoryTotal(),1024).doubleValue());
+        }
+
         return paasZhzy;
     }
 
     @Override
     public PaasZhzy totalRedisMemary(String appName, String area, String police, Integer day) {
         PaasZhzy paasZhzy = paasZhzyMapper.totalRedisMemary(appName, area, police, day);
-        paasZhzy.setRedisMemoryTotal(BigDecimalUtil.div(paasZhzy.getRedisMemoryTotal(),1024).doubleValue());
+        if(null!=paasZhzy&&null!=paasZhzy.getRedisMemoryTotal()){
+            paasZhzy.setRedisMemoryTotal(BigDecimalUtil.div(paasZhzy.getRedisMemoryTotal(),1024).doubleValue());
+        }
+
         return paasZhzy;
     }
 

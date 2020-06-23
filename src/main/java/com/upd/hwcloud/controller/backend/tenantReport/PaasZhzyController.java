@@ -239,10 +239,27 @@ public class PaasZhzyController {
             PaasZhzy maxCpu = paasZhzyService.maxYarnCpu(appName, area, police, day);
             PaasZhzy  maxMemory = paasZhzyService.maxYarnMemory(appName, area, police, day);
             PaasZhzy totalYarnCpu = paasZhzyService.totalYarnCpu(appName, area, police, day);
-            map.put("maxCpu",maxCpu.getCpuUsage());
-            map.put("maxMemory",maxMemory.getMemoryUsage());
-            map.put("totalYarnCpu",totalYarnCpu.getCpuTotal());
-            map.put("totalYarnMermory",totalYarnCpu.getMemoryTotal());
+            if(null!=maxCpu){
+                map.put("maxCpu",maxCpu.getCpuUsage());
+            }else{
+                map.put("maxCpu",0);
+            }
+
+            if(null!=maxMemory){
+                map.put("maxMemory",maxMemory.getMemoryUsage());
+            }else{
+                map.put("maxMemory",0);
+            }
+            if(null!=totalYarnCpu){
+                map.put("totalYarnCpu",totalYarnCpu.getCpuTotal());
+                map.put("totalYarnMermory",totalYarnCpu.getMemoryTotal());
+            }else{
+                map.put("totalYarnCpu",0);
+                map.put("totalYarnMermory",0);
+            }
+
+
+
         }catch (Exception e) {
             return R.error();
         }
@@ -261,11 +278,27 @@ public class PaasZhzyController {
             PaasZhzy  maxMemory = paasZhzyService.maxLibraMemary(appName, area, police, day);
             PaasZhzy  maxStorage = paasZhzyService.maxLibraStorage(appName, area, police, day);
             PaasZhzy totalLibraCpu = paasZhzyService.totalLibraMemary(appName, area, police, day);
+            if(null!=maxCpu){
+                map.put("maxCpu",maxCpu.getCpuUsage());
+            }else{
+                map.put("maxCpu",0);
+            }
             map.put("maxCpu",maxCpu.getCpuUsage());
-            map.put("maxMemory",maxMemory.getMemoryUsage());
-            map.put("totalLibraCpu",totalLibraCpu.getCpuTotal());
-            map.put("totalLibraMemory",totalLibraCpu.getMemoryTotal());
-            map.put("totalLibraStorage",totalLibraCpu.getStorageTotal());
+            if(null!=maxMemory){
+                map.put("maxMemory",maxMemory.getMemoryUsage());
+            }else{
+                map.put("maxMemory",0);
+            }
+            if(null!=totalLibraCpu){
+                map.put("totalLibraCpu",totalLibraCpu.getCpuTotal());
+                map.put("totalLibraMemory",totalLibraCpu.getMemoryTotal());
+                map.put("totalLibraStorage",totalLibraCpu.getStorageTotal());
+            }else{
+                map.put("totalLibraCpu",0);
+                map.put("totalLibraMemory",0);
+                map.put("totalLibraStorage",0);
+            }
+
             map.put("maxStorage",maxStorage);
         }catch (Exception e) {
             return R.error();
@@ -287,12 +320,27 @@ public class PaasZhzyController {
             PaasZhzy totalEsCpu = paasZhzyService.totalEsMemary(appName, area, police, day);
 
             PaasZhzy  maxStorage = paasZhzyService.maxEsStorage(appName, area, police, day);
-            map.put("maxCpu",maxCpu.getCpuUsage());
+            if(null!=maxCpu){
+                map.put("maxCpu",maxCpu.getElasticsearchCpuUsage());
+            }else{
+                map.put("maxCpu",0);
+            }
             map.put("maxMemory",maxMemory);
-            map.put("totalEsCpu",totalEsCpu.getCpuTotal());
-            map.put("totalEsMemory",totalEsCpu.getMemoryTotal());
-            map.put("totalEsStorage",totalEsCpu.getStorageTotal());
-            map.put("maxStorage",maxStorage.getStorageUsage());
+            if(null!=totalEsCpu){
+                map.put("totalEsCpu",totalEsCpu.getElasticsearchCpuTotal());
+                map.put("totalEsMemory",totalEsCpu.getElasticsearchMemoryTotal());
+                map.put("totalEsStorage",totalEsCpu.getStorageTotal());
+            }else{
+                map.put("totalEsCpu",0);
+                map.put("totalEsMemory",0);
+                map.put("totalEsStorage",0);
+            }
+            if(null!=maxCpu){
+                map.put("maxStorage",maxStorage.getStorageUsage());
+            }else{
+                map.put("maxStorage",0);
+            }
+
         }catch (Exception e) {
             return R.error();
         }
@@ -309,9 +357,18 @@ public class PaasZhzyController {
             List<PaasZhzy>  paasRedisResource = paasZhzyService.getPaasRedisResource(appName, area, police, day);
             map.put("paasRedisResource",paasRedisResource);
             PaasZhzy  maxMemory = paasZhzyService.maxRedisMemary(appName, area, police, day);
+            if(null!=maxMemory){
+                map.put("maxMemory",maxMemory.getRedisMemoryUsage());
+            }else{
+                map.put("maxMemory",0);
+            }
             PaasZhzy totalRedisMemary = paasZhzyService.totalRedisMemary(appName, area, police, day);
-            map.put("maxMemory",maxMemory.getMemoryUsage());
-            map.put("totalRedisMemary",totalRedisMemary.getMemoryTotal());
+            if(null!=totalRedisMemary){
+                map.put("totalRedisMemary",totalRedisMemary.getRedisMemoryTotal());
+            }else{
+                map.put("totalRedisMemary",0);
+            }
+
         }catch (Exception e) {
             return R.error();
         }
