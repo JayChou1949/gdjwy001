@@ -133,4 +133,132 @@ public class PaasZhzyServiceImpl extends ServiceImpl<PaasZhzyMapper, PaasZhzy> i
         }
         return clusterList;
     }
+
+    @Override
+    public PaasZhzy paasOverviewByYarn(String area, String police) {
+        PaasZhzy paasZhzy = paasZhzyMapper.paasOverviewByYarn(area, police);
+        paasZhzy.setMemoryTotal(BigDecimalUtil.div(paasZhzy.getMemoryTotal(),1024).doubleValue());
+        return paasZhzy;
+    }
+
+    @Override
+    public List<PaasZhzy> paasOverviewByElasticsearch(String area, String police) {
+        return paasZhzyMapper.paasOverviewByElasticsearch(area, police);
+    }
+
+    @Override
+    public PaasZhzy paasOverviewByRedis(String area, String police) {
+        return paasZhzyMapper.paasOverviewByRedis(area, police);
+    }
+
+    @Override
+    public PaasZhzy paasOverviewByLibra(String area, String police) {
+        PaasZhzy paasZhzy = paasZhzyMapper.paasOverviewByLibra(area, police);
+        paasZhzy.setMemoryTotal(BigDecimalUtil.div(paasZhzy.getMemoryTotal(),1024).doubleValue());
+        return paasZhzy;
+    }
+
+    @Override
+    public Map<String, Double> paasMaxByYarn(String area, String police,String day) {
+        Map<String,Double> zhzyMap = new HashMap<>();
+        PaasZhzy cpu = paasZhzyMapper.cpuMaxByYarn(area, police, day);
+        zhzyMap.put("cpu",cpu.getCpuUsage());
+        PaasZhzy memory = paasZhzyMapper.memoryMaxByYarn(area, police, day);
+        zhzyMap.put("memory",memory.getMemoryUsage());
+        return zhzyMap;
+    }
+
+    @Override
+    public Map<String, Double> paasMaxByLibra(String area, String police,String day) {
+        Map<String,Double> zhzyMap = new HashMap<>();
+        PaasZhzy cpu = paasZhzyMapper.cpuMaxByLibra(area, police, day);
+        zhzyMap.put("cpu",cpu.getCpuUsage());
+        PaasZhzy memory = paasZhzyMapper.memoryMaxByLibra(area, police, day);
+        zhzyMap.put("memory",memory.getMemoryUsage());
+        PaasZhzy storage = paasZhzyMapper.storageMaxByLibra(area, police, day);
+        zhzyMap.put("storage",storage.getStorageUsage());
+        return zhzyMap;
+    }
+
+    @Override
+    public Map<String, Double> paasMaxByElasticsearch(String area, String police, String day,String clusterName) {
+        Map<String,Double> zhzyMap = new HashMap<>();
+        PaasZhzy cpu = paasZhzyMapper.cpuMaxByElasticsearch(area, police, day,clusterName);
+        zhzyMap.put("cpu",cpu.getElasticsearchCpuUsage());
+        PaasZhzy memory = paasZhzyMapper.memoryMaxByElasticsearch(area, police, day,clusterName);
+        if (memory.getElasticsearchMemoryTotal() != 0) {
+            memory.setElasticsearchMemoryUsage(BigDecimalUtil.div(memory.getElasticsearchMemoryUsed(),memory.getElasticsearchMemoryTotal()).doubleValue());
+        }
+        zhzyMap.put("memory",memory.getElasticsearchMemoryUsage());
+        PaasZhzy storage = paasZhzyMapper.storageMaxByElasticsearch(area, police, day,clusterName);
+        if (storage.getElasticsearchDiskAvailable() != 0) {
+            storage.setElasticsearchDiskUsage(BigDecimalUtil.div(storage.getElasticsearchDiskUsed(),storage.getElasticsearchDiskAvailable()).doubleValue());
+        }
+        zhzyMap.put("storage",storage.getStorageTotal());
+        return zhzyMap;
+    }
+
+    @Override
+    public Map<String, Double> paasMaxByRedis(String area, String police, String day) {
+        Map<String,Double> zhzyMap = new HashMap<>();
+        PaasZhzy memory = paasZhzyMapper.memoryMaxByRedis(area, police, day);
+        zhzyMap.put("memory",memory.getRedisMemoryUsage());
+        return zhzyMap;
+    }
+
+    @Override
+    public List<PaasZhzy> situationByYarn(String area, String police, String day) {
+        List<PaasZhzy> paasZhzyList = paasZhzyMapper.situationByYarn(area, police, day);
+        for (PaasZhzy paasZhzy:paasZhzyList) {
+            if (paasZhzy != null) {
+                paasZhzy.setMemoryUsed(BigDecimalUtil.div(paasZhzy.getMemoryUsed(),1024).doubleValue());
+            }
+        }
+        return paasZhzyList;
+    }
+
+    @Override
+    public List<PaasZhzy> situationByLibra(String area, String police, String day) {
+        List<PaasZhzy> paasZhzyList = paasZhzyMapper.situationByLibra(area, police, day);
+        for (PaasZhzy paasZhzy:paasZhzyList) {
+            if (paasZhzy != null) {
+                paasZhzy.setMemoryUsed(BigDecimalUtil.div(paasZhzy.getMemoryUsed(),1024).doubleValue());
+            }
+        }
+        return paasZhzyList;
+    }
+
+    @Override
+    public List<PaasZhzy> situationByElasticsearch(String area, String police, String day, String clusterName) {
+        List<PaasZhzy> list = new ArrayList<>();
+        DecimalFormat df = new DecimalFormat("#.00");
+        list = paasZhzyMapper.situationByElasticsearch(area, police, day, clusterName);
+        for (PaasZhzy paasZhzy:list) {
+            if (paasZhzy.getElasticsearchCpuTotal()!=null) {
+                paasZhzy.setElasticsearchCpuUsed(Double.parseDouble(df.format(paasZhzy.getElasticsearchCpuTotal()*paasZhzy.getElasticsearchCpuUsage()*0.01)));
+            }
+            if (paasZhzy.getElasticsearchMemoryTotal()!=null) {
+                paasZhzy.setElasticsearchMemoryTotal(BigDecimalUtil.div(paasZhzy.getElasticsearchMemoryTotal(),1024).doubleValue());
+                paasZhzy.setElasticsearchMemoryUsage(BigDecimalUtil.div(paasZhzy.getElasticsearchMemoryUsed(),paasZhzy.getElasticsearchMemoryTotal()).doubleValue());
+            }
+            if (paasZhzy.getElasticsearchDiskAvailable()!=null) {
+                paasZhzy.setElasticsearchDiskAvailable(BigDecimalUtil.div(paasZhzy.getElasticsearchDiskAvailable(),1024*1024*1024).doubleValue());
+                paasZhzy.setElasticsearchDiskUsage(BigDecimalUtil.div(paasZhzy.getElasticsearchDiskUsed(),paasZhzy.getElasticsearchDiskAvailable()).doubleValue());
+            }
+        }
+        return list;
+    }
+
+    @Override
+    public List<PaasZhzy> situationByRedis(String area, String police, String day) {
+        List<PaasZhzy> list = new ArrayList<>();
+        DecimalFormat df = new DecimalFormat("#.00");
+        list = paasZhzyMapper.situationByRedis(area, police, day);
+        for (PaasZhzy paasZhzy:list) {
+            if (paasZhzy.getRedisMemoryTotal()!=null) {
+                paasZhzy.setRedisMemoryUsed(Double.parseDouble(df.format(paasZhzy.getRedisMemoryTotal()*paasZhzy.getRedisMemoryUsage()*0.01)));
+            }
+        }
+        return list;
+    }
 }

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,6 +82,154 @@ public class PaasZhzyController {
         }
         return R.ok(clusterList);
     }
+
+    @ApiOperation(value = "YARN资源总览")
+    @RequestMapping(value = "/paasOverviewByYarn",method = RequestMethod.GET)
+    public R paasOverviewByYarn(@RequestParam(value = "area",required = false) String area,@RequestParam(value = "police",required = false) String police){
+        PaasZhzy paasZhzy = new PaasZhzy();
+        try {
+            paasZhzy = paasZhzyService.paasOverviewByYarn(area, police);
+        }catch (Exception e) {
+            return R.error();
+        }
+        return R.ok(paasZhzy);
+    }
+
+    @ApiOperation(value = "Elasticsearch总览")
+    @RequestMapping(value = "/paasOverviewByElasticsearch",method = RequestMethod.GET)
+    public R paasOverviewByElasticsearch(@RequestParam(value = "area",required = false) String area,@RequestParam(value = "police",required = false) String police){
+        List<PaasZhzy> list = new ArrayList<>();
+        try {
+            list = paasZhzyService.paasOverviewByElasticsearch(area, police);
+        }catch (Exception e) {
+            return R.error();
+        }
+        return R.ok(list);
+    }
+
+    @ApiOperation(value = "Redis总览")
+    @RequestMapping(value = "/paasOverviewByRedis",method = RequestMethod.GET)
+    public R paasOverviewByRedis(@RequestParam(value = "area",required = false) String area,@RequestParam(value = "police",required = false) String police){
+        PaasZhzy paasZhzy = new PaasZhzy();
+        try {
+            paasZhzy = paasZhzyService.paasOverviewByRedis(area, police);
+        }catch (Exception e) {
+            return R.error();
+        }
+        return R.ok(paasZhzy);
+    }
+
+    @ApiOperation(value = "Libra集群总览")
+    @RequestMapping(value = "/paasOverviewByLibra",method = RequestMethod.GET)
+    public R paasOverviewByLibra(@RequestParam(value = "area",required = false) String area,@RequestParam(value = "police",required = false) String police){
+        PaasZhzy paasZhzy = new PaasZhzy();
+        try {
+            paasZhzy = paasZhzyService.paasOverviewByLibra(area, police);
+        }catch (Exception e) {
+            return R.error();
+        }
+        return R.ok(paasZhzy);
+    }
+
+    @ApiOperation(value = "Yarn资源峰值")
+    @RequestMapping(value = "/paasMaxByYarn",method = RequestMethod.GET)
+    public R paasMaxByYarn(@RequestParam(value = "area",required = false) String area,@RequestParam(value = "police",required = false) String police,@RequestParam(value = "day") String day){
+        Map<String,Double> zhzyMap = new HashMap<>();
+        try {
+            zhzyMap = paasZhzyService.paasMaxByYarn(area, police,day);
+        }catch (Exception e) {
+            return R.error();
+        }
+        return R.ok(zhzyMap);
+    }
+
+    @ApiOperation(value = "Libra资源峰值")
+    @RequestMapping(value = "/paasMaxByLibra",method = RequestMethod.GET)
+    public R paasMaxByLibra(@RequestParam(value = "area",required = false) String area,@RequestParam(value = "police",required = false) String police,@RequestParam(value = "day") String day){
+        Map<String,Double> zhzyMap = new HashMap<>();
+        try {
+            zhzyMap = paasZhzyService.paasMaxByLibra(area, police,day);
+        }catch (Exception e) {
+            return R.error();
+        }
+        return R.ok(zhzyMap);
+    }
+
+    @ApiOperation(value = "Elasticsearch资源峰值")
+    @RequestMapping(value = "/paasMaxByElasticsearch",method = RequestMethod.GET)
+    public R paasMaxByElasticsearch(@RequestParam(value = "area",required = false) String area,@RequestParam(value = "police",required = false) String police,@RequestParam(value = "day") String day,@RequestParam(value = "clusterName") String clusterName){
+        Map<String,Double> zhzyMap = new HashMap<>();
+        try {
+            zhzyMap = paasZhzyService.paasMaxByElasticsearch(area, police,day,clusterName);
+        }catch (Exception e) {
+            return R.error();
+        }
+        return R.ok(zhzyMap);
+    }
+
+    @ApiOperation(value = "Redis资源峰值")
+    @RequestMapping(value = "/paasMaxByRedis",method = RequestMethod.GET)
+    public R paasMaxByRedis(@RequestParam(value = "area",required = false) String area,@RequestParam(value = "police",required = false) String police,@RequestParam(value = "day") String day){
+        Map<String,Double> zhzyMap = new HashMap<>();
+        try {
+            zhzyMap = paasZhzyService.paasMaxByRedis(area, police,day);
+        }catch (Exception e) {
+            return R.error();
+        }
+        return R.ok(zhzyMap);
+    }
+
+    @ApiOperation(value = "Yarn资源使用情况")
+    @RequestMapping(value = "/situationByYarn",method = RequestMethod.GET)
+    public R situationByYarn(@RequestParam(value = "area",required = false) String area,@RequestParam(value = "police",required = false) String police,@RequestParam(value = "day") String day){
+        List<PaasZhzy> list = new ArrayList<>();
+        try {
+            list = paasZhzyService.situationByYarn(area, police,day);
+        }catch (Exception e) {
+            return R.error();
+        }
+        return R.ok(list);
+    }
+
+    @ApiOperation(value = "Libra资源使用情况")
+    @RequestMapping(value = "/situationByLibra",method = RequestMethod.GET)
+    public R situationByLibra(@RequestParam(value = "area",required = false) String area,@RequestParam(value = "police",required = false) String police,@RequestParam(value = "day") String day){
+        List<PaasZhzy> list = new ArrayList<>();
+        try {
+            list = paasZhzyService.situationByLibra(area, police,day);
+        }catch (Exception e) {
+            return R.error();
+        }
+        return R.ok(list);
+    }
+
+    @ApiOperation(value = "Elasticsearch资源使用情况")
+    @RequestMapping(value = "/situationByElasticsearch",method = RequestMethod.GET)
+    public R situationByElasticsearch(@RequestParam(value = "area",required = false) String area,@RequestParam(value = "police",required = false) String police,@RequestParam(value = "day") String day,@RequestParam(value = "clusterName") String clusterName){
+        List<PaasZhzy> list = new ArrayList<>();
+        try {
+            list = paasZhzyService.situationByElasticsearch(area, police,day,clusterName);
+        }catch (Exception e) {
+            return R.error();
+        }
+        return R.ok(list);
+    }
+
+    @ApiOperation(value = "Redis资源使用情况")
+    @RequestMapping(value = "/situationByRedis",method = RequestMethod.GET)
+    public R situationByRedis(@RequestParam(value = "area",required = false) String area,@RequestParam(value = "police",required = false) String police,@RequestParam(value = "day") String day){
+        List<PaasZhzy> list = new ArrayList<>();
+        try {
+            list = paasZhzyService.situationByRedis(area, police,day);
+        }catch (Exception e) {
+            return R.error();
+        }
+        return R.ok(list);
+    }
+
+
+
+
 
 
 }

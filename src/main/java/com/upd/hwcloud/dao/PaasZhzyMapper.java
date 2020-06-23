@@ -38,4 +38,38 @@ public interface PaasZhzyMapper extends BaseMapper<PaasZhzy> {
     PaasZhzy getClusterByElasticsearch(@Param("appName") String appName);
 
     PaasZhzy getClusterByRedis(@Param("appName") String appName);
+
+    PaasZhzy paasOverviewByYarn(@Param("area") String area,@Param("police") String police);
+
+    List<PaasZhzy> paasOverviewByElasticsearch(@Param("area") String area,@Param("police") String police);
+
+    PaasZhzy paasOverviewByRedis(@Param("area") String area,@Param("police") String police);
+
+    PaasZhzy paasOverviewByLibra(@Param("area") String area,@Param("police") String police);
+
+    PaasZhzy cpuMaxByYarn(@Param("area") String area,@Param("police") String police,@Param("day") String day);
+
+    PaasZhzy memoryMaxByYarn(@Param("area") String area,@Param("police") String police,@Param("day") String day);
+
+    PaasZhzy cpuMaxByLibra(@Param("area") String area,@Param("police") String police,@Param("day") String day);
+
+    PaasZhzy memoryMaxByLibra(@Param("area") String area,@Param("police") String police,@Param("day") String day);
+
+    PaasZhzy storageMaxByLibra(@Param("area") String area,@Param("police") String police,@Param("day") String day);
+
+    PaasZhzy cpuMaxByElasticsearch(@Param("area") String area,@Param("police") String police,@Param("day") String day,@Param("clusterName") String clusterName);
+
+    PaasZhzy memoryMaxByElasticsearch(@Param("area") String area,@Param("police") String police,@Param("day") String day,@Param("clusterName") String clusterName);
+
+    PaasZhzy storageMaxByElasticsearch(@Param("area") String area,@Param("police") String police,@Param("day") String day,@Param("clusterName") String clusterName);
+
+    PaasZhzy memoryMaxByRedis(@Param("area") String area,@Param("police") String police,@Param("day") String day);
+
+    List<PaasZhzy> situationByYarn(@Param("area") String area,@Param("police") String police,@Param("day") String day);
+
+    List<PaasZhzy> situationByLibra(@Param("area") String area,@Param("police") String police,@Param("day") String day);
+
+    List<PaasZhzy> situationByElasticsearch(@Param("area") String area,@Param("police") String police,@Param("day") String day,@Param("clusterName") String clusterName);
+
+    List<PaasZhzy> situationByRedis(@Param("area") String area,@Param("police") String police,@Param("day") String day);
 }
