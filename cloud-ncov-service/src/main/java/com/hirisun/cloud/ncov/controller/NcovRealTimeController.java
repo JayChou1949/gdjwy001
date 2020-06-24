@@ -9,6 +9,9 @@ import com.hirisun.cloud.common.vo.ResponseResult;
 import com.hirisun.cloud.model.ncov.vo.HomePageNcovRealtimeVo;
 import com.hirisun.cloud.ncov.service.NcovRealtimeService;
 
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+
 @RequestMapping("/ncov/realtime")
 @RestController
 public class NcovRealTimeController {
@@ -23,6 +26,9 @@ public class NcovRealTimeController {
 		return QueryResponseResult.success(homePageNcovRealtimeVo);
 	}
 	
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="json",value="疫情实时数据json",dataType="String",required=true),
+	})
 	@RequestMapping("/import")
 	public ResponseResult importData(String json) {
 		

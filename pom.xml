@@ -8,7 +8,6 @@
         <module>cloud-framework-common</module>
         <module>cloud-framework-model</module>
         <module>cloud-ncov-service</module>
-        <module>cloud-test-service</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -45,6 +44,11 @@
     <dependencyManagement>
         <dependencies>
         
+		  <dependency>
+			  <groupId>com.battcn</groupId>
+			  <artifactId>swagger-spring-boot-starter</artifactId>
+			  <version>${swagger-spring-boot.version}</version>
+		  </dependency>
 		<dependency>
 		    <groupId>com.baomidou</groupId>
 		    <artifactId>mybatis-plus-boot-starter</artifactId>

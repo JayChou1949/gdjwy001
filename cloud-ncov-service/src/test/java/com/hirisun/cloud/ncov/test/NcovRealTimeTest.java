@@ -89,8 +89,11 @@ public class NcovRealTimeTest {
 	@Test
 	public void save() {
 		
-		ResponseResult responseResult = ncovRealtimeService.importNcovRealtimeData(getData());
-		System.out.println(JSONObject.toJSONString(responseResult));
+		JSONObject parseObject = JSONObject.parseObject(getData());
+		
+		System.out.println(parseObject.toString());
+//		ResponseResult responseResult = ncovRealtimeService.importNcovRealtimeData(getData());
+//		System.out.println(JSONObject.toJSONString(responseResult));
 		
 	}
 	
