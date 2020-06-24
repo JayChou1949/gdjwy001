@@ -15,6 +15,9 @@ spring:
       connection-timeout: 30000
       connection-test-query: select 1 from dual
 
+  swagger:
+    enabled: true
+
 hystrix:
    threadpool:
     default:
@@ -65,5 +68,3 @@ mybatis-plus:
     jdbc-type-for-null: 'null'
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
     database-id: oracle
-
-
