@@ -1,12 +1,22 @@
 package com.hirisun.cloud.ncov.service.impl;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.hirisun.cloud.common.exception.CustomException;
 import com.hirisun.cloud.common.vo.CommonCode;
 import com.hirisun.cloud.common.vo.ResponseResult;
 import com.hirisun.cloud.model.ncov.vo.HomePageNcovRealtimeVo;
+import com.hirisun.cloud.model.ncov.vo.NcovRealtimeVo;
 import com.hirisun.cloud.ncov.bean.NcovRealtime;
 import com.hirisun.cloud.ncov.mapper.NcovRealtimeMapper;
 import com.hirisun.cloud.ncov.service.NcovRealtimeService;
@@ -20,32 +30,107 @@ public class NcovRealtimeServiceImpl implements NcovRealtimeService {
 	@Override
 	public HomePageNcovRealtimeVo getHomePageNcovRealtimeVo() {
 		
-		//获取广东数据
-//		ncovRealtimeMapper.selectList(new QueryWrapper<NcovRealtime>().lambda().eq(NcovRealtime::getProvinceCode,44).eq(column, val))
+		//统计全国数据
+		List<NcovRealtimeVo> toDayCounturyList = ncovRealtimeMapper.findNcovRealtimeList(1, 1);
+		NcovRealtimeVo yesterdayCountury = ncovRealtimeMapper.countNcovRealTime(1, 2);
 		
-		return null;
+		//统计所有城市
+		List<NcovRealtimeVo> toDayCityList = ncovRealtimeMapper.findNcovRealtimeList(2, 1);
+		NcovRealtimeVo yesterdayCity = ncovRealtimeMapper.countNcovRealTime(2, 2);
+		
+		HomePageNcovRealtimeVo vo = new HomePageNcovRealtimeVo();
+		
+		NcovRealtimeVo toDayCountury = extracted(toDayCounturyList, yesterdayCountury);
+		NcovRealtimeVo toDayCity = extracted(toDayCityList, yesterdayCity);
+		
+		
+		toDayCounturyList.forEach(ncovRealtimeVo->{
+			
+			ncovRealtimeVo.setDeath(0);
+			ncovRealtimeVo.setCure(0);
+			ncovRealtimeVo.setSuspected(0);
+			
+			if(ncovRealtimeVo.getProvinceCode() == 44) {
+				int diagnosis = toDayCityList.stream().mapToInt(NcovRealtimeVo::getDiagnosis).sum();
+				ncovRealtimeVo.setDiagnosis(diagnosis);	
+			}
+		});
+		
+		//当天全国各省确诊、疑似、治愈、死亡总计
+		vo.setToDayCountryTotal(toDayCountury);
+		
+		//当天全国各省确诊、疑似、治愈、死亡较昨日增长
+		vo.setYesterdayCountryTotal(yesterdayCountury);
+		
+		//广东确诊、治愈、死亡总计
+		vo.setToDayCityTotal(toDayCity);
+		
+		//广东确诊、治愈、死亡较昨日增长
+		vo.setYesterdayCityTotal(yesterdayCity);
+		
+		//当天全国各省确诊、疑似、治愈、死亡地图数据
+		vo.setProvinceList(toDayCounturyList);
+		
+		//广东列表数据
+		vo.setCityList(toDayCityList);
+		
+		return vo;
 	}
 
-	@Override
-	public boolean importNcovRealtimeData() {
+	private NcovRealtimeVo extracted(List<NcovRealtimeVo> toDayCountury, NcovRealtimeVo yesterdayCountury) {
 		
-		return false;
+		NcovRealtimeVo toDay = new NcovRealtimeVo();
+		
+		toDayCountury.forEach(ncovRealtime->{
+			toDay.setCure(toDay.getCure() + ncovRealtime.getCure());
+			toDay.setDeath(toDay.getDeath() + ncovRealtime.getDeath());
+			toDay.setDiagnosis(toDay.getDiagnosis() + ncovRealtime.getDiagnosis());
+			toDay.setSuspected(toDay.getSuspected() + ncovRealtime.getSuspected());
+			
+		});
+		
+		yesterdayCountury.setCure(toDay.getCure() - yesterdayCountury.getCure());
+		yesterdayCountury.setDeath(toDay.getDeath() - yesterdayCountury.getDeath());
+		yesterdayCountury.setDiagnosis(toDay.getDiagnosis() - yesterdayCountury.getDiagnosis());
+		yesterdayCountury.setSuspected(toDay.getSuspected() - yesterdayCountury.getSuspected());
+		return toDay;
 	}
 
 	@Transactional
-	public ResponseResult saveNcovRealtime(NcovRealtime ncovRealtime) {
-		
-		int insert = ncovRealtimeMapper.insert(ncovRealtime);
+	public ResponseResult importNcovRealtimeData(String json)throws CustomException {
 		
 		ResponseResult result = new ResponseResult(CommonCode.SUCCESS.code(),CommonCode.SUCCESS.msg());
+		JSONObject jo = JSONObject.parseObject(json);
+		String date = jo.get("date").toString();
+		List<NcovRealtime> cityList = JSONArray.parseArray(jo.get("city").toString(), NcovRealtime.class);
+		List<NcovRealtime> provinceList = JSONArray.parseArray(jo.get("province").toString(), NcovRealtime.class);
 		
-		if(insert ==0) {
-			result.setCode(CommonCode.INSERT_FAIL.code());
-			result.setMsg(CommonCode.INSERT_FAIL.msg());
+		if(StringUtils.isBlank(date) 
+				|| CollectionUtils.isEmpty(cityList) 
+				|| CollectionUtils.isEmpty(provinceList)) {
+			
+			throw new CustomException(CommonCode.INVALID_PARAM);
+			
 		}
+		
+		// 先删除需要导入那天的数据 
+		Map<String, Object> columnMap = new HashMap<String, Object>();
+		columnMap.put("CREATE_DATE", date);
+		ncovRealtimeMapper.deleteByMap(columnMap);
+
+		cityList.forEach(cityNcovRealtime -> {
+			cityNcovRealtime.setCreateDate(date);
+			ncovRealtimeMapper.insert(cityNcovRealtime);
+		});
+			
+		provinceList.forEach(provinceNcovRealtime->{
+			provinceNcovRealtime.setCreateDate(date);
+			ncovRealtimeMapper.insert(provinceNcovRealtime);
+		});
 		
 		return result;
 	}
+
 
 	@Transactional
 	public ResponseResult updateNcovRealtimeById(NcovRealtime ncovRealtime) {
@@ -75,6 +160,12 @@ public class NcovRealtimeServiceImpl implements NcovRealtimeService {
 		}
 		
 		return result;
+	}
+
+	@Override
+	public NcovRealtime getNcovRealtimeById(String id) {
+		NcovRealtime ncovRealtime = ncovRealtimeMapper.selectById(id);
+		return ncovRealtime;
 	}
 
 }

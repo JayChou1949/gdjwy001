@@ -8,7 +8,19 @@
     <result column="suspected" jdbcType="DECIMAL" property="suspected" />
     <result column="death" jdbcType="DECIMAL" property="death" />
     <result column="cure" jdbcType="DECIMAL" property="cure" />
-    <result column="create_date" jdbcType="DATE" property="createDate" />
+    <result column="create_date" jdbcType="VARCHAR" property="createDate" />
+    <result column="create_user" jdbcType="VARCHAR" property="createUser" />
+    <result column="province_code" jdbcType="DECIMAL" property="provinceCode" />
+    <result column="region_type" jdbcType="DECIMAL" property="regionType" />
+  </resultMap>
+  <resultMap id="ncovRealtimeVo" type="com.hirisun.cloud.model.ncov.vo.NcovRealtimeVo">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="region_name" jdbcType="VARCHAR" property="regionName" />
+    <result column="diagnosis" jdbcType="DECIMAL" property="diagnosis" />
+    <result column="suspected" jdbcType="DECIMAL" property="suspected" />
+    <result column="death" jdbcType="DECIMAL" property="death" />
+    <result column="cure" jdbcType="DECIMAL" property="cure" />
+    <result column="create_date" jdbcType="VARCHAR" property="createDate" />
     <result column="create_user" jdbcType="VARCHAR" property="createUser" />
     <result column="province_code" jdbcType="DECIMAL" property="provinceCode" />
     <result column="region_type" jdbcType="DECIMAL" property="regionType" />
@@ -17,137 +29,35 @@
     id, region_name, diagnosis, suspected, death, cure, create_date, create_user, province_code, 
     region_type
   </sql>
-  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+  <sql id="limitDate">
+  
+  
+  	(select create_date from (select create_date,rownum as rn from (select tn.create_date from t_ncov_realtime tn
+                                 group by tn.create_date
+                                 order by tn.create_date desc))
+                         where rn = #{rowNum,jdbcType=DECIMAL})
+  
+  </sql>
+  
+  <select id="countNcovRealTime" resultMap="ncovRealtimeVo">
     select 
-    <include refid="Base_Column_List" />
-    from T_NCOV_REALTIME
-    where id = #{id,jdbcType=VARCHAR}
+		sum(t.diagnosis) as diagnosis, 
+		sum(t.suspected) as suspected, 
+		sum(t.death) as death, 
+		sum(t.cure) as cure
+	from t_ncov_realtime t
+		where t.region_type = #{regionType,jdbcType=DECIMAL} and t.create_date = <include refid="limitDate"></include>
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
-    delete from T_NCOV_REALTIME
-    where id = #{id,jdbcType=VARCHAR}
-  </delete>
-  <insert id="insert" parameterType="com.hirisun.cloud.ncov.bean.NcovRealtime">
-    insert into T_NCOV_REALTIME (id, region_name, diagnosis, 
-      suspected, death, cure, 
-      create_date, create_user, province_code, 
-      region_type)
-    values (#{id,jdbcType=VARCHAR}, #{regionName,jdbcType=VARCHAR}, #{diagnosis,jdbcType=DECIMAL}, 
-      #{suspected,jdbcType=DECIMAL}, #{death,jdbcType=DECIMAL}, #{cure,jdbcType=DECIMAL}, 
-      #{createDate,jdbcType=DATE}, #{createUser,jdbcType=VARCHAR}, #{provinceCode,jdbcType=DECIMAL}, 
-      #{regionType,jdbcType=DECIMAL})
-  </insert>
-  <insert id="insertSelective" parameterType="com.hirisun.cloud.ncov.bean.NcovRealtime">
-    insert into T_NCOV_REALTIME
-    <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        id,
-      </if>
-      <if test="regionName != null">
-        region_name,
-      </if>
-      <if test="diagnosis != null">
-        diagnosis,
-      </if>
-      <if test="suspected != null">
-        suspected,
-      </if>
-      <if test="death != null">
-        death,
-      </if>
-      <if test="cure != null">
-        cure,
-      </if>
-      <if test="createDate != null">
-        create_date,
-      </if>
-      <if test="createUser != null">
-        create_user,
-      </if>
-      <if test="provinceCode != null">
-        province_code,
-      </if>
-      <if test="regionType != null">
-        region_type,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        #{id,jdbcType=VARCHAR},
-      </if>
-      <if test="regionName != null">
-        #{regionName,jdbcType=VARCHAR},
-      </if>
-      <if test="diagnosis != null">
-        #{diagnosis,jdbcType=DECIMAL},
-      </if>
-      <if test="suspected != null">
-        #{suspected,jdbcType=DECIMAL},
-      </if>
-      <if test="death != null">
-        #{death,jdbcType=DECIMAL},
-      </if>
-      <if test="cure != null">
-        #{cure,jdbcType=DECIMAL},
-      </if>
-      <if test="createDate != null">
-        #{createDate,jdbcType=DATE},
-      </if>
-      <if test="createUser != null">
-        #{createUser,jdbcType=VARCHAR},
-      </if>
-      <if test="provinceCode != null">
-        #{provinceCode,jdbcType=DECIMAL},
-      </if>
-      <if test="regionType != null">
-        #{regionType,jdbcType=DECIMAL},
-      </if>
-    </trim>
-  </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.hirisun.cloud.ncov.bean.NcovRealtime">
-    update T_NCOV_REALTIME
-    <set>
-      <if test="regionName != null">
-        region_name = #{regionName,jdbcType=VARCHAR},
-      </if>
-      <if test="diagnosis != null">
-        diagnosis = #{diagnosis,jdbcType=DECIMAL},
-      </if>
-      <if test="suspected != null">
-        suspected = #{suspected,jdbcType=DECIMAL},
-      </if>
-      <if test="death != null">
-        death = #{death,jdbcType=DECIMAL},
-      </if>
-      <if test="cure != null">
-        cure = #{cure,jdbcType=DECIMAL},
-      </if>
-      <if test="createDate != null">
-        create_date = #{createDate,jdbcType=DATE},
-      </if>
-      <if test="createUser != null">
-        create_user = #{createUser,jdbcType=VARCHAR},
-      </if>
-      <if test="provinceCode != null">
-        province_code = #{provinceCode,jdbcType=DECIMAL},
-      </if>
-      <if test="regionType != null">
-        region_type = #{regionType,jdbcType=DECIMAL},
-      </if>
-    </set>
-    where id = #{id,jdbcType=VARCHAR}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="com.hirisun.cloud.ncov.bean.NcovRealtime">
-    update T_NCOV_REALTIME
-    set region_name = #{regionName,jdbcType=VARCHAR},
-      diagnosis = #{diagnosis,jdbcType=DECIMAL},
-      suspected = #{suspected,jdbcType=DECIMAL},
-      death = #{death,jdbcType=DECIMAL},
-      cure = #{cure,jdbcType=DECIMAL},
-      create_date = #{createDate,jdbcType=DATE},
-      create_user = #{createUser,jdbcType=VARCHAR},
-      province_code = #{provinceCode,jdbcType=DECIMAL},
-      region_type = #{regionType,jdbcType=DECIMAL}
-    where id = #{id,jdbcType=VARCHAR}
-  </update>
+  
+  <select id="findNcovRealtimeList" resultMap="ncovRealtimeVo">
+  	select region_name,
+  		   diagnosis, 
+  		   suspected, 
+  		   death, 
+  		   cure, 
+  		   province_code 
+  		from t_ncov_realtime t 
+		where t.region_type = #{regionType,jdbcType=DECIMAL} and t.create_date = <include refid="limitDate"></include>
+  </select>
+  
 </mapper>

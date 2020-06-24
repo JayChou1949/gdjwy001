@@ -7,15 +7,15 @@ import com.hirisun.cloud.ncov.bean.NcovRealtime;
 
 public interface NcovRealtimeService {
 
-	public ResponseResult saveNcovRealtime(NcovRealtime ncovRealtime)throws CustomException;
-	
 	public ResponseResult updateNcovRealtimeById(NcovRealtime ncovRealtime)throws CustomException;
+	
+	public NcovRealtime getNcovRealtimeById(String id);
 	
 	public ResponseResult deleteNcovRealtimeById(String id)throws CustomException;
 	
 	public HomePageNcovRealtimeVo getHomePageNcovRealtimeVo();
 	
-	public boolean importNcovRealtimeData();
+	public ResponseResult importNcovRealtimeData(String json)throws CustomException;
 	
 	
 }

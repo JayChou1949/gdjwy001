@@ -1,6 +1,6 @@
 package com.hirisun.cloud.ncov.bean;
 
-import java.util.Date;
+import java.io.Serializable;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -8,7 +8,12 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 @TableName("T_NCOV_REALTIME")
-public class NcovRealtime {
+public class NcovRealtime implements Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6455619186632153210L;
 
 	@TableId(value = "ID", type = IdType.UUID)
 	private String id;
@@ -29,7 +34,7 @@ public class NcovRealtime {
     private Integer cure; //治愈
 
 	@TableField("CREATE_DATE")
-    private Date createDate; //创建日期
+    private String createDate; //创建日期
 
 	@TableField("CREATE_USER")
     private String createUser; //创建人
@@ -88,11 +93,11 @@ public class NcovRealtime {
         this.cure = cure;
     }
 
-    public Date getCreateDate() {
+    public String getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(Date createDate) {
+    public void setCreateDate(String createDate) {
         this.createDate = createDate;
     }
 
