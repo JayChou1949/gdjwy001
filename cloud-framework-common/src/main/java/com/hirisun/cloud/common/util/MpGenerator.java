@@ -1,4 +1,4 @@
-package com.hirisun.cloud.ncov.util;
+package com.hirisun.cloud.common.util;
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.generator.AutoGenerator;
 import com.baomidou.mybatisplus.generator.config.DataSourceConfig;
