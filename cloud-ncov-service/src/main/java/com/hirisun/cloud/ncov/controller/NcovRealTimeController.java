@@ -3,7 +3,9 @@ package com.hirisun.cloud.ncov.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hirisun.cloud.common.vo.QueryResponseResult;
@@ -45,7 +47,7 @@ public class NcovRealTimeController {
 		@ApiImplicitParam(name="json",value="疫情实时数据json",dataType="String",required=true),
 	})
 	@PostMapping("/import")
-	public ResponseResult importData(String json) {
+	public ResponseResult importData(@RequestBody String json) {
 		
 		try {
 			ncovRealtimeService.importNcovRealtimeData(json);

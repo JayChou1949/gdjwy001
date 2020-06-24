@@ -25,7 +25,7 @@ public class NcovRealTimeTest {
 	
 	private String getData(){
 		
-		String json = "{date:'2020-06-24',city:["
+		String json = "{date:'2020-06-25',city:["
 				+ "{'cure':15,'death':15,'diagnosis':15,'provinceCode':44,'regionName':'广州','regionType':2,'suspected':15},"
 				+ "{'cure':1,'death':4,'diagnosis':30,'provinceCode':44,'regionName':'深圳','regionType':2,'suspected':20},"
 				+ "{'cure':2,'death':6,'diagnosis':13,'provinceCode':44,'regionName':'珠海','regionType':2,'suspected':21},"
