@@ -11,5 +11,11 @@
 
     <artifactId>cloud-framework-model</artifactId>
 
+	<dependencies>
+		<dependency>
+			  <groupId>com.battcn</groupId>
+			  <artifactId>swagger-spring-boot-starter</artifactId>
+		  </dependency>
+	</dependencies>
 
 </project>

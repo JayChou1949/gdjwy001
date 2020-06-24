@@ -3,6 +3,8 @@ package com.hirisun.cloud.model.ncov.vo;
 import java.io.Serializable;
 import java.util.List;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * 首页疫情实时数据
  * @author cjh
@@ -15,12 +17,23 @@ public class HomePageNcovRealtimeVo implements Serializable{
 	 */
 	private static final long serialVersionUID = 260770784421597458L;
 	
-	private NcovRealtimeVo toDayCountryTotal; //今天全国统计数据
-	private NcovRealtimeVo yesterdayCountryTotal; //昨天全国统计数据
-	private NcovRealtimeVo toDayCityTotal; //今天城市统计数据
-	private NcovRealtimeVo  yesterdayCityTotal; //昨天城市统计数据
-	private List<NcovRealtimeVo> provinceList; //所有省份地图数据
-	private List<NcovRealtimeVo> cityList; //广东省列表数据
+	@ApiModelProperty(value="今天全国统计数据")
+	private NcovRealtimeVo toDayCountryTotal; 
+	
+	@ApiModelProperty(value="昨天全国统计数据")
+	private NcovRealtimeVo yesterdayCountryTotal; 
+	
+	@ApiModelProperty(value="今天城市统计数据")
+	private NcovRealtimeVo toDayCityTotal; 
+	
+	@ApiModelProperty(value="昨天城市统计数据")
+	private NcovRealtimeVo  yesterdayCityTotal; 
+	
+	@ApiModelProperty(value="所有省份地图数据")
+	private List<NcovRealtimeVo> provinceList; 
+	
+	@ApiModelProperty(value="广东省列表数据")
+	private List<NcovRealtimeVo> cityList; 
 	
 	public NcovRealtimeVo getToDayCountryTotal() {
 		return toDayCountryTotal;

@@ -11,7 +11,7 @@
         <maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
     </properties>
   
-  <!--分别设置开发，测试，生产环境
+  <!--分别设置开发，测试，生产环境 -->
 	<profiles>
 		<profile>
 			<id>dev</id>
@@ -34,7 +34,7 @@
 				<profiles.active>pro</profiles.active>
 			</properties>
 		</profile>
-	</profiles>-->
+	</profiles>
   
   <dependencies>
   		<dependency>
@@ -138,10 +138,6 @@
 					<artifactId>jackson-databind</artifactId>
 				</dependency>
 	  <dependency>
-			  <groupId>com.battcn</groupId>
-			  <artifactId>swagger-spring-boot-starter</artifactId>
-		  </dependency>
-	  <dependency>
 		  <groupId>com.baomidou</groupId>
 		  <artifactId>mybatis-plus-generator</artifactId>
 		  <version>${mybatis-plus.version}</version>
@@ -159,7 +155,7 @@
   
   		<!--  配置资源目录-->
         <resources>
-        	<!-- <resource>
+        	<resource>
 				<directory>src/main/resources</directory>
 				<filtering>true</filtering>
 				<excludes>
@@ -170,19 +166,20 @@
 			</resource>
 			
 			<resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>mapper/*.*</include>
+                    <include>**/*.properties</include>
+                </includes>
+            </resource>
+			
+			<resource>
 				<directory>src/main/resources/${profiles.active}</directory>
 				<filtering>true</filtering>
 				<includes>
 					<include>**/*.*</include>
 				</includes>
-			</resource> -->
-			
-			<resource>
-                <directory>src/main/resources</directory>
-                <includes>
-                    <include>**/*.*</include>
-                </includes>
-            </resource>
+			</resource> 
         </resources>
   
         <plugins>
@@ -217,6 +214,17 @@
                     <useDefaultDelimiters>true</useDefaultDelimiters>
                 </configuration>
             </plugin>
+            
+            <plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-jar-plugin</artifactId>
+		        <configuration>
+		            <excludes>
+		                <exclude>**/*.properties</exclude>
+		            </excludes>
+		        </configuration>
+		    </plugin>
+            
         </plugins>
 
         

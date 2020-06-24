@@ -1,26 +1,38 @@
 package com.hirisun.cloud.model.ncov.vo;
 
+import io.swagger.annotations.ApiModelProperty;
+
 public class NcovRealtimeVo {
 
+	@ApiModelProperty(value="id")
 	private String id;
 
-    private String regionName; //区域名称
+	@ApiModelProperty(value="区域名称")
+    private String regionName; 
 
-    private int diagnosis; //确诊
+	@ApiModelProperty(value="确诊")
+    private int diagnosis; 
 
-    private int suspected; //疑似
+	@ApiModelProperty(value="疑似")
+    private int suspected; 
 
-    private int death; //死亡
+	@ApiModelProperty(value="死亡")
+    private int death; 
 
-    private int cure; //治愈
+	@ApiModelProperty(value="治愈")
+    private int cure; 
 
-    private String createDate; //创建日期
+	@ApiModelProperty(value="创建日期")
+    private String createDate; 
 
-    private String createUser; //创建人
+	@ApiModelProperty(value="创建人")
+    private String createUser; 
 
-    private Integer provinceCode; //省份号码 广东=44
+	@ApiModelProperty(value="省份号码 广东=44")
+    private Integer provinceCode; 
 
-    private Integer regionType; //1=省，2=市
+	@ApiModelProperty(value="1=省，2=市")
+    private Integer regionType; 
 
     public String getId() {
         return id;
