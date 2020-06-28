@@ -336,6 +336,7 @@ public class PaasZhzyServiceImpl extends ServiceImpl<PaasZhzyMapper, PaasZhzy> i
             }
             if (paasZhzy.getMemoryTotal()!=null) {
                 paasZhzy.setMemoryTotal(BigDecimalUtil.div(paasZhzy.getMemoryTotal(),1024).doubleValue());
+                paasZhzy.setMemoryUsed(BigDecimalUtil.div(paasZhzy.getMemoryUsed(),1024).doubleValue());
             }
         }
         return paasYarnResource;
