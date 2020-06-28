@@ -245,14 +245,15 @@ public class MessageProvider {
     /**
      * 构造缩配短信通知消息
      */
-    public Message buildRecoverMessage(User submitor, String bizName, String orderNum,String month,String day) {
-        if (submitor == null) {
+    public Message buildRecoverMessage(String userId, String bizName, String orderNum,String month,String day) {
+        User user = userService.findUserByIdcard(userId);
+        if (user == null) {
             logger.error("to send user is null");
             return null;
         }
         Message toUser = new Message();
-        toUser.setContent(String.format(msgRecover, submitor.getName(), bizName, orderNum, month,day));
-        toUser.setUser(submitor);
+        toUser.setContent(String.format(msgRecover, user.getName(), bizName, orderNum, month,day));
+        toUser.setUser(user);
         return toUser;
     }
 

@@ -38,6 +38,8 @@ public interface IActivityService extends IService<Activity> {
 
     R advanceCurrentActivity(String currentActivityId, AppReviewInfo approve, Map<String, String> map);
 
+    R advanceCurrentActivityTemp(String currentActivityId, AppReviewInfo approve, Map<String, String> map);
+
     /**
      * 流转
      * @return
