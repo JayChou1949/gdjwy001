@@ -7,7 +7,14 @@ package com.hirisun.cloud.common.vo;
  * @Description 响应结果
  */
 public interface Response {
-    public static final int SUCCESS_CODE = 0 ;
 
-    public static final String SUCCESS_MSG = "成功";
+    /**
+     * 成功状态码
+     */
+    int SUCCESS_CODE = 0;
+
+    /**
+     * 成功消息
+     */
+    String SUCCESS_MSG = "成功";
 }

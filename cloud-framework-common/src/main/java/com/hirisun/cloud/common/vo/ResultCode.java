@@ -1,9 +1,15 @@
 package com.hirisun.cloud.common.vo;
 
 public interface ResultCode {
-    //状态码
+    /**
+     * 状态码
+     * @return
+     */
     Integer code();
 
-    //状态信息
+    /**
+     * 信息
+     * @return
+     */
     String msg();
 }
