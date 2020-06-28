@@ -136,6 +136,36 @@
         SELECT REDIS_CLUSTER_NAME FROM TB_PAAS_ZHZY WHERE APPLY_NAME=#{appName} AND ODS_TIME=(SELECT MAX(ODS_TIME) FROM TB_PAAS_ZHZY)
     </select>
 
+    <select id="getTypeSiteByAreaOrPolice" resultMap="BaseResultMap">
+        SELECT TYPE_SITE FROM TB_PAAS_ZHZY WHERE ODS_TIME=(SELECT MAX(ODS_TIME) FROM TB_PAAS_ZHZY)
+        <if test="area != null and area != ''">
+            AND AREA=#{area}
+        </if>
+        <if test="police != null and police != ''">
+            AND POLICE=#{police}
+        </if>
+    </select>
+
+    <select id="getElasticsearchByAreaOrPolice" resultMap="BaseResultMap">
+        SELECT ELASTICSEARCH_STORAGE_SPACE FROM TB_PAAS_ZHZY WHERE ODS_TIME=(SELECT MAX(ODS_TIME) FROM TB_PAAS_ZHZY)
+        <if test="area != null and area != ''">
+            AND AREA=#{area}
+        </if>
+        <if test="police != null and police != ''">
+            AND POLICE=#{police}
+        </if>
+    </select>
+
+    <select id="getRedisByAreaOrPolice" resultMap="BaseResultMap">
+        SELECT REDIS_CLUSTER_NAME FROM TB_PAAS_ZHZY WHERE ODS_TIME=(SELECT MAX(ODS_TIME) FROM TB_PAAS_ZHZY)
+        <if test="area != null and area != ''">
+            AND AREA=#{area}
+        </if>
+        <if test="police != null and police != ''">
+            AND POLICE=#{police}
+        </if>
+    </select>
+
     <select id="paasOverviewByYarn" resultMap="BaseResultMap">
         SELECT SUM(CPU_TOTAL) CPU_TOTAL,SUM(MEMORY_TOTAL) MEMORY_TOTAL,SUM(STORAGE_TOTAL) STORAGE_TOTAL FROM TB_PAAS_ZHZY
         WHERE TYPE_SITE='hadoop' AND ODS_TIME=(SELECT MAX(ODS_TIME) FROM TB_PAAS_ZHZY)

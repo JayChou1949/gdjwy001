@@ -83,6 +83,18 @@ public class PaasZhzyController {
         return R.ok(clusterList);
     }
 
+    @ApiOperation(value = "地市或警种的集群tabs")
+    @RequestMapping(value = "/clusterTabsByAreaOrPolice",method = RequestMethod.GET)
+    public R clusterTabsByAreaOrPolice(@RequestParam(value = "area",required = false) String area,@RequestParam(value = "police",required = false) String police){
+        List<String> clusterList;
+        try {
+            clusterList = paasZhzyService.clusterTabsByAreaOrPolice(area,police);
+        }catch (Exception e) {
+            return R.error();
+        }
+        return R.ok(clusterList);
+    }
+
     @ApiOperation(value = "YARN资源总览")
     @RequestMapping(value = "/paasOverviewByYarn",method = RequestMethod.GET)
     public R paasOverviewByYarn(@RequestParam(value = "area",required = false) String area,@RequestParam(value = "police",required = false) String police){

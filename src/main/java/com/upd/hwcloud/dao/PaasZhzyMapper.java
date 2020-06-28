@@ -39,6 +39,12 @@ public interface PaasZhzyMapper extends BaseMapper<PaasZhzy> {
 
     PaasZhzy getClusterByRedis(@Param("appName") String appName);
 
+    List<PaasZhzy> getTypeSiteByAreaOrPolice(@Param("area") String area,@Param("police") String police);
+
+    List<PaasZhzy> getElasticsearchByAreaOrPolice(@Param("area") String area,@Param("police") String police);
+
+    List<PaasZhzy> getRedisByAreaOrPolice(@Param("area") String area,@Param("police") String police);
+
     PaasZhzy paasOverviewByYarn(@Param("area") String area,@Param("police") String police);
 
     List<PaasZhzy> paasOverviewByElasticsearch(@Param("area") String area,@Param("police") String police);

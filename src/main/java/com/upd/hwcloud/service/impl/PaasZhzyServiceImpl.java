@@ -115,18 +115,52 @@ public class PaasZhzyServiceImpl extends ServiceImpl<PaasZhzyMapper, PaasZhzy> i
     public List<String> clusterTabs(String appName) {
         List<String> clusterList = new ArrayList<>();
         PaasZhzy typeSite = paasZhzyMapper.getClusterByTypeSite(appName);
-//        PaasZhzy elasticsearch = paasZhzyMapper.getClusterByElasticsearch(appName);
+        PaasZhzy elasticsearch = paasZhzyMapper.getClusterByElasticsearch(appName);
         PaasZhzy redis = paasZhzyMapper.getClusterByRedis(appName);
         if (StringUtils.equals("hadoop",typeSite.getTypeSite())) {
-            clusterList.add("YARN");
+            clusterList.add("YARN资源");
         }else {
-            clusterList.add(typeSite.getTypeSite());
+            clusterList.add("Libra集群");
         }
-//        if (elasticsearch != null) {
-        clusterList.add("Elasticsearch");
-//        }
+        if (elasticsearch != null) {
+            clusterList.add("Elasticsearch");
+        }
         if (redis != null) {
             clusterList.add("Redis");
+        }
+        return clusterList;
+    }
+
+    @Override
+    public List<String> clusterTabsByAreaOrPolice(String area,String police) {
+        List<String> clusterList = new ArrayList<>();
+        List<PaasZhzy> typeSite = paasZhzyMapper.getTypeSiteByAreaOrPolice(area,police);
+        List<PaasZhzy> elasticsearch = paasZhzyMapper.getElasticsearchByAreaOrPolice(area,police);
+        List<PaasZhzy> redis = paasZhzyMapper.getRedisByAreaOrPolice(area,police);
+        for (PaasZhzy list:typeSite) {
+            if (StringUtils.equals("hadoop",list.getTypeSite())) {
+                if (!clusterList.contains("YARN资源")) {
+                    clusterList.add("YARN资源");
+                }
+            }else {
+                if (!clusterList.contains("Libra集群")) {
+                    clusterList.add("Libra集群");
+                }
+            }
+        }
+        for (PaasZhzy list:elasticsearch) {
+            if (list != null) {
+                if (!clusterList.contains("Elasticsearch")) {
+                    clusterList.add("Elasticsearch");
+                }
+            }
+        }
+        for (PaasZhzy list:redis) {
+            if (list != null) {
+                if (!clusterList.contains("Redis")) {
+                    clusterList.add("Redis");
+                }
+            }
         }
         return clusterList;
     }
