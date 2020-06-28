@@ -328,7 +328,19 @@ public class PaasZhzyServiceImpl extends ServiceImpl<PaasZhzyMapper, PaasZhzy> i
 
     @Override
     public List<PaasZhzy>  getPaasYarnResource(String appName, String area, String police,Integer day) {
-        return paasZhzyMapper.getPaasYarnResource(appName,area,police,day);
+        List<PaasZhzy> paasYarnResource = paasZhzyMapper.getPaasYarnResource(appName, area, police, day);
+        //转换cpu和内存的单位
+        for (PaasZhzy paasZhzy : paasYarnResource) {
+            if (paasZhzy.getCpuTotal()!=null) {
+                paasZhzy.setCpuTotal(BigDecimalUtil.div(paasZhzy.getCpuTotal(),1024).doubleValue());
+            }
+            if (paasZhzy.getMemoryTotal()!=null) {
+                paasZhzy.setMemoryTotal(BigDecimalUtil.div(paasZhzy.getMemoryTotal(),1024).doubleValue());
+            }
+        }
+        return paasYarnResource;
+
+
     }
 
     @Override
@@ -336,12 +348,11 @@ public class PaasZhzyServiceImpl extends ServiceImpl<PaasZhzyMapper, PaasZhzy> i
         List<PaasZhzy> paasLibraResource = paasZhzyMapper.getPaasLibraResource(appName, area, police, day);
         DecimalFormat df = new DecimalFormat("#.00");
         for (PaasZhzy paasZhzy : paasLibraResource) {
-            if (paasZhzy.getElasticsearchCpuTotal()!=null) {
-                paasZhzy.setElasticsearchCpuUsed(Double.parseDouble(df.format(paasZhzy.getElasticsearchCpuTotal()*paasZhzy.getElasticsearchCpuUsage()*0.01)));
+            if (paasZhzy.getCpuTotal()!=null) {
+                paasZhzy.setCpuTotal(BigDecimalUtil.div(paasZhzy.getCpuTotal(),1024).doubleValue());
             }
-            if (paasZhzy.getElasticsearchMemoryTotal()!=null) {
-                paasZhzy.setElasticsearchMemoryTotal(BigDecimalUtil.div(paasZhzy.getElasticsearchMemoryTotal(),1024).doubleValue());
-                paasZhzy.setElasticsearchMemoryUsage(BigDecimalUtil.div(paasZhzy.getElasticsearchMemoryUsed(),paasZhzy.getElasticsearchMemoryTotal()).doubleValue());
+            if (paasZhzy.getMemoryTotal()!=null) {
+                paasZhzy.setMemoryTotal(BigDecimalUtil.div(paasZhzy.getMemoryTotal(),1024).doubleValue());
             }
             if (paasZhzy.getStorageTotal() != 0) {
                 paasZhzy.setStorageUsed(BigDecimalUtil.div(paasZhzy.getStorageUsed(),1024*1024).doubleValue());
