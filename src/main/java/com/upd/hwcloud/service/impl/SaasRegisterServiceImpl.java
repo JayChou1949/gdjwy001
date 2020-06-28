@@ -278,10 +278,10 @@ public class SaasRegisterServiceImpl extends RegisterServiceImpl<SaasRegisterMap
         if(StringUtils.isBlank(oldName)){
             throw new BaseException("原应用名为空");
         }
-        if(!StringUtils.equals(user.getIdcard(),info.getJsPrincipalIdcard())){
+        /*if(!StringUtils.equals(user.getIdcard(),info.getJsPrincipalIdcard())){
             logger.debug("user-> {} ,js -> {}",user.getIdcard(),info.getJsPrincipalIdcard());
             throw new BaseException("非应用建设单位负责人，不能变更");
-        }
+        }*/
         //更新应用注册信息及文件信息
         this.update(user,info);
         filesService.refFiles(info.getFileList(),info.getId());
