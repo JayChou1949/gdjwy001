@@ -11,10 +11,7 @@ import com.upd.hwcloud.dao.InstanceOrderMessageMapper;
 import com.upd.hwcloud.dao.ServiceInstanceMapper;
 import com.upd.hwcloud.service.InstanceOrderMessageService;
 import com.upd.hwcloud.service.application.impl.PaasApigServiceImpl;
-import okhttp3.Interceptor;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import okhttp3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,6 +107,7 @@ public class InstanceOrderMessageServiceImpl implements InstanceOrderMessageServ
                 .writeTimeout(30, TimeUnit.SECONDS)
                 .sslSocketFactory(SSLSocketClient.getSSLSocketFactory())
                 .hostnameVerifier(SSLSocketClient.getHostnameVerifier())
+                .connectionPool(new ConnectionPool(20,1,TimeUnit.MINUTES))
                 .build();
         return okHttpClient;
     }
