@@ -200,6 +200,7 @@ public class ServicePublishController {
        }
        info.setWorkFlowId(workFlow.getId());
        info.setWorkFlowVersion(workFlow.getVersion());
+       info.setWhereFrom("1");
        servicePublishService.save(user,info);
         R r= instanceService.launchInstanceOfWorkFlow(user.getIdcard(), info.getWorkFlowId(), info.getId());
 
