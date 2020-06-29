@@ -71,6 +71,7 @@ public class ThreePartyInterfaceController {
             return map;
         }
         ThreePartyInterface threePartyInterface = threePartyInterfaceService.getById(id);
+//        threePartyInterfaceService.getByParams();
         if(threePartyInterface==null){
             Map<String, Object> map = new HashMap<>();
             map.put("code", 200);

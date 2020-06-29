@@ -3,6 +3,8 @@ package com.hirisun.cloud.third.service;
 import com.hirisun.cloud.third.bean.ThreePartyInterface;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 /**
  * <p>
  * 第三方接口表 服务类
@@ -13,6 +15,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface ThreePartyInterfaceService extends IService<ThreePartyInterface> {
 
-    public ThreePartyInterface getByParams();
+    List<ThreePartyInterface> getByParams(ThreePartyInterface threePartyInterface);
 
 }
