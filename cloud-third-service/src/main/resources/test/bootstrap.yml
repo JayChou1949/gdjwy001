@@ -1,0 +1,16 @@
+server:
+   port: 8000
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  application: 
+     name: cloud-third-service-test
+  cloud:
+    nacos:
+        discovery:
+          # 配置Nacos地址
+          server-addr: 139.9.234.187:8848
+        #config:
+          #server-addr: 139.9.234.187:8848
+          #file-extension: yml
