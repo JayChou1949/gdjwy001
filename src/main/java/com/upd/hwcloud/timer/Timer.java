@@ -43,7 +43,7 @@ public class Timer {
      * 资源回收定时检查，按时间设定，到时间后自动执行程序
      *
      */
-    public void startRecoverCheck(String date,User user, ResourceRecoverAppInfo info) throws Exception{
+    public void startRecoverCheck(String date,String userId, ResourceRecoverAppInfo info) throws Exception{
         // 规定的时间进行
         final SimpleDateFormat sdf = new SimpleDateFormat(date);
         Date startTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(sdf.format(new Date()));
@@ -72,14 +72,14 @@ public class Timer {
                 String[] shrinkTime=null;
                 String month = "";
                 String day = "";
-                if(resourceRecover.getShrinkTime()!=null){
+                if(resourceRecover!=null&&resourceRecover.getShrinkTime()!=null){
                     shrinkTime=resourceRecover.getShrinkTime().split(" ")[0].split("-");
                 }else{
                     shrinkTime= DateUtil.formateDate(info.getCreateTime(),"yyyy-MM-dd").split("-");
                 }
                 month = shrinkTime[1];
                 day = shrinkTime[2];
-                messageProvider.sendMessageAsync(messageProvider.buildRecoverMessage(user, BusinessName.RECOVER, info.getOrderNumber(),month,day));
+                messageProvider.sendMessageAsync(messageProvider.buildRecoverMessage(userId, BusinessName.RECOVER, info.getOrderNumber(),month,day));
 
                 //更新状态
                 appInfo.setStatus(ApplicationInfoStatus.RESENT.getCode());

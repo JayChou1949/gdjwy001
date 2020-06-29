@@ -224,11 +224,11 @@
         </if>
 
         <if test="day==7">
-            and TO_CHAR(SYSDATE,'YYYYMMDD')-TO_CHAR(ODS_TIME,'YYYYMMDD') &lt; 6
+            and TO_CHAR(SYSDATE,'YYYYMMDD')-TO_CHAR(ODS_TIME,'YYYYMMDD') &lt; 7
             and TO_CHAR(ODS_TIME,'hh24:mi')='00:00'
         </if>
         <if test="day==30">
-            and TO_CHAR(SYSDATE,'YYYYMMDD')-TO_CHAR(ODS_TIME,'YYYYMMDD') &lt; 29
+            and TO_CHAR(SYSDATE,'YYYYMMDD')-TO_CHAR(ODS_TIME,'YYYYMMDD') &lt; 30
             and TO_CHAR(ODS_TIME,'hh24:mi')='00:00'
         </if>
     </sql>
@@ -247,11 +247,11 @@
         </if>
 
         <if test="day==7">
-            and TO_CHAR(SYSDATE,'YYYYMMDD')-TO_CHAR(ODS_TIME,'YYYYMMDD') &lt; 6
+            and TO_CHAR(SYSDATE,'YYYYMMDD')-TO_CHAR(ODS_TIME,'YYYYMMDD') &lt; 7
             and TO_CHAR(ODS_TIME,'hh24:mi')='00:00'
         </if>
         <if test="day==30">
-            and TO_CHAR(SYSDATE,'YYYYMMDD')-TO_CHAR(ODS_TIME,'YYYYMMDD') &lt; 29
+            and TO_CHAR(SYSDATE,'YYYYMMDD')-TO_CHAR(ODS_TIME,'YYYYMMDD') &lt; 30
             and TO_CHAR(ODS_TIME,'hh24:mi')='00:00'
         </if>
         <if test="clusterName != null and clusterName != ''">

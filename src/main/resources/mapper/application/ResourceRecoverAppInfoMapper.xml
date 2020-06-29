@@ -65,7 +65,6 @@
         select info.* from TB_RESOURCE_RECOVER_APP_INFO info
         where info.status='7'
         and info.RECOVERED_AGREE is null
-        and ROUND (TO_NUMBER (TO_DATE (TO_CHAR (SYSDATE,'yyyy-mm-dd hh24:mi:ss'),'yyyy-mm-dd hh24:mi:ss') - TO_DATE (TO_CHAR (create_TIME,'yyyy-mm-dd hh24:mi:ss'),'YYYY-MM-DD HH24:mi:ss')) * 24 * 60 * 60) > 60*60*48
         and ROUND (TO_NUMBER (TO_DATE (TO_CHAR (SYSDATE,'yyyy-mm-dd hh24:mi:ss'),'yyyy-mm-dd hh24:mi:ss') - TO_DATE (TO_CHAR (create_TIME,'yyyy-mm-dd hh24:mi:ss'),'YYYY-MM-DD HH24:mi:ss')) * 24 * 60 * 60) < 60*60*120
         ]]>
     </select>

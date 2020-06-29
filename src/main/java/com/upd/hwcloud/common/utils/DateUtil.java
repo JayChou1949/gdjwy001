@@ -15,6 +15,13 @@ import java.util.Date;
  */
 public class DateUtil {
 
+    /** 默认时间格式yyyy-MM-dd HH:mm:ss **/
+    public static String DEFAULTFORMAT = "yyyy-MM-dd HH:mm:ss";
+    /** 日期格式yyyy-MM-dd **/
+    public static String Date_Format = "yyyy-MM-dd";
+    public static String Date_FormatYMDHM = "yyyy-MM-dd HH:mm";
+    public static String Date_FormatYMDHMS = "yyyy-MM-dd HH:mm:ss";
+
     /**
      * 格式化Date，并转成字符串
      * @param date
@@ -166,6 +173,88 @@ public class DateUtil {
         return diff;
     }
     /**
+     * 按指定日期单位计算两个日期间的间隔
+     * @param timeInterval
+     *  总共支持year,quarter,month,week,day,hour,minute,second这几种时间间隔
+     *  间隔 = date1-date2
+     * @param date1 Date
+     * @param date2 Date
+     * @return long
+     */
+    public static long dateDiff(String timeInterval, Date date1,
+                                Date date2){
+        try {
+            if ("year".equals(timeInterval)) {
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(date1);
+                int time = calendar.get(Calendar.YEAR);
+                calendar.setTime(date2);
+                return time - calendar.get(Calendar.YEAR);
+            }
+
+            if ("quarter".equals(timeInterval)) {
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(date1);
+                int time = calendar.get(Calendar.YEAR) * 4;
+                calendar.setTime(date2);
+                time -= calendar.get(Calendar.YEAR) * 4;
+                calendar.setTime(date1);
+                time += calendar.get(Calendar.MONTH) / 4;
+                calendar.setTime(date2);
+                return time - calendar.get(Calendar.MONTH) / 4;
+            }
+
+            if ("month".equals(timeInterval)) {
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(date1);
+                int time = calendar.get(Calendar.YEAR) * 12;
+                calendar.setTime(date2);
+                time -= calendar.get(Calendar.YEAR) * 12;
+                calendar.setTime(date1);
+                time += calendar.get(Calendar.MONTH);
+                calendar.setTime(date2);
+                return time - calendar.get(Calendar.MONTH);
+            }
+
+            if ("week".equals(timeInterval)) {
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(date1);
+                int time = calendar.get(Calendar.YEAR) * 52;
+                calendar.setTime(date2);
+                time -= calendar.get(Calendar.YEAR) * 52;
+                calendar.setTime(date1);
+                time += calendar.get(Calendar.WEEK_OF_YEAR);
+                calendar.setTime(date2);
+                return time - calendar.get(Calendar.WEEK_OF_YEAR);
+            }
+
+            if ("day".equals(timeInterval)) {
+                return ((date1.getTime() - date2.getTime()) / (24 * 60 * 60 * 1000));
+            }
+
+            if ("hour".equals(timeInterval)) {
+                long time = date1.getTime() / 1000 / 60 / 60;
+                return time - date2.getTime() / 1000 / 60 / 60;
+            }
+
+            if ("minute".equals(timeInterval)) {
+                long time = date1.getTime() / 1000 / 60;
+                return time - date2.getTime() / 1000 / 60;
+            }
+            if ("second".equals(timeInterval)) {
+                long time = date1.getTime() / 1000;
+                return (time - date2.getTime() / 1000);
+            }
+            if ("millsecond".equals(timeInterval)) {
+                long time = date1.getTime();
+                return (time - date2.getTime());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return date1.getTime() - date2.getTime();
+    }
+    /**
      * 两个月份之间的相隔
      * month1-month2
      * @param month1 String 月份 yyyy-MM
@@ -200,6 +289,60 @@ public class DateUtil {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         return calendar;
+    }
+    /**
+     * 转换日期时间格式
+     * @param date String 字符串 表示的时间
+     * @param pattern String 当前传入字符串的时间格式
+     * @return  Date 返回一个java.util.Date对象
+     * @throws ParseException
+     */
+
+    public static Date parseDate(String date, String pattern) throws ParseException{
+        if("".equals(fMstr(date))){
+            return null;
+        }
+        if(pattern.equals(Date_Format)){
+            if(!checkDate(date)){
+                return null;
+            }
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+        return  sdf.parse(date);
+    }
+
+    public static String fMstr(String param) {
+        if (param == null) {
+            return "";
+        }
+        return param.trim();
+    }
+
+    /**
+     * 验证只能为yyyy-dd-mm或者yyyy/dd/mm日期格式
+     * @param value
+     * @return boolean 如为日期返回true 否则返回false
+     */
+    public static boolean checkDate(String value){
+        value = fMstr(value);
+        if(value.equals("")){
+            return false;
+        }
+        value = value.replaceAll("/", "-");
+        String vals[] = value.split("-");
+        if(vals.length != 3){
+            return false;
+        }
+        if(vals[0].length() != 4){
+            return false;
+        }
+        if(vals[1].length() <= 0){
+            return false;
+        }
+        if(vals[2].length() <= 0){
+            return false;
+        }
+        return true;
     }
 
 }

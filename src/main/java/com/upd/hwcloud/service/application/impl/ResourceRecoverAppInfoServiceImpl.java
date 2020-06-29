@@ -56,11 +56,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
@@ -213,14 +209,16 @@ public class ResourceRecoverAppInfoServiceImpl extends ServiceImpl<ResourceRecov
             Map<String,String> map = new HashMap<>();
             map.put("name", BusinessName.RECOVER);
             map.put("order", info.getOrderNumber());
+            getMsgTime(info,map);//处理map
             activityService.advanceCurrentActivity(advanceBeanVO, map);
-            sendMsg(user,info);
+            messageProvider.sendMessageAsync(messageProvider.buildSuccessMessage(user, BusinessName.RECOVER, info.getOrderNumber()));
+//            sendMsg(info.getRecoveredPersonIdCard(),info);
             //放入定时器，超过48小时未处理工单，重新发送短信
             //1.开启定时器，48小时后执行
             //2.检查工单状态，如果未处理，则进行短信发送
             try{
                 String expendTime="48:00:00";
-                timer.startRecoverCheck(DateUtil.dateAdd(info.getCreateTime(),expendTime),user,info);//发到定时器进行检查状态
+                timer.startRecoverCheck(DateUtil.dateAdd(info.getCreateTime(),expendTime),info.getRecoveredPersonIdCard(),info);//发到定时器进行检查状态
             }catch (Exception e){
                e.printStackTrace();
             }
@@ -443,7 +441,7 @@ public class ResourceRecoverAppInfoServiceImpl extends ServiceImpl<ResourceRecov
         Map<String,String> map = new HashMap<>();
         map.put("name",BusinessName.RECOVER);
         map.put("order",info.getOrderNumber());
-
+        getMsgTime(info,map);//处理map
 
         //被回收资源负责人
         if(StringUtils.equals(ModelName.RECOVERED.getName(),currentModel.getModelname())){
@@ -487,7 +485,7 @@ public class ResourceRecoverAppInfoServiceImpl extends ServiceImpl<ResourceRecov
                     //最新修改，大数据办不回收，进行回退
                     activityService.fallbackOnApproveNotPass(vo, null);
                     info.setStatus(ApplicationInfoStatus.REVIEW_REJECT.getCode());
-                    sendMsg(user,info);
+                    messageProvider.sendMessageAsync(messageProvider.buildRejectMessage(info.getCreator(), BusinessName.RECOVER));
 
                 }
             }
@@ -554,8 +552,8 @@ public class ResourceRecoverAppInfoServiceImpl extends ServiceImpl<ResourceRecov
         if ("1".equals(implRequest.getResult())){
             //ServiceReturnBean returnBean = getTestReturnBean(false);
             activityService.advanceCurrentActivity(activity,info.getCreator());
-            sendMsg(user,info);
-//            messageProvider.sendMessageAsync(messageProvider.buildCompleteMessage(info.getCreator(), BusinessName.RECOVER, info.getOrderNumber()));
+//            sendMsg(user,info);
+            messageProvider.sendMessageAsync(messageProvider.buildCompleteMessage(info.getCreator(), BusinessName.RECOVER, info.getOrderNumber()));
         }else {
             if (modelId==null||modelId.trim().equals("")) {
                 return R.error(201, "回退环节ID不能为空,回退失败");
@@ -592,49 +590,70 @@ public class ResourceRecoverAppInfoServiceImpl extends ServiceImpl<ResourceRecov
     }
 
     /**
-     * 获取未被负责人处理的回收资源工单
+     * 获取未被负责人处理的回收资源工单,检查状态，未被处理时重新发送短信
      */
     public void queryUntreatedRecover(){
-//        System.out.println("开始处理");
         logger.debug("开始执行查询未被回收负责人处理的工单");
         List<ResourceRecoverAppInfo> recoverList = resourceRecoverAppInfoMapper.queryUntreatedRecover();
         if(recoverList==null||recoverList.size()==0){return ;}
-        //存放被负责人，减少数据库查询
-//        ConcurrentMap<String,User> userMap=new ConcurrentHashMap<String,User>();
+        //存放被负责人集合，减少数据库重复查询
+        ConcurrentMap<String,User> userMap=new ConcurrentHashMap<String,User>();
         //循环未被负责责任处理的工单，再次发送短信，更新工单状态为已发送短信状态
-        recoverList.stream().forEach(entry->{
-            User user=userService.getById(entry.getRecoveredPersonIdCard());
-//            if(userMap.get(entry.getRecoveredPersonIdCard())!=null){
-//                user=userMap.get(entry.getRecoveredPersonIdCard());
-//            }else{
-//                user=userService.getById(entry.getRecoveredPersonIdCard());
-//                if(user!=null){
-//                    userMap.put(user.getIdcard(),user);
-//                }
-//
-//            }
-            if(user!=null) {
-                user.setNotifyType("0");//只重新发短信，不发送邮件等其他消息
-                //再次发提醒短信
-                sendMsg(user,entry);
+        recoverList.forEach(entry->{
+            //检查执行时间
+            try {
+                Date indate=DateUtil.parseDate(DateUtil.dateAdd(entry.getCreateTime(),48*60),"yyyy-MM-dd HH:mm:ss");
+                long timeLong=DateUtil.dateDiff("millsecond",indate,new Date());
+                if(timeLong<=999){//已经超出设定时间，马上再次发送短信
+                    //再次发提醒短信
+                    sendMsg(entry.getRecoveredPersonIdCard(),entry);
+                    //更新状态
+                    entry.setStatus(ApplicationInfoStatus.RESENT.getCode());
+                    this.updateById(entry);
+                    logger.debug("更新数据成功,id:"+entry.getId());
+                }else{//没超出时间，继续加入定时服务
+                    Date date=DateUtil.parseDate(DateUtil.dateAdd(entry.getCreateTime(),48*60),"yyyy-MM-dd HH:mm:ss");
+                    long l = date.getTime()-new Date().getTime();
+                    int hour=48-(((int)l)/(1000*60*60));//计算回收资源创建时间离重发消息的时间
+                    String expendTime="01:00:00";//00:00:00
+                    if(hour>0&&hour<10){
+                        expendTime="0"+hour+":00:00";
+                    }else if(hour>=10){
+                        expendTime=hour+":00:00";
+                    }
+//                    User user=null;
+//                    if(userMap.get(entry.getRecoveredPersonIdCard())!=null){
+//                        user=userMap.get(entry.getRecoveredPersonIdCard());
+//                    }else{
+//                        user=userService.getById(entry.getRecoveredPersonIdCard());
+//                        if(user!=null){
+//                            userMap.put(user.getIdcard(),user);
+//                        }
+//                    }
+                    logger.debug("短信任务加入计时器，"+expendTime+"后重发提示短信。");
+                    //如果旧数据没有负责人信息，则不发短信
+//                    if(user!=null) {
+                        timer.startRecoverCheck(DateUtil.dateAdd(entry.getCreateTime(), expendTime), entry.getRecoveredPersonIdCard(), entry);//发到定时器进行检查状态
+//                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
 
-            //更新状态
-            entry.setStatus(ApplicationInfoStatus.RESENT.getCode());
-            this.updateById(entry);
-//            System.out.println("更新数据成功");
-            logger.debug("更新数据成功,id:"+entry.getId());
+
         });
     }
 
     /**
      * 通用发送回收资源短信
-     * @param user
      * @param info
      */
-    public void sendMsg(User user,ResourceRecoverAppInfo info){
+    public void sendMsg(String userId,ResourceRecoverAppInfo info){
         //查出其中一个缩配资源的缩配时间
         ResourceRecover resourceRecover=resourceRecoverService.getOne(new QueryWrapper<ResourceRecover>().eq("ref_Id",info.getId()));
+        if(resourceRecover==null){
+            return ;
+        }
         //时间分割
         String[] shrinkTime=null;
         String month = "";
@@ -647,8 +666,27 @@ public class ResourceRecoverAppInfoServiceImpl extends ServiceImpl<ResourceRecov
         month = shrinkTime[1];
         day = shrinkTime[2];
         //发送短信
-        messageProvider.sendMessageAsync(messageProvider.buildRecoverMessage(user, BusinessName.RECOVER, info.getOrderNumber(),month,day));
+        messageProvider.sendMessageAsync(messageProvider.buildRecoverMessage(userId, BusinessName.RECOVER, info.getOrderNumber(),month,day));
     }
-
-
+    /**
+     * 通过回收资源查询短信提示时间,并传入map
+     * @param info
+     */
+    public void getMsgTime(ResourceRecoverAppInfo info,Map<String,String> map){
+        //查出其中一个缩配资源的缩配时间
+        ResourceRecover resourceRecover=resourceRecoverService.getOne(new QueryWrapper<ResourceRecover>().eq("ref_Id",info.getId()));
+        //时间分割
+        String[] shrinkTime=null;
+        String month = "";
+        String day = "";
+        if(resourceRecover!=null&&resourceRecover.getShrinkTime()!=null){
+            shrinkTime=resourceRecover.getShrinkTime().split(" ")[0].split("-");
+        }else{
+            shrinkTime=DateUtil.formateDate(info.getCreateTime(),"yyyy-MM-dd").split("-");
+        }
+        month = shrinkTime[1];
+        day = shrinkTime[2];
+        map.put("month",month);
+        map.put("day",day);
+    }
 }

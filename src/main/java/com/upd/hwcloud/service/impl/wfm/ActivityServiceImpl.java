@@ -2,6 +2,7 @@ package com.upd.hwcloud.service.impl.wfm;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.upd.hwcloud.bean.contains.BusinessName;
 import com.upd.hwcloud.bean.contains.ModelName;
 import com.upd.hwcloud.bean.entity.Files;
 import com.upd.hwcloud.bean.entity.User;
@@ -274,7 +275,7 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, Activity> i
         }else {
             throw new BaseException("当前环节信息为空,流转失败!", 201);
         }
-        String next = "";
+        String next = "";//next记录环节名
         for (Workflowmodel model:nextModels) {
             //取得对应环节的处理人
             String personids=model.getDefaulthandleperson();
@@ -307,6 +308,117 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, Activity> i
         activityDao.updateById(currentActivity);
         //返回下一环节的名字
         return R.ok(next);
+    }
+    @Override
+    public R advanceCurrentActivityTemp(String currentActivityId, AppReviewInfo approve, Map<String, String> map) {
+        logger.info("advanceCurrentActivity: currentActivityId -> {} ,approve ->{}",
+                currentActivityId,approve);
+
+        Activity currentActivity = null;
+        Map<String, String> modelMapToPerson=new HashMap<String, String>();
+        if (currentActivityId!=null&&!currentActivityId.equals("")) {
+            currentActivity=activityDao.selectById(currentActivityId);
+        }else {
+            throw new BaseException("当前环节ID不能为空", 201);
+        }
+        if (approve==null) {
+            return R.error(201, "审批信息不能为空");
+        }
+        if (approve.getAppInfoId()==null||approve.getAppInfoId().trim().equals("")) {
+            return R.error(201, "申请信息ID不能为空");
+        }
+        Workflowmodel curmodel = workFlowModelDao.selectById(currentActivity.getModelid());
+        approve.setStepName(curmodel.getModelname());
+        approve.setFlowStepId(currentActivity.getModelid());
+        logger.debug("advanceCurrentActivity approve -> {}",approve);
+        if (approve.getId()==null||approve.getId().trim().equals("")) {
+            logger.debug("advanceCurrentActivity approve insert -> {}",approve);
+            approve.insert();
+        }else {
+            logger.debug("advanceCurrentActivity approve update -> {}",approve);
+            approve.updateById();
+        }
+        //审批意见关联文件
+        List<Files> filesList = approve.getFileList();
+        if(CollectionUtils.isNotEmpty(filesList)){
+            filesService.refFiles(filesList,approve.getId());
+        }
+        //下级环节集合
+        List<Workflowmodel> nextModels=new ArrayList<>();
+        if (currentActivity!=null) {
+            String currentModelId=currentActivity.getModelid();
+            if (currentModelId==null||"".equals(currentModelId)) {
+                throw new BaseException("当前环节对应的流程环节为空，请传入流程定义环节信息!", 201);
+            }
+
+            if (!currentActivity.getActivitystatus().equals("待办")) {
+                throw new BaseException("该任务已经处理，不能重复处理!", 201);
+            }
+
+            logger.info("advanceCurrentActivity: currentModelId -> {}",currentModelId);
+            if(approve.getRdbAddAccount() == 1 || approve.getResourceRecoveredAgree() == 1){ //如果是关系型数据库新增账号类型或者资源回收被回收人同意回收,下级环节为业务办理
+                Instance instance = instanceDao.selectById(currentActivity.getInstanceid());
+                nextModels = workFlowModelDao.selectList(new QueryWrapper<Workflowmodel>().lambda().eq(Workflowmodel::getWorkflowid,instance.getWorkflowid()).eq(Workflowmodel::getVersion,instance.getWorkflowversion()).eq(Workflowmodel::getModelname,ModelName.CARRY.getName()));
+                logger.info("rdb nextModels -> {}",nextModels);
+            }else {
+                nextModels=workFlowModelDao.getSubordinateModel(currentModelId);
+            }
+            logger.info("advanceCurrentActivity: nextModels -> {}",nextModels);
+            //如果没有下级环节，则直接完成当前环节，完成流程实例
+            if (nextModels==null||nextModels.size()==0) {
+                currentActivity.setActivitystatus("已提交");
+                currentActivity.setHandletime(new Date());
+                activityDao.updateById(currentActivity);
+                Activity activity = new Activity();
+                activity.setHandletime(new Date());
+                activity.setActivitystatus("已抢占");
+                int updateR=activityDao.update(activity,new QueryWrapper<Activity>().eq("modelid",currentActivity.getModelid())
+                        .eq("instanceid",currentActivity.getInstanceid()).ne("id",currentActivity.getId()));
+
+                Instance instance=instanceDao.selectById(currentActivity.getInstanceid());
+                instance.setCompletetime(new Date());
+                instance.setInstancestatus("已完成");
+                instanceDao.updateById(instance);
+                return R.ok("finished");
+            }
+        }else {
+            throw new BaseException("当前环节信息为空,流转失败!", 201);
+        }
+        String next = "";//next记录环节名
+        Workflowmodel returnModel=null;
+        for (Workflowmodel model:nextModels) {
+            //取得对应环节的处理人
+            String personids=model.getDefaulthandleperson();
+            //如果默认处理人也为空则直接返回提示信息给前台
+            if (personids==null||personids.trim().equals("")) {
+                throw new BaseException("流程未配置处理人!", 201);
+            }
+            //把办理人分割成数组
+            String personArr[]=personids.split(",");
+            if (personArr.length==0) {
+                throw new BaseException("办理人不能为空!", 201);
+            }
+            //获取需要的参与人对应关系
+            String adviserIds=model.getAdviserperson();
+            //把参与人分割成数组
+            String adviserArr[]=null;
+            if (adviserIds!=null) {
+                adviserArr=adviserIds.split(",");
+            }
+            next = model.getModelname();
+            returnModel=model;
+            if (map==null){
+                //model:下一环节 ，currentActivity:当前流转ID，personArr：处理人数组，adviserArr:参与人数组
+                handleFlow(model, currentActivity, personArr,adviserArr,null);
+            }else{
+                handleFlow(model, currentActivity, personArr,adviserArr,null,map);
+            }
+        }
+        currentActivity.setHandletime(new Date());
+        currentActivity.setActivitystatus("已提交");
+        activityDao.updateById(currentActivity);
+        //返回下一环节的名字
+        return R.ok(returnModel);
     }
 
     @Transactional
@@ -427,7 +539,17 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, Activity> i
             Activity nextActivity=getTaskActivity(personArr[i],currentActivity,model,"待办");
             activityDao.insert(nextActivity);
             if (null!=map) {  //发送待办通知消息到mq
-                messageProvider.sendMessageAsync(messageProvider.buildProcessingMessage(map.get("name"), map.get("order"), personArr[i]));
+                //特殊处理，当name=资源回收时，发送特别短信消息
+                if(map.get("name")!=null&&map.get("name").equals(BusinessName.RECOVER)){
+                    //防止出错，没有月日则使用旧短信
+                    if(map.get("month")!=null&&map.get("day")!=null){
+                        messageProvider.sendMessageAsync(messageProvider.buildRecoverMessage(personArr[i], BusinessName.RECOVER, map.get("order"),map.get("month"),map.get("day")));
+                    }else{
+                        messageProvider.sendMessageAsync(messageProvider.buildProcessingMessage(map.get("name"), map.get("order"), personArr[i]));
+                    }
+                }else{
+                    messageProvider.sendMessageAsync(messageProvider.buildProcessingMessage(map.get("name"), map.get("order"), personArr[i]));
+                }
             }
         }
         //生成参与人待办

@@ -13,6 +13,8 @@ import com.upd.hwcloud.service.IUserService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jasig.cas.client.validation.Assertion;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -35,14 +37,18 @@ import java.util.Properties;
  */
 public class LoginInitFilter extends DcucTicketValidationFilter {
 
+    private static  final Logger logger = LoggerFactory.getLogger(LoginInitFilter.class);
+
     @Override
     protected String onSuccessfulValidation(HttpServletRequest request, HttpServletResponse response, Assertion assertion) {
         //获取登录用户的userId
         String userId = assertion.getPrincipal().getName();
+        logger.debug("ducuxxx userId -> {}",userId);
         HttpSession session = request.getSession(false);
         User user = null;
         if (EnvironmentUtils.ONLINE_PROFILES.contains(profile)) {
             user = dcucHttpEngin.getUserInfoById(userId);
+            logger.debug("ducuxxx user -> {}",user);
             if (user == null || StringUtils.isEmpty(user.getIdcard())) {
                 User govUser = dcucHttpEngin.getGovUserInfoById(userId);
                 if (govUser == null || StringUtils.isEmpty(govUser.getIdcard())){
@@ -54,15 +60,19 @@ public class LoginInitFilter extends DcucTicketValidationFilter {
             // 保存用户信息到本地数据库
             userService.saveOrUpdateFromRemote(user);
             user = userService.findUserByIdcard(user.getIdcard());
+            logger.debug("ducuxxx Session User -> {}" ,user);
             session.setAttribute(SessionName.USER, user);
             new Log(user.getIdcard(),"","登录", IpUtil.getRealIP(request)).insert();
         } else {
             try {
-                String json = FileUtils.readFileToString(new File("C:\\Users\\Administrator\\Desktop\\config_user.txt"), "UTF-8");
+                logger.info("Read Config_USER");
+                String json = FileUtils.readFileToString(new File("/usr/local/config_user.txt"), "UTF-8");
+                logger.debug("user json {}",json);
                 user = JSONObject.parseObject(json, User.class);
                 user = userService.findUserByIdcard(user.getIdcard());
                 session.setAttribute(SessionName.USER, user);
             } catch (Exception e) {
+                logger.error("Read File Exception");
                 user =  new User().setName("唐彪").setIdcard("410184198209096919");
                 session.setAttribute(SessionName.USER,user);
             }
