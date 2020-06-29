@@ -5,8 +5,7 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.application.manage.ApplicationManage">
         <id column="ID" property="id" />
-        <result column="AREA" property="area" />
-        <result column="POLICE" property="police" />
+        <result column="AREA_OR_POLICE" property="areaOrPolice" />
         <result column="USER_QUOTA_NUM" property="userQuotaNum" />
         <result column="USER_TOTAL" property="userTotal" />
         <result column="POLICE_USER_NUM" property="policeUserNum" />
