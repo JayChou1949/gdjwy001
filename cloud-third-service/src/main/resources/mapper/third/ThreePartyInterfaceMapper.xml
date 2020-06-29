@@ -10,8 +10,16 @@
         <result column="TYPE" property="type" />
         <result column="CREATE_TIME" property="createTime" />
     </resultMap>
-    <select id="getByParams" resultType="com.hirisun.cloud.third.bean.ThreePartyInterface">
+    <select id="getByParams" parameterType="com.hirisun.cloud.third.bean.ThreePartyInterface" resultType="com.hirisun.cloud.third.bean.ThreePartyInterface">
 
-        SELECT ID,LABEL,DATA,TYPE,CREATE_TIME FROM TB_THREE_PARTY_INTERFACE WHERE ID='resourceTotal';
+        SELECT ID,LABEL,DATA,TYPE,CREATE_TIME FROM TB_THREE_PARTY_INTERFACE
+        <where>
+            <if test="id !=null">
+                and  id = #{id}
+            </if>
+            <if test="label !=null">
+                and  label = #{label}
+            </if>
+        </where>
     </select>
 </mapper>
