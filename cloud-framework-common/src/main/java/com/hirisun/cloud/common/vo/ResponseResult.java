@@ -1,5 +1,9 @@
 package com.hirisun.cloud.common.vo;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,8 +15,13 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
+@ApiResponses(value = { @ApiResponse(code = 200, message = "成功") })
 public class ResponseResult implements Response {
+	
+	@ApiModelProperty(value="状态码200成功")
 	Integer code = SUCCESS_CODE;
+	
+	@ApiModelProperty(value="状态信息")
     String msg = SUCCESS_MSG;
 
     public ResponseResult(Integer code, String msg) {
