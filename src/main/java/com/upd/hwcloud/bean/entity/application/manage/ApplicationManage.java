@@ -1,5 +1,6 @@
 package com.upd.hwcloud.bean.entity.application.manage;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -20,7 +21,7 @@ public class ApplicationManage extends Model<ApplicationManage> {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId("ID")
+    @TableId(value = "ID",type = IdType.UUID)
     private String id;
 
         /**
@@ -33,43 +34,43 @@ public class ApplicationManage extends Model<ApplicationManage> {
      * 用户配额数
      */
          @TableField("USER_QUOTA_NUM")
-    private Long userQuotaNum;
+    private Integer userQuotaNum;
 
         /**
      * 已有用户总数
      */
          @TableField("USER_TOTAL")
-    private Long userTotal;
+    private Integer userTotal;
 
         /**
      * 已有网警用户数
      */
          @TableField("POLICE_USER_NUM")
-    private Long policeUserNum;
+    private Integer policeUserNum;
 
         /**
      * 已有非网警用户数
      */
          @TableField("NO_POLICE_USER_NUM")
-    private Long noPoliceUserNum;
+    private Integer noPoliceUserNum;
 
         /**
      * 当前剩余配额数
      */
          @TableField("AVAILABLE_QUOTA_NUM")
-    private Long availableQuotaNum;
+    private Integer availableQuotaNum;
 
         /**
      * 违规次数
      */
          @TableField("VIOLATION_NUM")
-    private Long violationNum;
+    private Integer violationNum;
 
         /**
      * 严重违规次数
      */
          @TableField("SERIOUS_VIOLATION_NUM")
-    private Long seriousViolationNum;
+    private Integer seriousViolationNum;
 
 
     public String getId() {
@@ -90,65 +91,65 @@ public class ApplicationManage extends Model<ApplicationManage> {
         return this;
     }
 
-    public Long getUserQuotaNum() {
+    public Integer getUserQuotaNum() {
         return userQuotaNum;
     }
 
-    public ApplicationManage setUserQuotaNum(Long userQuotaNum) {
+    public ApplicationManage setUserQuotaNum(Integer userQuotaNum) {
         this.userQuotaNum = userQuotaNum;
         return this;
     }
 
-    public Long getUserTotal() {
+    public Integer getUserTotal() {
         return userTotal;
     }
 
-    public ApplicationManage setUserTotal(Long userTotal) {
+    public ApplicationManage setUserTotal(Integer userTotal) {
         this.userTotal = userTotal;
         return this;
     }
 
-    public Long getPoliceUserNum() {
+    public Integer getPoliceUserNum() {
         return policeUserNum;
     }
 
-    public ApplicationManage setPoliceUserNum(Long policeUserNum) {
+    public ApplicationManage setPoliceUserNum(Integer policeUserNum) {
         this.policeUserNum = policeUserNum;
         return this;
     }
 
-    public Long getNoPoliceUserNum() {
+    public Integer getNoPoliceUserNum() {
         return noPoliceUserNum;
     }
 
-    public ApplicationManage setNoPoliceUserNum(Long noPoliceUserNum) {
+    public ApplicationManage setNoPoliceUserNum(Integer noPoliceUserNum) {
         this.noPoliceUserNum = noPoliceUserNum;
         return this;
     }
 
-    public Long getAvailableQuotaNum() {
+    public Integer getAvailableQuotaNum() {
         return availableQuotaNum;
     }
 
-    public ApplicationManage setAvailableQuotaNum(Long availableQuotaNum) {
+    public ApplicationManage setAvailableQuotaNum(Integer availableQuotaNum) {
         this.availableQuotaNum = availableQuotaNum;
         return this;
     }
 
-    public Long getViolationNum() {
+    public Integer getViolationNum() {
         return violationNum;
     }
 
-    public ApplicationManage setViolationNum(Long violationNum) {
+    public ApplicationManage setViolationNum(Integer violationNum) {
         this.violationNum = violationNum;
         return this;
     }
 
-    public Long getSeriousViolationNum() {
+    public Integer getSeriousViolationNum() {
         return seriousViolationNum;
     }
 
-    public ApplicationManage setSeriousViolationNum(Long seriousViolationNum) {
+    public ApplicationManage setSeriousViolationNum(Integer seriousViolationNum) {
         this.seriousViolationNum = seriousViolationNum;
         return this;
     }
