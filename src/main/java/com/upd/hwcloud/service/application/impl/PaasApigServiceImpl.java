@@ -1266,7 +1266,7 @@ public class PaasApigServiceImpl implements IPaasApigService {
                 reqApiOperation.put("backend_type", apiOperation.getBackendType());
                 //  参数specified_backend_operation
                 Map<String, String> backend_operation = new HashMap<>();
-                backend_operation.put("path", apiOperation.getBackendName());
+                backend_operation.put("path", apiOperation.getBackendPath());
                 backend_operation.put("method", apiOperation.getBackendMethod());
                 reqApiOperation.put("specified_backend_operation", backend_operation);
                 //  请求地址
