@@ -17,6 +17,6 @@ public class NcovExceptionCatch extends ExceptionCatch {
 
     static {
         //定义异常类型所对应的错误代码
-        builder.put(JSONException.class, CommonCode.INVALID_PARAM);
+        builder.put(JSONException.class, CommonCode.JSON_RESOLVE_FAIL);
     }
 }
