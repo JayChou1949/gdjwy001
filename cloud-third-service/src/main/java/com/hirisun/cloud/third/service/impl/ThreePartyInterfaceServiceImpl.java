@@ -7,6 +7,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * <p>
  * 第三方接口表 服务实现类
@@ -20,8 +22,9 @@ public class ThreePartyInterfaceServiceImpl extends ServiceImpl<ThreePartyInterf
 
     @Autowired
     private ThreePartyInterfaceMapper threePartyInterfaceMapper;
+
     @Override
-    public ThreePartyInterface getByParams() {
-        return threePartyInterfaceMapper.getByParams();
+    public List<ThreePartyInterface> getByParams(ThreePartyInterface threePartyInterface) {
+        return threePartyInterfaceMapper.getByParams(threePartyInterface);
     }
 }

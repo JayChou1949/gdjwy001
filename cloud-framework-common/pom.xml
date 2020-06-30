@@ -74,6 +74,15 @@
 		      <groupId>cn.afterturn</groupId>
 		      <artifactId>easypoi-annotation</artifactId>
 		    </dependency>
+        <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc6</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity-engine-core</artifactId>
+            <version>2.2</version>
+        </dependency>
     </dependencies>
 
 </project>
