@@ -3,6 +3,7 @@ package com.upd.hwcloud.service.application.manage;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.upd.hwcloud.bean.entity.SaasApplication;
+import com.upd.hwcloud.bean.entity.SaasApplicationExt;
 import com.upd.hwcloud.bean.entity.application.manage.ApplicationManage;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -40,4 +41,6 @@ public interface IApplicationManageService extends IService<ApplicationManage> {
     IPage<ApplicationManage> getAppManage(IPage<ApplicationManage> page, String areaOrPolice);
 
     IPage<SaasApplication> getUser(IPage<SaasApplication> page, String creatorName, String creator, String orgName, String areaOrPolice);
+
+    IPage<SaasApplicationExt> getAppDetails(IPage<SaasApplicationExt> page, String creator, String serviceName);
 }

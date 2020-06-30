@@ -4,6 +4,7 @@ package com.upd.hwcloud.controller.backend.application.manage;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.upd.hwcloud.bean.entity.SaasApplication;
+import com.upd.hwcloud.bean.entity.SaasApplicationExt;
 import com.upd.hwcloud.bean.entity.User;
 import com.upd.hwcloud.bean.entity.application.manage.ApplicationManage;
 import com.upd.hwcloud.bean.entity.application.manage.ApplicationRecords;
@@ -105,10 +106,30 @@ public class ApplicationManageController {
                      @RequestParam(value = "creator",required = false) String creator,
                      @RequestParam(value = "orgName",required = false) String orgName,
                      @RequestParam(value = "areaOrPolice",required = false) String areaOrPolice,
-                     Long current,Long size){
+                     @RequestParam(defaultValue = "1") Long current,
+                     @RequestParam(defaultValue = "10") Long size){
         IPage<SaasApplication> page = new Page<>(current,size);
         try {
             page = iApplicationManageService.getUser(page,creatorName,creator,orgName,areaOrPolice);
+        }catch (Exception e) {
+            return R.error();
+        }
+        return R.ok(page);
+    }
+
+    @ApiOperation(value = "权限应用详情")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "creator",value = "身份证号",paramType = "query",dataType = "String"),
+            @ApiImplicitParam(name = "serviceName",value = "应用名称",paramType = "query",dataType = "String"),
+            })
+    @RequestMapping(value = "/getAppDetails",method = RequestMethod.GET)
+    public R getAppDetails(@RequestParam(value = "creator") String creator,
+                     @RequestParam(value = "serviceName",required = false) String serviceName,
+                           @RequestParam(defaultValue = "1") Long current,
+                           @RequestParam(defaultValue = "10") Long size){
+        IPage<SaasApplicationExt> page = new Page<>(current,size);
+        try {
+            page = iApplicationManageService.getAppDetails(page,creator,serviceName);
         }catch (Exception e) {
             return R.error();
         }

@@ -10,6 +10,44 @@
         <result column="MASTER_ID" property="masterId" />
         <result column="CREATE_TIME" property="createTime" />
         <result column="MODIFIED_TIME" property="modifiedTime" />
+        <result column="VIEW_COUNT" property="viewCount" />
+        <result column="OPENING_NUMBER" property="openingNumber" />
+        <result column="OPENING_TIME" property="openingTime" />
+        <result column="RECYCLING_NUMBER" property="recyclingNumber" />
+        <result column="RECYCLING_TIME" property="recyclingTime" />
+        
     </resultMap>
+    
+    <select id="getAppOpeningNum" resultMap="BaseResultMap">
+        SELECT b.SERVICE_NAME SERVICE_NAME,count(1) OPENING_NUMBER,b.MODIFIED_TIME OPENING_TIME
+        FROM TB_SAAS_APPLICATION a
+        JOIN TB_SAAS_APPLICATION_EXT b ON a.ID = b.MASTER_ID
+        WHERE a.RECOVER_FLAG != '-1' and a.STATUS ='3'
+        and not exists (select ra.CREATOR from TB_SAAS_RECOVER_APPLICATION ra,TB_SAAS_RECOVER_INFO ri
+                        where ri.APP_INFO_ID = ra.ID and ra.STATUS != '3' and ri.RE_IDCARD = a.CREATOR)
+		<if test="creator != null and creator != ''">
+            and a.CREATOR=#{creator}
+        </if>
+		<if test="serviceName != null and serviceName != ''">
+            and b.SERVICE_NAME=#{serviceName}
+        </if>
+        GROUP BY b.SERVICE_NAME,b.MODIFIED_TIME
+    </select>
+    
+    <select id="getAppRecyclingNum" resultMap="BaseResultMap">
+        SELECT b.SERVICE_NAME SERVICE_NAME,count(1) RECYCLING_NUMBER,b.MODIFIED_TIME RECYCLING_TIME
+        FROM TB_SAAS_APPLICATION a
+        JOIN TB_SAAS_APPLICATION_EXT b ON a.ID = b.MASTER_ID
+        WHERE a.RECOVER_FLAG = '-1' and a.STATUS ='3'
+        and not exists (select ra.CREATOR from TB_SAAS_RECOVER_APPLICATION ra,TB_SAAS_RECOVER_INFO ri
+        where ri.APP_INFO_ID = ra.ID and ra.STATUS != '3' and ri.RE_IDCARD = a.CREATOR)
+        <if test="creator != null and creator != ''">
+            and a.CREATOR=#{creator}
+        </if>
+        <if test="serviceName != null and serviceName != ''">
+            and b.SERVICE_NAME=#{serviceName}
+        </if>
+        GROUP BY b.SERVICE_NAME,b.MODIFIED_TIME
+    </select>
 
 </mapper>
