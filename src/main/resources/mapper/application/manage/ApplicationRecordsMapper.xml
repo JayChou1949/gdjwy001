@@ -11,5 +11,7 @@
         <result column="USER_NAME" property="userName" />
         <result column="MODFIY_TIME" property="modfiyTime" />
     </resultMap>
-
+    <select id="getApplicationRecords"  resultMap="BaseResultMap">
+            select * from TB_APPLICATION_RECORDS  where ID=#{id}
+    </select>
 </mapper>

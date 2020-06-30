@@ -15,4 +15,12 @@
         <result column="APPLY_NUMBER" property="applyNumber" />
     </resultMap>
 
+    <select id="getApplicationQuotaById"  resultMap="BaseResultMap">
+            select * from TB_APPLICATION_QUOTA  where ID=#{id}
+    </select>
+
+    <select id="getApplicationQuotaList"  resultMap="BaseResultMap">
+            select APPLY_NUMBER,APPLY_PERSON,APPLY_TIME from TB_APPLICATION_QUOTA where APPLY_PERSON=#{applyPerson}
+    </select>
+
 </mapper>

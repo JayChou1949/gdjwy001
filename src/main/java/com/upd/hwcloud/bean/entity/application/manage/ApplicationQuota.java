@@ -4,7 +4,10 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.time.LocalDateTime;
+import java.util.List;
+
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.upd.hwcloud.bean.entity.Files;
 import lombok.Data;
 
 
@@ -76,6 +79,7 @@ public class ApplicationQuota extends Model<ApplicationQuota> {
          @TableField("APPLY_NUMBER")
     private String applyNumber;
 
-
+    @TableField(exist = false)
+    private List<Files> filesList;
 
 }
