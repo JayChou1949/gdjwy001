@@ -17,7 +17,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -26,6 +25,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <p>
@@ -51,6 +53,7 @@ public class ApplicationManageController {
     public R updateQuota(@LoginUser User user, @RequestParam(value = "id") String id, @RequestParam(value = "quota")
             Integer quota, @RequestParam(value = "oldQuota") Integer oldQuota, @RequestParam(value = "areaOrPolice") String areaOrPolice){
         ApplicationRecords applicationRecords=new ApplicationRecords();
+        //设置限额
         iApplicationManageService.updateQuota(id,quota);
         applicationRecords.setRefId(id);
         applicationRecords.setNewUserQuota(quota);
@@ -58,9 +61,12 @@ public class ApplicationManageController {
         if(user!=null){
             applicationRecords.setUserName(user.getName());
         }
-        applicationRecords.setModfiyTime(LocalDateTime.now());
+        applicationRecords.setModfiyTime(new Date());
         applicationRecords.setAreaOrPolice(areaOrPolice);
+        //记录修改记录
         iApplicationRecordsService.addQuotaRecord(applicationRecords);
+        //更新可用限额数量
+        iApplicationManageService.updateAvailableQuota(id);
         return R.ok();
     }
 
@@ -134,6 +140,24 @@ public class ApplicationManageController {
             return R.error();
         }
         return R.ok(page);
+    }
+
+
+    @ApiOperation(value = "当前账号总限额量,剩余量")
+    @ApiImplicitParam(name = "areaOrPolice",value = "地市/警种",paramType = "query",dataType = "String")
+    @RequestMapping(value = "/v1/getQuota",method = RequestMethod.GET)
+    public R getQuota(@RequestParam(value = "areaOrPolice") String areaOrPolice){
+
+        ApplicationManage applicationQuotaDetail = iApplicationManageService.getApplicationQuotaDetail(areaOrPolice);
+        Map map=new HashMap();
+        if(applicationQuotaDetail!=null){
+            Integer availableQuotaNum = applicationQuotaDetail.getAvailableQuotaNum();
+            Integer userTotal = applicationQuotaDetail.getUserQuotaNum();
+            map.put("availableQuotaNum",availableQuotaNum);
+            map.put("quotaTotal",userTotal);
+        }
+
+        return R.ok(map);
     }
 }
 

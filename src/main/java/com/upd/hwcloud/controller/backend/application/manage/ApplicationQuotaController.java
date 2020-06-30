@@ -45,7 +45,7 @@ public class ApplicationQuotaController {
 
     @ApiOperation(value = "通过申请人查询配额列表")
     @RequestMapping(value = "/v1/searchQuotaByPerson",method = RequestMethod.GET)
-    public R searchQuotaByPerson(@RequestParam(value = "applyPerson") String applyPerson){
+    public R searchQuotaByPerson(@RequestParam(value = "applyPerson",required = false) String applyPerson){
         Page<ApplicationQuota> page=new Page<>();
         page.setCurrent(1);
         page.setSize(20);

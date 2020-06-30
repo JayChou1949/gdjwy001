@@ -29,6 +29,7 @@ public interface ApplicationManageMapper extends BaseMapper<ApplicationManage> {
      */
     void  updateQuota(@Param("id") String id,@Param("quota") Integer quota);
 
+    void  updateAvailableQuota(@Param("id") String id);
     /**
      * 根据地市或警种查询  当前账号总限额 以及剩余数量
      * @param areaOrPolice

@@ -74,4 +74,9 @@ public class ApplicationManageServiceImpl extends ServiceImpl<ApplicationManageM
         }
         return appOpeningNum;
     }
+
+    @Override
+    public void updateAvailableQuota(String id) {
+        applicationManageMapper.updateAvailableQuota(id);
+    }
 }

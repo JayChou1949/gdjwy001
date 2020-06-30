@@ -6,6 +6,7 @@ import com.upd.hwcloud.bean.entity.SaasApplication;
 import com.upd.hwcloud.bean.entity.SaasApplicationExt;
 import com.upd.hwcloud.bean.entity.application.manage.ApplicationManage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
@@ -43,4 +44,5 @@ public interface IApplicationManageService extends IService<ApplicationManage> {
     IPage<SaasApplication> getUser(IPage<SaasApplication> page, String creatorName, String creator, String orgName, String areaOrPolice);
 
     IPage<SaasApplicationExt> getAppDetails(IPage<SaasApplicationExt> page, String creator, String serviceName);
+    void  updateAvailableQuota(String id);
 }

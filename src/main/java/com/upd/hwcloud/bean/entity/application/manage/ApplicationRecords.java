@@ -4,9 +4,10 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
+
+import java.util.Date;
 
 
 /**
@@ -54,7 +55,7 @@ public class ApplicationRecords extends Model<ApplicationRecords> {
      * 修改时间
      */
          @TableField("MODFIY_TIME")
-    private LocalDateTime modfiyTime;
+    private Date modfiyTime;
 
     /**
      * 关联表TB_APPLICATION_MANAGE的主键

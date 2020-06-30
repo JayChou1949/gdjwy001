@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -60,7 +60,7 @@ public class ApplicationQuota extends Model<ApplicationQuota> {
      * 申请时间
      */
          @TableField("APPLY_TIME")
-    private LocalDateTime applyTime;
+    private Date applyTime;
 
         /**
      * 申请描述
