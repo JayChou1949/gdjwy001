@@ -68,3 +68,6 @@ mybatis-plus:
     jdbc-type-for-null: 'null'
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
     database-id: oracle
+
+file: 
+ path: E://hwyFiles
