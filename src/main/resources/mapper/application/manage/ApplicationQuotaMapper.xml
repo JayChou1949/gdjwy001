@@ -21,7 +21,7 @@
 
     <select id="getApplicationQuotaList"  resultMap="BaseResultMap">
 
-            select APPLY_NUMBER,APPLY_PERSON,APPLY_TIME from TB_APPLICATION_QUOTA
+            select * from TB_APPLICATION_QUOTA
         <if test="applyPerson != null and applyPerson !=''">
             where APPLY_PERSON=#{applyPerson}
         </if>

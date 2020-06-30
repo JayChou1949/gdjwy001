@@ -42,7 +42,14 @@ public class ApplicationManageServiceImpl extends ServiceImpl<ApplicationManageM
 
     @Override
     public void updateQuota(String id, Integer quota) {
-        applicationManageMapper.updateQuota(id,quota);
+        ApplicationManage applicationQuota = applicationManageMapper.getApplicationQuotaById(id);
+        applicationQuota.setUserQuotaNum(quota);
+        applicationQuota.updateById();
+        Integer total = applicationQuota.getUserTotal();
+        if(quota-total>0){
+            applicationQuota.setAvailableQuotaNum(quota-total);
+        }
+        applicationQuota.updateById();
         //写入更改记录表
     }
 
@@ -79,4 +86,6 @@ public class ApplicationManageServiceImpl extends ServiceImpl<ApplicationManageM
     public void updateAvailableQuota(String id) {
         applicationManageMapper.updateAvailableQuota(id);
     }
+
+
 }
