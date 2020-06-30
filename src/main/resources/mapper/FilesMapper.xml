@@ -16,5 +16,7 @@
     <select id="getFileById" resultType="com.upd.hwcloud.bean.entity.Files">
         SELECT * FROM TB_FILES WHERE ID = #{id}
     </select>
-
+    <select id="getFileListById" resultType="com.upd.hwcloud.bean.entity.Files">
+        SELECT * FROM TB_FILES WHERE ID = #{id}
+    </select>
 </mapper>

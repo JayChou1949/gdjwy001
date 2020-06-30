@@ -103,5 +103,5 @@ public interface SaasApplicationMapper extends BaseMapper<SaasApplication> {
 
     HashMap<String,Long> getApplicationOverview(@Param("p")  Map<String,Object> param);
 
-
+    IPage<SaasApplication> getUser(IPage<SaasApplication> page,@Param("creatorName") String creatorName,@Param("creator") String creator,@Param("orgName") String orgName,@Param("areaOrPolice") String areaOrPolice);
 }

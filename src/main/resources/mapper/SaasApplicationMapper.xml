@@ -498,4 +498,26 @@
         </if>)
     </select>
 
+    <select id="getUser" resultMap="BaseResultMap">
+        SELECT CREATOR,CREATOR_NAME,ORG_ID,ORG_NAME,count(1) TOTAL
+        FROM TB_SAAS_APPLICATION a
+        JOIN TB_SAAS_APPLICATION_EXT b ON a.ID = b.MASTER_ID
+        <!-- 查询正在使用中的服务(包含使用中和正在回收中的),且用户没有被正在处理回收申请单 -->
+        WHERE a.RECOVER_FLAG != '-1' and a.STATUS ='3'
+        and not exists (select ra.CREATOR from TB_SAAS_RECOVER_APPLICATION ra,TB_SAAS_RECOVER_INFO ri
+        where ri.APP_INFO_ID = ra.ID and ra.STATUS != '3' and ri.RE_IDCARD = a.CREATOR)
+        <if test="creatorName != null and creatorName != ''">
+            AND a.CREATOR_NAME=#{creatorName}
+        </if>
+        <if test="creator != null and creator != ''">
+            AND a.CREATOR=#{creator}
+        </if>
+        <if test="orgName != null and orgName != ''">
+            AND a.ORG_NAME=#{orgName}
+        </if>
+        <if test="areaOrPolice != null and areaOrPolice != ''">
+            AND a.AREAS=#{areaOrPolice} OR a.POLICE_CATEGORY=#{areaOrPolice}
+        </if>
+        GROUP BY CREATOR,CREATOR_NAME,ORG_ID,ORG_NAME
+    </select>
 </mapper>

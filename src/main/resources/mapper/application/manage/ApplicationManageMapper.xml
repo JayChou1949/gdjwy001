@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.application.manage.ApplicationManageMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.application.manage.ApplicationManage">
+        <id column="ID" property="id" />
+        <result column="AREA_OR_POLICE" property="areaOrPolice" />
+        <result column="USER_QUOTA_NUM" property="userQuotaNum" />
+        <result column="USER_TOTAL" property="userTotal" />
+        <result column="POLICE_USER_NUM" property="policeUserNum" />
+        <result column="NO_POLICE_USER_NUM" property="noPoliceUserNum" />
+        <result column="AVAILABLE_QUOTA_NUM" property="availableQuotaNum" />
+        <result column="VIOLATION_NUM" property="violationNum" />
+        <result column="SERIOUS_VIOLATION_NUM" property="seriousViolationNum" />
+    </resultMap>
+
+    <select id="getApplicationQuotaDetail"  resultMap="BaseResultMap">
+            select * from TB_APPLICATION_MANAGE  where AREA_OR_POLICE=#{areaOrPolice}
+    </select>
+     <update id="updateQuota">
+         update TB_APPLICATION_MANAGE set USER_QUOTA_NUM=#{quota}  where ID=#{id}
+     </update>
+
+    <update id="updateAvailableQuota">
+         update TB_APPLICATION_MANAGE set AVAILABLE_QUOTA_NUM=USER_QUOTA_NUM-USER_TOTAL  where ID=#{id}
+     </update>
+    <select id="getApplicationQuota"  resultMap="BaseResultMap">
+            select * from TB_APPLICATION_MANAGE
+    </select>
+
+    <select id="getAppManage" resultMap="BaseResultMap">
+        SELECT * FROM TB_APPLICATION_MANAGE
+        <where>
+            <if test="areaOrPolice != null and areaOrPolice != ''">
+                AREA_OR_POLICE=#{areaOrPolice}
+            </if>
+        </where>
+    </select>
+</mapper>
