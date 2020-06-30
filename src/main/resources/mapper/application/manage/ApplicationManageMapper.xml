@@ -25,4 +25,13 @@
     <select id="getApplicationQuota"  resultMap="BaseResultMap">
             select * from TB_APPLICATION_MANAGE
     </select>
+
+    <select id="getAppManage" resultMap="BaseResultMap">
+        SELECT * FROM TB_APPLICATION_MANAGE
+        <where>
+            <if test="areaOrPolice != null and areaOrPolice != ''">
+                AREA_OR_POLICE=#{areaOrPolice}
+            </if>
+        </where>
+    </select>
 </mapper>

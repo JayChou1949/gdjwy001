@@ -1,5 +1,6 @@
 package com.upd.hwcloud.dao.application.manage;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.upd.hwcloud.bean.entity.application.manage.ApplicationManage;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -35,4 +36,5 @@ public interface ApplicationManageMapper extends BaseMapper<ApplicationManage> {
      */
     ApplicationManage  getApplicationQuotaDetail(@Param("areaOrPolice")String areaOrPolice);
 
+    IPage<ApplicationManage> getAppManage(IPage<ApplicationManage> page, @Param("areaOrPolice") String areaOrPolice);
 }
