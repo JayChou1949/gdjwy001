@@ -38,7 +38,7 @@
         SELECT * FROM TB_APPLICATION_MANAGE
         <where>
             <if test="areaOrPolice != null and areaOrPolice != ''">
-                AREA_OR_POLICE=#{areaOrPolice}
+                AREA_OR_POLICE like '%'||#{areaOrPolice}||'%'
             </if>
         </where>
     </select>
