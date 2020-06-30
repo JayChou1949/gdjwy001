@@ -65,8 +65,6 @@ public class ApplicationManageController {
         applicationRecords.setAreaOrPolice(areaOrPolice);
         //记录修改记录
         iApplicationRecordsService.addQuotaRecord(applicationRecords);
-        //更新可用限额数量
-        iApplicationManageService.updateAvailableQuota(id);
         return R.ok();
     }
 

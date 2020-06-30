@@ -18,6 +18,11 @@
     <select id="getApplicationQuotaDetail"  resultMap="BaseResultMap">
             select * from TB_APPLICATION_MANAGE  where AREA_OR_POLICE=#{areaOrPolice}
     </select>
+
+    <select id="getApplicationQuotaById"  resultMap="BaseResultMap">
+            select * from TB_APPLICATION_MANAGE  where ID=#{id}
+    </select>
+
      <update id="updateQuota">
          update TB_APPLICATION_MANAGE set USER_QUOTA_NUM=#{quota}  where ID=#{id}
      </update>
@@ -33,7 +38,7 @@
         SELECT * FROM TB_APPLICATION_MANAGE
         <where>
             <if test="areaOrPolice != null and areaOrPolice != ''">
-                AREA_OR_POLICE=#{areaOrPolice}
+                AREA_OR_POLICE like '%'||#{areaOrPolice}||'%'
             </if>
         </where>
     </select>

@@ -26,10 +26,10 @@
         and not exists (select ra.CREATOR from TB_SAAS_RECOVER_APPLICATION ra,TB_SAAS_RECOVER_INFO ri
                         where ri.APP_INFO_ID = ra.ID and ra.STATUS != '3' and ri.RE_IDCARD = a.CREATOR)
 		<if test="creator != null and creator != ''">
-            and a.CREATOR=#{creator}
+            and a.CREATOR like '%'||#{creator}||'%'
         </if>
 		<if test="serviceName != null and serviceName != ''">
-            and b.SERVICE_NAME=#{serviceName}
+            and b.SERVICE_NAME like '%'||#{serviceName}||'%'
         </if>
         GROUP BY b.SERVICE_NAME,b.MODIFIED_TIME
     </select>

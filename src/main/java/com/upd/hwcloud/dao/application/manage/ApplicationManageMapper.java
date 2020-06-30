@@ -36,6 +36,7 @@ public interface ApplicationManageMapper extends BaseMapper<ApplicationManage> {
      * @return
      */
     ApplicationManage  getApplicationQuotaDetail(@Param("areaOrPolice")String areaOrPolice);
+    ApplicationManage  getApplicationQuotaById(@Param("id")String id);
 
     IPage<ApplicationManage> getAppManage(IPage<ApplicationManage> page, @Param("areaOrPolice") String areaOrPolice);
 }

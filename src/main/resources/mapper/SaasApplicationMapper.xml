@@ -507,16 +507,16 @@
         and not exists (select ra.CREATOR from TB_SAAS_RECOVER_APPLICATION ra,TB_SAAS_RECOVER_INFO ri
         where ri.APP_INFO_ID = ra.ID and ra.STATUS != '3' and ri.RE_IDCARD = a.CREATOR)
         <if test="creatorName != null and creatorName != ''">
-            AND a.CREATOR_NAME=#{creatorName}
+            AND a.CREATOR_NAME like '%'||#{creatorName}||'%'
         </if>
         <if test="creator != null and creator != ''">
-            AND a.CREATOR=#{creator}
+            AND a.CREATOR like '%'||#{creator}||'%'
         </if>
         <if test="orgName != null and orgName != ''">
-            AND a.ORG_NAME=#{orgName}
+            AND a.ORG_NAME like '%'||#{orgName}||'%'
         </if>
         <if test="areaOrPolice != null and areaOrPolice != ''">
-            AND a.AREAS=#{areaOrPolice} OR a.POLICE_CATEGORY=#{areaOrPolice}
+            AND a.AREAS like '%'||#{areaOrPolice}||'%' OR a.POLICE_CATEGORY like '%'||#{areaOrPolice}||'%'
         </if>
         GROUP BY CREATOR,CREATOR_NAME,ORG_ID,ORG_NAME
     </select>

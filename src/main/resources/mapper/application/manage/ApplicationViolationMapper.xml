@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.application.manage.ApplicationViolationMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.application.manage.ApplicationViolation">
+        <id column="ID" property="id" />
+        <result column="CREATOR" property="creator" />
+        <result column="CREATOR_NAME" property="creatorName" />
+        <result column="ORG_ID" property="orgId" />
+        <result column="ORG_NAME" property="orgName" />
+        <result column="VIOLATION_TIME" property="violationTime" />
+        <result column="VIOLATION_REASON" property="violationReason" />
+        <result column="AREA_OR_POLICE" property="areaOrPolice" />
+    </resultMap>
+    
+    <select id="getViolationUser" resultMap="BaseResultMap">
+        SELECT CREATOR_NAME,ORG_NAME,VIOLATION_TIME,VIOLATION_REASON FROM TB_APPLICATION_VIOLATION
+        <where>
+            <if test="areaOrPolice != null and areaOrPolice !=''">
+                AREA_OR_POLICE like '%'||#{areaOrPolice}||'%'
+            </if>
+            <if test="creatorName != null and creatorName !=''">
+                AND CREATOR_NAME like '%'||#{creatorName}||'%'
+            </if>
+            <if test="orgName != null and orgName !=''">
+                AND ORG_NAME like '%'||#{orgName}||'%'
+            </if>
+            <if test="violationTime != null and violationTime !=''">
+                AND VIOLATION_TIME like '%'||#{violationTime}||'%'
+            </if>
+        </where>
+        ORDER BY VIOLATION_TIME DESC
+    </select>
+
+</mapper>
