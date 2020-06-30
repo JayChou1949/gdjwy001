@@ -10,7 +10,6 @@ import com.upd.hwcloud.bean.entity.application.manage.ApplicationManage;
 import com.upd.hwcloud.bean.entity.application.manage.ApplicationRecords;
 import com.upd.hwcloud.bean.response.R;
 import com.upd.hwcloud.common.config.LoginUser;
-import com.upd.hwcloud.common.utils.UUIDUtil;
 import com.upd.hwcloud.service.application.manage.IApplicationManageService;
 import com.upd.hwcloud.service.application.manage.IApplicationRecordsService;
 import io.swagger.annotations.Api;
@@ -24,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -70,10 +68,8 @@ public class ApplicationManageController {
 
     @ApiOperation(value = "查询配额信息列表")
     @RequestMapping(value = "/v1/queryQuotaList",method = RequestMethod.GET)
-    public R getApplicationQuotaDetail() {
-        Page<ApplicationManage> page=new Page<>();
-        page.setCurrent(1);
-        page.setSize(20);
+    public R getApplicationQuotaDetail(@RequestParam(value = "current") Long current,@RequestParam(value = "size") Long size) {
+        Page<ApplicationManage> page=new Page<>(current, size);
         Page<ApplicationManage> applicationQuota = iApplicationManageService.getApplicationQuota(page);
         return R.ok(applicationQuota);
     }
