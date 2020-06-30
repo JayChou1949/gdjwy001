@@ -1,8 +1,9 @@
-package com.hirisun.cloud.model.ncov.vo;
+package com.hirisun.cloud.model.ncov.vo.realtime;
 
 import java.io.Serializable;
 import java.util.List;
 
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
@@ -10,6 +11,7 @@ import io.swagger.annotations.ApiModelProperty;
  * @author cjh
  *
  */
+@ApiModel("首页疫情实时数据")
 public class HomePageNcovRealtimeVo implements Serializable{
 
 	/**

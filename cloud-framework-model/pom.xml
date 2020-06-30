@@ -12,10 +12,36 @@
     <artifactId>cloud-framework-model</artifactId>
 
 	<dependencies>
-		<dependency>
+		  <dependency>
 			  <groupId>com.battcn</groupId>
 			  <artifactId>swagger-spring-boot-starter</artifactId>
 		  </dependency>
+		  <!--poi-->
+		    <dependency>
+		      <groupId>org.apache.poi</groupId>
+		      <artifactId>poi-ooxml</artifactId>
+		    </dependency>
+		    <dependency>
+		      <groupId>org.apache.poi</groupId>
+		      <artifactId>poi</artifactId>
+		    </dependency>
+		    <dependency>
+		      <groupId>org.apache.poi</groupId>
+		      <artifactId>poi-ooxml-schemas</artifactId>
+		    </dependency>
+		
+		    <dependency>
+		      <groupId>cn.afterturn</groupId>
+		      <artifactId>easypoi-base</artifactId>
+		    </dependency>
+		    <dependency>
+		      <groupId>cn.afterturn</groupId>
+		      <artifactId>easypoi-web</artifactId>
+		    </dependency>
+		    <dependency>
+		      <groupId>cn.afterturn</groupId>
+		      <artifactId>easypoi-annotation</artifactId>
+		    </dependency>
 	</dependencies>
 
 </project>

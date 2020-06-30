@@ -13,7 +13,7 @@
     <result column="province_code" jdbcType="DECIMAL" property="provinceCode" />
     <result column="region_type" jdbcType="DECIMAL" property="regionType" />
   </resultMap>
-  <resultMap id="ncovRealtimeVo" type="com.hirisun.cloud.model.ncov.vo.NcovRealtimeVo">
+  <resultMap id="ncovRealtimeVo" type="com.hirisun.cloud.model.ncov.vo.realtime.NcovRealtimeVo">
     <id column="id" jdbcType="VARCHAR" property="id" />
     <result column="region_name" jdbcType="VARCHAR" property="regionName" />
     <result column="diagnosis" jdbcType="DECIMAL" property="diagnosis" />

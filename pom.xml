@@ -40,21 +40,64 @@
         <feign.version>1.4.7.RELEASE</feign.version>
         <mybatis-plus.version>3.3.2</mybatis-plus.version>
         <swagger-spring-boot.version>2.1.5-RELEASE</swagger-spring-boot.version>
+        <poi.version>3.15</poi.version>
+        <easypoi.version>3.2.0</easypoi.version>
+        <spring-boot-redis.version>2.3.1.RELEASE</spring-boot-redis.version>
+        <commons-collections.version>4.4</commons-collections.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+			<dependency>
+			    <groupId>org.apache.commons</groupId>
+			    <artifactId>commons-collections4</artifactId>
+			    <version>${commons-collections.version}</version>
+			</dependency>
+        	
+			<dependency>
+			    <groupId>org.springframework.boot</groupId>
+			    <artifactId>spring-boot-starter-data-redis</artifactId>
+			    <version>${spring-boot-redis.version}</version>
+			</dependency>
+        	
+        	<!--poi-->
+		    <dependency>
+		      <groupId>org.apache.poi</groupId>
+		      <artifactId>poi-ooxml</artifactId>
+		      <version>${poi.version}</version>
+		    </dependency>
+		    <dependency>
+		      <groupId>org.apache.poi</groupId>
+		      <artifactId>poi</artifactId>
+		      <version>${poi.version}</version>
+		    </dependency>
+		    <dependency>
+		      <groupId>org.apache.poi</groupId>
+		      <artifactId>poi-ooxml-schemas</artifactId>
+		      <version>${poi.version}</version>
+		    </dependency>
+		
+		    <dependency>
+		      <groupId>cn.afterturn</groupId>
+		      <artifactId>easypoi-base</artifactId>
+		      <version>${easypoi.version}</version>
+		    </dependency>
+		    <dependency>
+		      <groupId>cn.afterturn</groupId>
+		      <artifactId>easypoi-web</artifactId>
+		      <version>${easypoi.version}</version>
+		    </dependency>
+		    <dependency>
+		      <groupId>cn.afterturn</groupId>
+		      <artifactId>easypoi-annotation</artifactId>
+		      <version>${easypoi.version}</version>
+		    </dependency>
         
 		  <dependency>
 			  <groupId>com.battcn</groupId>
 			  <artifactId>swagger-spring-boot-starter</artifactId>
 			  <version>${swagger-spring-boot.version}</version>
 		  </dependency>
-		<dependency>
-		    <groupId>com.baomidou</groupId>
-		    <artifactId>mybatis-plus-boot-starter</artifactId>
-		    <version>${mybatis-plus.version}</version>
-		</dependency>
         
 		<dependency>
 		    <groupId>com.alibaba.cloud</groupId>
@@ -82,11 +125,6 @@
 		    <version>${mybatis-spring-boot.version}</version>
 		</dependency>
         
-        <dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-feign</artifactId>
-			<version>${feign.version}</version>
-		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-hystrix</artifactId>
@@ -120,51 +158,16 @@
                 <artifactId>mybatis-plus-boot-starter</artifactId>
                 <version>${mybatis-plus.version}</version>
             </dependency>
-
-
-            <dependency>
-                <groupId>com.oracle</groupId>
-                <artifactId>ojdbc14</artifactId>
-                <version>${ojdbc14.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.mybatis.spring.boot</groupId>
-                <artifactId>mybatis-spring-boot-starter</artifactId>
-                <version>${mybatis-spring-boot.version}</version>
-            </dependency>
+			<dependency>
+			  <groupId>com.baomidou</groupId>
+			  <artifactId>mybatis-plus-generator</artifactId>
+			  <version>${mybatis-plus.version}</version>
+		  </dependency>
 
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-starter-feign</artifactId>
                 <version>${feign.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-starter-hystrix</artifactId>
-                <version>${feign.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-io</groupId>
-                <artifactId>commons-io</artifactId>
-                <version>${commons-io.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>fastjson</artifactId>
-                <version>${fastjson.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>commons-lang</groupId>
-                <artifactId>commons-lang</artifactId>
-                <version>${commons-lang.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.zaxxer</groupId>
-                <artifactId>HikariCP</artifactId>
-                <version>${hikaricp.version}</version>
             </dependency>
 
             <dependency>

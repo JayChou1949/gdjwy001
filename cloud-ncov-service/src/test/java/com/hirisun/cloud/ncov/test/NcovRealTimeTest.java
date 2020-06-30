@@ -8,7 +8,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import com.alibaba.fastjson.JSONObject;
 import com.hirisun.cloud.common.vo.ResponseResult;
-import com.hirisun.cloud.model.ncov.vo.HomePageNcovRealtimeVo;
+import com.hirisun.cloud.model.ncov.vo.realtime.HomePageNcovRealtimeVo;
 import com.hirisun.cloud.ncov.NcovApplication;
 import com.hirisun.cloud.ncov.bean.NcovRealtime;
 import com.hirisun.cloud.ncov.service.NcovRealtimeService;

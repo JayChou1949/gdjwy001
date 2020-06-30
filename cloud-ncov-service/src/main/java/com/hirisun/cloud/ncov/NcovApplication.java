@@ -5,7 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.hirisun.cloud")
 @EnableDiscoveryClient
 @MapperScan("com.hirisun.cloud.ncov.mapper")
 public class NcovApplication {

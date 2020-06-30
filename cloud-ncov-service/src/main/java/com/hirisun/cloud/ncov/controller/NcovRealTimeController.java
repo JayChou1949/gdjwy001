@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.common.vo.ResponseResult;
-import com.hirisun.cloud.model.ncov.vo.HomePageNcovRealtimeVo;
+import com.hirisun.cloud.model.ncov.vo.realtime.HomePageNcovRealtimeVo;
 import com.hirisun.cloud.ncov.service.NcovRealtimeService;
 
 import io.swagger.annotations.Api;
