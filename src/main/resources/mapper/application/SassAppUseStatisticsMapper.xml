@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upd.hwcloud.dao.application.SassAppUseStatisticsMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.application.SassAppUseStatistics">
+        <result column="ID" property="id" />
+        <result column="PERSONID" property="personid" />
+        <result column="PERSONNAME" property="personname" />
+        <result column="APPID" property="appid" />
+        <result column="APPNAME" property="appname" />
+        <result column="COUNT" property="count" />
+        <result column="ADDTIME" property="addtime" />
+    </resultMap>
+    <!--应用次数访问趋势-->
+    <select id="queryUseCount"  resultType="java.util.HashMap" >
+        <![CDATA[
+        select sum(saus.count) as scount,saus.addtime
+        from TB_SASS_APP_USE_STATISTICS saus left join tb_saas saas on saus.appid= saas.id
+        where saas.sub_type=#{param.subType} and saas.status=2
+        and to_date(#{param.startDate},'yyyy-MM-dd')<=to_date(saus.addtime,'yyyy-MM-dd')
+        and to_date(#{param.endDate},'yyyy-MM-dd')>=to_date(saus.addtime,'yyyy-MM-dd')
+        group by saus.addtime order by saus.addtime asc
+        ]]>
+    </select>
+    <select id="allCount"  resultType="java.lang.Long" >
+        <![CDATA[
+        select sum(saus.count) as scount
+        from TB_SASS_APP_USE_STATISTICS saus left join tb_saas saas on saus.appid= saas.id
+        where saas.sub_type='98e4b576835c4c46977815fb66dbc9ba' and saas.status=2
+        ]]>
+    </select>
+
+    <!--地市用户使用总量-->
+    <select id="queryAreaUseCount"  resultType="java.util.HashMap" >
+        <![CDATA[
+        select sa.areas,nvl(sum(saus.count),0) scount
+        from tb_saas_application sa
+        left join tb_saas_application_ext sae on sa.id=sae.master_id
+        left join tb_saas saas on sae.service_id=saas.id
+        left join TB_SASS_APP_USE_STATISTICS saus on saas.id=saus.appid and sa.creator=saus.personid
+        where sa.STATUS =3 and sa.IS_IMPORT=0 and sa.RECOVER_FLAG != -1 and saas.sub_type=#{param.subType} and saas.status=2
+
+        group by sa.areas order by scount desc
+        ]]>
+    </select>
+    <!--警种使用总量-->
+    <select id="queryPoliceUseCount"  resultType="java.util.HashMap" >
+        <![CDATA[
+        select sa.police_category,nvl(sum(saus.count),0) scount
+        from tb_saas_application sa
+        left join tb_saas_application_ext sae on sa.id=sae.master_id
+        left join tb_saas saas on sae.service_id=saas.id
+        left join TB_SASS_APP_USE_STATISTICS saus on saas.id=saus.appid and sa.creator=saus.personid
+        where sa.STATUS =3 and sa.IS_IMPORT=0 and sa.RECOVER_FLAG != -1 and saas.sub_type=#{param.subType} and saas.status=2
+
+        group by sa.police_category order by scount desc
+        ]]>
+    </select>
+    <!--通用应用使用量-->
+    <select id="queryAppUseCount"  resultType="java.util.HashMap" >
+        <![CDATA[
+        select appid,appname,sum(saus.count) as scount
+        from TB_SASS_APP_USE_STATISTICS saus left join tb_saas saas on saus.appid= saas.id
+        where saas.sub_type=#{param.subType} and saas.status=2
+        group by appid,appname order by scount desc
+        ]]>
+    </select>
+    <!--地市用户数量-->
+    <select id="queryAreaUserCount"  resultType="java.util.HashMap" >
+        <![CDATA[
+        select count(*) scount,areas,sum(ssum)/count(*) avgcount from (
+       select sa.areas,sa.creator,nvl(sum(saus.count),0) ssum
+        from tb_saas_application sa
+        left join tb_saas_application_ext sae on sa.id=sae.master_id
+        left join tb_saas saas on sae.service_id=saas.id
+        left join TB_SASS_APP_USE_STATISTICS saus on saas.id=saus.appid and sa.creator=saus.personid
+        where sa.STATUS =3 and sa.IS_IMPORT=0 and sa.RECOVER_FLAG != -1 and saas.sub_type='98e4b576835c4c46977815fb66dbc9ba' and saas.status=2
+
+        group by sa.creator,sa.areas
+        ) temp group by temp.areas order by scount desc
+        ]]>
+    </select>
+    <!--警种用户数量-->
+    <select id="queryPoliceUserCount"  resultType="java.util.HashMap" >
+        <![CDATA[
+        select count(*) scount,police_category,sum(ssum)/count(*) avgcount from (
+       select sa.police_category,sa.creator,nvl(sum(saus.count),0) ssum
+        from tb_saas_application sa
+        left join tb_saas_application_ext sae on sa.id=sae.master_id
+        left join tb_saas saas on sae.service_id=saas.id
+        left join TB_SASS_APP_USE_STATISTICS saus on saas.id=saus.appid and sa.creator=saus.personid
+        where sa.STATUS =3 and sa.IS_IMPORT=0 and sa.RECOVER_FLAG != -1 and saas.sub_type=#{param.subType} and saas.status=2
+
+        group by sa.creator,sa.police_category
+
+        ) temp group by temp.police_category order by scount desc
+        ]]>
+    </select>
+    <select id="countByAppAuth" resultType="java.lang.Integer">
+        select count(*) scount from(
+        select sa.creator,sae.service_id
+        from tb_saas_application sa
+        left join tb_saas_application_ext sae on sa.id=sae.master_id
+        left join tb_saas saas on sae.service_id=saas.id
+        where sa.STATUS =3 and sa.IS_IMPORT=0 and sa.RECOVER_FLAG != -1 and saas.sub_type=#{param.subType} and saas.status=2
+        group by sa.creator,sae.service_id
+        )
+    </select>
+
+
+    <!--地市用户数量-->
+    <select id="queryAreaUserAvgCount"  resultType="java.util.HashMap" >
+        <![CDATA[
+        select count(*) scount,areas,sum(ssum)/count(*) avgcount from (
+       select sa.areas,sa.creator,nvl(sum(saus.count),0) ssum
+        from tb_saas_application sa
+        left join tb_saas_application_ext sae on sa.id=sae.master_id
+        left join tb_saas saas on sae.service_id=saas.id
+        left join TB_SASS_APP_USE_STATISTICS saus on saas.id=saus.appid and sa.creator=saus.personid
+        where sa.STATUS =3 and sa.IS_IMPORT=0 and sa.RECOVER_FLAG != -1 and saas.sub_type=#{param.subType} and saas.status=2
+
+        group by sa.creator,sa.areas
+        ) temp group by temp.areas order by avgcount desc
+        ]]>
+    </select>
+    <!--警种用户数量-->
+    <select id="queryPoliceUserAvgCount"  resultType="java.util.HashMap" >
+        <![CDATA[
+        select count(*) scount,police_category,sum(ssum)/count(*) avgcount from (
+       select sa.police_category,sa.creator,nvl(sum(saus.count),0) ssum
+        from tb_saas_application sa
+        left join tb_saas_application_ext sae on sa.id=sae.master_id
+        left join tb_saas saas on sae.service_id=saas.id
+        left join TB_SASS_APP_USE_STATISTICS saus on saas.id=saus.appid and sa.creator=saus.personid
+        where sa.STATUS =3 and sa.IS_IMPORT=0 and sa.RECOVER_FLAG != -1 and saas.sub_type=#{param.subType} and saas.status=2
+
+        group by sa.creator,sa.police_category
+
+        ) temp group by temp.police_category order by avgcount desc
+        ]]>
+    </select>
+</mapper>
