@@ -98,7 +98,7 @@
         ]]>
     </select>
     <select id="countByAppAuth" resultType="java.lang.Integer">
-        select count(*) scount from(
+        select count(distinct creator ) scount from(
         select sa.creator,sae.service_id
         from tb_saas_application sa
         left join tb_saas_application_ext sae on sa.id=sae.master_id
