@@ -23,13 +23,7 @@
             select * from TB_APPLICATION_MANAGE  where ID=#{id}
     </select>
 
-     <update id="updateQuota">
-         update TB_APPLICATION_MANAGE set USER_QUOTA_NUM=#{quota}  where ID=#{id}
-     </update>
 
-    <update id="updateAvailableQuota">
-         update TB_APPLICATION_MANAGE set AVAILABLE_QUOTA_NUM=USER_QUOTA_NUM-USER_TOTAL  where ID=#{id}
-     </update>
     <select id="getApplicationQuota"  resultMap="BaseResultMap">
             select * from TB_APPLICATION_MANAGE
     </select>
