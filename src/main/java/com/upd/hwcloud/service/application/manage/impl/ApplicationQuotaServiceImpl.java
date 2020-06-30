@@ -54,7 +54,6 @@ public class ApplicationQuotaServiceImpl extends ServiceImpl<ApplicationQuotaMap
                 files.insert();
 
             }
-
         }
 
     }
