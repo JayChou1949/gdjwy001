@@ -1,5 +1,6 @@
 package com.upd.hwcloud.bean.entity.application.manage;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -22,7 +23,7 @@ public class ApplicationRecords extends Model<ApplicationRecords> {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId("ID")
+    @TableId(value = "ID",type = IdType.UUID)
     private String id;
 
         /**

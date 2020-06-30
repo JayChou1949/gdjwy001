@@ -48,18 +48,18 @@ public class ApplicationManageController {
 
     @ApiOperation(value = "配额修改")
     @RequestMapping(value = "/v1/updateQuota",method = RequestMethod.GET)
-    public R getPaasZhzy(@LoginUser User user, @RequestParam(value = "id") String id, @RequestParam(value = "quota")
-            Integer quota, @RequestParam(value = "oldQuota") Integer oldQuota){
+    public R updateQuota(@LoginUser User user, @RequestParam(value = "id") String id, @RequestParam(value = "quota")
+            Integer quota, @RequestParam(value = "oldQuota") Integer oldQuota, @RequestParam(value = "areaOrPolice") String areaOrPolice){
         ApplicationRecords applicationRecords=new ApplicationRecords();
         iApplicationManageService.updateQuota(id,quota);
         applicationRecords.setRefId(id);
-        applicationRecords.setId(UUIDUtil.getUUID());
         applicationRecords.setNewUserQuota(quota);
         applicationRecords.setUserQuota(oldQuota);
         if(user!=null){
             applicationRecords.setUserName(user.getName());
         }
         applicationRecords.setModfiyTime(LocalDateTime.now());
+        applicationRecords.setAreaOrPolice(areaOrPolice);
         iApplicationRecordsService.addQuotaRecord(applicationRecords);
         return R.ok();
     }

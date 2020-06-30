@@ -1,7 +1,6 @@
 package com.upd.hwcloud.service.application.manage;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.upd.hwcloud.bean.entity.Files;
 import com.upd.hwcloud.bean.entity.application.manage.ApplicationQuota;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -28,7 +27,7 @@ public interface IApplicationQuotaService extends IService<ApplicationQuota> {
      * @param applyPerson
      * @return
      */
-    Page<ApplicationQuota> getApplicationQuotaList(String applyPerson);
+    Page<ApplicationQuota> getApplicationQuotaList(Page<ApplicationQuota> page,String applyPerson);
 
     /**
      * 根据id查询单个  限额的详细信息

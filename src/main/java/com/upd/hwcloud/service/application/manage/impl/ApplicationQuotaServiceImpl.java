@@ -41,7 +41,6 @@ public class ApplicationQuotaServiceImpl extends ServiceImpl<ApplicationQuotaMap
     @Override
     public void addApplicationQuota(ApplicationQuota applicationQuota) {
 
-        applicationQuota.setId(UUIDUtil.getUUID());
         applicationQuota.setRefFilesId(UUIDUtil.getUUID());
         //生成申请单号  根据年月日来生成
         applicationQuota.setApplyNumber(genOrderNum());
@@ -49,7 +48,6 @@ public class ApplicationQuotaServiceImpl extends ServiceImpl<ApplicationQuotaMap
         List<Files> filesList = applicationQuota.getFilesList();
         if(filesList!=null&&filesList.size()>0){
             for (Files files : filesList) {
-                files.setId(UUIDUtil.getUUID());
                 files.setRefId(applicationQuota.getRefFilesId());
                 files.insert();
 
@@ -59,8 +57,8 @@ public class ApplicationQuotaServiceImpl extends ServiceImpl<ApplicationQuotaMap
     }
 
     @Override
-    public Page<ApplicationQuota> getApplicationQuotaList(String applyPerson) {
-        return applicationQuotaMapper.getApplicationQuotaList(applyPerson);
+    public Page<ApplicationQuota> getApplicationQuotaList(Page<ApplicationQuota> page,String applyPerson) {
+        return applicationQuotaMapper.getApplicationQuotaList( page,applyPerson);
     }
 
     @Override

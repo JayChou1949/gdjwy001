@@ -48,7 +48,7 @@ public interface ApplicationQuotaMapper extends BaseMapper<ApplicationQuota> {
      * @param applyPerson
      * @return
      */
-    Page<ApplicationQuota> getApplicationQuotaList(@Param("applyPerson")String applyPerson);
+    Page<ApplicationQuota> getApplicationQuotaList(Page<ApplicationQuota> page,@Param("applyPerson")String applyPerson);
 
     /**
      * 根据id查询单个  限额的详细信息
