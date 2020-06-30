@@ -52,6 +52,7 @@ public class ApplicationQuotaServiceImpl extends ServiceImpl<ApplicationQuotaMap
                 files.setId(UUIDUtil.getUUID());
                 files.setRefId(applicationQuota.getRefFilesId());
                 files.insert();
+
             }
 
         }
