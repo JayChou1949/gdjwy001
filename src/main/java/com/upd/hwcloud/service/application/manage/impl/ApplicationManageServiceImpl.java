@@ -27,7 +27,7 @@ public class ApplicationManageServiceImpl extends ServiceImpl<ApplicationManageM
     }
 
     @Override
-    public void updateQuota(String id, String quota) {
+    public void updateQuota(String id, Integer quota) {
         applicationManageMapper.updateQuota(id,quota);
         //写入更改记录表
     }

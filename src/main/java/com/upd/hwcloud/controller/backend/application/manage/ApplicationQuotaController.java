@@ -1,15 +1,14 @@
 package com.upd.hwcloud.controller.backend.application.manage;
 
 
-import com.upd.hwcloud.bean.entity.Files;
 import com.upd.hwcloud.bean.entity.application.manage.ApplicationQuota;
 import com.upd.hwcloud.bean.response.R;
 import com.upd.hwcloud.service.application.manage.IApplicationQuotaService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import org.springframework.stereotype.Controller;
 
 
 
@@ -21,7 +20,8 @@ import org.springframework.stereotype.Controller;
  * @author lqm
  * @since 2020-06-29
  */
-@Controller
+@Api(description = "配额设置")
+@RestController
 @RequestMapping("/applicationQuota")
 public class ApplicationQuotaController {
 
@@ -37,8 +37,8 @@ public class ApplicationQuotaController {
 
     @ApiOperation(value = "新增配额设置")
     @RequestMapping(value = "/v1/addApplicationQuota",method = RequestMethod.POST)
-    public R addApplicationQuota(@RequestBody ApplicationQuota applicationQuota, @RequestBody Files files){
-        applicationQuotaService.addApplicationQuota(files,applicationQuota);
+    public R addApplicationQuota(@RequestBody ApplicationQuota applicationQuota){
+        applicationQuotaService.addApplicationQuota(applicationQuota);
         return R.ok();
     }
 

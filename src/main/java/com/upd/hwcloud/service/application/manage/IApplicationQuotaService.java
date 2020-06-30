@@ -21,7 +21,7 @@ public interface IApplicationQuotaService extends IService<ApplicationQuota> {
      * @param files
      * @param applicationQuota
      */
-    void addApplicationQuota(Files files,ApplicationQuota applicationQuota);
+    void addApplicationQuota(ApplicationQuota applicationQuota);
 
     /**
      * 根据申请人查询配置设置列表

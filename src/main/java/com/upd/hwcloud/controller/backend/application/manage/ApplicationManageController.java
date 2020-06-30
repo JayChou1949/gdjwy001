@@ -10,14 +10,15 @@ import com.upd.hwcloud.common.config.LoginUser;
 import com.upd.hwcloud.common.utils.UUIDUtil;
 import com.upd.hwcloud.service.application.manage.IApplicationManageService;
 import com.upd.hwcloud.service.application.manage.IApplicationRecordsService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 
@@ -29,7 +30,8 @@ import java.time.LocalDateTime;
  * @author lqm
  * @since 2020-06-29
  */
-@Controller
+@Api(description = "配额设置")
+@RestController
 @RequestMapping("/applicationManage")
 public class ApplicationManageController {
 
@@ -37,16 +39,13 @@ public class ApplicationManageController {
     private IApplicationManageService iApplicationManageService;
     @Autowired
     private IApplicationRecordsService iApplicationRecordsService;
-    @Autowired
-    private ApplicationRecords applicationRecords;
+
 
     @ApiOperation(value = "配额修改")
     @RequestMapping(value = "/v1/updateQuota",method = RequestMethod.GET)
     public R getPaasZhzy(@LoginUser User user, @RequestParam(value = "id") String id, @RequestParam(value = "quota")
-            String quota, @RequestParam(value = "oldQuota") String oldQuota){
-        if(StringUtils.isBlank(id)||StringUtils.isBlank(quota)){
-            R.error("参数不能为空");
-        }
+            Integer quota, @RequestParam(value = "oldQuota") Integer oldQuota){
+        ApplicationRecords applicationRecords=new ApplicationRecords();
         iApplicationManageService.updateQuota(id,quota);
         applicationRecords.setRefId(id);
         applicationRecords.setId(UUIDUtil.getUUID());
@@ -73,8 +72,8 @@ public class ApplicationManageController {
     @ApiOperation(value = "查询单个配额信息")
     @RequestMapping(value = "/v1/queryQuota",method = RequestMethod.GET)
     public R getApplicationQuota(@RequestParam(value = "areaOrPolice") String areaOrPolice){
-        iApplicationManageService.getApplicationQuotaDetail(areaOrPolice);
-        return R.ok();
+        ApplicationManage applicationQuotaDetail = iApplicationManageService.getApplicationQuotaDetail(areaOrPolice);
+        return R.ok(applicationQuotaDetail);
     }
 }
 

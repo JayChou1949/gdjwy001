@@ -4,12 +4,14 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.upd.hwcloud.bean.entity.application.manage.ApplicationRecords;
 import com.upd.hwcloud.bean.response.R;
 import com.upd.hwcloud.service.application.manage.IApplicationRecordsService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 /**
  * <p>
  *  前端控制器
@@ -18,7 +20,8 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @author lqm
  * @since 2020-06-29
  */
-@Controller
+@Api(description = "配额设置")
+@RestController
 @RequestMapping("/applicationRecords")
 public class ApplicationRecordsController {
 

@@ -26,7 +26,7 @@ public interface IApplicationManageService extends IService<ApplicationManage> {
      * @param id
      * @param quota
      */
-    void  updateQuota(String id,String quota);
+    void  updateQuota(String id,Integer quota);
 
     /**
      * 根据地市或警种查询  当前账号总限额 以及剩余数量

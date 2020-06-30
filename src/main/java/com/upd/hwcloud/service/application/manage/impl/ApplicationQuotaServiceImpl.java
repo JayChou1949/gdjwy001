@@ -39,16 +39,23 @@ public class ApplicationQuotaServiceImpl extends ServiceImpl<ApplicationQuotaMap
     private StringRedisTemplate stringRedisTemplate;
 
     @Override
-    public void addApplicationQuota(Files files, ApplicationQuota applicationQuota) {
+    public void addApplicationQuota(ApplicationQuota applicationQuota) {
 
         applicationQuota.setId(UUIDUtil.getUUID());
         applicationQuota.setRefFilesId(UUIDUtil.getUUID());
         //生成申请单号  根据年月日来生成
         applicationQuota.setApplyNumber(genOrderNum());
         applicationQuota.insert();
-        files.setId(UUIDUtil.getUUID());
-        files.setRefId(applicationQuota.getRefFilesId());
-        files.insert();
+        List<Files> filesList = applicationQuota.getFilesList();
+        if(filesList!=null&&filesList.size()>0){
+            for (Files files : filesList) {
+                files.setId(UUIDUtil.getUUID());
+                files.setRefId(applicationQuota.getRefFilesId());
+                files.insert();
+            }
+
+        }
+
     }
 
     @Override
@@ -59,8 +66,10 @@ public class ApplicationQuotaServiceImpl extends ServiceImpl<ApplicationQuotaMap
     @Override
     public ApplicationQuota getApplicationQuotaById(String id) {
         ApplicationQuota applicationQuota = applicationQuotaMapper.getApplicationQuotaById(id);
-        List<Files> fileList = filesMapper.getFileListById(applicationQuota.getRefFilesId());
-        applicationQuota.setFilesList(fileList);
+        if(null!=applicationQuota){
+            List<Files> fileList = filesMapper.getFileListById(applicationQuota.getRefFilesId());
+            applicationQuota.setFilesList(fileList);
+        }
         return applicationQuota;
     }
     private String genOrderNum() {

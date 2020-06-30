@@ -35,13 +35,13 @@ public class ApplicationRecords extends Model<ApplicationRecords> {
      * 用户配额数
      */
          @TableField("USER_QUOTA")
-    private String userQuota;
+    private Integer userQuota;
 
         /**
      * 修改后的用户配额数
      */
          @TableField("NEW_USER_QUOTA")
-    private String newUserQuota;
+    private Integer newUserQuota;
 
         /**
      * 修改人
