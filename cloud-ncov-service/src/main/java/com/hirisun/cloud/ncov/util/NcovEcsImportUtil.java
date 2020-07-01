@@ -1,4 +1,4 @@
-package com.hirisun.cloud.common.util;
+package com.hirisun.cloud.ncov.util;
 
 import java.io.File;
 import java.io.FileInputStream;

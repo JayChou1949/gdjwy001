@@ -8,10 +8,10 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
-import com.hirisun.cloud.common.util.NcovEcsImportUtil;
 import com.hirisun.cloud.model.ncov.contains.NcovKey;
 import com.hirisun.cloud.model.ncov.vo.iaas.NcovEcsOverviewVo;
 import com.hirisun.cloud.ncov.service.NcovIaasService;
+import com.hirisun.cloud.ncov.util.NcovEcsImportUtil;
 
 @Service
 public class NcovIaasServiceImpl implements NcovIaasService {
