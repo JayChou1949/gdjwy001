@@ -1,20 +1,24 @@
 package com.hirisun.cloud.common.util;
 
-import com.google.common.collect.Lists;
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFDateUtil;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.util.NumberToTextConverter;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFDateUtil;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.util.NumberToTextConverter;
+import org.springframework.stereotype.Component;
 
 /**
  * @author junglefisher
@@ -23,90 +27,6 @@ import java.util.List;
 @Component
 public class UnitExcelExportUtil {
 
-    private static String rootPath;
-
-    @Value("${file.path}")
-    public void setRootPath(String rootPath) {
-        UnitExcelExportUtil.rootPath = rootPath;
-    }
-
-    /**
-     * 获取表格数据
-     * @return
-     * @throws Exception
-     */
-    public static List<List<Object>> list(String name){
-        List<List<Object>> list=null;
-        InputStream inputStream =null;
-        Workbook workbook = null;
-        File file = new File(rootPath+"/"+name);
-//        File file = new File("E:/hwyFiles/省直疫情数据服务调用统计.xls");//song本地测试用
-        try{
-            inputStream =new FileInputStream(file);
-            workbook = createWorkbook(inputStream);
-            if (null != workbook) {
-                if ("省直疫情数据服务调用统计.xls".equals(name)) {
-                    list = getDataList(workbook,3);
-                } else if ("疫情桌面云.xls".equals(name)) {
-                    list = getDataList(workbook, 1);
-                }
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }finally {
-            if(workbook!=null){
-                try {
-                    workbook.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            if(inputStream != null){
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        return list;
-    }
-
-    /**
-     * 获取疫情专区表格数据
-     * @return
-     * @throws Exception
-     */
-    public static List<List<Object>> ncovDataList(String name,Integer num,Integer sheetNum){
-        File file = new File(rootPath+"/ncovArea/"+name);
-        InputStream inputStream = null;
-        Workbook workbook = null;
-        List<List<Object>> resultList = Lists.newArrayList();
-        try{
-            inputStream=new FileInputStream(file);
-            workbook = createWorkbook(inputStream);
-            resultList = getDataListBySheet(workbook,num,sheetNum);
-        }catch (Exception e){
-            e.printStackTrace();
-        }finally {
-            if(workbook != null){
-                try {
-                    workbook.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            if(inputStream !=null){
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return resultList;
-    }
 
     /**
      * Excel2003和Excel2007+创建方式不同
