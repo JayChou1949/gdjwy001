@@ -8,10 +8,10 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 @SpringBootApplication
 @EnableDiscoveryClient
 @MapperScan("com.hirisun.cloud.third.mapper")
-public class CloudThirdServiceApplication {
+public class ThirdServiceApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(CloudThirdServiceApplication.class, args);
+        SpringApplication.run(ThirdServiceApplication.class, args);
     }
 
 }

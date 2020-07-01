@@ -16,40 +16,15 @@
         <maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
     </properties>
 
-    <!--分别设置开发，测试，生产环境 -->
-    <profiles>
-        <profile>
-            <id>dev</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <profiles.active>dev</profiles.active>
-            </properties>
-        </profile>
-        <profile>
-            <id>test</id>
-            <properties>
-                <profiles.active>test</profiles.active>
-            </properties>
-        </profile>
-        <profile>
-            <id>pro</id>
-            <properties>
-                <profiles.active>pro</profiles.active>
-            </properties>
-        </profile>
-    </profiles>
-
     <dependencies>
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
         </dependency>
-        <!-- <dependency>
-              <groupId>com.alibaba.cloud</groupId>
-              <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
-          </dependency> -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
@@ -74,8 +49,6 @@
             <groupId>com.oracle</groupId>
             <artifactId>ojdbc6</artifactId>
         </dependency>
-
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -105,14 +78,6 @@
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-commons</artifactId>
         </dependency>
-        <!-- <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-feign</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-hystrix</artifactId>
-        </dependency>-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -150,38 +115,6 @@
     </dependencies>
 
     <build>
-
-        <finalName>ROOT</finalName>
-
-        <!--  配置资源目录-->
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-                <excludes>
-                    <exclude>dev/*</exclude>
-                    <exclude>test/*</exclude>
-                    <exclude>pro/*</exclude>
-                </excludes>
-            </resource>
-
-            <resource>
-                <directory>src/main/resources</directory>
-                <includes>
-                    <include>mapper/*.*</include>
-                    <include>**/*.properties</include>
-                </includes>
-            </resource>
-
-            <resource>
-                <directory>src/main/resources/${profiles.active}</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>**/*.*</include>
-                </includes>
-            </resource>
-        </resources>
-
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -205,29 +138,6 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
-
-            <!--  配置多环境-->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <configuration>
-                    <useDefaultDelimiters>true</useDefaultDelimiters>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>**/*.properties</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-
         </plugins>
-
-
     </build>
-
 </project>
