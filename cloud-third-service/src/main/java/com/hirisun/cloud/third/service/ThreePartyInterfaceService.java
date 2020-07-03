@@ -1,10 +1,7 @@
 package com.hirisun.cloud.third.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.hirisun.cloud.model.ncov.dto.CovOrderDetail;
-import com.hirisun.cloud.model.ncov.dto.CovOverview;
-import com.hirisun.cloud.model.ncov.dto.CovOverviewLevel2;
-import com.hirisun.cloud.model.ncov.dto.CovStatistic;
+import com.hirisun.cloud.model.ncov.dto.*;
 import com.hirisun.cloud.model.third.dto.*;
 import com.hirisun.cloud.third.bean.ThreePartyInterface;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -101,11 +98,11 @@ public interface ThreePartyInterfaceService extends IService<ThreePartyInterface
 
     CovOverview unitOverview() throws Exception;
 
-//    List<EpidemicDesktop> epidemicExcl() throws Exception;
-//
-//    EpidemicDeskIssue epidemicDeskIssue(List<EpidemicDesktop> epidemicDesktops);
-//
-//    DeskTopNum epidemicExclNum(List<EpidemicDesktop> epidemicDesktops) throws Exception;
+    List<EpidemicDesktop> epidemicExcl() throws Exception;
+
+    EpidemicDeskIssue epidemicDeskIssue(List<EpidemicDesktop> epidemicDesktops);
+
+    DeskTopNum epidemicExclNum(List<EpidemicDesktop> epidemicDesktops) throws Exception;
 
     List<CovOverviewLevel2> unitOverviewLevel2() throws Exception;
 

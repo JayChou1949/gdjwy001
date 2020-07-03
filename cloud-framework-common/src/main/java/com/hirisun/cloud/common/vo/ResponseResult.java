@@ -16,13 +16,16 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @ApiResponses(value = { @ApiResponse(code = 200, message = "成功") })
-public class ResponseResult implements Response {
+public class ResponseResult<T> implements Response {
 	
 	@ApiModelProperty(value="状态码200成功")
 	Integer code = SUCCESS_CODE;
 	
 	@ApiModelProperty(value="状态信息")
     String msg = SUCCESS_MSG;
+
+    @ApiModelProperty(value = "对象")
+    private T resultObj;
 
     public ResponseResult(Integer code, String msg) {
         this.code = code;

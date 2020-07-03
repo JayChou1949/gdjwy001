@@ -7,10 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Maps;
 import com.hirisun.cloud.common.util.OkHttpUtils;
 import com.hirisun.cloud.common.util.UnitExcelExportUtil;
-import com.hirisun.cloud.model.ncov.dto.CovOrderDetail;
-import com.hirisun.cloud.model.ncov.dto.CovOverview;
-import com.hirisun.cloud.model.ncov.dto.CovOverviewLevel2;
-import com.hirisun.cloud.model.ncov.dto.CovStatistic;
+import com.hirisun.cloud.model.ncov.dto.*;
 import com.hirisun.cloud.model.third.dto.*;
 import com.hirisun.cloud.third.bean.ThreePartyInterface;
 import com.hirisun.cloud.third.mapper.ThreePartyInterfaceMapper;
@@ -545,6 +542,77 @@ public class ThreePartyInterfaceServiceImpl extends ServiceImpl<ThreePartyInterf
         unitOrderDetailPage.setTotal(unitOrderDetails.size());
         unitOrderDetailPage.setRecords(details);
         return unitOrderDetailPage;
+    }
+    @Override
+    public List<EpidemicDesktop> epidemicExcl() throws Exception {
+        List<List<Object>> list = NcovEcsImportUtil.list("疫情桌面云.xls");
+        List<EpidemicDesktop> epidemicDesktops = new ArrayList<>();
+        for (List<Object> itemlist : list) {
+            EpidemicDesktop epidemicDesktop = new EpidemicDesktop();
+            epidemicDesktop.setUnit((String) itemlist.get(0));
+            epidemicDesktop.setYunCount((String) itemlist.get(1));
+            epidemicDesktop.setCpuCount((String) itemlist.get(2));
+            epidemicDesktop.setRamCount((String) itemlist.get(3));
+            epidemicDesktop.setDistCount((String) itemlist.get(4));
+            epidemicDesktop.setPolice((String) itemlist.get(5));
+            epidemicDesktop.setArea((String) itemlist.get(6));
+            epidemicDesktops.add(epidemicDesktop);
+        }
+        return epidemicDesktops;
+    }
+
+    @Override
+    public EpidemicDeskIssue epidemicDeskIssue(List<EpidemicDesktop> epidemicDesktops) {
+        EpidemicDeskIssue epidemicDeskIssue = new EpidemicDeskIssue();
+        List<EpidemicDeskIssue.AreaBean> areaBeans = new ArrayList<>();
+        List<EpidemicDeskIssue.PoliceBean> policeBeans = new ArrayList<>();
+        for (EpidemicDesktop item : epidemicDesktops) {
+            if (StringUtils.isNotEmpty(item.getArea())) {
+                EpidemicDeskIssue.AreaBean areaBean = new EpidemicDeskIssue.AreaBean();
+                areaBean.setAreaCount(Integer.valueOf(item.getYunCount()));
+                areaBean.setAreaName(item.getArea());
+                areaBeans.add(areaBean);
+            }
+            if (StringUtils.isNotEmpty(item.getPolice())) {
+                EpidemicDeskIssue.PoliceBean policeBean = new EpidemicDeskIssue.PoliceBean();
+                policeBean.setPoliceCount(Integer.valueOf(item.getYunCount()));
+                policeBean.setPoliceName(item.getPolice());
+                policeBeans.add(policeBean);
+            }
+        }
+        epidemicDeskIssue.setArea(areaBeans);
+        epidemicDeskIssue.setPolice(policeBeans);
+        return epidemicDeskIssue;
+    }
+
+    @Override
+    public DeskTopNum epidemicExclNum(List<EpidemicDesktop> epidemicDesktops) throws Exception {
+        int yunCount = 0;
+        int areaCount = 0;
+        int policeCount = 0;
+        int cpuCount = 0;
+        int ramCount = 0;
+        double diskCount = 0;
+        for (EpidemicDesktop item : epidemicDesktops) {
+            yunCount += Integer.valueOf(item.getYunCount());
+            if (StringUtils.isNotEmpty(item.getArea())) {
+                areaCount++;
+            }
+            if (StringUtils.isNotEmpty(item.getPolice())) {
+                policeCount++;
+            }
+            cpuCount += Integer.valueOf(item.getCpuCount());
+            ramCount += Integer.valueOf(item.getRamCount());
+            diskCount += Double.valueOf(item.getDistCount());
+        }
+        DeskTopNum deskTopNum = new DeskTopNum();
+        deskTopNum.setYunCount(yunCount);
+        deskTopNum.setAreaCount(areaCount);
+        deskTopNum.setPoliceCount(policeCount);
+        deskTopNum.setCpuCount(cpuCount);
+        deskTopNum.setRamCount(ramCount);
+        deskTopNum.setDiskCount(diskCount);
+        return deskTopNum;
     }
 
     /**

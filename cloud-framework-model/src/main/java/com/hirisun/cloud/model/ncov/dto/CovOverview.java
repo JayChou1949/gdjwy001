@@ -1,5 +1,7 @@
 package com.hirisun.cloud.model.ncov.dto;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * @author junglefisher
  * @date 2020/2/27 13:56
@@ -9,18 +11,22 @@ public class CovOverview {
     /**
      * 省厅/地市总数
      */
+    @ApiModelProperty("省厅/地市总数")
     private Integer count;
     /**
      * 订购数
      */
+    @ApiModelProperty("订购数")
     private Integer orderCount;
     /**
      * 调用总数
      */
+    @ApiModelProperty("调用总数")
     private Integer dyCount;
     /**
      * 昨日新增
      */
+    @ApiModelProperty("昨日新增")
     private Integer ydCount;
 
     public Integer getYdCount() {

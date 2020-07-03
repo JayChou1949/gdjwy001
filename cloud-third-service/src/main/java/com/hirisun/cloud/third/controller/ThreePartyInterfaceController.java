@@ -2,7 +2,9 @@ package com.hirisun.cloud.third.controller;
 
 
 import cn.afterturn.easypoi.excel.entity.ExportParams;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.parser.Feature;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -10,22 +12,28 @@ import com.google.common.collect.Lists;
 import com.hirisun.cloud.common.util.OkHttpUtils;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.common.vo.ResponseResult;
-import com.hirisun.cloud.model.ncov.dto.CovOrderDetail;
-import com.hirisun.cloud.model.ncov.dto.CovOverview;
-import com.hirisun.cloud.model.ncov.dto.CovOverviewLevel2;
-import com.hirisun.cloud.model.ncov.dto.CovStatistic;
+import com.hirisun.cloud.model.ncov.contains.NcovKey;
+import com.hirisun.cloud.model.ncov.dto.*;
+import com.hirisun.cloud.model.ncov.vo.daas.NcovExcelSheetOneVo;
+import com.hirisun.cloud.model.ncov.vo.daas.NcovExcelSheetTwoVo;
+import com.hirisun.cloud.model.ncov.vo.daas.NcovOverview;
 import com.hirisun.cloud.model.third.dto.DirectUnitOrderDetail;
 import com.hirisun.cloud.model.third.dto.DirectUnitStatistics;
 import com.hirisun.cloud.model.third.dto.ResourceTotalDTO;
 import com.hirisun.cloud.model.third.dto.YqServiceDetail;
+import com.hirisun.cloud.third.bean.Files;
 import com.hirisun.cloud.third.bean.ThreePartyInterface;
+import com.hirisun.cloud.third.service.IFilesService;
 import com.hirisun.cloud.third.service.ThreePartyInterfaceService;
+import com.hirisun.cloud.third.util.easypoi.NcovExcelImportUtil;
+import com.hirisun.cloud.third.util.ncov.MemoryPageUtil;
 import io.swagger.annotations.*;
 import okhttp3.Response;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.stereotype.Controller;
@@ -37,6 +45,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -49,12 +58,19 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("/api/threePartyInterface")
+@Api(description = "美亚daas数据治理")
 public class ThreePartyInterfaceController {
 
     private static Logger logger = LoggerFactory.getLogger(ThreePartyInterfaceController.class);
 
     @Autowired
     private ThreePartyInterfaceService threePartyInterfaceService;
+
+    @Autowired
+    private IFilesService filesService;
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
 
     @ApiOperation("保存第三方接口")
     @PostMapping("/save")
@@ -66,6 +82,7 @@ public class ThreePartyInterfaceController {
     /**
      * 根据第三方资源id查找数据
      * 兼容前端代码，开放post、getMapping
+     *
      * @param id
      * @return
      */
@@ -143,7 +160,7 @@ public class ThreePartyInterfaceController {
     @ApiResponses(//相应参数说明
             @ApiResponse(code = 200, message = "success", response = ThreePartyInterface.class)
     )
-    @RequestMapping(value = "/{id}",method = {RequestMethod.GET,RequestMethod.POST})
+    @RequestMapping(value = "/{id}", method = {RequestMethod.GET, RequestMethod.POST})
     public Object getById(@ApiParam(name = "id", value = "第三方数据id", required = true) @PathVariable String id) {
         if (StringUtils.isEmpty(id)) {
             Map<String, Object> map = new HashMap<>();
@@ -152,8 +169,6 @@ public class ThreePartyInterfaceController {
             return map;
         }
         ThreePartyInterface threePartyInterface = threePartyInterfaceService.getById(id);
-//        threePartyInterfaceService.getByParams();
-//        int a=1/0;
         if (threePartyInterface == null) {
             Map<String, Object> map = new HashMap<>();
             map.put("code", 200);
@@ -161,6 +176,14 @@ public class ThreePartyInterfaceController {
             return map;
         }
         logger.info("threePartyInterface:{}", threePartyInterface);
+        JSONObject json = null;
+        //特殊处理，对部分接口内容进行排序
+        if(id.equals("ncovImportRecentAll")||id.equals("ncovImportImportantData")){
+            json=JSONObject.parseObject(threePartyInterface.getData(), Feature.OrderedField);
+        }else{
+            json=JSONObject.parseObject(threePartyInterface.getData());
+        }
+
         return JSONObject.parseObject(threePartyInterface.getData());
     }
 
@@ -179,9 +202,9 @@ public class ThreePartyInterfaceController {
             + "mxfx:模型分析服务总数;        "
             + "sjts:数据推送服务总数;        "
             + "xtdytop:近7天系统调用top10;        "
-            + "xtdytopAll:系统调用top10(全量);        "
+            + "xtdytopAll:系统调用Top10;        "
             + "fwfwtop:近7天服务访问top10;        "
-            + "fwfwtopAll:服务访问top10(全量);        "
+            + "fwfwtopAll:服务访问top10;        "
             + "zxgztop:最新挂载服务top10;       "
             + "yyfwtop:应用调用服务Top10;     "
             + "jzdytop5:警种调用Top5;      "
@@ -191,7 +214,7 @@ public class ThreePartyInterfaceController {
             + "hDylFwXtTop:高频订阅低频访问系统Top10;       "
             + "ztqs7day:近7天服务请求总体趋势;     "
             + "hsqs7day:近7天服务响应耗时趋势;      "
-            + "yqServiceTop10:疫情服务top10;       "
+            + "yqServiceTop10:疫情数据服务Top10;       "
             + "yqServiceInfo:疫情数据服务二级页面;     "
             + "yqServiceLast7:疫情服务近7天调用趋势;      "
 
@@ -199,7 +222,7 @@ public class ThreePartyInterfaceController {
     @ApiResponses(//相应参数说明
             @ApiResponse(code = 200, message = "success", response = ThreePartyInterface.class)
     )
-    @RequestMapping(value="/getByLabel/{label}", method = {RequestMethod.GET,RequestMethod.POST})
+    @RequestMapping(value = "/getByLabel/{label}", method = {RequestMethod.GET, RequestMethod.POST})
     public Object getByLabel(@ApiParam(name = "label", value = "第三方数据标识", required = true) @PathVariable String label) {
         if (StringUtils.isEmpty(label)) {
             Map<String, Object> map = new HashMap<>();
@@ -283,7 +306,6 @@ public class ThreePartyInterfaceController {
 
     /**
      * 获取实时数据，包括实时数据in和out
-     *
      */
     @ApiOperation("获取实时数据In")
     @GetMapping("/getRealTimeDataIn")
@@ -402,7 +424,7 @@ public class ThreePartyInterfaceController {
      * @return
      */
     @ApiOperation("省直单位总览")
-    @RequestMapping(value = "/unitOverview",method = {RequestMethod.GET,RequestMethod.POST})
+    @RequestMapping(value = "/unitOverview", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseResult unitOverview() {
         try {
             CovOverview covOverview = threePartyInterfaceService.unitOverview();
@@ -412,13 +434,69 @@ public class ThreePartyInterfaceController {
             return QueryResponseResult.fail();
         }
     }
+    @ApiOperation("疫情云桌面二级页面发放情况")
+    @RequestMapping("/epidemicDesktopTable")
+    public ResponseResult epidemicDesktopTable() {
+        try {
+            List<EpidemicDesktop> epidemicDesktops = threePartyInterfaceService.epidemicExcl();
+            EpidemicDeskIssue epidemicDeskIssue = threePartyInterfaceService.epidemicDeskIssue(epidemicDesktops);
+            return QueryResponseResult.success(epidemicDeskIssue);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return QueryResponseResult.fail();
+        }
+    }
+
+    /**
+     * 疫情云桌面表格数据总览
+     *
+     * @return
+     */
+    @ApiOperation("疫情云桌面表格数据总览")
+    @RequestMapping("/epidemicDesktopNum")
+    public ResponseResult epidemicDesktopNum() {
+        String res = stringRedisTemplate.opsForValue().get(NcovKey.EPIC_DESKTOP);
+        if(org.apache.commons.lang3.StringUtils.isNotBlank(res)){
+            DeskTopNum deskTopNum = JSON.parseObject(res,DeskTopNum.class);
+            return QueryResponseResult.success(deskTopNum);
+        }
+        try {
+            List<EpidemicDesktop> epidemicDesktops = threePartyInterfaceService.epidemicExcl();
+            DeskTopNum deskTopNum = threePartyInterfaceService.epidemicExclNum(epidemicDesktops);
+            stringRedisTemplate.opsForValue().set(NcovKey.EPIC_DESKTOP,JSON.toJSONString(deskTopNum),5, TimeUnit.HOURS);
+            return QueryResponseResult.success(deskTopNum);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return QueryResponseResult.fail();
+        }
+    }
+
+    /**
+     * 疫情云桌面表格数据
+     *
+     * @return
+     */
+    @ApiOperation("疫情云桌面表格数据")
+    @RequestMapping("/epidemicDesktop")
+    public ResponseResult epidemicDesktop(@RequestParam("pageSize") long pageSize, @RequestParam("pageNum") long pageNum) {
+        try {
+            List<EpidemicDesktop> epidemicDesktops = threePartyInterfaceService.epidemicExcl();
+            Page<EpidemicDesktop> page = MemoryPageUtil.page(epidemicDesktops, pageSize, pageNum);
+            return QueryResponseResult.success(page);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return QueryResponseResult.fail();
+        }
+
+    }
+
     /**
      * 省厅警种总览
      *
      * @return
      */
     @ApiOperation("省厅警种总览")
-    @RequestMapping(value = "/policeData",method = {RequestMethod.GET,RequestMethod.POST})
+    @RequestMapping(value = "/policeData", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseResult policeData() {
         try {
             CovOverview covOverview = threePartyInterfaceService.policeData();
@@ -435,8 +513,8 @@ public class ThreePartyInterfaceController {
      * @return
      */
     @ApiOperation("地市总览")
-    @RequestMapping(value = "/areaData",method = {RequestMethod.GET,RequestMethod.POST})
-    public ResponseResult areaData() {
+    @RequestMapping(value = "/areaData", method = {RequestMethod.GET, RequestMethod.POST})
+    public ResponseResult<CovOverview> areaData() {
         try {
             CovOverview covOverview = threePartyInterfaceService.areaData();
             return QueryResponseResult.success(covOverview);
@@ -445,13 +523,14 @@ public class ThreePartyInterfaceController {
             return QueryResponseResult.fail();
         }
     }
+
     /**
      * 省直各单位订购及调用统计
      *
      * @return
      */
     @ApiOperation("省直各单位订购及调用统计")
-    @RequestMapping(value = "/unitOverviewLevel2",method = {RequestMethod.GET,RequestMethod.POST})
+    @RequestMapping(value = "/unitOverviewLevel2", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseResult unitOverviewLevel2() {
         try {
             List<CovOverviewLevel2> covOverviewLevel2list = threePartyInterfaceService.unitOverviewLevel2();
@@ -461,6 +540,7 @@ public class ThreePartyInterfaceController {
             return QueryResponseResult.fail();
         }
     }
+
     /**
      * 各省直单位调用详情
      *
@@ -470,10 +550,10 @@ public class ThreePartyInterfaceController {
      * @return
      */
     @ApiOperation("各省直单位调用详情")
-    @RequestMapping(value = "/unitStatistic",method = {RequestMethod.GET,RequestMethod.POST})
+    @RequestMapping(value = "/unitStatistic", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseResult unitStatistic(@RequestParam(name = "unitName") String unitName,
-                           @RequestParam(name = "page", required = false, defaultValue = "1") Integer pageNo,
-                           @RequestParam(name = "size", required = false, defaultValue = "10") Integer pageSize) {
+                                        @RequestParam(name = "page", required = false, defaultValue = "1") Integer pageNo,
+                                        @RequestParam(name = "size", required = false, defaultValue = "10") Integer pageSize) {
         try {
             IPage<DirectUnitStatistics> directUnitStatistics = threePartyInterfaceService.unitStatistic(unitName, pageNo, pageSize);
             return QueryResponseResult.success(directUnitStatistics);
@@ -482,6 +562,7 @@ public class ThreePartyInterfaceController {
             return QueryResponseResult.fail();
         }
     }
+
     /**
      * 各省直单位订阅详情
      *
@@ -489,10 +570,10 @@ public class ThreePartyInterfaceController {
      * @return
      */
     @ApiOperation("各省直单位订阅详情")
-    @RequestMapping(value = "/unitOrderDetail",method = {RequestMethod.GET,RequestMethod.POST})
+    @RequestMapping(value = "/unitOrderDetail", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseResult unitOrderDetail(@RequestParam(name = "unitName") String unitName,
-                             @RequestParam(name = "page", required = false, defaultValue = "1") Integer pageNo,
-                             @RequestParam(name = "size", required = false, defaultValue = "10") Integer pageSize) {
+                                          @RequestParam(name = "page", required = false, defaultValue = "1") Integer pageNo,
+                                          @RequestParam(name = "size", required = false, defaultValue = "10") Integer pageSize) {
         try {
             IPage<DirectUnitOrderDetail> directUnitOrderDetail = threePartyInterfaceService.unitOrderDetail(unitName, pageNo, pageSize);
             return QueryResponseResult.success(directUnitOrderDetail);
@@ -500,6 +581,45 @@ public class ThreePartyInterfaceController {
             e.printStackTrace();
             return QueryResponseResult.fail();
         }
+    }
+    /**
+     * 疫情云桌面表格上传
+     *
+     * @param request
+     * @return
+     */
+    @ApiOperation("疫情云桌面表格上传")
+    @RequestMapping("/updataUnitFile")
+    @ResponseBody
+    public ResponseResult updataUnitFile(MultipartRequest request) {
+        List<MultipartFile> files = request.getFiles("file");
+        for (MultipartFile file : files) {
+            try {
+                threePartyInterfaceService.updataFile(file);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return QueryResponseResult.fail();
+            }
+        }
+        return QueryResponseResult.success(files.get(0).getOriginalFilename());
+    }
+    /**
+     * 疫情云桌面表格下载
+     *
+     * @param response
+     * @return
+     */
+    @ApiOperation("疫情云桌面表格下载")
+    @RequestMapping("/downDataFile")
+    @ResponseBody
+    public ResponseResult downDataFile(HttpServletResponse response) {
+        try {
+            threePartyInterfaceService.downdataFile(response);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return QueryResponseResult.success();
+        }
+        return QueryResponseResult.success();
     }
 
     /**
@@ -509,7 +629,7 @@ public class ThreePartyInterfaceController {
      * @return
      */
     @ApiOperation("省直单位表格上传")
-    @RequestMapping(value = "/uploadUnitFile",method = {RequestMethod.GET,RequestMethod.POST})
+    @RequestMapping(value = "/uploadUnitFile", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseResult uploadUnitFile(MultipartRequest request) {
         List<MultipartFile> files = request.getFiles("file");
         for (MultipartFile file : files) {
@@ -530,7 +650,7 @@ public class ThreePartyInterfaceController {
      * @return
      */
     @ApiOperation("省直单位表格下载")
-    @RequestMapping(value = "/downloadUnitFile",method = {RequestMethod.GET,RequestMethod.POST})
+    @RequestMapping(value = "/downloadUnitFile", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseResult downloadUnitFile(HttpServletResponse response) {
         try {
             threePartyInterfaceService.downloadFile(response);
@@ -540,13 +660,14 @@ public class ThreePartyInterfaceController {
         }
         return QueryResponseResult.success();
     }
+
     /**
      * 各警种订购及调用统计
      *
      * @return
      */
     @ApiOperation("各警种订购及调用统计")
-    @RequestMapping(value = "/policeDataLevel2",method = {RequestMethod.GET,RequestMethod.POST})
+    @RequestMapping(value = "/policeDataLevel2", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseResult policeDataLevel2() {
         try {
             List<CovOverviewLevel2> covOverviewLevel2s = threePartyInterfaceService.policeDataLevel2();
@@ -565,7 +686,7 @@ public class ThreePartyInterfaceController {
      * @return
      */
     @ApiOperation("各地市订购及调用统计")
-    @RequestMapping(value = "/areaDataLevel2",method = {RequestMethod.GET,RequestMethod.POST})
+    @RequestMapping(value = "/areaDataLevel2", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseResult areaDataLevel2() {
         try {
             List<CovOverviewLevel2> covOverviewLevel2s = threePartyInterfaceService.areaDataLevel2();
@@ -587,10 +708,10 @@ public class ThreePartyInterfaceController {
      * @return
      */
     @ApiOperation("各警种调用详情")
-    @RequestMapping(value = "/policeStatistic",method = {RequestMethod.GET,RequestMethod.POST})
+    @RequestMapping(value = "/policeStatistic", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseResult policeStatistic(@RequestParam(name = "policeName") String policeName,
-                             @RequestParam(name = "page", required = false, defaultValue = "1") Integer pageNo,
-                             @RequestParam(name = "size", required = false, defaultValue = "10") Integer pageSize) {
+                                          @RequestParam(name = "page", required = false, defaultValue = "1") Integer pageNo,
+                                          @RequestParam(name = "size", required = false, defaultValue = "10") Integer pageSize) {
         try {
             IPage<CovStatistic> covStatistics = threePartyInterfaceService.policeStatistic(policeName, pageNo, pageSize);
             return QueryResponseResult.success(covStatistics);
@@ -607,10 +728,10 @@ public class ThreePartyInterfaceController {
      * @return
      */
     @ApiOperation("各地市调用详情")
-    @RequestMapping(value = "/areaStatistic",method = {RequestMethod.GET,RequestMethod.POST})
+    @RequestMapping(value = "/areaStatistic", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseResult areaStatistic(@RequestParam(name = "areaName") String areaName,
-                           @RequestParam(name = "page", required = false, defaultValue = "1") Integer pageNo,
-                           @RequestParam(name = "size", required = false, defaultValue = "10") Integer pageSize) {
+                                        @RequestParam(name = "page", required = false, defaultValue = "1") Integer pageNo,
+                                        @RequestParam(name = "size", required = false, defaultValue = "10") Integer pageSize) {
         try {
             IPage<CovStatistic> covStatistics = threePartyInterfaceService.areaStatistic(areaName, pageNo, pageSize);
             return QueryResponseResult.success(covStatistics);
@@ -627,10 +748,10 @@ public class ThreePartyInterfaceController {
      * @return
      */
     @ApiOperation("各警种订阅详情")
-    @RequestMapping(value = "/policeOrderDetail",method = {RequestMethod.GET,RequestMethod.POST})
+    @RequestMapping(value = "/policeOrderDetail", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseResult policeOrderDetail(@RequestParam(name = "policeName") String policeName,
-                               @RequestParam(name = "page", required = false, defaultValue = "1") Integer pageNo,
-                               @RequestParam(name = "size", required = false, defaultValue = "10") Integer pageSize) {
+                                            @RequestParam(name = "page", required = false, defaultValue = "1") Integer pageNo,
+                                            @RequestParam(name = "size", required = false, defaultValue = "10") Integer pageSize) {
         try {
             IPage<CovOrderDetail> covStatistics = threePartyInterfaceService.policeOrderDetail(policeName, pageNo, pageSize);
             return QueryResponseResult.success(covStatistics);
@@ -647,10 +768,10 @@ public class ThreePartyInterfaceController {
      * @return
      */
     @ApiOperation("各地市订阅详情")
-    @RequestMapping(value = "/areaOrderDetail",method = {RequestMethod.GET,RequestMethod.POST})
+    @RequestMapping(value = "/areaOrderDetail", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseResult areaOrderDetail(@RequestParam(name = "areaName") String areaName,
-                             @RequestParam(name = "page", required = false, defaultValue = "1") Integer pageNo,
-                             @RequestParam(name = "size", required = false, defaultValue = "10") Integer pageSize) {
+                                          @RequestParam(name = "page", required = false, defaultValue = "1") Integer pageNo,
+                                          @RequestParam(name = "size", required = false, defaultValue = "10") Integer pageSize) {
         try {
             IPage<CovOrderDetail> covStatistics = threePartyInterfaceService.areaOrderDetail(areaName, pageNo, pageSize);
             return QueryResponseResult.success(covStatistics);
@@ -680,5 +801,139 @@ public class ThreePartyInterfaceController {
 
     //---------------------------疫情部分--------------------------------
 
+    @ApiOperation("疫情数据接入-要素部门")
+    @RequestMapping("/ncov/import/departmentOfElement")
+    @ResponseBody
+    public ResponseResult ncovImportDepartmentOfElementC(String type) {
+
+        return QueryResponseResult.success(ncovImportDepartmentOfElement(type));
+    }
+
+
+    @ApiOperation("疫情-部门要素目录分页")
+    @RequestMapping("/ncov/import/departmentOfElement/detailPage")
+    @ResponseBody
+    public ResponseResult ncovImportDepartmentOfElementPage(@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "1") int pageNum, String type, String dept, String name) {
+        List<NcovExcelSheetOneVo> fullInfoList = getFullNcovExcelInfo();
+        dealCarType(fullInfoList);
+        List<Files> attachmentList = getAllAttachment(fullInfoList);
+        List<NcovExcelSheetOneVo> attachmentFirstList = getAttachmentFirstSort(fullInfoList, attachmentList);
+        Page<NcovExcelSheetOneVo> page = MemoryPageUtil.ncovPageByDeptTypeAndName(attachmentFirstList, pageSize, pageNum, dept, type, name);
+        return QueryResponseResult.success(page);
+
+
+    }
+
+    @ApiOperation("疫情数据接入-分页")
+    @RequestMapping("ncov/import/page")
+    @ResponseBody
+    public ResponseResult ncovImportPage(@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "1") int pageNum, String name) {
+
+        List<NcovExcelSheetOneVo> fullInfoList = getFullNcovExcelInfo();
+        List<Files> attachmentList = getAllAttachment(fullInfoList);
+
+        List<NcovExcelSheetOneVo> attachmentFirstList = getAttachmentFirstSort(fullInfoList, attachmentList);
+        Page<NcovExcelSheetOneVo> page = MemoryPageUtil.ncovPageByName(attachmentFirstList, pageSize, pageNum, name);
+        return QueryResponseResult.success(page);
+
+    }
+    /**
+     * 要素下部门
+     *
+     * @param type
+     * @return
+     */
+    private List<NcovOverview> ncovImportDepartmentOfElement(String type) {
+        List<NcovExcelSheetOneVo> fullInfoList = getFullNcovExcelInfo();
+        dealCarType(fullInfoList);
+        List<NcovExcelSheetOneVo> typeList = fullInfoList.stream().filter(item -> org.apache.commons.lang3.StringUtils.equals(type, item.getElementType())).collect(Collectors.toList());
+
+        Map<String, Long> tableNum = typeList.stream().collect(Collectors.groupingBy(NcovExcelSheetOneVo::getDepartmentOfData, Collectors.counting()));
+
+        Map<String, Long> all = typeList.stream().collect(Collectors.groupingBy(NcovExcelSheetOneVo::getDepartmentOfData, Collectors.summingLong(NcovExcelSheetOneVo::getDataTotalNum)));
+
+        Map<String, Long> yesterday = typeList.stream().collect(Collectors.groupingBy(NcovExcelSheetOneVo::getDepartmentOfData, Collectors.summingLong(NcovExcelSheetOneVo::getDataUpOfYesterday)));
+
+        List<NcovOverview> overviewList = dealGroupMapDataOfNcov(all, yesterday, tableNum);
+
+
+        return overviewList;
+    }
+
+    /**
+     * 合并SheetTwo的元素类型到SheetOne
+     *
+     * @return
+     */
+    private List<NcovExcelSheetOneVo> getFullNcovExcelInfo() {
+        List<NcovExcelSheetOneVo> sheetOneVoList = NcovExcelImportUtil.getSheetOneData();
+
+        List<NcovExcelSheetTwoVo> sheetTwoVoList = NcovExcelImportUtil.getSheetTwoData();
+
+        sheetOneVoList.forEach(one -> {
+            sheetTwoVoList.forEach(two -> {
+                if (org.apache.commons.lang3.StringUtils.equals(two.getTableCnName(), one.getTableCnName())) {
+                    one.setElementType(two.getElementType());
+                }
+            });
+        });
+        return sheetOneVoList;
+    }
+
+    private List<Files> getAllAttachment(List<NcovExcelSheetOneVo> sheetOneVoList) {
+        List<String> nameList = sheetOneVoList.stream().map(NcovExcelSheetOneVo::getTableCnName).collect(Collectors.toList());
+        List<Files> files = filesService.list(new QueryWrapper<Files>().lambda().in(Files::getTitle, nameList));
+        return files;
+
+    }
+    private List<NcovExcelSheetOneVo> getAttachmentFirstSort(List<NcovExcelSheetOneVo> fullInfoList, List<Files> attachmentList) {
+        fullInfoList.forEach(sheetOneVo -> {
+            attachmentList.forEach(attachment -> {
+                if (org.apache.commons.lang3.StringUtils.equals(attachment.getTitle(), sheetOneVo.getTableCnName())) {
+                    sheetOneVo.setAttachmentUrl(attachment.getUrl());
+                    sheetOneVo.setAttachmentName(attachment.getOriginaName());
+                }
+            });
+        });
+        List<NcovExcelSheetOneVo> attachmentFirstList = fullInfoList.stream().sorted(Comparator.comparing(i -> i.getAttachmentUrl(), Comparator.nullsLast(String::compareTo))).collect(Collectors.toList());
+        return attachmentFirstList;
+    }
+    /**
+     * 车辆 处理为 车
+     *
+     * @param sheetOneVoList
+     */
+    private void dealCarType(List<NcovExcelSheetOneVo> sheetOneVoList) {
+        sheetOneVoList.forEach(item -> {
+            if (org.apache.commons.lang3.StringUtils.equals("车辆", item.getElementType())) {
+                item.setElementType("车");
+            }
+        });
+    }
+    /**
+     * 疫情数据分组map整合为一个实体
+     *
+     * @param all
+     * @param yesterday
+     * @return
+     */
+    private List<NcovOverview> dealGroupMapDataOfNcov(Map<String, Long> all, Map<String, Long> yesterday, Map<String, Long> tableNum) {
+        List<NcovOverview> overviewList = Lists.newArrayList();
+        all.forEach((k, v) -> {
+            NcovOverview overview = new NcovOverview();
+            overview.setName(k);
+            overview.setTotal(v);
+            overviewList.add(overview);
+        });
+
+        overviewList.forEach(overview -> {
+            overview.setYesterdayUp(yesterday.get(overview.getName()));
+            overview.setTableNum(tableNum.get(overview.getName()));
+        });
+
+        //按接入數降序排列
+        List<NcovOverview> sortList = overviewList.parallelStream().sorted(Comparator.comparingLong(NcovOverview::getTotal).reversed()).collect(Collectors.toList());
+        return sortList;
+    }
 }
 
