@@ -11,6 +11,8 @@ import com.hirisun.cloud.ncov.service.NcovDaasService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 @Api("首页-数据服务DAAS")
 @RestController
@@ -21,6 +23,9 @@ public class NcovDaasController {
 	private NcovDaasService ncovDaasService;
 	
 	@ApiOperation(value = "防疫大数据")
+	@ApiResponses(//响应参数说明
+            @ApiResponse(code=200,message="success",response= HomePageDataVo.class)
+    )
     @RequestMapping(value ="/antiepidemic",method = RequestMethod.GET)
     public QueryResponseResult homePage() throws Exception{
 		

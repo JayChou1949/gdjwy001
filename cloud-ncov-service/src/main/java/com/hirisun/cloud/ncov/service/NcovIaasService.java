@@ -1,10 +1,10 @@
 package com.hirisun.cloud.ncov.service;
 
-import com.hirisun.cloud.model.ncov.vo.iaas.NcovEcsOverviewVo;
+import com.hirisun.cloud.model.ncov.vo.iaas.NcovHomePageIaasVo;
 
 public interface NcovIaasService {
 
-	public NcovEcsOverviewVo getOverview();
+	public NcovHomePageIaasVo getIaasVmData();
 	
-	public NcovEcsOverviewVo getSupport();
+	public NcovHomePageIaasVo epidemicDesktopNum() throws Exception;
 }

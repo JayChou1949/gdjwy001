@@ -1,9 +1,9 @@
 package com.hirisun.cloud.third.service;
 
-import com.hirisun.cloud.third.bean.ThreePartyInterface;
-import com.baomidou.mybatisplus.extension.service.IService;
-
 import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.hirisun.cloud.third.bean.ThreePartyInterface;
 
 /**
  * <p>
@@ -16,5 +16,4 @@ import java.util.List;
 public interface ThreePartyInterfaceService extends IService<ThreePartyInterface> {
 
     List<ThreePartyInterface> getByParams(ThreePartyInterface threePartyInterface);
-
 }

@@ -29,7 +29,7 @@ public class NcovRealTimeController {
 
     @ApiOperation(value = "疫情实时数据接口", notes = "接口说明")
     @ApiResponses(
-            @ApiResponse(code = 200, message = "success", response = ResponseResult.class)
+            @ApiResponse(code = 200, message = "success", response = HomePageNcovRealtimeVo.class)
     )
     @GetMapping("/query")
     public QueryResponseResult realtime() {

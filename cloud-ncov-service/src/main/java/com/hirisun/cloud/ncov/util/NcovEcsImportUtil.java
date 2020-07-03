@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Lists;
 import com.hirisun.cloud.common.util.UnitExcelExportUtil;
-import com.hirisun.cloud.model.ncov.vo.iaas.NcovEcsOverviewVo;
+import com.hirisun.cloud.model.ncov.vo.iaas.NcovHomePageIaasVo;
 import com.hirisun.cloud.model.ncov.vo.iaas.NcovIaasVo;
 
 import cn.afterturn.easypoi.excel.ExcelImportUtil;
@@ -119,13 +119,13 @@ public class NcovEcsImportUtil {
      * 疫情虚拟机总览数据
      * @return
      */
-    public static NcovEcsOverviewVo getOverviewData(){
+    public static NcovHomePageIaasVo getOverviewData(){
         FileInputStream inputStream = null;
         try{
             ImportParams params = new ImportParams();
             inputStream = new FileInputStream(new File(rootPath+"/"+sourceFileName));
             params.setStartSheetIndex(0);
-            List<NcovEcsOverviewVo> list = ExcelImportUtil.importExcel(inputStream,NcovEcsOverviewVo.class,params);
+            List<NcovHomePageIaasVo> list = ExcelImportUtil.importExcel(inputStream,NcovHomePageIaasVo.class,params);
             if(CollectionUtils.isNotEmpty(list)){
                 return list.get(0);
             }

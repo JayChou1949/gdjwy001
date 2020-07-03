@@ -5,13 +5,10 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-/**
- * @author wuc
- * @date 2020/3/5
- */
+
 @Data
 @ApiModel("疫情-IaaS(ECS)")
-public class NcovEcsOverviewVo {
+public class NcovHomePageIaasVo {
 
     @Excel(name = "供给总数",type = 10)
     @ApiModelProperty(value="供给总数")
