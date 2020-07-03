@@ -435,7 +435,7 @@ public class ThreePartyInterfaceController {
         }
     }
     @ApiOperation("疫情云桌面二级页面发放情况")
-    @RequestMapping("/epidemicDesktopTable")
+    @RequestMapping(value = "/epidemicDesktopTable", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseResult epidemicDesktopTable() {
         try {
             List<EpidemicDesktop> epidemicDesktops = threePartyInterfaceService.epidemicExcl();
@@ -453,7 +453,7 @@ public class ThreePartyInterfaceController {
      * @return
      */
     @ApiOperation("疫情云桌面表格数据总览")
-    @RequestMapping("/epidemicDesktopNum")
+    @RequestMapping(value = "/epidemicDesktopNum", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseResult epidemicDesktopNum() {
         String res = stringRedisTemplate.opsForValue().get(NcovKey.EPIC_DESKTOP);
         if(org.apache.commons.lang3.StringUtils.isNotBlank(res)){
@@ -477,7 +477,7 @@ public class ThreePartyInterfaceController {
      * @return
      */
     @ApiOperation("疫情云桌面表格数据")
-    @RequestMapping("/epidemicDesktop")
+    @RequestMapping(value = "/epidemicDesktop", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseResult epidemicDesktop(@RequestParam("pageSize") long pageSize, @RequestParam("pageNum") long pageNum) {
         try {
             List<EpidemicDesktop> epidemicDesktops = threePartyInterfaceService.epidemicExcl();
@@ -589,8 +589,7 @@ public class ThreePartyInterfaceController {
      * @return
      */
     @ApiOperation("疫情云桌面表格上传")
-    @RequestMapping("/updataUnitFile")
-    @ResponseBody
+    @RequestMapping(value = "/updataUnitFile", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseResult updataUnitFile(MultipartRequest request) {
         List<MultipartFile> files = request.getFiles("file");
         for (MultipartFile file : files) {
@@ -610,8 +609,7 @@ public class ThreePartyInterfaceController {
      * @return
      */
     @ApiOperation("疫情云桌面表格下载")
-    @RequestMapping("/downDataFile")
-    @ResponseBody
+    @RequestMapping(value = "/downDataFile", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseResult downDataFile(HttpServletResponse response) {
         try {
             threePartyInterfaceService.downdataFile(response);
@@ -769,7 +767,7 @@ public class ThreePartyInterfaceController {
      */
     @ApiOperation("各地市订阅详情")
     @RequestMapping(value = "/areaOrderDetail", method = {RequestMethod.GET, RequestMethod.POST})
-    public ResponseResult areaOrderDetail(@RequestParam(name = "areaName") String areaName,
+    public ResponseResult<CovOrderDetail> areaOrderDetail(@RequestParam(name = "areaName") String areaName,
                                           @RequestParam(name = "page", required = false, defaultValue = "1") Integer pageNo,
                                           @RequestParam(name = "size", required = false, defaultValue = "10") Integer pageSize) {
         try {
@@ -802,8 +800,7 @@ public class ThreePartyInterfaceController {
     //---------------------------疫情部分--------------------------------
 
     @ApiOperation("疫情数据接入-要素部门")
-    @RequestMapping("/ncov/import/departmentOfElement")
-    @ResponseBody
+    @RequestMapping(value = "/ncov/import/departmentOfElement", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseResult ncovImportDepartmentOfElementC(String type) {
 
         return QueryResponseResult.success(ncovImportDepartmentOfElement(type));
@@ -811,8 +808,7 @@ public class ThreePartyInterfaceController {
 
 
     @ApiOperation("疫情-部门要素目录分页")
-    @RequestMapping("/ncov/import/departmentOfElement/detailPage")
-    @ResponseBody
+    @RequestMapping(value = "/ncov/import/departmentOfElement/detailPage", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseResult ncovImportDepartmentOfElementPage(@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "1") int pageNum, String type, String dept, String name) {
         List<NcovExcelSheetOneVo> fullInfoList = getFullNcovExcelInfo();
         dealCarType(fullInfoList);
@@ -825,8 +821,7 @@ public class ThreePartyInterfaceController {
     }
 
     @ApiOperation("疫情数据接入-分页")
-    @RequestMapping("ncov/import/page")
-    @ResponseBody
+    @RequestMapping(value = "ncov/import/page", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseResult ncovImportPage(@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "1") int pageNum, String name) {
 
         List<NcovExcelSheetOneVo> fullInfoList = getFullNcovExcelInfo();

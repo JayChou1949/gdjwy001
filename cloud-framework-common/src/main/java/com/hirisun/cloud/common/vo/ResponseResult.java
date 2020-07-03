@@ -24,8 +24,8 @@ public class ResponseResult<T> implements Response {
 	@ApiModelProperty(value="状态信息")
     String msg = SUCCESS_MSG;
 
-    @ApiModelProperty(value = "对象")
-    private T resultObj;
+    @ApiModelProperty(value = "数据")
+    private T data;
 
     public ResponseResult(Integer code, String msg) {
         this.code = code;
