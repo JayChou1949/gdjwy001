@@ -43,6 +43,8 @@
         <easypoi.version>3.2.0</easypoi.version>
         <spring-boot-redis.version>2.3.1.RELEASE</spring-boot-redis.version>
         <commons-collections.version>4.4</commons-collections.version>
+        <velocity-engine.version>2.2</velocity-engine.version>
+        <okhttp3.version>3.3.1</okhttp3.version>
     </properties>
 
     <dependencyManagement>
@@ -191,6 +193,16 @@
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>${guava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.velocity</groupId>
+                <artifactId>velocity-engine-core</artifactId>
+                <version>${velocity-engine.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp</artifactId>
+                <version>${okhttp3.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

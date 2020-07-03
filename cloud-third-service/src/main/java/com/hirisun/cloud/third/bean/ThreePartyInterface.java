@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.baomidou.mybatisplus.extension.activerecord.Model;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -20,7 +21,7 @@ import io.swagger.annotations.ApiModelProperty;
  */
 @TableName("TB_THREE_PARTY_INTERFACE")
 @ApiModel(value="ThreePartyInterface对象", description="第三方接口表")
-public class ThreePartyInterface implements Serializable {
+public class ThreePartyInterface extends Model<ThreePartyInterface> implements Serializable {
 
     private static final long serialVersionUID=1L;
 
