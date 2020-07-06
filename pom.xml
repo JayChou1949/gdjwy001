@@ -9,6 +9,8 @@
         <module>cloud-framework-model</module>
         <module>cloud-ncov-service</module>
         <module>cloud-third-service</module>
+        <module>cloud-file-service</module>
+        <!--<module>cloud-redis.service</module>-->
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -45,97 +47,98 @@
         <commons-collections.version>4.4</commons-collections.version>
         <velocity-engine.version>2.2</velocity-engine.version>
         <okhttp3.version>3.3.1</okhttp3.version>
+        <fastdfs-client-java.version>1.27.0.0</fastdfs-client-java.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
-			<dependency>
-			    <groupId>org.apache.commons</groupId>
-			    <artifactId>commons-collections4</artifactId>
-			    <version>${commons-collections.version}</version>
-			</dependency>
-        	
-			<dependency>
-			    <groupId>org.springframework.boot</groupId>
-			    <artifactId>spring-boot-starter-data-redis</artifactId>
-			    <version>${spring-boot-redis.version}</version>
-			</dependency>
-        	
-        	<!--poi-->
-		    <dependency>
-		      <groupId>org.apache.poi</groupId>
-		      <artifactId>poi-ooxml</artifactId>
-		      <version>${poi.version}</version>
-		    </dependency>
-		    <dependency>
-		      <groupId>org.apache.poi</groupId>
-		      <artifactId>poi</artifactId>
-		      <version>${poi.version}</version>
-		    </dependency>
-		    <dependency>
-		      <groupId>org.apache.poi</groupId>
-		      <artifactId>poi-ooxml-schemas</artifactId>
-		      <version>${poi.version}</version>
-		    </dependency>
-		
-		    <dependency>
-		      <groupId>cn.afterturn</groupId>
-		      <artifactId>easypoi-base</artifactId>
-		      <version>${easypoi.version}</version>
-		    </dependency>
-		    <dependency>
-		      <groupId>cn.afterturn</groupId>
-		      <artifactId>easypoi-web</artifactId>
-		      <version>${easypoi.version}</version>
-		    </dependency>
-		    <dependency>
-		      <groupId>cn.afterturn</groupId>
-		      <artifactId>easypoi-annotation</artifactId>
-		      <version>${easypoi.version}</version>
-		    </dependency>
-        
-		  <dependency>
-			  <groupId>com.battcn</groupId>
-			  <artifactId>swagger-spring-boot-starter</artifactId>
-			  <version>${swagger-spring-boot.version}</version>
-		  </dependency>
-        
-		<dependency>
-		    <groupId>com.alibaba.cloud</groupId>
-		    <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
-		    <version>${nacos.version}</version>
-		</dependency>
-		<dependency>
-		    <groupId>com.alibaba.cloud</groupId>
-		    <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
-		    <version>${nacos.version}</version>
-		</dependency>
-        <dependency>
-		    <groupId>com.oracle</groupId>
-		    <artifactId>ojdbc14</artifactId>
-		    <version>${ojdbc14.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-hystrix</artifactId>
-			<version>${feign.version}</version>
-		</dependency>
-		<dependency>
-		    <groupId>commons-io</groupId>
-		    <artifactId>commons-io</artifactId>
-		    <version>${commons-io.version}</version>
-		</dependency>
-        
-		<dependency>
-		    <groupId>com.zaxxer</groupId>
-		    <artifactId>HikariCP</artifactId>
-		    <version>${hikaricp.version}</version>
-		</dependency>
-			<dependency>
-			  <groupId>com.baomidou</groupId>
-			  <artifactId>mybatis-plus-generator</artifactId>
-			  <version>${mybatis-plus.version}</version>
-		  </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
+                <version>${commons-collections.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-data-redis</artifactId>
+                <version>${spring-boot-redis.version}</version>
+            </dependency>
+
+            <!--poi-->
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml</artifactId>
+                <version>${poi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi</artifactId>
+                <version>${poi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml-schemas</artifactId>
+                <version>${poi.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.afterturn</groupId>
+                <artifactId>easypoi-base</artifactId>
+                <version>${easypoi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.afterturn</groupId>
+                <artifactId>easypoi-web</artifactId>
+                <version>${easypoi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.afterturn</groupId>
+                <artifactId>easypoi-annotation</artifactId>
+                <version>${easypoi.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.battcn</groupId>
+                <artifactId>swagger-spring-boot-starter</artifactId>
+                <version>${swagger-spring-boot.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+                <version>${nacos.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+                <version>${nacos.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.oracle</groupId>
+                <artifactId>ojdbc14</artifactId>
+                <version>${ojdbc14.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-hystrix</artifactId>
+                <version>${feign.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons-io.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.zaxxer</groupId>
+                <artifactId>HikariCP</artifactId>
+                <version>${hikaricp.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-generator</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
             <dependency>
                 <groupId>com.oracle</groupId>
                 <artifactId>ojdbc6</artifactId>
@@ -203,6 +206,11 @@
                 <groupId>com.squareup.okhttp3</groupId>
                 <artifactId>okhttp</artifactId>
                 <version>${okhttp3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.oschina.zcx7878</groupId>
+                <artifactId>fastdfs-client-java</artifactId>
+                <version>${fastdfs-client-java.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
