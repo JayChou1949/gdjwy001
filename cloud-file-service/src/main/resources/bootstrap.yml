@@ -7,12 +7,18 @@ spring:
   cloud:
     nacos:
       config:
-        server-addr: 192.168.11.65:8848
+        server-addr: 139.9.234.187:8848
         file-extension: yaml
       discovery:
-        server-addr: 192.168.11.65:8848
+        server-addr: 139.9.234.187:8848
+  swagger:
+    enabled: true
+    title: 云资源服务平台文件服务API接口
+    description: 为云资源服务平台提供文件相关操作
+    version: v1.0
+    exclude-path: /error
 server:
-  port: 8000
+  port: 8002
 ---
 spring:
   profiles: test
@@ -20,13 +26,12 @@ spring:
     nacos:
       config:
         server-addr: 139.9.234.187:8848
-        file-extension: yaml
       discovery:
         server-addr: 139.9.234.187:8848
 server:
-  port: 9000
+  port: 9002
 ---
 spring:
   profiles: pro
 server:
-  port: 80
+  port: 82
