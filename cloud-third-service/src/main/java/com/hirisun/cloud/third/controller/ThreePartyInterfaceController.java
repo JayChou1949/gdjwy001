@@ -5,19 +5,19 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.parser.Feature;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
-import com.hirisun.cloud.common.vo.ResponseResult;
 import com.hirisun.cloud.third.bean.ThreePartyInterface;
 import com.hirisun.cloud.third.service.ThreePartyInterfaceService;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.web.bind.annotation.*;
-
-import java.text.SimpleDateFormat;
-import java.util.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * <p>
@@ -37,9 +37,6 @@ public class ThreePartyInterfaceController {
     @Autowired
     private ThreePartyInterfaceService threePartyInterfaceService;
 
-
-    @Autowired
-    private StringRedisTemplate stringRedisTemplate;
 
 
     /**

@@ -10,7 +10,7 @@
         <module>cloud-ncov-service</module>
         <module>cloud-third-service</module>
         <module>cloud-file-service</module>
-        <!--<module>cloud-redis.service</module>-->
+        <module>cloud-redis.service</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
