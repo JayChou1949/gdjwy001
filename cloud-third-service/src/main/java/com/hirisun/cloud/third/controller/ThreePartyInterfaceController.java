@@ -43,56 +43,29 @@ public class ThreePartyInterfaceController {
 
 
     /**
-     * 根据第三方资源id查找数据
-     * 兼容前端代码，开放post、getMapping
+     * 根据第三方资源标识名查找数据
+     * 已修复数据表数据，所有name字段不为空的数据为有用数据，name空字段的数据为无用数据，待清除
      *
-     * @param id
+     * @param name
      * @return
      */
-    @ApiOperation(value = "根据第三方资源id查找数据", notes = "{"
-            + "resourceTotal:资源目录总数;        "
-
-            + "}")
-    @GetMapping("/{id}")
-    public Object getById(@ApiParam(name = "id", value = "第三方数据id", required = true) @PathVariable String id) {
-        if (StringUtils.isEmpty(id)) {
+    @ApiOperation(value = "根据第三方资源标识名查找数据")
+    @GetMapping("/{name}")
+    public Object getById(@ApiParam(name = "name", value = "第三方资源标识", required = true) @PathVariable String name) {
+        if (StringUtils.isEmpty(name)) {
             return QueryResponseResult.fail("缺少参数");
         }
-        ThreePartyInterface threePartyInterface = threePartyInterfaceService.getById(id);
+        ThreePartyInterface threePartyInterface = threePartyInterfaceService.getOne(
+                new QueryWrapper<ThreePartyInterface>().lambda().eq(ThreePartyInterface::getName,name));
         if (threePartyInterface == null) {
             return QueryResponseResult.fail("无数据返回");
         }
         JSONObject json = null;
         //特殊处理，对部分接口内容进行排序
-        if(id.equals("ncovImportRecentAll")||id.equals("ncovImportImportantData")){
+        if(name.equals("ncovImportRecentAll")||name.equals("ncovImportImportantData")){
             json=JSONObject.parseObject(threePartyInterface.getData(), Feature.OrderedField);
         }else{
             json=JSONObject.parseObject(threePartyInterface.getData());
-        }
-        return JSONObject.parseObject(threePartyInterface.getData());
-    }
-
-    /**
-     * 根据第三方资源id查找数据
-     * 此处和旧接口不一样，新接口需要传label，即中文
-     *
-     * @param label
-     * @return
-     */
-    @ApiOperation(value = "根据第三方资源label查找数据", notes = "旧接口中如果接口为/fwzl,则前端需要改为/服务总量。数据：" +
-            "{"
-            + "fwzl:服务总量;        "
-
-            + "}")
-    @GetMapping("/getByLabel/{label}")
-    public Object getByLabel(@ApiParam(name = "label", value = "第三方数据标识", required = true) @PathVariable String label) {
-        if (StringUtils.isEmpty(label)) {
-            return QueryResponseResult.fail("缺少参数");
-        }
-        ThreePartyInterface threePartyInterface = threePartyInterfaceService.getOne(
-                new QueryWrapper<ThreePartyInterface>().lambda().eq(ThreePartyInterface::getLabel,label));
-        if (threePartyInterface == null) {
-            return QueryResponseResult.fail("无数据返回");
         }
         return JSONObject.parseObject(threePartyInterface.getData());
     }
