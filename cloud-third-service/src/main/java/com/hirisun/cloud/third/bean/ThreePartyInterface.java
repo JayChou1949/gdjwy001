@@ -1,10 +1,13 @@
 package com.hirisun.cloud.third.bean;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
+import java.util.Date;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -36,11 +39,11 @@ public class ThreePartyInterface implements Serializable {
 
     @ApiModelProperty(value = "接口类型（1 华为 2 美亚）")
     @TableField("TYPE")
-    private Integer type;
+    private String type;
 
     @ApiModelProperty(value = "更新时间")
-    @TableField("UPDATE_TIME")
-    private LocalDateTime updateTime;
+    @TableField(value = "UPDATE_TIME",fill = FieldFill.INSERT)
+    private Date updateTime;
 
     @ApiModelProperty(value = "接口名")
     @TableField("NAME")
@@ -71,19 +74,19 @@ public class ThreePartyInterface implements Serializable {
         this.data = data;
     }
 
-    public Integer getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(Integer type) {
+    public void setType(String type) {
         this.type = type;
     }
 
-    public LocalDateTime getUpdateTime() {
+    public Date getUpdateTime() {
         return updateTime;
     }
 
-    public void setUpdateTime(LocalDateTime updateTime) {
+    public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
     }
 
