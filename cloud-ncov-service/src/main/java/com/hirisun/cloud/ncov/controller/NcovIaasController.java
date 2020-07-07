@@ -46,7 +46,8 @@ public class NcovIaasController {
     @GetMapping("/desktop")
     @ResponseBody
     public QueryResponseResult epidemicDesktopNum() throws Exception {
-    	return QueryResponseResult.success(ncovIaasService.epidemicDesktopNum());
+    	NcovHomePageIaasVo epidemicDesktopNum = ncovIaasService.epidemicDesktopNum();
+    	return QueryResponseResult.success(epidemicDesktopNum);
     }
 
 }

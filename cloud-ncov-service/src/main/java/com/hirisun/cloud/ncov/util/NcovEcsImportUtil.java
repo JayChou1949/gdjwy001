@@ -4,7 +4,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -13,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Lists;
 import com.hirisun.cloud.common.util.UnitExcelExportUtil;
+import com.hirisun.cloud.model.ncov.vo.daas.DataGovernanceLevel2Vo;
 import com.hirisun.cloud.model.ncov.vo.iaas.NcovHomePageIaasVo;
 import com.hirisun.cloud.model.ncov.vo.iaas.NcovIaasVo;
 
@@ -70,6 +75,95 @@ public class NcovEcsImportUtil {
             }
         }
         return resultList;
+    }
+    
+    public static Map<String,List<DataGovernanceLevel2Vo>> getDataGovernanceMap(String dataGovernanceName){
+    	
+    	File file = new File(rootPath+"/ncovArea/"+dataGovernanceName);
+        InputStream inputStream = null;
+        Workbook workbook = null;
+        Map<String,List<DataGovernanceLevel2Vo>> map = new HashMap<String,List<DataGovernanceLevel2Vo>>();
+        try{
+            inputStream=new FileInputStream(file);
+            workbook = UnitExcelExportUtil.createWorkbook(inputStream);
+            List<List<Object>> updateType = UnitExcelExportUtil.getDataListBySheet(workbook,1,2);
+            List<DataGovernanceLevel2Vo> updateTypeVos = Lists.newArrayList();
+            for (List<Object> objects : updateType) {
+            	DataGovernanceLevel2Vo dataGovernanceLevel2 = new DataGovernanceLevel2Vo();
+                dataGovernanceLevel2.setType((String) objects.get(1));
+                dataGovernanceLevel2.setNum((String) objects.get(2));
+                dataGovernanceLevel2.setSum((String) objects.get(3));
+                dataGovernanceLevel2.setPercentage((String) objects.get(4));
+                updateTypeVos.add(dataGovernanceLevel2);
+            }
+            
+            map.put("updateTypeVos", updateTypeVos);
+            
+            List<List<Object>> updateCycle =UnitExcelExportUtil.getDataListBySheet(workbook,1,3);
+            List<DataGovernanceLevel2Vo> updateCycleVos = Lists.newArrayList();
+            for (List<Object> objects : updateCycle) {
+            	DataGovernanceLevel2Vo dataGovernanceLevel2 = new DataGovernanceLevel2Vo();
+                dataGovernanceLevel2.setType((String) objects.get(1));
+                dataGovernanceLevel2.setNum((String) objects.get(2));
+                dataGovernanceLevel2.setSum((String) objects.get(3));
+                dataGovernanceLevel2.setPercentage((String) objects.get(4));
+                updateCycleVos.add(dataGovernanceLevel2);
+            }
+            map.put("updateCycleVos", updateCycleVos);
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if(workbook != null){
+                try {
+                    workbook.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if(inputStream !=null){
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return map;
+    	
+    }
+    
+    public static int getNcovDataServiceCount(String dataServiceName) {
+    	
+    	File file = new File(rootPath+"/ncovArea/"+dataServiceName);
+        InputStream inputStream = null;
+        Workbook workbook = null;
+        Set<String> set = new HashSet<>();
+        try{
+            inputStream=new FileInputStream(file);
+            workbook = UnitExcelExportUtil.createWorkbook(inputStream);
+            UnitExcelExportUtil.getDataListBySheet(workbook,3,0).forEach(objs->{set.add((String) objs.get(3));});
+            UnitExcelExportUtil.getDataListBySheet(workbook,3,1).forEach(objs->{set.add((String) objs.get(3));});
+            return set.size();
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if(workbook != null){
+                try {
+                    workbook.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if(inputStream !=null){
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return 0;
+    	
     }
     
     /**

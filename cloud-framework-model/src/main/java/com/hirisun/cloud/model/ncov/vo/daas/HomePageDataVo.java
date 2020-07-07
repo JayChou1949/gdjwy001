@@ -1,14 +1,11 @@
 package com.hirisun.cloud.model.ncov.vo.daas;
 
-import lombok.Data;
-
 import java.io.Serializable;
 import java.util.List;
 
-import com.hirisun.cloud.model.ncov.dto.daas.NcovDataOverviewDTO;
-
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 @Data
 @ApiModel("首页daas防疫大数据")
@@ -44,8 +41,8 @@ public class HomePageDataVo implements Serializable{
     private List<DataGovernanceLevel2Vo> updateCycle;
 
 	@ApiModelProperty(value="总览数据")
-    private List<NcovDataOverviewDTO> dataModelingOverview;
+    private List<NcovDataOverviewVo> dataModelingOverview;
 
 	@ApiModelProperty(value="总览数据")
-    private List<NcovDataOverviewDTO> dataSharingOverview;
+    private List<NcovDataOverviewVo> dataSharingOverview;
 }
