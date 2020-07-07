@@ -12,10 +12,10 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class QueryResponseResult extends ResponseResult {
-    Object data;
+public class QueryResponseResult<T> extends ResponseResult<T> {
+    T data;
 
-    public QueryResponseResult(ResultCode resultCode, Object data) {
+    public QueryResponseResult(ResultCode resultCode, T data) {
         super(resultCode);
         this.data = data;
     }

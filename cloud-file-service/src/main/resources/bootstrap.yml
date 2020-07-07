@@ -13,7 +13,7 @@ spring:
       discovery:
         server-addr: 139.9.234.187:8848
 server:
-  port: 8001
+  port: 8002
 ---
 spring:
   profiles: test
@@ -24,9 +24,9 @@ spring:
       discovery:
         server-addr: 139.9.234.187:8848
 server:
-  port: 9001
+  port: 9002
 ---
 spring:
   profiles: pro
 server:
-  port: 81
+  port: 82

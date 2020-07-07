@@ -1,5 +1,6 @@
 package com.hirisun.cloud.third.bean;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.time.LocalDateTime;
@@ -7,7 +8,6 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
 import java.util.Date;
 
-import com.baomidou.mybatisplus.extension.activerecord.Model;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -17,14 +17,15 @@ import io.swagger.annotations.ApiModelProperty;
  * </p>
  *
  * @author wuxiaoxing
- * @since 2020-06-28
+ * @since 2020-07-05
  */
-@TableName("TB_THREE_PARTY_INTERFACE")
+@TableName("T_THREE_PARTY_INTERFACE")
 @ApiModel(value="ThreePartyInterface对象", description="第三方接口表")
-public class ThreePartyInterface extends Model<ThreePartyInterface> implements Serializable {
+public class ThreePartyInterface implements Serializable {
 
     private static final long serialVersionUID=1L;
 
+    @ApiModelProperty(value = "id")
     @TableId("ID")
     private String id;
 
@@ -36,12 +37,17 @@ public class ThreePartyInterface extends Model<ThreePartyInterface> implements S
     @TableField("DATA")
     private String data;
 
-    @ApiModelProperty(value = "1代表华为接口")
+    @ApiModelProperty(value = "接口类型（1 华为 2 美亚）")
     @TableField("TYPE")
     private String type;
 
-    @TableField("CREATE_TIME")
-    private Date createTime;
+    @ApiModelProperty(value = "更新时间")
+    @TableField(value = "UPDATE_TIME",fill = FieldFill.INSERT)
+    private Date updateTime;
+
+    @ApiModelProperty(value = "接口名")
+    @TableField("NAME")
+    private String name;
 
 
     public String getId() {
@@ -76,12 +82,20 @@ public class ThreePartyInterface extends Model<ThreePartyInterface> implements S
         this.type = type;
     }
 
-    public Date getCreateTime() {
-        return createTime;
+    public Date getUpdateTime() {
+        return updateTime;
     }
 
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override
@@ -91,7 +105,8 @@ public class ThreePartyInterface extends Model<ThreePartyInterface> implements S
         ", label=" + label +
         ", data=" + data +
         ", type=" + type +
-        ", createTime=" + createTime +
+        ", updateTime=" + updateTime +
+        ", name=" + name +
         "}";
     }
 }
