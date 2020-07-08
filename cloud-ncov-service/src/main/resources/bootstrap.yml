@@ -9,7 +9,6 @@ spring:
       config:
         server-addr: 192.168.11.65:8848
         file-extension: yaml
-        shared-configs: cloud-common.yaml
       discovery:
         server-addr: 192.168.11.65:8848
 server:
