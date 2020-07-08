@@ -18,7 +18,6 @@ import com.hirisun.cloud.common.exception.CustomException;
 import com.hirisun.cloud.common.vo.CommonCode;
 import com.hirisun.cloud.common.vo.ResponseResult;
 import com.hirisun.cloud.model.ncov.contains.NcovKey;
-import com.hirisun.cloud.model.ncov.vo.iaas.NcovHomePageIaasVo;
 import com.hirisun.cloud.model.ncov.vo.realtime.HomePageNcovRealtimeVo;
 import com.hirisun.cloud.model.ncov.vo.realtime.NcovRealtimeVo;
 import com.hirisun.cloud.ncov.bean.NcovRealtime;

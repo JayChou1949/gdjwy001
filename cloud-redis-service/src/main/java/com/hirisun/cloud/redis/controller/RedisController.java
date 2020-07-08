@@ -77,6 +77,7 @@ public class RedisController implements RedisApi {
     @Override
     public String getStrValue(@PathVariable("key") String key) {
         Object value = redisService.get(key);
+        if(value == null) return null;
         return value.toString();
     }
 
