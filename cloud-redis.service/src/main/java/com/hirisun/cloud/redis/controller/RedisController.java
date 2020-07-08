@@ -1,19 +1,26 @@
 package com.hirisun.cloud.redis.controller;
 
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.hirisun.cloud.api.redis.RedisApi;
 import com.hirisun.cloud.redis.service.RedisService;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.ss.formula.functions.T;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author zhoufeng
@@ -70,7 +77,10 @@ public class RedisController implements RedisApi {
     @Override
     public String getStrValue(@PathVariable("key") String key) {
         Object value = redisService.get(key);
-        return value.toString();
+        if(value != null) {
+        	return value.toString();
+        }
+        return null;
     }
 
     @GetMapping("/keys")
@@ -115,6 +125,16 @@ public class RedisController implements RedisApi {
     @Override
     public Long remove(@RequestParam("key") String key, @RequestParam("count") long count, @RequestParam("value") Object value) {
         return redisService.remove(key, count, value);
+    }
+    
+    @DeleteMapping("/delete")
+    @ApiOperation("根据键删除值")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "key", value = "键", required = true, paramType = "query"),
+    })
+    @Override
+    public boolean delete(@RequestParam("key") String key) {
+        return redisService.delete(key);
     }
 
     @ApiOperation("判断某个键是否存在")

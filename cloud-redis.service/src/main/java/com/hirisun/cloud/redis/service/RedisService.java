@@ -76,6 +76,14 @@ public interface RedisService {
      * @return
      */
     Long remove(String key, long count, Object value);
+    
+    /**
+     * delete操作
+     *
+     * @param key 键
+     * @return
+     */
+    Boolean delete(String key);
 
     /**
      * hasKey操作

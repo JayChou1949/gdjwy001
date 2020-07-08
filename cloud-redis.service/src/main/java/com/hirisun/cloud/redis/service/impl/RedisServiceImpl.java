@@ -72,4 +72,10 @@ public class RedisServiceImpl implements RedisService {
     public Long getExpire(String key, TimeUnit timeUnit) {
         return redisTemplate.getExpire(key, timeUnit);
     }
+
+	@Override
+	public Boolean delete(String key) {
+		return redisTemplate.delete(key);
+		
+	}
 }

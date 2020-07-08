@@ -126,4 +126,11 @@ public interface RedisApi {
     @GetMapping("/redis/getExpire")
     Long getExpire(@RequestParam("key") String key, @RequestParam("timeUnit") final TimeUnit timeUnit);
 
+    /**
+     * 根据键删除值
+     * @param key 键
+     */
+    @DeleteMapping("/redis/delete")
+	boolean delete(@RequestParam("key") String key);
+
 }

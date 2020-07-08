@@ -46,6 +46,37 @@ public class UnitExcelExportUtil {
      * @param wb
      * @return
      */
+    public static List<List<Object>> getDataListByCellNumber(Workbook wb,int num,int sheetNum,int cellNum) {
+
+        List<List<Object>> rowList = new ArrayList<>();
+        Sheet sheet = wb.getSheetAt(sheetNum);
+        for (int i = sheet.getFirstRowNum()+num; i <= sheet.getLastRowNum(); i++) {
+            Row row = sheet.getRow(i);
+            if (null == row){
+                continue;
+            }
+            List<Object> cellList = new ArrayList<>();
+            Cell cell =row.getCell(cellNum);
+            if (num == 3) {
+                cellList.add(getCellValue(cell));
+            } else if (num == 1) {
+                if ("null".equals(getCellValue(cell))) {
+                    cellList.add("null");
+                } else {
+                    cellList.add(getCellValue(cell));
+                }
+            }
+            rowList.add(cellList);
+        }
+        return rowList;
+    
+    }
+    
+    /**
+     *导入数据获取数据列表
+     * @param wb
+     * @return
+     */
     public static List<List<Object>> getDataList(Workbook wb,int num) {
         List<List<Object>> rowList = new ArrayList<>();
         Sheet sheet = wb.getSheetAt(0);

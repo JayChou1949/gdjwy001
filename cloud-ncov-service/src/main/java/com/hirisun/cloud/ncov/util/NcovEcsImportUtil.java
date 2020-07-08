@@ -77,6 +77,50 @@ public class NcovEcsImportUtil {
         return resultList;
     }
     
+    public static Map<String,Long> getDataAccess(String dataAccessName){
+    	
+    	Map<String,Long> map = new HashMap<String,Long>();
+    	
+    	File file = new File(rootPath+"/ncovArea/"+dataAccessName);
+        InputStream inputStream = null;
+        Workbook workbook = null;
+        try{
+            inputStream=new FileInputStream(file);
+            workbook = UnitExcelExportUtil.createWorkbook(inputStream);
+            
+            
+            List<List<Object>> dataList = UnitExcelExportUtil.getDataListByCellNumber(workbook,1,0,5);
+            
+            Long total = dataList.stream()
+             .mapToLong(list -> Long.valueOf(list.get(0).toString())).sum();
+            
+            Long yesterday = UnitExcelExportUtil.getDataListByCellNumber(workbook,1,0,6).stream()
+                    .mapToLong(list -> Long.valueOf(list.get(0).toString())).sum();
+            map.put("total", total);
+            map.put("yesterday", yesterday);
+            map.put("size", Long.valueOf(dataList.size()));
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if(workbook != null){
+                try {
+                    workbook.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if(inputStream !=null){
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+		return map;
+    	
+    }
+    
     public static Map<String,List<DataGovernanceLevel2Vo>> getDataGovernanceMap(String dataGovernanceName){
     	
     	File file = new File(rootPath+"/ncovArea/"+dataGovernanceName);
@@ -87,28 +131,10 @@ public class NcovEcsImportUtil {
             inputStream=new FileInputStream(file);
             workbook = UnitExcelExportUtil.createWorkbook(inputStream);
             List<List<Object>> updateType = UnitExcelExportUtil.getDataListBySheet(workbook,1,2);
-            List<DataGovernanceLevel2Vo> updateTypeVos = Lists.newArrayList();
-            for (List<Object> objects : updateType) {
-            	DataGovernanceLevel2Vo dataGovernanceLevel2 = new DataGovernanceLevel2Vo();
-                dataGovernanceLevel2.setType((String) objects.get(1));
-                dataGovernanceLevel2.setNum((String) objects.get(2));
-                dataGovernanceLevel2.setSum((String) objects.get(3));
-                dataGovernanceLevel2.setPercentage((String) objects.get(4));
-                updateTypeVos.add(dataGovernanceLevel2);
-            }
-            
+            List<DataGovernanceLevel2Vo> updateTypeVos = setDataGovernanceData(updateType);
             map.put("updateTypeVos", updateTypeVos);
-            
             List<List<Object>> updateCycle =UnitExcelExportUtil.getDataListBySheet(workbook,1,3);
-            List<DataGovernanceLevel2Vo> updateCycleVos = Lists.newArrayList();
-            for (List<Object> objects : updateCycle) {
-            	DataGovernanceLevel2Vo dataGovernanceLevel2 = new DataGovernanceLevel2Vo();
-                dataGovernanceLevel2.setType((String) objects.get(1));
-                dataGovernanceLevel2.setNum((String) objects.get(2));
-                dataGovernanceLevel2.setSum((String) objects.get(3));
-                dataGovernanceLevel2.setPercentage((String) objects.get(4));
-                updateCycleVos.add(dataGovernanceLevel2);
-            }
+            List<DataGovernanceLevel2Vo> updateCycleVos = setDataGovernanceData(updateCycle);
             map.put("updateCycleVos", updateCycleVos);
         }catch (Exception e){
             e.printStackTrace();
@@ -131,6 +157,19 @@ public class NcovEcsImportUtil {
         return map;
     	
     }
+
+	private static List<DataGovernanceLevel2Vo> setDataGovernanceData(List<List<Object>> updateType) {
+		List<DataGovernanceLevel2Vo> updateTypeVos = Lists.newArrayList();
+		for (List<Object> objects : updateType) {
+			DataGovernanceLevel2Vo dataGovernanceLevel2 = new DataGovernanceLevel2Vo();
+		    dataGovernanceLevel2.setType((String) objects.get(1));
+		    dataGovernanceLevel2.setNum((String) objects.get(2));
+		    dataGovernanceLevel2.setSum((String) objects.get(3));
+		    dataGovernanceLevel2.setPercentage((String) objects.get(4));
+		    updateTypeVos.add(dataGovernanceLevel2);
+		}
+		return updateTypeVos;
+	}
     
     public static int getNcovDataServiceCount(String dataServiceName) {
     	

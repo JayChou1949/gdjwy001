@@ -10,11 +10,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.hirisun.cloud.api.redis.RedisApi;
 import com.hirisun.cloud.common.exception.CustomException;
 import com.hirisun.cloud.common.vo.CommonCode;
 import com.hirisun.cloud.common.vo.ResponseResult;
+import com.hirisun.cloud.model.ncov.contains.NcovKey;
+import com.hirisun.cloud.model.ncov.vo.iaas.NcovHomePageIaasVo;
 import com.hirisun.cloud.model.ncov.vo.realtime.HomePageNcovRealtimeVo;
 import com.hirisun.cloud.model.ncov.vo.realtime.NcovRealtimeVo;
 import com.hirisun.cloud.ncov.bean.NcovRealtime;
@@ -26,10 +30,21 @@ public class NcovRealtimeServiceImpl implements NcovRealtimeService {
 
 	@Autowired
 	private NcovRealtimeMapper ncovRealtimeMapper;
+	@Autowired
+    private RedisApi redisApi;
 	
 	@Override
 	public HomePageNcovRealtimeVo getHomePageNcovRealtimeVo() {
 		
+		String resString = redisApi.getStrValue(NcovKey.HOMG_PAGE_NCOV_REALTIME);
+		if(StringUtils.isNotBlank(resString))return JSON.parseObject(resString,HomePageNcovRealtimeVo.class);
+		
+		HomePageNcovRealtimeVo vo = getHomePageNcovRealtime();
+		redisApi.setForPerpetual(NcovKey.HOMG_PAGE_NCOV_REALTIME, JSON.toJSONString(vo));
+		return vo;
+	}
+
+	private HomePageNcovRealtimeVo getHomePageNcovRealtime() {
 		//统计全国数据
 		List<NcovRealtimeVo> toDayCounturyList = ncovRealtimeMapper.findNcovRealtimeList(1, 1);
 		NcovRealtimeVo yesterdayCountury = ncovRealtimeMapper.countNcovRealTime(1, 2);
@@ -73,7 +88,6 @@ public class NcovRealtimeServiceImpl implements NcovRealtimeService {
 		
 		//广东列表数据
 		vo.setCityList(toDayCityList);
-		
 		return vo;
 	}
 
@@ -127,6 +141,8 @@ public class NcovRealtimeServiceImpl implements NcovRealtimeService {
 			provinceNcovRealtime.setCreateDate(date);
 			ncovRealtimeMapper.insert(provinceNcovRealtime);
 		});
+		
+		redisApi.delete(NcovKey.HOMG_PAGE_NCOV_REALTIME);
 		
 		return result;
 	}

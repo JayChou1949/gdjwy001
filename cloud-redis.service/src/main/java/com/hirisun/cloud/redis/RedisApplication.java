@@ -2,6 +2,7 @@ package com.hirisun.cloud.redis;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 /**
  * @author zhoufeng
@@ -10,6 +11,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @data 2020/7/6 9:53
  * @description Redis 服务主启动类
  */
+@EnableDiscoveryClient
 @SpringBootApplication
 public class RedisApplication {
 

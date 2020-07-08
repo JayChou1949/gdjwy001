@@ -2,14 +2,13 @@ package com.hirisun.cloud.ncov.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
+import com.hirisun.cloud.api.redis.RedisApi;
 import com.hirisun.cloud.model.ncov.contains.NcovKey;
 import com.hirisun.cloud.model.ncov.vo.iaas.NcovHomePageIaasVo;
 import com.hirisun.cloud.ncov.service.NcovIaasService;
@@ -19,16 +18,16 @@ import com.hirisun.cloud.ncov.util.NcovEcsImportUtil;
 public class NcovIaasServiceImpl implements NcovIaasService {
 
 	@Autowired
-    private StringRedisTemplate stringRedisTemplate; 
+    private RedisApi redisApi;
 	
 	@Override
 	public NcovHomePageIaasVo getIaasVmData() {
 		
-		String resString = stringRedisTemplate.opsForValue().get(NcovKey.NCOV_IAAS_OVERVIEW);
+		String resString = redisApi.getStrValue(NcovKey.NCOV_IAAS_OVERVIEW);
         if(StringUtils.isNotBlank(resString))return JSON.parseObject(resString,NcovHomePageIaasVo.class);
 
         NcovHomePageIaasVo overview =  NcovEcsImportUtil.getOverviewData();
-        stringRedisTemplate.opsForValue().set(NcovKey.NCOV_IAAS_OVERVIEW,JSON.toJSONString(overview),5, TimeUnit.HOURS);
+        redisApi.setForPerpetual(NcovKey.NCOV_IAAS_OVERVIEW, JSON.toJSONString(overview));
         
         return  overview;
 	}
@@ -36,11 +35,11 @@ public class NcovIaasServiceImpl implements NcovIaasService {
 	@Override
 	public NcovHomePageIaasVo epidemicDesktopNum() throws Exception {
 		
-		String res = stringRedisTemplate.opsForValue().get(NcovKey.EPIC_DESKTOP);
+		String res = redisApi.getStrValue(NcovKey.EPIC_DESKTOP);
         if(StringUtils.isNotBlank(res))return JSON.parseObject(res,NcovHomePageIaasVo.class);
         
         NcovHomePageIaasVo ncovHomePageIaasVo = epidemicExclNum(epidemicExcl());
-        stringRedisTemplate.opsForValue().set(NcovKey.EPIC_DESKTOP,JSON.toJSONString(ncovHomePageIaasVo),5, TimeUnit.HOURS);
+        redisApi.setForPerpetual(NcovKey.EPIC_DESKTOP,JSON.toJSONString(ncovHomePageIaasVo));
         return ncovHomePageIaasVo;
 		
 	}

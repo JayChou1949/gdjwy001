@@ -70,4 +70,9 @@ public class RedisApiFallback implements RedisApi {
     public Long getExpire(String key, TimeUnit timeUnit) {
         return null;
     }
+
+	@Override
+	public boolean delete(String key) {
+		return false;
+	}
 }
