@@ -129,8 +129,9 @@ public interface RedisApi {
     /**
      * 根据键删除值
      * @param key 键
+     * @return 是否删除成功
      */
-    @DeleteMapping("/redis/delete")
-	boolean delete(@RequestParam("key") String key);
+    @DeleteMapping("/redis/delete/{key}")
+	Boolean delete(@PathVariable("key") String key);
 
 }

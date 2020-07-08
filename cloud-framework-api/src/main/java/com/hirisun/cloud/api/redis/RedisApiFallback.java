@@ -72,7 +72,7 @@ public class RedisApiFallback implements RedisApi {
     }
 
 	@Override
-	public boolean delete(String key) {
+	public Boolean delete(String key) {
 		return false;
 	}
 }
