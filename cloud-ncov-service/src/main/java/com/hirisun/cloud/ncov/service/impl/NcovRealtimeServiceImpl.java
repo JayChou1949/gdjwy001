@@ -32,14 +32,16 @@ public class NcovRealtimeServiceImpl implements NcovRealtimeService {
 	@Autowired
     private RedisApi redisApi;
 	
-	@Override
+	/**
+	 * 获取首页 疫情实时数据,先读取缓存，没有则读取数据库
+	 */
 	public HomePageNcovRealtimeVo getHomePageNcovRealtimeVo() {
 		
-		String resString = redisApi.getStrValue(NcovKey.HOMG_PAGE_NCOV_REALTIME);
+		String resString = redisApi.getStrValue(NcovKey.HOME_PAGE_NCOV_REALTIME);
 		if(StringUtils.isNotBlank(resString))return JSON.parseObject(resString,HomePageNcovRealtimeVo.class);
 		
 		HomePageNcovRealtimeVo vo = getHomePageNcovRealtime();
-		redisApi.setForPerpetual(NcovKey.HOMG_PAGE_NCOV_REALTIME, JSON.toJSONString(vo));
+		redisApi.setForPerpetual(NcovKey.HOME_PAGE_NCOV_REALTIME, JSON.toJSONString(vo));
 		return vo;
 	}
 
@@ -141,7 +143,7 @@ public class NcovRealtimeServiceImpl implements NcovRealtimeService {
 			ncovRealtimeMapper.insert(provinceNcovRealtime);
 		});
 		
-		redisApi.delete(NcovKey.HOMG_PAGE_NCOV_REALTIME);
+		redisApi.delete(NcovKey.HOME_PAGE_NCOV_REALTIME);
 		
 		return result;
 	}

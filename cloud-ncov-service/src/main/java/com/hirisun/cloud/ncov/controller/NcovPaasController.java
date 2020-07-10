@@ -47,7 +47,7 @@ public class NcovPaasController {
 	}
 
 	@SuppressWarnings("unchecked")
-	@ApiOperation("疫情防控,流动人口,流动人口1")
+	@ApiOperation("疫情防控,流动人口")
 	@ApiResponses(//响应参数说明
             @ApiResponse(code=200,message="success")
     )

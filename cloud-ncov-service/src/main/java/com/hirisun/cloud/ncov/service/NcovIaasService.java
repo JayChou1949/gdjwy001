@@ -1,10 +1,11 @@
 package com.hirisun.cloud.ncov.service;
 
+import java.util.Map;
+
 import com.hirisun.cloud.model.ncov.vo.iaas.NcovHomePageIaasVo;
 
 public interface NcovIaasService {
 
-	public NcovHomePageIaasVo getIaasVmData();
+	public Map<String,NcovHomePageIaasVo> getIaasNcovData() throws Exception;
 	
-	public NcovHomePageIaasVo epidemicDesktopNum() throws Exception;
 }

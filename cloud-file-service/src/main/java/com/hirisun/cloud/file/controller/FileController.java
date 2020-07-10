@@ -34,4 +34,20 @@ public class FileController {
         log.debug("<== fileId:{}", fileId);
         return QueryResponseResult.success(fileId);
     }
+    
+    @ApiOperation(value = "文件删除")
+    @PostMapping("/delete")
+    public QueryResponseResult deleteFileByFileId(String fileId) {
+        Integer success = fileService.deleteFileByFileId(fileId);
+        log.debug("<== 文件删除 fileId:{}", fileId);
+        return QueryResponseResult.success(success);
+    }
+    
+    @ApiOperation(value = "文件下载")
+    @PostMapping("/download")
+    public QueryResponseResult downloadFileByFileId(String fileId) {
+        byte[] file = fileService.downloadFileByFileId(fileId);
+        log.debug("<== 文件下载 fileId:{}", fileId);
+        return QueryResponseResult.success(file);
+    }
 }

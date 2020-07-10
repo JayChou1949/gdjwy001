@@ -6,10 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
@@ -17,34 +18,30 @@ import com.alibaba.fastjson.TypeReference;
 import com.google.common.collect.Lists;
 import com.hirisun.cloud.api.redis.RedisApi;
 import com.hirisun.cloud.common.util.FastJsonUtil;
+import com.hirisun.cloud.model.ncov.contains.NcovFileupload;
 import com.hirisun.cloud.model.ncov.contains.NcovKey;
 import com.hirisun.cloud.model.ncov.vo.daas.DataGovernanceLevel2Vo;
 import com.hirisun.cloud.model.ncov.vo.daas.HomePageDataVo;
 import com.hirisun.cloud.model.ncov.vo.daas.NcovDataOverviewVo;
 import com.hirisun.cloud.ncov.mapper.NcovDataAreaMapper;
 import com.hirisun.cloud.ncov.service.NcovDaasService;
+import com.hirisun.cloud.ncov.service.NcovFileUploadService;
 import com.hirisun.cloud.ncov.util.NcovEcsImportUtil;
 
 @Service
+@RefreshScope
 public class NcovDaasServiceImpl implements NcovDaasService {
 
-	@Value("${ncov.datasharing.name}")
-    private String dataSharingName;
-    @Value("${ncov.datamodeling.name}")
-    private String dataModelingName;
-    @Value("${ncov.datagovernance.name}")
-    private String dataGovernanceName;
-    @Value("${ncov.dataaccess.name}")
-    private String dataAccessName;
-    @Value("${ncov.dataservice.name}")
-    private String dataServiceName;
-	
     @Autowired
     private NcovDataAreaMapper ncovDataAreaMapper;
     @Autowired
     private RedisApi redisApi;
+    @Autowired
+    private NcovFileUploadService ncovFileUploadService;
     
-	@Override
+	/**
+	 * 首页daas模块疫情数据,先取缓存
+	 */
 	public HomePageDataVo getHomePageBigData() throws Exception {
 		
 		HomePageDataVo homePage = null;
@@ -58,38 +55,30 @@ public class NcovDaasServiceImpl implements NcovDaasService {
 		return homePage;
 	}
 
-	//读取 excel 数据共享数据
-	private void getExcelData(List<NcovDataOverviewVo> dataSharingDtos,String fileName,
-			 Integer num, Integer sheetNum) {
-		
-		List<List<Object>> dataSharing = NcovEcsImportUtil.ncovDataList(fileName,num,sheetNum);
-		for (List<Object> objects : dataSharing) {
-			NcovDataOverviewVo ncovDataOverviewVo = new NcovDataOverviewVo();
-			ncovDataOverviewVo.setName((String) objects.get(0));
-			ncovDataOverviewVo.setCount((String) objects.get(1));
-			ncovDataOverviewVo.setUnit((String) objects.get(2));
-		    dataSharingDtos.add(ncovDataOverviewVo);
-		}
-	}
-	
+	/**
+	 * 首页daas模块疫情数据,读取excel和数据库统计
+	 */
 	public HomePageDataVo homePage() throws Exception {
 		
 		HomePageDataVo homePageData = new HomePageDataVo();
 		
-        //  数据共享
-		List<NcovDataOverviewVo> dataSharingVos = getDataSharding();
+		//获取所有疫情文件地址(fileId)
+		Map<String, String> urlMap = ncovFileUploadService.getFileUriByServiceType(NcovFileupload.NCOV_FILE_TYPE);
+		
+        //数据共享
+		List<NcovDataOverviewVo> dataSharingVos = getDataSharding(urlMap.get(NcovFileupload.DAAS_DATA_SHARING));
         homePageData.setDataSharingOverview(dataSharingVos);
         
-        //  数据建模
-        List<NcovDataOverviewVo> dataModelingVos = dataModeling();
+        //数据建模
+        List<NcovDataOverviewVo> dataModelingVos = dataModeling(urlMap.get(NcovFileupload.DAAS_DATA_MODELING));
         homePageData.setDataModelingOverview(dataModelingVos);
         
-        //  数据服务
+        //数据服务
         Integer serviceCount = ncovDataAreaMapper.serviceCount();
         Integer policeCount = ncovDataAreaMapper.policeCount();
         Integer areaCount = ncovDataAreaMapper.areaCount();
         Long ncovServiceCall = ncovDataAreaMapper.ncovServiceCall();
-        Integer dataServiceCount = getDataServiceCount();
+        Integer dataServiceCount = getDataServiceCount(urlMap.get(NcovFileupload.DAAS_DATA_SERVICE));
         
         homePageData.setServiceCount(serviceCount);
         homePageData.setUnitCount(policeCount+areaCount+dataServiceCount);
@@ -99,16 +88,16 @@ public class NcovDaasServiceImpl implements NcovDaasService {
         Long yesterdayCall = ncovDataAreaMapper.yesterdayCall(getTime(1));
         homePageData.setYesterdayCall(yesterdayCall);
         
-        //  数据接入
-        Map<String, Long> dataAccess = getDataAccess();
+        //数据接入
+        Map<String, Long> dataAccess = getDataAccess(urlMap.get(NcovFileupload.DAAS_DATA_ACCESS));
         
         homePageData.setTotalCount(dataAccess.get("total"));
         homePageData.setResourceCount(dataAccess.get("size").intValue());
         homePageData.setYesterdayCount(dataAccess.get("yesterday"));
         
         
-        //  数据治理
-        Map<String, List<DataGovernanceLevel2Vo>> dataGovernanceMap = getDataGovernance();
+        //数据治理
+        Map<String, List<DataGovernanceLevel2Vo>> dataGovernanceMap = getDataGovernance(urlMap.get(NcovFileupload.DAAS_DATA_GOVERNANCE));
         List<DataGovernanceLevel2Vo> updateTypeVos = dataGovernanceMap.get("updateTypeVos");
         List<DataGovernanceLevel2Vo> updateCycleVos = dataGovernanceMap.get("updateCycleVos");
         
@@ -117,76 +106,102 @@ public class NcovDaasServiceImpl implements NcovDaasService {
         return homePageData;
     }
 
+	/**
+	 * 获取 数据治理 先从缓存读取，没有则读取文件服务器下载
+	 * @param fileId
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
-	private Map<String, List<DataGovernanceLevel2Vo>> getDataGovernance() {
+	private Map<String, List<DataGovernanceLevel2Vo>> getDataGovernance(String fileId) {
 		Map<String, List<DataGovernanceLevel2Vo>> dataGovernanceMap = null;
-        String dataGovernanceStr = redisApi.getStrValue(NcovKey.HOMG_PAGE_DATA_GOVERNANCE);
+        String dataGovernanceStr = redisApi.getStrValue(NcovKey.HOME_PAGE_DAAS_DATA_GOVERNANCE);
         if(StringUtils.isNotBlank(dataGovernanceStr)) {
         	
         	dataGovernanceMap = (Map<String, List<DataGovernanceLevel2Vo>>) JSON.parseObject(dataGovernanceStr,
         			new TypeReference<List<Map<String, List<DataGovernanceLevel2Vo>>>>(){});
         	
         }else {
-        	dataGovernanceMap = NcovEcsImportUtil.getDataGovernanceMap(dataGovernanceName);
+        	dataGovernanceMap = NcovEcsImportUtil.getDataGovernanceMap(fileId);
         	if(MapUtils.isEmpty(dataGovernanceMap))
-        		redisApi.setForPerpetual(NcovKey.HOMG_PAGE_DATA_GOVERNANCE, FastJsonUtil.bean2Json(dataGovernanceMap));
+        		redisApi.setForPerpetual(NcovKey.HOME_PAGE_DAAS_DATA_GOVERNANCE, FastJsonUtil.bean2Json(dataGovernanceMap));
         }
 		return dataGovernanceMap;
 	}
 
-	private Map<String, Long> getDataAccess() {
+	/**
+	 * 获取 数据接入 先从缓存读取，没有则读取文件服务器下载
+	 * @param fileId
+	 * @return
+	 */
+	private Map<String, Long> getDataAccess(String fileId) {
 		Map<String, Long> dataAccess = null;
-        String dataAccessStr = redisApi.getStrValue(NcovKey.HOMG_PAGE_DATA_ACCESS);
+        String dataAccessStr = redisApi.getStrValue(NcovKey.HOME_PAGE_DAAS_DATA_ACCESS);
         if(StringUtils.isNotBlank(dataAccessStr)) {
         	
         	dataAccess = JSON.parseObject(dataAccessStr,new TypeReference<Map<String, Long>>(){});
         	
         }else {
-        	dataAccess = NcovEcsImportUtil.getDataAccess(dataAccessName);
-        	redisApi.setForPerpetual(NcovKey.HOMG_PAGE_DATA_ACCESS, FastJsonUtil.bean2Json(dataAccess));
+        	dataAccess = NcovEcsImportUtil.getDataAccess(fileId);
+        	if(MapUtils.isEmpty(dataAccess))
+        		redisApi.setForPerpetual(NcovKey.HOME_PAGE_DAAS_DATA_ACCESS, FastJsonUtil.bean2Json(dataAccess));
         }
 		return dataAccess;
 	}
 
-	private Integer getDataServiceCount() {
+	/**
+	 * 获取 数据服务数据 先从缓存读取，没有则读取文件服务器下载
+	 * @param fileId
+	 * @return
+	 */
+	private Integer getDataServiceCount(String fileId) {
 		Integer dataServiceCount = 0;
-        String dataServiceCountStr = redisApi.getStrValue(NcovKey.HOMG_PAGE_DATA_SERVICE_COUNT);
+        String dataServiceCountStr = redisApi.getStrValue(NcovKey.HOME_PAGE_DAAS_DATA_SERVICE_COUNT);
         
         if(StringUtils.isNotBlank(dataServiceCountStr)) {
         	dataServiceCount = Integer.valueOf(dataServiceCountStr);
         }else {
         	
-        	dataServiceCount = NcovEcsImportUtil.getNcovDataServiceCount(dataServiceName);
-        	redisApi.setForPerpetual(NcovKey.HOMG_PAGE_DATA_SERVICE_COUNT, dataServiceCount.toString());
+        	dataServiceCount = NcovEcsImportUtil.getNcovDataServiceCount(fileId);
+        	redisApi.setForPerpetual(NcovKey.HOME_PAGE_DAAS_DATA_SERVICE_COUNT, dataServiceCount.toString());
         	
         }
 		return dataServiceCount;
 	}
 
-	private List<NcovDataOverviewVo> dataModeling() {
+	/**
+	 * 获取 数据建模数据 先从缓存读取，没有则读取文件服务器下载
+	 * @param fileId
+	 * @return
+	 */
+	private List<NcovDataOverviewVo> dataModeling(String fileId) {
 		List<NcovDataOverviewVo> dataModelingVos = Lists.newArrayList();
-        String dataModelingStr = redisApi.getStrValue(NcovKey.HOMG_PAGE_DATA_MODELING);
+        String dataModelingStr = redisApi.getStrValue(NcovKey.HOME_PAGE_DAAS_DATA_MODELING);
         if(StringUtils.isNotBlank(dataModelingStr)) {
         	dataModelingVos = FastJsonUtil.json2ListBean(dataModelingStr, NcovDataOverviewVo.class);
 		}else {
-			getExcelData(dataModelingVos,dataModelingName,1,0);
-	        //缓存存储
-			redisApi.setForPerpetual(NcovKey.HOMG_PAGE_DATA_MODELING, FastJsonUtil.bean2Json(dataModelingVos));
+			dataModelingVos = NcovEcsImportUtil.getShardingMoelingExcelData(fileId,1,0);
+			if(CollectionUtils.isNotEmpty(dataModelingVos)) 
+				redisApi.setForPerpetual(NcovKey.HOME_PAGE_DAAS_DATA_MODELING, FastJsonUtil.bean2Json(dataModelingVos));
 		}
 		return dataModelingVos;
 	}
 
-	private List<NcovDataOverviewVo> getDataSharding() {
+	/**
+	 * 获取 数据共享先从缓存读取，没有则读取文件服务器下载
+	 * @param fileId
+	 * @return
+	 */
+	private List<NcovDataOverviewVo> getDataSharding(String fileId) {
 		List<NcovDataOverviewVo> dataSharingVos = Lists.newArrayList();
 		
-		String dataSharingStr = redisApi.getStrValue(NcovKey.HOMG_PAGE_DATA_SHARING);
+		String dataSharingStr = redisApi.getStrValue(NcovKey.HOME_PAGE_DAAS_DATA_SHARING);
 		if(StringUtils.isNotBlank(dataSharingStr)) {
 			dataSharingVos = FastJsonUtil.json2ListBean(dataSharingStr, NcovDataOverviewVo.class);
 		}else {
-			//获取共享数据
-			getExcelData(dataSharingVos,dataSharingName,1,0);
-	        //缓存存储
-			redisApi.setForPerpetual(NcovKey.HOMG_PAGE_DATA_SHARING, FastJsonUtil.bean2Json(dataSharingVos));;
+			dataSharingVos = NcovEcsImportUtil.getShardingMoelingExcelData(fileId,1,0);
+			if(CollectionUtils.isNotEmpty(dataSharingVos)) 
+				redisApi.setForPerpetual(NcovKey.HOME_PAGE_DAAS_DATA_SHARING, FastJsonUtil.bean2Json(dataSharingVos));
+	        
 		}
 		return dataSharingVos;
 	}

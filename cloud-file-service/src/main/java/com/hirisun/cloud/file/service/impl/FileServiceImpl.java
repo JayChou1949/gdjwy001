@@ -92,4 +92,57 @@ public class FileServiceImpl implements FileService {
         }
         return null;
     }
+
+	@Override
+	public Integer deleteFileByFileId(String fileId) {
+		
+
+        //初始化Fdfs配置信息
+        initFdfsConfig();
+        try {
+            //创建tracker client
+            TrackerClient client = new TrackerClient();
+            //获取tracker server
+            TrackerServer server = client.getConnection();
+            //获取storage
+            StorageServer storage = client.getStoreStorage(server);
+            //创建 storage client
+            StorageClient1 storageClient = new StorageClient1(server, storage);
+            //获取文件扩展名
+            //上传文件并获得文件Id
+            return storageClient.delete_file1(fileId);
+        } catch (Exception e) {
+            log.error("删除文件失败,具体信息为:{}", e.getMessage());
+            ExceptionCast.cast(FileCode.FDFS_UPLOAD_FAULT);
+        }
+        return null;
+    
+		
+	}
+
+	@Override
+	public byte[] downloadFileByFileId(String fileId) {
+		
+		//初始化Fdfs配置信息
+        initFdfsConfig();
+        try {
+            //创建tracker client
+            TrackerClient client = new TrackerClient();
+            //获取tracker server
+            TrackerServer server = client.getConnection();
+            //获取storage
+            StorageServer storage = client.getStoreStorage(server);
+            //创建 storage client
+            StorageClient1 storageClient = new StorageClient1(server, storage);
+            //获取文件扩展名
+            //上传文件并获得文件Id
+            return storageClient.download_file1(fileId);
+        } catch (Exception e) {
+            log.error("下载文件失败,具体信息为:{}", e.getMessage());
+            ExceptionCast.cast(FileCode.FDFS_UPLOAD_FAULT);
+        }
+        return null;
+		
+		
+	}
 }

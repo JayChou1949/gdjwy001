@@ -1,6 +1,7 @@
 package com.hirisun.cloud.common.util;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -20,9 +21,28 @@ public class LocalDateUtil {
 		
 	}
 	
+	/**
+	 * 获取当前年月日时分秒
+	 * @return
+	 */
+	public static String getCurrentDateTime() {
+		DateTimeFormatter fmt = DateTimeFormatter.ofPattern(yyyyMMddHHmmss);
+		return fmt.format(LocalDateTime.now());
+	}
+	
+	/**
+	 * 获取当前年月日
+	 * @return
+	 */
+	public static String getCurrentDate() {
+		DateTimeFormatter fmt = DateTimeFormatter.ofPattern(yyyyMMdd);
+		return fmt.format(LocalDateTime.now());
+	}
+	
 	public static void main(String[] args) {
 		Date convertDate = convertDate("2020-06-23", yyyyMMdd);
 		System.out.println(convertDate.toString());
+		System.out.println(getCurrentDateTime());
 	}
 	
 }

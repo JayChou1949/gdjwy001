@@ -17,4 +17,18 @@ public interface FileService {
      * @return
      */
     String fdfs_upload(MultipartFile file);
+    
+    /**
+     * 根据fileId删除文件
+     * @param fileId
+     * @return
+     */
+    Integer deleteFileByFileId(String fileId);
+    
+    /**
+     * 根据fileId下载文件
+     * @param fileId
+     * @return
+     */
+    byte[] downloadFileByFileId(String fileId);
 }

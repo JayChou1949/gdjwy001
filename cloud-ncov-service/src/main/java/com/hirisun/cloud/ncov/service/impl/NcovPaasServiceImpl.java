@@ -5,7 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -19,54 +19,72 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.hirisun.cloud.api.redis.RedisApi;
 import com.hirisun.cloud.common.util.MemoryPageUtil;
+import com.hirisun.cloud.model.ncov.contains.NcovFileupload;
 import com.hirisun.cloud.model.ncov.contains.NcovKey;
 import com.hirisun.cloud.model.ncov.vo.paas.NcovClusterApp;
 import com.hirisun.cloud.model.ncov.vo.paas.NcovClusterAppVo;
 import com.hirisun.cloud.model.ncov.vo.paas.NcovClusterOverviewVo;
 import com.hirisun.cloud.model.ncov.vo.paas.NcovClusterResourceVo;
+import com.hirisun.cloud.ncov.service.NcovFileUploadService;
 import com.hirisun.cloud.ncov.service.NcovPaasService;
-import com.hirisun.cloud.ncov.util.NcovClusterImportUtil;
+import com.hirisun.cloud.ncov.util.NcovEcsImportUtil;
 
 @Service
 public class NcovPaasServiceImpl implements NcovPaasService {
 
 	@Autowired
     private RedisApi redisApi;
+	@Autowired
+    private NcovFileUploadService ncovFileUploadService;
 	
-	@Override
+	/**
+	 * 获取首页 paas 概况数据,先读取缓存,没有则下载文件读取再放入缓存.
+	 */
 	public NcovClusterOverviewVo getOverview() {
 		
 		NcovClusterOverviewVo overview = null;
-		String  res = redisApi.getStrValue(NcovKey.HOMG_PAGE_PAAS_OVERVIEW);
+		String  res = redisApi.getStrValue(NcovKey.HOME_PAGE_PAAS_OVERVIEW);
         if(StringUtils.isNotBlank(res)){
         	overview = JSON.parseObject(res,NcovClusterOverviewVo.class);
             if(overview != null)return  overview;
         }
-        overview = NcovClusterImportUtil.getOverview();
-        redisApi.setForPerpetual(NcovKey.HOMG_PAGE_PAAS_OVERVIEW, JSON.toJSONString(overview));
+        
+        Map<String, String> url = ncovFileUploadService.getFileUriByServiceType((NcovFileupload.NCOV_FILE_TYPE));
+        
+        overview = NcovEcsImportUtil.getOverview(url.get(NcovFileupload.PAAS_DATA),0);
+        if(overview != null)
+        	redisApi.setForPerpetual(NcovKey.HOME_PAGE_PAAS_OVERVIEW, JSON.toJSONString(overview));
 		
 		return overview;
 	}
 
-	@Override
+	/**
+	 * 获取首页 paas 资源数据,先读取缓存,没有则下载文件读取再放入缓存.
+	 */
 	public List<NcovClusterResourceVo> getResource() {
 		
 		List<NcovClusterResourceVo> resourceList = null;
-		String  res = redisApi.getStrValue(NcovKey.HOMG_PAGE_PAAS_RESOURCE);
+		String  res = redisApi.getStrValue(NcovKey.HOME_PAGE_PAAS_RESOURCE);
         if(StringUtils.isNotBlank(res)){
         	resourceList = JSON.parseArray(res, NcovClusterResourceVo.class);
             if(CollectionUtils.isNotEmpty(resourceList))return  resourceList;
         }
-		resourceList = NcovClusterImportUtil.getResourceList();
-		redisApi.setForPerpetual(NcovKey.HOMG_PAGE_PAAS_RESOURCE, JSON.toJSONString(resourceList));
+        
+        Map<String, String> url = ncovFileUploadService.getFileUriByServiceType(NcovFileupload.NCOV_FILE_TYPE);
+        
+		resourceList = NcovEcsImportUtil.getResourceList(url.get(NcovFileupload.PAAS_DATA),1);
+		if(CollectionUtils.isNotEmpty(resourceList))
+			redisApi.setForPerpetual(NcovKey.HOME_PAGE_PAAS_RESOURCE, JSON.toJSONString(resourceList));
 		return resourceList;
 	}
 
-	@Override
+	/**
+	 * 获取首页 paas 应用明细数据,先读取缓存,没有则下载文件读取再放入缓存.
+	 */
 	public Page<NcovClusterAppVo> getAppDetailList(long pageSize,long current) {
 		
 		List<NcovClusterApp> appList = null;
-		String  res = redisApi.getStrValue(NcovKey.HOMG_PAGE_PAAS_APPDETAIL);
+		String  res = redisApi.getStrValue(NcovKey.HOME_PAGE_PAAS_APPDETAIL);
         if(StringUtils.isNotBlank(res)){
         	appList = JSON.parseArray(res, NcovClusterApp.class);
             if(CollectionUtils.isNotEmpty(appList)) {
@@ -74,8 +92,12 @@ public class NcovPaasServiceImpl implements NcovPaasService {
             }
         }
 		
-		appList = NcovClusterImportUtil.getAppDetailList();
-		redisApi.setForPerpetual(NcovKey.HOMG_PAGE_PAAS_APPDETAIL, JSON.toJSONString(appList));
+        Map<String, String> url = ncovFileUploadService.getFileUriByServiceType(NcovFileupload.NCOV_FILE_TYPE);
+		appList = NcovEcsImportUtil.getAppDetailList(url.get(NcovFileupload.PAAS_DATA),2);
+		
+		if(CollectionUtils.isNotEmpty(appList))
+			redisApi.setForPerpetual(NcovKey.HOME_PAGE_PAAS_APPDETAIL, JSON.toJSONString(appList));
+		
 		Page<NcovClusterAppVo> page = MemoryPageUtil.page(convert2Vo(appList), pageSize, current);
 		return page;
 	}
