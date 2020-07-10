@@ -19,7 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @description 文件服务控制器
  */
 @Api(tags = "文件服务处理类")
-@RequestMapping("/v1/file")
+@RequestMapping("/file")
 @RestController
 @Slf4j
 public class FileController {

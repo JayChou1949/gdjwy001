@@ -1,7 +1,6 @@
 package com.hirisun.cloud.file.service.impl;
 
 import com.hirisun.cloud.common.exception.ExceptionCast;
-import com.hirisun.cloud.common.vo.CommonCode;
 import com.hirisun.cloud.file.service.FileService;
 import com.hirisun.cloud.file.vo.FileCode;
 import lombok.extern.slf4j.Slf4j;
@@ -9,7 +8,6 @@ import org.csource.fastdfs.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 
 /**

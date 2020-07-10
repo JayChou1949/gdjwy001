@@ -12,6 +12,11 @@ spring:
         shared-configs: cloud-common.yaml
       discovery:
         server-addr: 192.168.11.65:8848
+ribbon:
+  #建立连接所用时间
+  ReadTimeout: 5000
+  #建立链接后从服务器获得所需资源所用的时间
+  ConnectTimeout: 5000
 server:
   port: 8003
 ---
