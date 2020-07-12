@@ -15,10 +15,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.alibaba.fastjson.JSON;
 import com.hirisun.cloud.api.file.FileUploadApi;
 import com.hirisun.cloud.api.redis.RedisApi;
 import com.hirisun.cloud.common.util.FastJsonUtil;
+import com.hirisun.cloud.common.util.JsonUtils;
 import com.hirisun.cloud.common.util.LocalDateUtil;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.model.ncov.contains.NcovFileupload;
@@ -29,9 +29,13 @@ import com.hirisun.cloud.model.ncov.vo.iaas.NcovHomePageIaasVo;
 import com.hirisun.cloud.model.ncov.vo.paas.NcovClusterApp;
 import com.hirisun.cloud.model.ncov.vo.paas.NcovClusterOverviewVo;
 import com.hirisun.cloud.model.ncov.vo.paas.NcovClusterResourceVo;
+import com.hirisun.cloud.model.ncov.vo.realtime.NcovRealtimeVo;
 import com.hirisun.cloud.ncov.bean.FileUpload;
+import com.hirisun.cloud.ncov.bean.NcovHomePageData;
 import com.hirisun.cloud.ncov.mapper.FileUploadMapper;
 import com.hirisun.cloud.ncov.service.NcovFileUploadService;
+import com.hirisun.cloud.ncov.service.NcovHomePageDataService;
+import com.hirisun.cloud.ncov.service.NcovRealtimeService;
 import com.hirisun.cloud.ncov.util.NcovEcsImportUtil;
 
 
@@ -45,6 +49,11 @@ public class NcovFileUploadServiceImpl implements NcovFileUploadService {
 	private FileUploadApi fileUploadApi;
 	@Autowired
 	private FileUploadMapper fileUploadMapper;
+	@Autowired
+	private NcovHomePageDataService ncovHomePageDataService;
+	@Autowired
+	private NcovRealtimeService ncovRealtimeService;
+	
 	@Value("${file.access.path}")
 	private String fileAccessPath;
 	
@@ -66,7 +75,7 @@ public class NcovFileUploadServiceImpl implements NcovFileUploadService {
 			//保存或更新数据
 			String fileOldId = saveFileUpload(serviceType,dataType ,fileName, upload.getData().toString());
 			//刷新缓存
-			setCache(serviceType, multipartFile);
+			setCache(dataType, multipartFile);
 			
 			//最后如果是更新数据,则尝试删除旧的excel文件(无法保证100%删除,可能存在网络原因),避免过多垃圾文件
 			if(StringUtils.isNotBlank(fileOldId)) {
@@ -133,60 +142,119 @@ public class NcovFileUploadServiceImpl implements NcovFileUploadService {
 		if(NcovFileupload.DAAS_DATA_SHARING.equals(dataType)) {
 			
 			List<NcovDataOverviewVo> dataSharingVos = NcovEcsImportUtil.getShardingMoelingExcelData(multipartFile.getInputStream(), 1, 0);
-			if(CollectionUtils.isNotEmpty(dataSharingVos))
-				redisApi.setForPerpetual(NcovKey.HOME_PAGE_DAAS_DATA_SHARING, FastJsonUtil.bean2Json(dataSharingVos));
+			if(CollectionUtils.isNotEmpty(dataSharingVos)) {
+				String json = JsonUtils.objectToJson(dataSharingVos);
+				saveOrUpdate(NcovFileupload.DAAS_DATA_SHARING,
+						NcovKey.HOME_PAGE_DAAS_DATA_SHARING,json);
+			}
 			
 		}else if(NcovFileupload.DAAS_DATA_MODELING.equals(dataType)) {
 			
 			List<NcovDataOverviewVo> dataModelingVos = NcovEcsImportUtil.getShardingMoelingExcelData(multipartFile.getInputStream(), 1, 0);
-			if(CollectionUtils.isNotEmpty(dataModelingVos))
-				redisApi.setForPerpetual(NcovKey.HOME_PAGE_DAAS_DATA_MODELING, FastJsonUtil.bean2Json(dataModelingVos));
+			if(CollectionUtils.isNotEmpty(dataModelingVos)) {
+				String json = JsonUtils.objectToJson(dataModelingVos);
+				saveOrUpdate(NcovFileupload.DAAS_DATA_MODELING,
+						NcovKey.HOME_PAGE_DAAS_DATA_MODELING,json);
+			}
 			
 		}else if(NcovFileupload.DAAS_DATA_GOVERNANCE.equals(dataType)) {
 			
 			Map<String, List<DataGovernanceLevel2Vo>> dataGovernanceMap = NcovEcsImportUtil.getDataGovernanceMap(multipartFile.getInputStream());
-			if(MapUtils.isEmpty(dataGovernanceMap))
-        		redisApi.setForPerpetual(NcovKey.HOME_PAGE_DAAS_DATA_GOVERNANCE, FastJsonUtil.bean2Json(dataGovernanceMap));
+			if(MapUtils.isNotEmpty(dataGovernanceMap)) {
+				String json = JsonUtils.objectToJson(dataGovernanceMap);
+				saveOrUpdate(NcovFileupload.DAAS_DATA_GOVERNANCE,
+						NcovKey.HOME_PAGE_DAAS_DATA_GOVERNANCE,json);
+			}
 			
 		}else if(NcovFileupload.DAAS_DATA_ACCESS.equals(dataType)) {
 			
 			Map<String, Long> dataAccess = NcovEcsImportUtil.getDataAccess(multipartFile.getInputStream());
-			if(MapUtils.isEmpty(dataAccess))
-        		redisApi.setForPerpetual(NcovKey.HOME_PAGE_DAAS_DATA_ACCESS, FastJsonUtil.bean2Json(dataAccess));
+			if(MapUtils.isNotEmpty(dataAccess)) {
+				
+				String json = JsonUtils.objectToJson(dataAccess);
+				saveOrUpdate(NcovFileupload.DAAS_DATA_ACCESS,
+						NcovKey.HOME_PAGE_DAAS_DATA_ACCESS,json);
+				
+			}
 			
 		}else if(NcovFileupload.DAAS_DATA_SERVICE.equals(dataType)) {
 			
 			int ncovDataServiceCount = NcovEcsImportUtil.getNcovDataServiceCount(multipartFile.getInputStream());
-				redisApi.setForPerpetual(NcovKey.HOME_PAGE_DAAS_DATA_SERVICE_COUNT, ncovDataServiceCount);
+			
+			saveOrUpdate(NcovFileupload.DAAS_DATA_SERVICE,
+					NcovKey.HOME_PAGE_DAAS_DATA_SERVICE_COUNT,String.valueOf(ncovDataServiceCount));
 			
 		}else if(NcovFileupload.IAAS_VM.equals(dataType)) {
 			
 			NcovHomePageIaasVo vmIaasVo = NcovEcsImportUtil.getOverviewData(multipartFile.getInputStream());
-			if(vmIaasVo != null)
-				redisApi.setForPerpetual(NcovKey.HOME_PAGE_IAAS_NCOV_OVERVIEW, JSON.toJSONString(vmIaasVo));
+			if(vmIaasVo != null) {
+				String json = JsonUtils.objectToJson(vmIaasVo);
+				saveOrUpdate(NcovFileupload.IAAS_VM,
+						NcovKey.HOME_PAGE_IAAS_NCOV_OVERVIEW,json);
+			}
 			
 		}else if(NcovFileupload.IAAS_DESKTOP.equals(dataType)) {
 			
 			NcovHomePageIaasVo desktopNumIaasVo = NcovEcsImportUtil.epidemicExcl(multipartFile.getInputStream());
-			if(desktopNumIaasVo != null)
-				redisApi.setForPerpetual(NcovKey.HOME_PAGE_IAAS_NCOV_DESKTOP,JSON.toJSONString(desktopNumIaasVo));
+			if(desktopNumIaasVo != null) {
+				String json = JsonUtils.objectToJson(desktopNumIaasVo);
+				saveOrUpdate(NcovFileupload.IAAS_DESKTOP,
+						NcovKey.HOME_PAGE_IAAS_NCOV_DESKTOP,json);
+			}
 			
 		}else if(NcovFileupload.PAAS_DATA.equals(dataType)) {
 			
 			NcovClusterOverviewVo overview = NcovEcsImportUtil.getOverview(multipartFile.getInputStream(),0);
-			if(overview != null)
-	        	redisApi.setForPerpetual(NcovKey.HOME_PAGE_PAAS_OVERVIEW, JSON.toJSONString(overview));
+			if(overview != null) {
+				String json = JsonUtils.objectToJson(overview);
+				saveOrUpdate(NcovFileupload.PAAS_OVERVIEW,
+						NcovKey.HOME_PAGE_PAAS_OVERVIEW,json);
+			}
 			
 			List<NcovClusterResourceVo> resourceList = NcovEcsImportUtil.getResourceList(multipartFile.getInputStream(),1);
-			if(CollectionUtils.isNotEmpty(resourceList))
-				redisApi.setForPerpetual(NcovKey.HOME_PAGE_PAAS_RESOURCE, JSON.toJSONString(resourceList));
+			if(CollectionUtils.isNotEmpty(resourceList)) {
+				String json = JsonUtils.objectToJson(resourceList);
+				saveOrUpdate(NcovFileupload.PAAS_RESOURCE,
+						NcovKey.HOME_PAGE_PAAS_RESOURCE,json);
+			}
 			
 			List<NcovClusterApp> appList = NcovEcsImportUtil.getAppDetailList(multipartFile.getInputStream(),2);
-			if(CollectionUtils.isNotEmpty(appList))
-				redisApi.setForPerpetual(NcovKey.HOME_PAGE_PAAS_APPDETAIL, JSON.toJSONString(appList));
+			if(CollectionUtils.isNotEmpty(appList)) {
+				String json = JsonUtils.objectToJson(appList);
+				saveOrUpdate(NcovFileupload.PAAS_APPDETAIL,
+						NcovKey.HOME_PAGE_PAAS_APPDETAIL,json);
+			}
 			
 		}else if(NcovFileupload.REALTIME.equals(dataType)) {
 			
+			List<NcovRealtimeVo> provideList = NcovEcsImportUtil.getNcovRealtimeByExcel(multipartFile.getInputStream(), 0);
+			List<NcovRealtimeVo> cityList = NcovEcsImportUtil.getNcovRealtimeByExcel(multipartFile.getInputStream(), 1);
+			ncovRealtimeService.importNcovRealtimeData(provideList);
+			ncovRealtimeService.importNcovRealtimeData(cityList);
+			
+			
+		}
+	}
+
+	private void saveOrUpdate(String dataType,String redisKey,String json) {
+		NcovHomePageData ncovHomePageData = ncovHomePageDataService.getNcovHomePageDataByType(dataType);
+		
+		int success = 0;
+		
+		if(ncovHomePageData != null) {
+			ncovHomePageData.setUpdateDate(LocalDateUtil.getCurrentDateTime());
+			ncovHomePageData.setData(json);
+			success = ncovHomePageDataService.updateNcovHomePageData(ncovHomePageData);
+		}else {
+			ncovHomePageData = new NcovHomePageData();
+			ncovHomePageData.setData(json);
+			ncovHomePageData.setDataType(dataType);
+			ncovHomePageData.setCreateDate(LocalDateUtil.getCurrentDateTime());
+			success = ncovHomePageDataService.saveNcovHomePageData(ncovHomePageData);
+		}
+		//新增或更新成功才刷新内存
+		if(success >0 ) {
+			redisApi.setForPerpetual(redisKey, json);
 		}
 	}
 	

@@ -13,6 +13,7 @@ public enum CommonCode implements ResultCode{
     JSON_RESOLVE_FAIL(1002,"JSON解析错误"),
     UPDATE_FAIL(1006,"数据更新失败"),
     DELETE_FAIL(1007,"数据删除失败"),
+    IMPORT_FAIL(1008,"导入数据失败,请检查导入文件数据"),
     SERVER_ERROR(9999,"系统繁忙，稍后重试");
     /**
      * 状态码

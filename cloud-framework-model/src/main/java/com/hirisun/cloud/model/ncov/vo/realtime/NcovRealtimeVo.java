@@ -1,5 +1,6 @@
 package com.hirisun.cloud.model.ncov.vo.realtime;
 
+import cn.afterturn.easypoi.excel.annotation.Excel;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -10,31 +11,43 @@ public class NcovRealtimeVo {
 	private String id;
 
 	@ApiModelProperty(value="区域名称")
+	@Excel(name = "区域名称",type = 10)
     private String regionName; 
 
 	@ApiModelProperty(value="确诊")
+	@Excel(name = "确诊",type = 10)
     private int diagnosis; 
 
 	@ApiModelProperty(value="疑似")
+	@Excel(name = "疑似",type = 10)
     private int suspected; 
 
 	@ApiModelProperty(value="死亡")
+	@Excel(name = "死亡",type = 10)
     private int death; 
 
 	@ApiModelProperty(value="治愈")
+	@Excel(name = "治愈",type = 10)
     private int cure; 
 
-	@ApiModelProperty(value="创建日期")
-    private String createDate; 
-
-	@ApiModelProperty(value="创建人")
-    private String createUser; 
-
 	@ApiModelProperty(value="省份号码 广东=44")
+	@Excel(name = "省份编号",type = 10)
     private Integer provinceCode; 
 
 	@ApiModelProperty(value="1=省，2=市")
     private Integer regionType; 
+	
+	@Excel(name = "较昨日确诊新增",type = 10)
+    private Integer yesterdayDiagnosis; //较昨日确诊新增
+
+	@Excel(name = "较昨日疑似新增",type = 10)
+    private Integer yesterdaySuspected; //较昨日疑似新增
+
+	@Excel(name = "较昨日死亡新增",type = 10)
+    private Integer yesterdayDeath; //较昨日死亡新增
+
+	@Excel(name = "较昨日治愈新增",type = 10)
+    private Integer yesterdayCure; //较昨日治愈新增
 
     public String getId() {
         return id;
@@ -84,22 +97,6 @@ public class NcovRealtimeVo {
         this.cure = cure;
     }
 
-    public String getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(String createDate) {
-        this.createDate = createDate;
-    }
-
-    public String getCreateUser() {
-        return createUser;
-    }
-
-    public void setCreateUser(String createUser) {
-        this.createUser = createUser;
-    }
-
     public Integer getProvinceCode() {
         return provinceCode;
     }
@@ -115,5 +112,37 @@ public class NcovRealtimeVo {
     public void setRegionType(Integer regionType) {
         this.regionType = regionType;
     }
+
+	public Integer getYesterdayDiagnosis() {
+		return yesterdayDiagnosis;
+	}
+
+	public void setYesterdayDiagnosis(Integer yesterdayDiagnosis) {
+		this.yesterdayDiagnosis = yesterdayDiagnosis;
+	}
+
+	public Integer getYesterdaySuspected() {
+		return yesterdaySuspected;
+	}
+
+	public void setYesterdaySuspected(Integer yesterdaySuspected) {
+		this.yesterdaySuspected = yesterdaySuspected;
+	}
+
+	public Integer getYesterdayDeath() {
+		return yesterdayDeath;
+	}
+
+	public void setYesterdayDeath(Integer yesterdayDeath) {
+		this.yesterdayDeath = yesterdayDeath;
+	}
+
+	public Integer getYesterdayCure() {
+		return yesterdayCure;
+	}
+
+	public void setYesterdayCure(Integer yesterdayCure) {
+		this.yesterdayCure = yesterdayCure;
+	}
 
 }

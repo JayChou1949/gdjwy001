@@ -8,8 +8,10 @@
     <result column="suspected" jdbcType="DECIMAL" property="suspected" />
     <result column="death" jdbcType="DECIMAL" property="death" />
     <result column="cure" jdbcType="DECIMAL" property="cure" />
-    <result column="create_date" jdbcType="VARCHAR" property="createDate" />
-    <result column="create_user" jdbcType="VARCHAR" property="createUser" />
+    <result column="yesterday_diagnosis" jdbcType="DECIMAL" property="yesterdayDiagnosis" />
+    <result column="yesterday_suspected" jdbcType="DECIMAL" property="yesterdaySuspected" />
+    <result column="yesterday_death" jdbcType="DECIMAL" property="yesterdayDeath" />
+    <result column="yesterday_cure" jdbcType="DECIMAL" property="yesterdayCure" />
     <result column="province_code" jdbcType="DECIMAL" property="provinceCode" />
     <result column="region_type" jdbcType="DECIMAL" property="regionType" />
   </resultMap>
@@ -20,8 +22,10 @@
     <result column="suspected" jdbcType="DECIMAL" property="suspected" />
     <result column="death" jdbcType="DECIMAL" property="death" />
     <result column="cure" jdbcType="DECIMAL" property="cure" />
-    <result column="create_date" jdbcType="VARCHAR" property="createDate" />
-    <result column="create_user" jdbcType="VARCHAR" property="createUser" />
+    <result column="yesterday_diagnosis" jdbcType="DECIMAL" property="yesterdayDiagnosis" />
+    <result column="yesterday_suspected" jdbcType="DECIMAL" property="yesterdaySuspected" />
+    <result column="yesterday_death" jdbcType="DECIMAL" property="yesterdayDeath" />
+    <result column="yesterday_cure" jdbcType="DECIMAL" property="yesterdayCure" />
     <result column="province_code" jdbcType="DECIMAL" property="provinceCode" />
     <result column="region_type" jdbcType="DECIMAL" property="regionType" />
   </resultMap>
@@ -29,24 +33,19 @@
     id, region_name, diagnosis, suspected, death, cure, create_date, create_user, province_code, 
     region_type
   </sql>
-  <sql id="limitDate">
-  
-  
-  	(select create_date from (select create_date,rownum as rn from (select tn.create_date from t_ncov_realtime tn
-                                 group by tn.create_date
-                                 order by tn.create_date desc))
-                         where rn = #{rowNum,jdbcType=DECIMAL})
-  
-  </sql>
   
   <select id="countNcovRealTime" resultMap="ncovRealtimeVo">
     select 
 		sum(t.diagnosis) as diagnosis, 
 		sum(t.suspected) as suspected, 
 		sum(t.death) as death, 
-		sum(t.cure) as cure
+		sum(t.cure) as cure,
+		sum(t.yesterday_diagnosis) as yesterdayDiagnosis, 
+		sum(t.yesterday_suspected) as yesterdaySuspected, 
+		sum(t.yesterday_death) as yesterdayDeath, 
+		sum(t.yesterday_cure) as yesterdayCure
 	from t_ncov_realtime t
-		where t.region_type = #{regionType,jdbcType=DECIMAL} and t.create_date = <include refid="limitDate"></include>
+		where t.region_type = #{regionType,jdbcType=DECIMAL} 
   </select>
   
   <select id="findNcovRealtimeList" resultMap="ncovRealtimeVo">
@@ -57,7 +56,7 @@
   		   cure, 
   		   province_code 
   		from t_ncov_realtime t 
-		where t.region_type = #{regionType,jdbcType=DECIMAL} and t.create_date = <include refid="limitDate"></include>
+		where t.region_type = #{regionType,jdbcType=DECIMAL}
   </select>
   
 </mapper>

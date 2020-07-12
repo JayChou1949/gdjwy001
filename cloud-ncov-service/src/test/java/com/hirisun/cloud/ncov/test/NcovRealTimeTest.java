@@ -7,10 +7,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.alibaba.fastjson.JSONObject;
-import com.hirisun.cloud.common.vo.ResponseResult;
 import com.hirisun.cloud.model.ncov.vo.realtime.HomePageNcovRealtimeVo;
 import com.hirisun.cloud.ncov.NcovApplication;
-import com.hirisun.cloud.ncov.bean.NcovRealtime;
 import com.hirisun.cloud.ncov.service.NcovRealtimeService;
 
 @RunWith(SpringRunner.class)
@@ -90,33 +88,8 @@ public class NcovRealTimeTest {
 	public void save() {
 		
 		JSONObject parseObject = JSONObject.parseObject(getData());
-		
 		System.out.println(parseObject.toString());
-//		ResponseResult responseResult = ncovRealtimeService.importNcovRealtimeData(getData());
-//		System.out.println(JSONObject.toJSONString(responseResult));
 		
-	}
-	
-	@Test
-	public void update() {
-		
-		String id = "10dabc0498ab2a7c837a0e52561a68d4";
-		NcovRealtime ncovRealtime = ncovRealtimeService.getNcovRealtimeById(id );
-		System.out.println(JSONObject.toJSONString(ncovRealtime));
-		ncovRealtime.setCure(2);
-		ncovRealtime.setDeath(2);
-		ncovRealtime.setDiagnosis(2);
-		ncovRealtime.setSuspected(2);
-		ncovRealtimeService.updateNcovRealtimeById(ncovRealtime);
-		ncovRealtime = ncovRealtimeService.getNcovRealtimeById(id );
-		System.out.println(JSONObject.toJSONString(ncovRealtime));
-	}
-	
-	@Test
-	public void delete() {
-		
-		ResponseResult responseResult = ncovRealtimeService.deleteNcovRealtimeById("59e9d02c08a8dcb6d6472d45b37cc55e");
-		System.out.println(JSONObject.toJSONString(responseResult));
 	}
 	
 	@Test

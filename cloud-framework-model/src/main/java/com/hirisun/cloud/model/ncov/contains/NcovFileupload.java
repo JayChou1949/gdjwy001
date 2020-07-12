@@ -15,6 +15,9 @@ public class NcovFileupload {
 	public final static String IAAS_VM = "IAASVM";
 	public final static String IAAS_DESKTOP = "IAASDESKTOP";
 	public final static String PAAS_DATA = "PAASDATA";
+	public final static String PAAS_OVERVIEW = "PAASOVERVIEW";
+	public final static String PAAS_RESOURCE = "PAASRESOURCE";
+	public final static String PAAS_APPDETAIL = "PAASAPPDETAIL";
 	public final static String REALTIME = "REALTIME";
 	
 	public static  Map<String, String> initUrlData(){

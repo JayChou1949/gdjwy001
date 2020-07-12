@@ -16,7 +16,7 @@ public interface FileUploadApi {
      *
      * @return
      */
-    @PostMapping(value = "/v1/file/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/file/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     QueryResponseResult upload(MultipartFile file);
     
     /**
@@ -24,7 +24,7 @@ public interface FileUploadApi {
      * @param fileId
      * @return
      */
-    @PostMapping("/v1/file/delete")
+    @PostMapping("/file/delete")
     public QueryResponseResult deleteFileByFileId(@RequestParam("fileId")String fileId);
 	
     /**
@@ -32,7 +32,7 @@ public interface FileUploadApi {
      * @param fileId
      * @return
      */
-    @PostMapping("/v1/file/download")
+    @PostMapping("/file/download")
     public QueryResponseResult downloadFileByFileId(@RequestParam("fileId")String fileId);
     
     

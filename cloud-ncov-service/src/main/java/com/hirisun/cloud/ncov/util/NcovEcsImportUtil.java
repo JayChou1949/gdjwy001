@@ -1,6 +1,8 @@
 package com.hirisun.cloud.ncov.util;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -26,6 +28,7 @@ import com.hirisun.cloud.model.ncov.vo.iaas.NcovHomePageIaasVo;
 import com.hirisun.cloud.model.ncov.vo.paas.NcovClusterApp;
 import com.hirisun.cloud.model.ncov.vo.paas.NcovClusterOverviewVo;
 import com.hirisun.cloud.model.ncov.vo.paas.NcovClusterResourceVo;
+import com.hirisun.cloud.model.ncov.vo.realtime.NcovRealtimeVo;
 
 import cn.afterturn.easypoi.excel.ExcelImportUtil;
 import cn.afterturn.easypoi.excel.entity.ImportParams;
@@ -378,6 +381,31 @@ public class NcovEcsImportUtil {
         return list;
     }
     
+    public static List<NcovRealtimeVo> getNcovRealtimeByExcel(InputStream inputStream,int sheet){
+    	
+		try{
+            ImportParams params = new ImportParams();
+            params.setStartSheetIndex(sheet);
+            List<NcovRealtimeVo> list = ExcelImportUtil.importExcel(inputStream,NcovRealtimeVo.class,params);
+            if(CollectionUtils.isNotEmpty(list)) {
+            	//excel sheet 0则是第一页省份数据,1则是广东省市区数据,RegionType = 1为省份,2=市区
+            	list.forEach(vo->{vo.setRegionType(sheet+1);});
+            }
+            return list;
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if(inputStream != null){
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    	return null;
+    }
+    
     /**
      * 疫情虚拟机总览数据
      * 原来读取 ncovEcsSource.xlsx 
@@ -461,7 +489,11 @@ public class NcovEcsImportUtil {
     public static NcovHomePageIaasVo epidemicExcl(String fileId) throws Exception {
     	
     	Object obj = downloadFileByFileId(fileId);
-    	if(obj != null)return epidemicExcl(new ByteArrayInputStream((byte[]) obj));
+    	if(obj != null) {
+    		byte[] bytes = obj.toString().getBytes();
+    		InputStream inputStream = new ByteArrayInputStream(bytes);
+    		return epidemicExcl(inputStream);
+    	}
         return null;
         
     }

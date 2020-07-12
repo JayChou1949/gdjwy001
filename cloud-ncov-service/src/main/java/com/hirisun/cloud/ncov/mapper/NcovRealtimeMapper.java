@@ -10,9 +10,9 @@ import com.hirisun.cloud.ncov.bean.NcovRealtime;
 
 public interface NcovRealtimeMapper extends BaseMapper<NcovRealtime>{
 	
-	NcovRealtimeVo countNcovRealTime(@Param("regionType")Integer regionType,@Param("rowNum")Integer rowNum );
+	NcovRealtimeVo countNcovRealTime(@Param("regionType")Integer regionType);
 	
-	List<NcovRealtimeVo> findNcovRealtimeList(@Param("regionType")Integer regionType,@Param("rowNum")Integer rowNum );
+	List<NcovRealtimeVo> findNcovRealtimeList(@Param("regionType")Integer regionType);
 	
 	
 }

@@ -11,9 +11,12 @@
     <properties>
         <maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
     </properties>
-
+	
     <dependencies>
-
+		<dependency>
+		    <groupId>com.alibaba</groupId>
+		    <artifactId>druid-spring-boot-starter</artifactId>
+		</dependency>
         <dependency>
             <groupId>com.hirisun.cloud</groupId>
             <artifactId>cloud-framework-api</artifactId>
@@ -122,7 +125,6 @@
     </dependencies>
 
     <build>
-
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -146,17 +148,6 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
-            <plugin>
-			    <groupId>org.apache.maven.plugins</groupId>
-			    <artifactId>maven-resources-plugin</artifactId>
-			    <configuration>
-			        <encoding>UTF-8</encoding>
-			        <nonFilteredFileExtensions>
-			            <nonFilteredFileExtension>xlsx</nonFilteredFileExtension>
-			            <nonFilteredFileExtension>xls</nonFilteredFileExtension>
-			        </nonFilteredFileExtensions>
-			    </configuration>
-			</plugin>
         </plugins>
     </build>
 </project>

@@ -20,16 +20,10 @@ public class HomePageNcovRealtimeVo implements Serializable{
 	private static final long serialVersionUID = 260770784421597458L;
 	
 	@ApiModelProperty(value="今天全国统计数据")
-	private NcovRealtimeVo toDayCountryTotal; 
-	
-	@ApiModelProperty(value="昨天全国统计数据")
-	private NcovRealtimeVo yesterdayCountryTotal; 
+	private NcovRealtimeVo countryTotal; 
 	
 	@ApiModelProperty(value="今天城市统计数据")
-	private NcovRealtimeVo toDayCityTotal; 
-	
-	@ApiModelProperty(value="昨天城市统计数据")
-	private NcovRealtimeVo  yesterdayCityTotal; 
+	private NcovRealtimeVo cityTotal; 
 	
 	@ApiModelProperty(value="所有省份地图数据")
 	private List<NcovRealtimeVo> provinceList; 
@@ -37,29 +31,17 @@ public class HomePageNcovRealtimeVo implements Serializable{
 	@ApiModelProperty(value="广东省列表数据")
 	private List<NcovRealtimeVo> cityList; 
 	
-	public NcovRealtimeVo getToDayCountryTotal() {
-		return toDayCountryTotal;
+	public NcovRealtimeVo getCountryTotal() {
+		return countryTotal;
 	}
-	public void setToDayCountryTotal(NcovRealtimeVo toDayCountryTotal) {
-		this.toDayCountryTotal = toDayCountryTotal;
+	public void setCountryTotal(NcovRealtimeVo countryTotal) {
+		this.countryTotal = countryTotal;
 	}
-	public NcovRealtimeVo getYesterdayCountryTotal() {
-		return yesterdayCountryTotal;
+	public NcovRealtimeVo getCityTotal() {
+		return cityTotal;
 	}
-	public void setYesterdayCountryTotal(NcovRealtimeVo yesterdayCountryTotal) {
-		this.yesterdayCountryTotal = yesterdayCountryTotal;
-	}
-	public NcovRealtimeVo getToDayCityTotal() {
-		return toDayCityTotal;
-	}
-	public void setToDayCityTotal(NcovRealtimeVo toDayCityTotal) {
-		this.toDayCityTotal = toDayCityTotal;
-	}
-	public NcovRealtimeVo getYesterdayCityTotal() {
-		return yesterdayCityTotal;
-	}
-	public void setYesterdayCityTotal(NcovRealtimeVo yesterdayCityTotal) {
-		this.yesterdayCityTotal = yesterdayCityTotal;
+	public void setCityTotal(NcovRealtimeVo cityTotal) {
+		this.cityTotal = cityTotal;
 	}
 	public List<NcovRealtimeVo> getProvinceList() {
 		return provinceList;
