@@ -1,5 +1,6 @@
 package com.hirisun.cloud.ncov.service.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,14 +49,52 @@ public class NcovRealtimeServiceImpl implements NcovRealtimeService {
 	 * @return
 	 */
 	private HomePageNcovRealtimeVo getHomePageNcovRealtime() {
+		
+		List<NcovRealtimeVo> allList = ncovRealtimeMapper.findAll();
 		//全国数据省份
-		List<NcovRealtimeVo> provinceList = ncovRealtimeMapper.findNcovRealtimeList(1);
+		List<NcovRealtimeVo> provinceList = new ArrayList<NcovRealtimeVo>();
 		//全国统计数据
-		NcovRealtimeVo counturyTotal = ncovRealtimeMapper.countNcovRealTime(1);
+		NcovRealtimeVo counturyTotal = new NcovRealtimeVo();
 		//所有城市列表数据
-		List<NcovRealtimeVo> cityList = ncovRealtimeMapper.findNcovRealtimeList(2);
+		List<NcovRealtimeVo> cityList = new ArrayList<NcovRealtimeVo>();
 		//统计所有城市列表数据
-		NcovRealtimeVo cityTotal = ncovRealtimeMapper.countNcovRealTime(2);
+		NcovRealtimeVo cityTotal = new NcovRealtimeVo();
+		
+		if(CollectionUtils.isNotEmpty(allList)) {
+			
+			allList.forEach(vo->{
+				
+				Integer regionType = vo.getRegionType();
+				//省份
+				if(regionType == 1) {
+					
+					provinceList.add(vo);
+					
+					counturyTotal.setCure(counturyTotal.getCure()+vo.getCure());
+					counturyTotal.setDeath(counturyTotal.getDeath()+vo.getDeath());
+					counturyTotal.setDiagnosis(counturyTotal.getDiagnosis()+vo.getDiagnosis());
+					counturyTotal.setSuspected(counturyTotal.getSuspected()+vo.getSuspected());
+					counturyTotal.setYesterdayCure(counturyTotal.getYesterdayCure()+vo.getYesterdayCure());
+					counturyTotal.setYesterdayDeath(counturyTotal.getYesterdayDeath()+vo.getYesterdayDeath());
+					counturyTotal.setYesterdayDiagnosis(counturyTotal.getYesterdayDiagnosis()+vo.getYesterdayDiagnosis());
+					counturyTotal.setYesterdaySuspected(counturyTotal.getYesterdaySuspected()+vo.getYesterdaySuspected());
+					
+				}else {
+					cityList.add(vo);
+					
+					cityTotal.setCure(cityTotal.getCure()+vo.getCure());
+					cityTotal.setDeath(cityTotal.getDeath()+vo.getDeath());
+					cityTotal.setDiagnosis(cityTotal.getDiagnosis()+vo.getDiagnosis());
+					cityTotal.setSuspected(cityTotal.getSuspected()+vo.getSuspected());
+					cityTotal.setYesterdayCure(cityTotal.getYesterdayCure()+vo.getYesterdayCure());
+					cityTotal.setYesterdayDeath(cityTotal.getYesterdayDeath()+vo.getYesterdayDeath());
+					cityTotal.setYesterdayDiagnosis(cityTotal.getYesterdayDiagnosis()+vo.getYesterdayDiagnosis());
+					cityTotal.setYesterdaySuspected(cityTotal.getYesterdaySuspected()+vo.getYesterdaySuspected());
+				}
+				
+			});
+			
+		}
 		
 		HomePageNcovRealtimeVo vo = new HomePageNcovRealtimeVo();
 		//当天全国各省确诊、疑似、治愈、死亡,较昨日增长总计

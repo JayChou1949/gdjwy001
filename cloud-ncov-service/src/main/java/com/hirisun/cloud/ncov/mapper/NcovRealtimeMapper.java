@@ -14,5 +14,6 @@ public interface NcovRealtimeMapper extends BaseMapper<NcovRealtime>{
 	
 	List<NcovRealtimeVo> findNcovRealtimeList(@Param("regionType")Integer regionType);
 	
+	List<NcovRealtimeVo> findAll();
 	
 }

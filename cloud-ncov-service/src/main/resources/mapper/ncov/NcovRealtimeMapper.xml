@@ -34,6 +34,12 @@
     region_type
   </sql>
   
+  
+  <select id="findAll" resultMap="ncovRealtimeVo">
+  	select <include refid="Base_Column_List"></include> 
+  		from t_ncov_realtime t
+  </select>
+  
   <select id="countNcovRealTime" resultMap="ncovRealtimeVo">
     select 
 		sum(t.diagnosis) as diagnosis, 

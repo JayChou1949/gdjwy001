@@ -35,19 +35,19 @@ public class NcovRealtimeVo {
     private Integer provinceCode; 
 
 	@ApiModelProperty(value="1=省，2=市")
-    private Integer regionType; 
+    private int regionType; 
 	
 	@Excel(name = "较昨日确诊新增",type = 10)
-    private Integer yesterdayDiagnosis; //较昨日确诊新增
+    private int yesterdayDiagnosis; //较昨日确诊新增
 
 	@Excel(name = "较昨日疑似新增",type = 10)
-    private Integer yesterdaySuspected; //较昨日疑似新增
+    private int yesterdaySuspected; //较昨日疑似新增
 
 	@Excel(name = "较昨日死亡新增",type = 10)
-    private Integer yesterdayDeath; //较昨日死亡新增
+    private int yesterdayDeath; //较昨日死亡新增
 
 	@Excel(name = "较昨日治愈新增",type = 10)
-    private Integer yesterdayCure; //较昨日治愈新增
+    private int yesterdayCure; //较昨日治愈新增
 
     public String getId() {
         return id;
@@ -113,35 +113,35 @@ public class NcovRealtimeVo {
         this.regionType = regionType;
     }
 
-	public Integer getYesterdayDiagnosis() {
+	public int getYesterdayDiagnosis() {
 		return yesterdayDiagnosis;
 	}
 
-	public void setYesterdayDiagnosis(Integer yesterdayDiagnosis) {
+	public void setYesterdayDiagnosis(int yesterdayDiagnosis) {
 		this.yesterdayDiagnosis = yesterdayDiagnosis;
 	}
 
-	public Integer getYesterdaySuspected() {
+	public int getYesterdaySuspected() {
 		return yesterdaySuspected;
 	}
 
-	public void setYesterdaySuspected(Integer yesterdaySuspected) {
+	public void setYesterdaySuspected(int yesterdaySuspected) {
 		this.yesterdaySuspected = yesterdaySuspected;
 	}
 
-	public Integer getYesterdayDeath() {
+	public int getYesterdayDeath() {
 		return yesterdayDeath;
 	}
 
-	public void setYesterdayDeath(Integer yesterdayDeath) {
+	public void setYesterdayDeath(int yesterdayDeath) {
 		this.yesterdayDeath = yesterdayDeath;
 	}
 
-	public Integer getYesterdayCure() {
+	public int getYesterdayCure() {
 		return yesterdayCure;
 	}
 
-	public void setYesterdayCure(Integer yesterdayCure) {
+	public void setYesterdayCure(int yesterdayCure) {
 		this.yesterdayCure = yesterdayCure;
 	}
 
