@@ -184,4 +184,10 @@ public class NcovRealtimeServiceImpl implements NcovRealtimeService {
 		return vo;
 	}
 
+	@Override
+	public List<NcovRealtimeVo> findNcovRealtimeByRegionType(int regionType) {
+		List<NcovRealtimeVo> list = ncovRealtimeMapper.findNcovRealtimeList(regionType);
+		return list;
+	}
+
 }

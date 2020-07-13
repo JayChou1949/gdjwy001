@@ -26,8 +26,15 @@ public class NcovFileUploadController {
 	
 	@ApiOperation(value = "文件上传")
 	@ApiImplicitParams({
-        @ApiImplicitParam(name = "serviceType", value = "服务类型", required = true, paramType = "query"),
-        @ApiImplicitParam(name = "dataType", value = "数据类型", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "serviceType", value = "服务类型(疫情直接大写写死 NCOV)", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "dataType", value = "服务共享:DATASHARING," + 
+        		"数据服务:DATASERVICE," + 
+        		"数据接入:DATAACCESS," + 
+        		"数据建模:DATAMODELING," + 
+        		"数据治理:DATAGOVERNANCE," + 
+        		"大数据集群配置:PAASDATA," + 
+        		"疫情桌面云数据配置:IAASDESKTOP," + 
+        		"虚拟机数据配置:IAASVM", required = true, paramType = "query"),
         @ApiImplicitParam(name = "file", value = "文件", required = true, paramType = "query")
 	})
 	@PostMapping (value="/upload")

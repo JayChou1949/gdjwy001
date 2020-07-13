@@ -1,9 +1,12 @@
 package com.hirisun.cloud.ncov.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hirisun.cloud.common.vo.QueryResponseResult;
@@ -13,6 +16,8 @@ import com.hirisun.cloud.model.ncov.vo.realtime.NcovRealtimeVo;
 import com.hirisun.cloud.ncov.service.NcovRealtimeService;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -44,5 +49,18 @@ public class NcovRealTimeController {
     public ResponseResult save(NcovRealtimeVo vo) {
         ncovRealtimeService.editNcovRealtime(vo);
         return ResponseResult.success();
+    }
+    
+    @ApiOperation(value = "后台获取疫情实时省市数据", notes = "接口说明")
+    @ApiImplicitParams({
+    	  @ApiImplicitParam(name="regionType",value="区域类型1=省,2=市",dataType="int", paramType = "query")
+    })
+    @ApiResponses(
+            @ApiResponse(code = 200, message = "success", response = NcovRealtimeVo.class)
+    )
+    @PostMapping("/find")
+    public QueryResponseResult find(@RequestParam(required = true, defaultValue = "1") int regionType) {
+        List<NcovRealtimeVo> list = ncovRealtimeService.findNcovRealtimeByRegionType(regionType);
+        return QueryResponseResult.success(list);
     }
 }

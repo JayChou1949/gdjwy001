@@ -20,5 +20,7 @@ public interface NcovRealtimeService {
 	
 	public HomePageNcovRealtimeVo setHomePageNcovRealtimeCache();
 	
+	public List<NcovRealtimeVo> findNcovRealtimeByRegionType(int regionType);
+	
 	
 }
