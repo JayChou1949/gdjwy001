@@ -16,6 +16,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
@@ -36,6 +37,10 @@ import java.util.Map;
 @RequestMapping("/api/threePartyInterface")
 @Api(description = "美亚daas数据治理")
 public class ThreePartyInterfaceController {
+
+    //美亚ip、开放端口
+    @Value("${third.my.url}")
+    private String BASE_URL;
 
     private static Logger logger = LoggerFactory.getLogger(ThreePartyInterfaceController.class);
 
@@ -128,7 +133,7 @@ public class ThreePartyInterfaceController {
         String jsonString = jsonObject.getJSONObject("dataJson").toJSONString();
         jsonObject.remove("dataJson");
         jsonObject.put("dataJson", jsonString);
-        String url = "http://15.40.3.71:8000/services/serviceInvoke/queryDataService/foreign/dataResource/action/pageQuery";
+        String url = BASE_URL+"/services/serviceInvoke/queryDataService/foreign/dataResource/action/pageQuery";
         Response response=null;
         String data =null;
         try{
@@ -152,7 +157,7 @@ public class ThreePartyInterfaceController {
     @ApiOperation("数据表结构")
     @RequestMapping(value = "/sourceStandardFieldMappingList", method = RequestMethod.GET)
     public Object sourceStandardFieldMappingList(String id)throws Exception {
-        String url = "http://15.40.3.71:8000/services/serviceInvoke/queryDataService/foreign/dataResource/action/sourceStandardFieldMappingList?resourceId=" + id;
+        String url = BASE_URL+"/services/serviceInvoke/queryDataService/foreign/dataResource/action/sourceStandardFieldMappingList?resourceId=" + id;
         Response response=null;
         String data =null;
         try{

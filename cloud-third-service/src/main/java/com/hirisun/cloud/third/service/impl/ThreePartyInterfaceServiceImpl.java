@@ -57,7 +57,7 @@ public class ThreePartyInterfaceServiceImpl extends ServiceImpl<ThreePartyInterf
             threePartyInterface.setLabel(label);
             threePartyInterface.setName(name);
             threePartyInterface.setData(data);
-            threePartyInterface.setType("99");//美亚类型接口
+            threePartyInterface.setType(ThreePartyInterface.TYPE_MY);//美亚类型接口
             long millis = System.currentTimeMillis();
             Date date = new Date(millis);
             threePartyInterface.setUpdateTime(date);

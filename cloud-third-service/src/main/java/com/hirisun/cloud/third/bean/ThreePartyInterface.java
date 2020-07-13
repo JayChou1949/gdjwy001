@@ -25,6 +25,13 @@ public class ThreePartyInterface implements Serializable {
 
     private static final long serialVersionUID=1L;
 
+    //华为类型
+    @TableField(exist = false)
+    public static final String type_HW="1";
+    //美亚类型
+    @TableField(exist = false)
+    public static final String TYPE_MY="2";
+
     @ApiModelProperty(value = "id")
     @TableId("ID")
     private String id;
