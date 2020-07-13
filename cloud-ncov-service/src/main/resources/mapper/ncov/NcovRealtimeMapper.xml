@@ -30,8 +30,8 @@
     <result column="region_type" jdbcType="DECIMAL" property="regionType" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, region_name, diagnosis, suspected, death, cure, create_date, create_user, province_code, 
-    region_type
+    id, region_name, diagnosis, suspected, death, cure, province_code, 
+    region_type,yesterday_diagnosis,yesterday_suspected,yesterday_death,yesterday_cure
   </sql>
   
   

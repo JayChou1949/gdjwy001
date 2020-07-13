@@ -17,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.hirisun.cloud.api.file.FileUploadApi;
 import com.hirisun.cloud.api.redis.RedisApi;
-import com.hirisun.cloud.common.util.FastJsonUtil;
 import com.hirisun.cloud.common.util.JsonUtils;
 import com.hirisun.cloud.common.util.LocalDateUtil;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
@@ -211,6 +210,9 @@ public class NcovFileUploadServiceImpl implements NcovFileUploadService {
 						NcovKey.HOME_PAGE_PAAS_OVERVIEW,json);
 			}
 			
+			
+			
+			
 			List<NcovClusterResourceVo> resourceList = NcovEcsImportUtil.getResourceList(multipartFile.getInputStream(),1);
 			if(CollectionUtils.isNotEmpty(resourceList)) {
 				String json = JsonUtils.objectToJson(resourceList);
@@ -227,8 +229,8 @@ public class NcovFileUploadServiceImpl implements NcovFileUploadService {
 			
 		}else if(NcovFileupload.REALTIME.equals(dataType)) {
 			
-			List<NcovRealtimeVo> provideList = NcovEcsImportUtil.getNcovRealtimeByExcel(multipartFile.getInputStream(), 0);
-			List<NcovRealtimeVo> cityList = NcovEcsImportUtil.getNcovRealtimeByExcel(multipartFile.getInputStream(), 1);
+			List<NcovRealtimeVo> provideList = NcovEcsImportUtil.getNcovRealtimeByExcel(multipartFile.getInputStream(), 0,1);
+			List<NcovRealtimeVo> cityList = NcovEcsImportUtil.getNcovRealtimeByExcel(multipartFile.getInputStream(), 1,1);
 			ncovRealtimeService.importNcovRealtimeData(provideList);
 			ncovRealtimeService.importNcovRealtimeData(cityList);
 			

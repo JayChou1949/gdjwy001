@@ -151,6 +151,7 @@ public class NcovRealtimeServiceImpl implements NcovRealtimeService {
 		
 		if(CollectionUtils.isNotEmpty(list)) {
 			list.forEach(entity->{
+				vo.setId(entity.getId());
 				BeanUtils.copyProperties(vo, entity);
 				ncovRealtimeMapper.updateById(entity);
 			});

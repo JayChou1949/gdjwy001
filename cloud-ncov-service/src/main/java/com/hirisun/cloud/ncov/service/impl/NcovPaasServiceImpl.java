@@ -43,7 +43,7 @@ public class NcovPaasServiceImpl implements NcovPaasService {
 		
 		NcovClusterOverviewVo overview = null;
 		String  res = redisApi.getStrValue(NcovKey.HOME_PAGE_PAAS_OVERVIEW);
-        if(StringUtils.isNotBlank(res)){
+        if(StringUtils.isNotBlank(res) && !"null".equals(res)){
         	overview = JSON.parseObject(res,NcovClusterOverviewVo.class);
             if(overview != null)return  overview;
         }
@@ -66,7 +66,7 @@ public class NcovPaasServiceImpl implements NcovPaasService {
 		
 		List<NcovClusterResourceVo> resourceList = null;
 		String  res = redisApi.getStrValue(NcovKey.HOME_PAGE_PAAS_RESOURCE);
-        if(StringUtils.isNotBlank(res)){
+        if(StringUtils.isNotBlank(res) && !"null".equals(res)){
         	resourceList = JSON.parseArray(res, NcovClusterResourceVo.class);
             if(CollectionUtils.isNotEmpty(resourceList))return  resourceList;
         }
@@ -88,7 +88,7 @@ public class NcovPaasServiceImpl implements NcovPaasService {
 		
 		List<NcovClusterApp> appList = null;
 		String  res = redisApi.getStrValue(NcovKey.HOME_PAGE_PAAS_APPDETAIL);
-        if(StringUtils.isNotBlank(res)){
+        if(StringUtils.isNotBlank(res) && !"null".equals(res)){
         	appList = JSON.parseArray(res, NcovClusterApp.class);
             if(CollectionUtils.isNotEmpty(appList)) {
             	return MemoryPageUtil.page(convert2Vo(appList), pageSize, current);
@@ -97,7 +97,7 @@ public class NcovPaasServiceImpl implements NcovPaasService {
 		
         NcovHomePageData data = ncovHomePageDataService.getNcovHomePageDataByType(NcovFileupload.PAAS_APPDETAIL);
         String json = data.getData();
-        if(StringUtils.isNotBlank(json)){
+        if(StringUtils.isNotBlank(json) ){
         	appList = JSON.parseArray(json, NcovClusterApp.class);
         	redisApi.setForPerpetual(NcovKey.HOME_PAGE_PAAS_APPDETAIL, json);
         }
