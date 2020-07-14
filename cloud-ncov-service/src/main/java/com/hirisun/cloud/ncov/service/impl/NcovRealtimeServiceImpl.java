@@ -190,4 +190,9 @@ public class NcovRealtimeServiceImpl implements NcovRealtimeService {
 		return list;
 	}
 
+	@Override
+	public NcovRealtimeVo countNcovRealTime(Integer regionType) {
+		return ncovRealtimeMapper.countNcovRealTime(regionType);
+	}
+
 }

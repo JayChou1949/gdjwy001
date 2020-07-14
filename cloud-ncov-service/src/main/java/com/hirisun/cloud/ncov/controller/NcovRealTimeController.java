@@ -63,4 +63,17 @@ public class NcovRealTimeController {
         List<NcovRealtimeVo> list = ncovRealtimeService.findNcovRealtimeByRegionType(regionType);
         return QueryResponseResult.success(list);
     }
+    
+    @ApiOperation(value = "后台获取疫情实时省市统计数据", notes = "接口说明")
+    @ApiImplicitParams({
+    	  @ApiImplicitParam(name="regionType",value="区域类型1=省,2=市",dataType="int", paramType = "query")
+    })
+    @ApiResponses(
+            @ApiResponse(code = 200, message = "success", response = NcovRealtimeVo.class)
+    )
+    @PostMapping("/total")
+    public QueryResponseResult total(@RequestParam(required = true, defaultValue = "1") int regionType) {
+    	NcovRealtimeVo ncovRealtimeVo = ncovRealtimeService.countNcovRealTime(regionType);
+        return QueryResponseResult.success(ncovRealtimeVo);
+    }
 }

@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.hirisun.cloud.common.vo.QueryResponseResult;
-import com.hirisun.cloud.common.vo.ResponseResult;
 import com.hirisun.cloud.ncov.service.NcovFileUploadService;
 
 import io.swagger.annotations.Api;
@@ -38,11 +37,11 @@ public class NcovFileUploadController {
         @ApiImplicitParam(name = "file", value = "文件", required = true, paramType = "query")
 	})
 	@PostMapping (value="/upload")
-	public ResponseResult upload(@RequestParam("serviceType") String serviceType,
+	public QueryResponseResult upload(@RequestParam("serviceType") String serviceType,
 			@RequestParam("dataType") String dataType,@RequestParam("file") MultipartFile file) throws Exception {
 		
-		ncovFileUploadService.fileUpload(serviceType, dataType,file);
-		return ResponseResult.success();
+		String filePath = ncovFileUploadService.fileUpload(serviceType, dataType,file);
+		return QueryResponseResult.success(filePath);
 	}
 	
 	@ApiOperation(value = "获取疫情excel文件下载地址")
@@ -50,8 +49,9 @@ public class NcovFileUploadController {
         @ApiImplicitParam(name = "serviceType", value = "服务类型", required = true, paramType = "query")
 	})
 	@PostMapping (value="/url")
-	public QueryResponseResult getUrl(@RequestParam("serviceType") String serviceType) throws Exception {
-		return QueryResponseResult.success(ncovFileUploadService.getFileUrlByServiceType(serviceType));
+	public QueryResponseResult getUrl(@RequestParam("serviceType") String serviceType,
+			@RequestParam("dataType") String dataType) throws Exception {
+		return QueryResponseResult.success(ncovFileUploadService.getFileUrlByServiceType(serviceType,dataType));
 	}
 	
 	
