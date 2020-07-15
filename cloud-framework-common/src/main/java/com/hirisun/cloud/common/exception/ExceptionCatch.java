@@ -1,6 +1,7 @@
 package com.hirisun.cloud.common.exception;
 
 import com.google.common.collect.ImmutableMap;
+import com.hirisun.cloud.common.util.ExceptionPrintUtil;
 import com.hirisun.cloud.common.vo.CommonCode;
 import com.hirisun.cloud.common.vo.ResponseResult;
 import com.hirisun.cloud.common.vo.ResultCode;
@@ -52,8 +53,9 @@ public class ExceptionCatch {
     @ResponseBody
     public ResponseResult exception(Exception exception) {
         //exception.printStackTrace();
-        //记录日志
+        //记录日志和报错详情
         log.error("catch exception:{}", exception.getMessage());
+        log.error("catch exception detail:{}", ExceptionPrintUtil.getStackTraceInfo(exception));
         if (EXCEPTIONS == null) {
             //EXCEPTIONS构建成功
             EXCEPTIONS = builder.build();
