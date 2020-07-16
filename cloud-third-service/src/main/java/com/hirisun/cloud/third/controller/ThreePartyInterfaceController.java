@@ -4,6 +4,7 @@ package com.hirisun.cloud.third.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.parser.Feature;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.hirisun.cloud.common.util.ExceptionPrintUtil;
 import com.hirisun.cloud.common.util.OkHttpUtils;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.third.bean.ThreePartyInterface;
@@ -126,6 +127,7 @@ public class ThreePartyInterfaceController {
     /**
      * 数据资源目录列表，作用于daas-数据治理二级页面下查询的目录列表
      * 数据量大，直接去美亚查询，不保存数据到数据库
+     * jsonobject 带上分页信息
      */
     @ApiOperation("数据目录列表")
     @RequestMapping(value = "/pageQuery", method = RequestMethod.POST)
@@ -140,9 +142,8 @@ public class ThreePartyInterfaceController {
             response= OkHttpUtils.postJson(url, jsonObject.toString());
             data=response.body().string();
         }catch (Exception e){
-            e.printStackTrace();
             logger.error("catch exception:{}", e.getMessage());
-            logger.info("美亚接口异常[url:{}, label:{}, name:{}]",url);
+            logger.info("美亚接口异常[url:{},内容:{}]",url, ExceptionPrintUtil.getStackTraceInfo(e));
         }finally {
             if(response!=null){
                 response.close();
@@ -164,9 +165,57 @@ public class ThreePartyInterfaceController {
             response=OkHttpUtils.get(url, null);
             data = response.body().string();
         }catch (Exception e){
-            e.printStackTrace();
             logger.error("catch exception:{}", e.getMessage());
-            logger.info("美亚接口异常[url:{}, label:{}, name:{}]",url);
+            logger.info("美亚接口异常[url:{},内容:{}]",url, ExceptionPrintUtil.getStackTraceInfo(e));
+        }finally {
+            if(response!=null){
+                response.close();
+            }
+        }
+        return JSONObject.parseObject(data);
+    }
+
+    /*
+     *数据服务-数据组织-资源库等五大库二级页面接口
+     * resourceFirstClass:一级编码，由美亚分配，02资源库 03主题库 04知识库 05业务库 06业务要素索引库
+     */
+    @ApiOperation("数据组织五大库二级页面类型")
+    @GetMapping("/wdkSubPageType")
+    public Object wdkSubPageType(String resourceFirstClass) throws Exception {
+        String url = BASE_URL+"/services/serviceInvoke/queryDataService/foreign/statisticsSecond/getSecondClass?resourceFirstClass=" + resourceFirstClass;
+        Response response=null;
+        String data =null;
+        try{
+            response = OkHttpUtils.get(url, null);
+            data = response.body().string();
+        }catch (Exception e){
+            logger.error("catch exception:{}", e.getMessage());
+            logger.info("美亚接口异常[url:{},内容:{}]",url, ExceptionPrintUtil.getStackTraceInfo(e));
+        }finally {
+            if(response!=null){
+                response.close();
+            }
+        }
+        return JSONObject.parseObject(data);
+    }
+
+    /*
+     *数据服务-数据组织-资源库等五大库二级页面详情接口
+     * resourceFirstClass:一级编码，由美亚定义，02资源库 03主题库 04知识库 05业务库 06业务要素索引库
+     * resourceSecondClass：二级编码，由页面类型查询返回的列表数据中itemccode
+     */
+    @ApiOperation("数据组织五大库二级页面详情")
+    @GetMapping("/wdkSubPageInfo")
+    public Object wdkSubPageInfo(String resourceFirstClass, String resourceSecondClass) throws Exception {
+        String url = BASE_URL+"/services/serviceInvoke/queryDataService/foreign/statisticsSecond/getSecondClassCount?resourceFirstClass=" + resourceFirstClass + "&resourceSecondClass=" + resourceSecondClass;
+        Response response=null;
+        String data =null;
+        try{
+            response = OkHttpUtils.get(url, null);
+            data = response.body().string();
+        }catch (Exception e){
+            logger.error("catch exception:{}", e.getMessage());
+            logger.info("美亚接口异常[url:{},内容:{}]",url, ExceptionPrintUtil.getStackTraceInfo(e));
         }finally {
             if(response!=null){
                 response.close();

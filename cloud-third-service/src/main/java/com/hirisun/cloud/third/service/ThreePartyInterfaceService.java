@@ -2,7 +2,9 @@ package com.hirisun.cloud.third.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hirisun.cloud.third.bean.ThreePartyInterface;
+import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,5 +20,7 @@ public interface ThreePartyInterfaceService extends IService<ThreePartyInterface
     void getDataHandler(String url,String name,String label);
     void jsonDataHandler(String url,String name,String label,String json);
     void postDataHandler(String url, String name, String label, Map<String, String> map);
+
+    public List<ThreePartyInterface> getOldDataByParams(@Param("names") List<String> names);
 
 }

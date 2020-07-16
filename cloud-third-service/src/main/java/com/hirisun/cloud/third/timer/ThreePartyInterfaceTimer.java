@@ -1,5 +1,7 @@
 package com.hirisun.cloud.third.timer;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.hirisun.cloud.third.bean.ThreePartyInterface;
 import com.hirisun.cloud.third.service.ThreePartyInterfaceService;
 import com.hirisun.cloud.third.service.impl.ThreePartyInterfaceServiceImpl;
 import org.slf4j.Logger;
@@ -8,6 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author wuxiaoxing
@@ -148,7 +154,6 @@ public class ThreePartyInterfaceTimer {
                 "attrCategory","筛选条件","{}");
         threePartyInterfaceService.getDataHandler(BASE_URL+"/services/serviceInvoke/queryDataService/foreign/dataResource/action/tag",
                 "dataTag","常用标签");
-
         /**
          * 未发现使用位置
          * apimodel 模型超市按模型上线时间排行
@@ -156,5 +161,38 @@ public class ThreePartyInterfaceTimer {
          * modeljuesai 模型超市按决赛取
          */
         logger.info("====三方接口同步结束===");
+    }
+
+    /**
+     * 同步旧表到新表内，因为新第三方数据表数据来源不仅是美亚，大数据表、应用统计表、调用统计等模块未完成，没有数据来源，所以先同步旧表数据到新表，等其他模块新表完全重建，则更新此接口
+     */
+    @Scheduled(cron = "0 0/30 * * * ?")
+    public void syncThreePartyInterfaceTable() {
+        //查出需要同步数据的列，不查data字段，加快查询速度
+        List<ThreePartyInterface> list= threePartyInterfaceService.list(new QueryWrapper<ThreePartyInterface>().lambda()
+                .select(ThreePartyInterface::getId,ThreePartyInterface::getLabel,ThreePartyInterface::getName,ThreePartyInterface::getType)
+                .isNotNull(ThreePartyInterface::getName));
+        List<String> labelList = new ArrayList<>();
+        list.forEach(item->{
+            //只查询非美亚的数据，来源美亚的数据id和name一致
+            if (!item.getId().equals(item.getName())) {
+                labelList.add(item.getLabel());
+            }
+        });
+        //查询旧表的相关数据
+        List<ThreePartyInterface> oldDataList=threePartyInterfaceService.getOldDataByParams(labelList);
+        for (ThreePartyInterface threePartyInterface:list) {
+            for (ThreePartyInterface oldData:oldDataList) {
+                if (threePartyInterface.getId().equals(oldData.getId())) {
+                    threePartyInterface.setUpdateTime(new Date());
+                    threePartyInterface.setData(oldData.getData());
+                    threePartyInterfaceService.updateById(threePartyInterface);
+                    break;
+                }
+
+            }
+
+        }
+
     }
 }

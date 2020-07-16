@@ -12,4 +12,11 @@
         <result column="NAME" property="name" />
     </resultMap>
 
+    <select id="getOldDataByParams" resultType="com.hirisun.cloud.third.bean.ThreePartyInterface">
+        select * from TB_THREE_PARTY_INTERFACE i where 1=1
+        and i.LABEL IN
+        <foreach collection="labels" item="label" open="(" separator="," close=")">
+            #{label}
+        </foreach>
+    </select>
 </mapper>
