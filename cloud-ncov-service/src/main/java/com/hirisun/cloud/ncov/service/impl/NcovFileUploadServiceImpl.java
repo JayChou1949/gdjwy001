@@ -17,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.hirisun.cloud.api.file.FileUploadApi;
 import com.hirisun.cloud.api.redis.RedisApi;
-import com.hirisun.cloud.common.util.FastJsonUtil;
 import com.hirisun.cloud.common.util.JsonUtils;
 import com.hirisun.cloud.common.util.LocalDateUtil;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
@@ -64,16 +63,18 @@ public class NcovFileUploadServiceImpl implements NcovFileUploadService {
 	 * 3、刷新缓存
 	 */
 	@Transactional(rollbackFor = Exception.class) 
-	public void fileUpload(String serviceType,String dataType, MultipartFile multipartFile) throws Exception {
+	public String fileUpload(String serviceType,String dataType, MultipartFile multipartFile) throws Exception {
 		
 		String fileName = multipartFile.getOriginalFilename();
+		String filePath = "";
 		
 		//先上传
 		QueryResponseResult upload = fileUploadApi.upload(multipartFile);
 		Integer code = upload.getCode();
 		if(code == 0) {
+			filePath = upload.getData().toString();
 			//保存或更新数据
-			String fileOldId = saveFileUpload(serviceType,dataType ,fileName, upload.getData().toString());
+			String fileOldId = saveFileUpload(serviceType,dataType ,fileName, filePath);
 			//刷新缓存
 			setCache(dataType, multipartFile);
 			
@@ -83,6 +84,8 @@ public class NcovFileUploadServiceImpl implements NcovFileUploadService {
 				System.out.println(delete.getData());
 			}
 		}
+		
+		return fileAccessPath+filePath;
 	}
 
 	/**
@@ -211,6 +214,9 @@ public class NcovFileUploadServiceImpl implements NcovFileUploadService {
 						NcovKey.HOME_PAGE_PAAS_OVERVIEW,json);
 			}
 			
+			
+			
+			
 			List<NcovClusterResourceVo> resourceList = NcovEcsImportUtil.getResourceList(multipartFile.getInputStream(),1);
 			if(CollectionUtils.isNotEmpty(resourceList)) {
 				String json = JsonUtils.objectToJson(resourceList);
@@ -227,8 +233,8 @@ public class NcovFileUploadServiceImpl implements NcovFileUploadService {
 			
 		}else if(NcovFileupload.REALTIME.equals(dataType)) {
 			
-			List<NcovRealtimeVo> provideList = NcovEcsImportUtil.getNcovRealtimeByExcel(multipartFile.getInputStream(), 0);
-			List<NcovRealtimeVo> cityList = NcovEcsImportUtil.getNcovRealtimeByExcel(multipartFile.getInputStream(), 1);
+			List<NcovRealtimeVo> provideList = NcovEcsImportUtil.getNcovRealtimeByExcel(multipartFile.getInputStream(), 0,1);
+			List<NcovRealtimeVo> cityList = NcovEcsImportUtil.getNcovRealtimeByExcel(multipartFile.getInputStream(), 1,1);
 			ncovRealtimeService.importNcovRealtimeData(provideList);
 			ncovRealtimeService.importNcovRealtimeData(cityList);
 			
@@ -261,10 +267,13 @@ public class NcovFileUploadServiceImpl implements NcovFileUploadService {
 	/**
 	 * 根据服务类型获取所有文件(Ncov)
 	 */
-	public Map<String, String> getFileUrlByServiceType(String serviceType) {
+	public Map<String, String> getFileUrlByServiceType(String serviceType,String dataType) {
 		
 		Map<String, Object> columnMap  = new HashMap<String, Object>();
 		columnMap.put("SERVICE_TYPE", serviceType);
+		if(StringUtils.isNotBlank(dataType)) {
+			columnMap.put("DATA_TYPE", dataType);
+		}
 		List<FileUpload> fileList = fileUploadMapper.selectByMap(columnMap);
 		
 		Map<String, String> map = NcovFileupload.initUrlData();
@@ -275,10 +284,13 @@ public class NcovFileUploadServiceImpl implements NcovFileUploadService {
 	}
 
 	@Override
-	public Map<String, String> getFileUriByServiceType(String serviceType) {
+	public Map<String, String> getFileUriByServiceType(String serviceType,String dataType) {
 		
 		Map<String, Object> columnMap  = new HashMap<String, Object>();
 		columnMap.put("SERVICE_TYPE", serviceType);
+		if(StringUtils.isNotBlank(dataType)) {
+			columnMap.put("DATA_TYPE", dataType);
+		}
 		List<FileUpload> fileList = fileUploadMapper.selectByMap(columnMap);
 
 		Map<String, String> map = NcovFileupload.initUrlData();

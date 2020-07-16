@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -44,7 +45,7 @@ public class NcovDaasServiceImpl implements NcovDaasService {
 		
 		HomePageDataVo homePage = null;
 		String  res = redisApi.getStrValue(NcovKey.HOME_PAGE);
-        if(StringUtils.isNotBlank(res)){
+        if(StringUtils.isNotBlank(res) && !"null".equals(res)){
         	homePage = JSON.parseObject(res,HomePageDataVo.class);
             if(homePage != null)return  homePage;
         }
@@ -85,18 +86,22 @@ public class NcovDaasServiceImpl implements NcovDaasService {
         
         //数据接入
         Map<String, Object> dataAccess = getDataAccess(NcovFileupload.DAAS_DATA_ACCESS);
-        homePageData.setTotalCount(Long.valueOf(dataAccess.get("total").toString()));
-        homePageData.setResourceCount(Integer.valueOf(dataAccess.get("size").toString()));
-        homePageData.setYesterdayCount(Long.valueOf(dataAccess.get("yesterday").toString()));
-        
+        if(MapUtils.isNotEmpty(dataAccess)) {
+        	homePageData.setTotalCount(Long.valueOf(dataAccess.get("total").toString()));
+            homePageData.setResourceCount(Integer.valueOf(dataAccess.get("size").toString()));
+            homePageData.setYesterdayCount(Long.valueOf(dataAccess.get("yesterday").toString()));
+        }
         
         //数据治理
         Map<String, List<DataGovernanceLevel2Vo>> dataGovernanceMap = getDataGovernance(NcovFileupload.DAAS_DATA_GOVERNANCE);
-        List<DataGovernanceLevel2Vo> updateTypeVos = dataGovernanceMap.get("updateTypeVos");
-        List<DataGovernanceLevel2Vo> updateCycleVos = dataGovernanceMap.get("updateCycleVos");
+        if(MapUtils.isNotEmpty(dataGovernanceMap)) {
+        	List<DataGovernanceLevel2Vo> updateTypeVos = dataGovernanceMap.get("updateTypeVos");
+            List<DataGovernanceLevel2Vo> updateCycleVos = dataGovernanceMap.get("updateCycleVos");
+            
+            homePageData.setUpdateType(updateTypeVos);
+            homePageData.setUpdateCycle(updateCycleVos);
+        }
         
-        homePageData.setUpdateType(updateTypeVos);
-        homePageData.setUpdateCycle(updateCycleVos);
         return homePageData;
     }
 
@@ -109,27 +114,18 @@ public class NcovDaasServiceImpl implements NcovDaasService {
 	private Map<String, List<DataGovernanceLevel2Vo>> getDataGovernance(String dataType) {
 		Map<String, List<DataGovernanceLevel2Vo>> dataGovernanceMap = null;
         String dataGovernanceStr = redisApi.getStrValue(NcovKey.HOME_PAGE_DAAS_DATA_GOVERNANCE);
-		try {
-			if(StringUtils.isNotBlank(dataGovernanceStr)) {
-	        	
-	        	dataGovernanceMap =JSON.parseObject(dataGovernanceStr,Map.class);
-	        	
-	        }else {
-	        	NcovHomePageData ncovHomePageData = ncovHomePageDataService.getNcovHomePageDataByType(dataType);
-				String json = ncovHomePageData.getData();
-				if(StringUtils.isNotBlank(json)) {
-					dataGovernanceMap = JSON.parseObject(json,Map.class);
-					redisApi.setForPerpetual(NcovKey.HOME_PAGE_DAAS_DATA_GOVERNANCE, json);
-				}
-	        	
-	        		
-	        }
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		
-        
+		if(StringUtils.isNotBlank(dataGovernanceStr) && !"null".equals(dataGovernanceStr)) {
+        	
+        	dataGovernanceMap =JSON.parseObject(dataGovernanceStr,Map.class);
+        	
+        }else {
+        	NcovHomePageData ncovHomePageData = ncovHomePageDataService.getNcovHomePageDataByType(dataType);
+			String json = ncovHomePageData.getData();
+			if(StringUtils.isNotBlank(json)) {
+				dataGovernanceMap = JSON.parseObject(json,Map.class);
+				redisApi.setForPerpetual(NcovKey.HOME_PAGE_DAAS_DATA_GOVERNANCE, json);
+			}
+        }
 		return dataGovernanceMap;
 	}
 
@@ -141,14 +137,8 @@ public class NcovDaasServiceImpl implements NcovDaasService {
 	private Map<String, Object> getDataAccess(String dataType) {
 		Map<String, Object> dataAccess = null;
         String dataAccessStr = redisApi.getStrValue(NcovKey.HOME_PAGE_DAAS_DATA_ACCESS);
-        if(StringUtils.isNotBlank(dataAccessStr)) {
-        	
-        	try {
-        		dataAccess = JSON.parseObject(dataAccessStr,Map.class);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-        	
+        if(StringUtils.isNotBlank(dataAccessStr)  && !"null".equals(dataAccessStr)) {
+        	dataAccess = JSON.parseObject(dataAccessStr,Map.class);
         }else {
         	
         	NcovHomePageData ncovHomePageData = ncovHomePageDataService.getNcovHomePageDataByType(dataType);
@@ -172,7 +162,7 @@ public class NcovDaasServiceImpl implements NcovDaasService {
 		Integer dataServiceCount = 0;
         String dataServiceCountStr = redisApi.getStrValue(NcovKey.HOME_PAGE_DAAS_DATA_SERVICE_COUNT);
         
-        if(StringUtils.isNotBlank(dataServiceCountStr)) {
+        if(StringUtils.isNotBlank(dataServiceCountStr) && !"null".equals(dataServiceCountStr)) {
         	dataServiceCount = Integer.valueOf(dataServiceCountStr);
         }else {
         	
@@ -197,7 +187,7 @@ public class NcovDaasServiceImpl implements NcovDaasService {
 	private List<NcovDataOverviewVo> dataModeling(String dataType) {
 		List<NcovDataOverviewVo> dataModelingVos = Lists.newArrayList();
         String dataModelingStr = redisApi.getStrValue(NcovKey.HOME_PAGE_DAAS_DATA_MODELING);
-        if(StringUtils.isNotBlank(dataModelingStr)) {
+        if(StringUtils.isNotBlank(dataModelingStr) && !"null".equals(dataModelingStr)) {
         	dataModelingVos = FastJsonUtil.json2ListBean(dataModelingStr, NcovDataOverviewVo.class);
 		}else {
 			
@@ -222,7 +212,7 @@ public class NcovDaasServiceImpl implements NcovDaasService {
 		List<NcovDataOverviewVo> dataSharingVos = Lists.newArrayList();
 		
 		String dataSharingStr = redisApi.getStrValue(NcovKey.HOME_PAGE_DAAS_DATA_SHARING);
-		if(StringUtils.isNotBlank(dataSharingStr)) {
+		if(StringUtils.isNotBlank(dataSharingStr) && !"null".equals(dataSharingStr)) {
 			dataSharingVos = FastJsonUtil.json2ListBean(dataSharingStr, NcovDataOverviewVo.class);
 		}else {
 			NcovHomePageData ncovHomePageData = ncovHomePageDataService.getNcovHomePageDataByType(dataType);

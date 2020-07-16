@@ -2,6 +2,8 @@ package com.hirisun.cloud.ncov.service;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.hirisun.cloud.common.exception.CustomException;
 import com.hirisun.cloud.common.vo.ResponseResult;
 import com.hirisun.cloud.model.ncov.vo.realtime.HomePageNcovRealtimeVo;
@@ -19,6 +21,10 @@ public interface NcovRealtimeService {
 	public ResponseResult editNcovRealtime(NcovRealtimeVo vo);
 	
 	public HomePageNcovRealtimeVo setHomePageNcovRealtimeCache();
+	
+	public List<NcovRealtimeVo> findNcovRealtimeByRegionType(int regionType);
+	
+	NcovRealtimeVo countNcovRealTime(Integer regionType);
 	
 	
 }

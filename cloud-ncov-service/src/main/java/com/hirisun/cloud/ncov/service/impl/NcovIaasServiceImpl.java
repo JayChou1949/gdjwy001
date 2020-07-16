@@ -34,7 +34,7 @@ public class NcovIaasServiceImpl implements NcovIaasService {
 		NcovHomePageIaasVo desktopNumIaasVo = null;
 		
 		String overviewJson = redisApi.getStrValue(NcovKey.HOME_PAGE_IAAS_NCOV_OVERVIEW);
-        if(StringUtils.isNotBlank(overviewJson)) {
+        if(StringUtils.isNotBlank(overviewJson) && !"null".equals(overviewJson)) {
         	vmIaasVo = JSON.parseObject(overviewJson,NcovHomePageIaasVo.class);
         }else {
         	
@@ -48,7 +48,7 @@ public class NcovIaasServiceImpl implements NcovIaasService {
         	
         String desktopJson = redisApi.getStrValue(NcovKey.HOME_PAGE_IAAS_NCOV_DESKTOP);
         
-        if(StringUtils.isNotBlank(desktopJson)) {
+        if(StringUtils.isNotBlank(desktopJson) && !"null".equals(desktopJson)) {
         	desktopNumIaasVo = JSON.parseObject(desktopJson,NcovHomePageIaasVo.class);
         }else {
         	NcovHomePageData data = ncovHomePageDataService.getNcovHomePageDataByType(NcovFileupload.IAAS_DESKTOP);

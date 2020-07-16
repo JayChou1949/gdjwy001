@@ -1,8 +1,5 @@
 package com.hirisun.cloud.ncov.util;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -32,6 +29,8 @@ import com.hirisun.cloud.model.ncov.vo.realtime.NcovRealtimeVo;
 
 import cn.afterturn.easypoi.excel.ExcelImportUtil;
 import cn.afterturn.easypoi.excel.entity.ImportParams;
+import cn.afterturn.easypoi.excel.entity.result.ExcelImportResult;
+import cn.afterturn.easypoi.excel.imports.ExcelImportService;
 
 @Component
 public class NcovEcsImportUtil {
@@ -42,36 +41,6 @@ public class NcovEcsImportUtil {
     public NcovEcsImportUtil(FileUploadApi fileUploadApi) {
     	NcovEcsImportUtil.fileUploadApi = fileUploadApi;
     }
-    
-    /**
-     * 下载
-     * 首页 daas 数据共享和数据建模数据 
-     * 原来读 数据共享 读取  数据共享情况V1.xlsx
-     * 原来读 数据建模 读取  数据建模情况V1.xlsx
-     * @param fileId
-     * @param num
-     * @param sheetNum
-     * @return
-     */
-    public static List<NcovDataOverviewVo> getShardingMoelingExcelData(String fileId,
-  			 Integer num, Integer sheetNum) {
-  		
-    	List<NcovDataOverviewVo> dataSharingVos = new ArrayList<NcovDataOverviewVo>();
-    	Object object = downloadFileByFileId(fileId);
-    	if(object != null) {
-    		byte[] bytes = object.toString().getBytes();
-    		
-    		List<List<Object>> ncovDataList = getNcovDataList(new ByteArrayInputStream(bytes), num, sheetNum);
-	  		for (List<Object> objects : ncovDataList) {
-	  			NcovDataOverviewVo ncovDataOverviewVo = new NcovDataOverviewVo();
-	  			ncovDataOverviewVo.setName((String) objects.get(0));
-	  			ncovDataOverviewVo.setCount((String) objects.get(1));
-	  			ncovDataOverviewVo.setUnit((String) objects.get(2));
-	  			dataSharingVos.add(ncovDataOverviewVo);
-	  		}
-    	}
-  		return dataSharingVos;
-  	}
     
     /**
      * 上传
@@ -97,21 +66,6 @@ public class NcovEcsImportUtil {
   		}
   		return dataSharingVos;
   	}
-    
-    /**
-     * 根据文件id下载文件
-     * @param fileId
-     * @return
-     */
-    private static Object downloadFileByFileId(String fileId) {
-    	
-    	if(StringUtils.isNotBlank(fileId)) {
-    		QueryResponseResult result = fileUploadApi.downloadFileByFileId(fileId);
-        	return result.getData();
-    	}
-    	return null;
-    	
-    }
     
     public static List<List<Object>> getNcovDataList(InputStream inputStream,Integer num,Integer sheetNum){
     	
@@ -194,23 +148,6 @@ public class NcovEcsImportUtil {
     }
     
     /**
-     * 下载
-     * 首页 daas 数据接入
-     * 原来读 数据接入情况.xlsx
-     * @param fileId
-     * @param num
-     * @param sheetNum
-     * @return
-     */
-    public static Map<String,Long> getDataAccess(String fileId){
-    	
-    	Object obj = downloadFileByFileId(fileId);
-    	if(obj != null) return getDataAccess(new ByteArrayInputStream((byte[]) obj));
-		return null;
-    	
-    }
-    
-    /**
      * 上传
      * 首页 daas 数据治理
      * 原来读 数据接入情况.xlsx
@@ -253,23 +190,6 @@ public class NcovEcsImportUtil {
     	
     }
     
-    /**
-     * 下载
-     * 首页 daas 数据治理
-     * 原来读 数据接入情况.xlsx
-     * @param fileId
-     * @param num
-     * @param sheetNum
-     * @return
-     */
-    public static Map<String,List<DataGovernanceLevel2Vo>> getDataGovernanceMap(String fileId){
-    	
-    	Object object = downloadFileByFileId(fileId);
-    	if(object != null) return getDataGovernanceMap(new ByteArrayInputStream((byte[]) object));
-        return null;
-    	
-    }
-
 	private static List<DataGovernanceLevel2Vo> setDataGovernanceData(List<List<Object>> updateType) {
 		List<DataGovernanceLevel2Vo> updateTypeVos = Lists.newArrayList();
 		for (List<Object> objects : updateType) {
@@ -325,23 +245,6 @@ public class NcovEcsImportUtil {
 	
 	
 	
-	/**
-     * 下载
-     * 首页 daas 数据服务
-     * 原来读 质量分析情况清单.xls
-     * @param fileId
-     * @param num
-     * @param sheetNum
-     * @return
-     */
-    public static int getNcovDataServiceCount(String fileId) {
-    	
-    	Object object = downloadFileByFileId(fileId);
-    	if(object != null) return getNcovDataServiceCount(new ByteArrayInputStream((byte[]) object));
-        return 0;
-    	
-    }
-    
     /**
      * 获取表格数据
      * @return
@@ -381,15 +284,17 @@ public class NcovEcsImportUtil {
         return list;
     }
     
-    public static List<NcovRealtimeVo> getNcovRealtimeByExcel(InputStream inputStream,int sheet){
+    public static List<NcovRealtimeVo> getNcovRealtimeByExcel(InputStream inputStream,int row,int sheet){
     	
 		try{
             ImportParams params = new ImportParams();
-            params.setStartSheetIndex(sheet);
+            params.setStartSheetIndex(row);
+            params.setSheetNum(sheet);
+            
             List<NcovRealtimeVo> list = ExcelImportUtil.importExcel(inputStream,NcovRealtimeVo.class,params);
             if(CollectionUtils.isNotEmpty(list)) {
             	//excel sheet 0则是第一页省份数据,1则是广东省市区数据,RegionType = 1为省份,2=市区
-            	list.forEach(vo->{vo.setRegionType(sheet+1);});
+            	list.forEach(vo->{vo.setRegionType(row+1);});
             }
             return list;
         }catch (Exception e){
@@ -435,28 +340,6 @@ public class NcovEcsImportUtil {
     }
     
     /**
-     * 疫情虚拟机总览数据
-     * 原来读取 ncovEcsSource.xlsx 
-     * @return
-     */
-    public static NcovHomePageIaasVo getOverviewData(String fileId){
-    	
-        try{
-        	Object obj = downloadFileByFileId(fileId);
-        	if(obj != null) {
-        		ImportParams params = new ImportParams();
-                params.setStartSheetIndex(0);
-                List<NcovHomePageIaasVo> list = ExcelImportUtil.importExcel(new ByteArrayInputStream((byte[]) obj),NcovHomePageIaasVo.class,params);
-                if(CollectionUtils.isNotEmpty(list))return list.get(0);
-        	}
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-
-        return  null;
-    }
-
-    /**
      * 首页 iaas 疫情桌面云数据 上传
      * 原来读取 疫情桌面云.xls
      * @return
@@ -481,23 +364,6 @@ public class NcovEcsImportUtil {
         
     }
     
-    /**
-     * 首页 iaas 疫情桌面云数据 下载
-     * 原来读取 疫情桌面云.xls
-     * @return
-     */
-    public static NcovHomePageIaasVo epidemicExcl(String fileId) throws Exception {
-    	
-    	Object obj = downloadFileByFileId(fileId);
-    	if(obj != null) {
-    		byte[] bytes = obj.toString().getBytes();
-    		InputStream inputStream = new ByteArrayInputStream(bytes);
-    		return epidemicExcl(inputStream);
-    	}
-        return null;
-        
-    }
-	
     public static  NcovHomePageIaasVo epidemicExclNum(List<NcovHomePageIaasVo> epidemicDesktops) throws Exception {
     	
         int yunCount = 0;
@@ -560,18 +426,6 @@ public class NcovEcsImportUtil {
     }
     
     /**
-     * 首页 paas 数据概况
-     * 原来读取 ncovCluster.xlsx SheetIndex(0)
-     * @return
-     */
-    public static NcovClusterOverviewVo getOverview(String fileId,Integer sheetIndex){
-    	
-    	Object obj = downloadFileByFileId(fileId);
-    	if(obj != null) return getOverview(new ByteArrayInputStream((byte[]) obj),sheetIndex);
-        return null;
-    }
-    
-    /**
      * 首页 paas 数据资源分配上传
      * 原来读取 ncovCluster.xlsx SheetIndex(1)
      * @return
@@ -599,19 +453,6 @@ public class NcovEcsImportUtil {
 	}
     
 	/**
-     * 首页 paas 数据资源分配下载
-     * 原来读取 ncovCluster.xlsx SheetIndex(1)
-     * @return
-     */
-	public static List<NcovClusterResourceVo> getResourceList(String fileId,Integer sheetIndex) {
-		
-		Object obj = downloadFileByFileId(fileId);
-    	if(obj != null) return getResourceList(new ByteArrayInputStream((byte[]) obj),sheetIndex);
-		return null;
-
-	}
-
-	/**
      * 首页 paas APP应用明细资源分配上传
      * 原来读取 ncovCluster.xlsx SheetIndex(2)
      * @return
@@ -636,15 +477,4 @@ public class NcovEcsImportUtil {
         return null;
     }
 	
-	/**
-     * 首页 paas APP应用明细资源分配下载
-     * 原来读取 ncovCluster.xlsx SheetIndex(2)
-     * @return
-     */
-    public static List<NcovClusterApp> getAppDetailList(String fileId,Integer sheetIndex){
-    	Object obj = downloadFileByFileId(fileId);
-    	if(obj != null) return getAppDetailList(new ByteArrayInputStream((byte[]) obj),sheetIndex);
-        return null;
-    }
-    
 }

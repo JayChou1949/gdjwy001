@@ -37,17 +37,21 @@ public class NcovRealtimeVo {
 	@ApiModelProperty(value="1=省，2=市")
     private int regionType; 
 	
+	@ApiModelProperty(value="较昨日确诊新增")
 	@Excel(name = "较昨日确诊新增",type = 10)
     private int yesterdayDiagnosis; //较昨日确诊新增
 
+	@ApiModelProperty(value="较昨日疑似新增")
 	@Excel(name = "较昨日疑似新增",type = 10)
-    private int yesterdaySuspected; //较昨日疑似新增
+    private int yesterdaySuspected; //
 
+	@ApiModelProperty(value="较昨日死亡新增")
 	@Excel(name = "较昨日死亡新增",type = 10)
-    private int yesterdayDeath; //较昨日死亡新增
+    private int yesterdayDeath; 
 
+	@ApiModelProperty(value="较昨日治愈新增")
 	@Excel(name = "较昨日治愈新增",type = 10)
-    private int yesterdayCure; //较昨日治愈新增
+    private int yesterdayCure;
 
     public String getId() {
         return id;

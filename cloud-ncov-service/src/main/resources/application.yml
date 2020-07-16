@@ -5,15 +5,6 @@ spring:
       max-file-size: 10MB
   application:
     name: cloud-ncov-service
-ncov:
-  datasharing:
-    name: 数据共享情况V1.xlsx
-  datamodeling:
-    name: 数据建模情况V1.xlsx
-  datagovernance:
-    name: 质量分析情况清单.xls
-  dataaccess:
-    name: 数据接入情况.xlsx
-  dataservice:
-    name: 地市疫情防控数据.xlsx
 
+server:
+  max-http-header-size: 1024000

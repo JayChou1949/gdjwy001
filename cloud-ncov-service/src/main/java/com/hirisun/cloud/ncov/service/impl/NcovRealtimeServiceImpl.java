@@ -151,6 +151,7 @@ public class NcovRealtimeServiceImpl implements NcovRealtimeService {
 		
 		if(CollectionUtils.isNotEmpty(list)) {
 			list.forEach(entity->{
+				vo.setId(entity.getId());
 				BeanUtils.copyProperties(vo, entity);
 				ncovRealtimeMapper.updateById(entity);
 			});
@@ -181,6 +182,17 @@ public class NcovRealtimeServiceImpl implements NcovRealtimeService {
 		HomePageNcovRealtimeVo vo = getHomePageNcovRealtime();
 		redisApi.setForPerpetual(NcovKey.HOME_PAGE_NCOV_REALTIME, JSON.toJSONString(vo));
 		return vo;
+	}
+
+	@Override
+	public List<NcovRealtimeVo> findNcovRealtimeByRegionType(int regionType) {
+		List<NcovRealtimeVo> list = ncovRealtimeMapper.findNcovRealtimeList(regionType);
+		return list;
+	}
+
+	@Override
+	public NcovRealtimeVo countNcovRealTime(Integer regionType) {
+		return ncovRealtimeMapper.countNcovRealTime(regionType);
 	}
 
 }
