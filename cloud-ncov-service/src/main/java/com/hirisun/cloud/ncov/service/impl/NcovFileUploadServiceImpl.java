@@ -17,8 +17,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.hirisun.cloud.api.file.FileUploadApi;
 import com.hirisun.cloud.api.redis.RedisApi;
+import com.hirisun.cloud.common.exception.ExceptionCast;
 import com.hirisun.cloud.common.util.JsonUtils;
 import com.hirisun.cloud.common.util.LocalDateUtil;
+import com.hirisun.cloud.common.vo.CommonCode;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.model.ncov.contains.NcovFileupload;
 import com.hirisun.cloud.model.ncov.contains.NcovKey;
@@ -268,6 +270,11 @@ public class NcovFileUploadServiceImpl implements NcovFileUploadService {
 	 * 根据服务类型获取所有文件(Ncov)
 	 */
 	public Map<String, String> getFileUrlByServiceType(String serviceType,String dataType) {
+		
+		//serviceType 不能为空
+		if(StringUtils.isBlank(serviceType)) {
+			ExceptionCast.cast(CommonCode.INVALID_PARAM);
+		}
 		
 		Map<String, Object> columnMap  = new HashMap<String, Object>();
 		columnMap.put("SERVICE_TYPE", serviceType);

@@ -46,11 +46,11 @@ public class NcovFileUploadController {
 	
 	@ApiOperation(value = "获取疫情excel文件下载地址")
 	@ApiImplicitParams({
-        @ApiImplicitParam(name = "serviceType", value = "服务类型", required = true, paramType = "query")
+        @ApiImplicitParam(name = "serviceType", value = "服务类型", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "dataType", value = "数据类型", required = false, paramType = "query")
 	})
 	@PostMapping (value="/url")
-	public QueryResponseResult getUrl(@RequestParam("serviceType") String serviceType,
-			@RequestParam("dataType") String dataType) throws Exception {
+	public QueryResponseResult getUrl(String serviceType,String dataType) throws Exception {
 		return QueryResponseResult.success(ncovFileUploadService.getFileUrlByServiceType(serviceType,dataType));
 	}
 	

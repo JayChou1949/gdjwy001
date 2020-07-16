@@ -33,6 +33,10 @@
     id, region_name, diagnosis, suspected, death, cure, province_code, 
     region_type,yesterday_diagnosis,yesterday_suspected,yesterday_death,yesterday_cure
   </sql>
+  <sql id="ncovRealtimeColumn">
+    region_name, diagnosis, suspected, death, cure, province_code, 
+    region_type,yesterday_diagnosis,yesterday_suspected,yesterday_death,yesterday_cure
+  </sql>
   
   
   <select id="findAll" resultMap="ncovRealtimeVo">
@@ -55,12 +59,7 @@
   </select>
   
   <select id="findNcovRealtimeList" resultMap="ncovRealtimeVo">
-  	select region_name,
-  		   diagnosis, 
-  		   suspected, 
-  		   death, 
-  		   cure, 
-  		   province_code 
+  	select <include refid="ncovRealtimeColumn"></include> 
   		from t_ncov_realtime t 
 		where t.region_type = #{regionType,jdbcType=DECIMAL}
   </select>
