@@ -33,5 +33,12 @@ server:
 ---
 spring:
   profiles: pro
+  cloud:
+    nacos:
+      config:
+        server-addr: 68.26.8.254:8848
+        file-extension: yaml
+      discovery:
+        server-addr: 68.26.8.254:8848
 server:
   port: 82
