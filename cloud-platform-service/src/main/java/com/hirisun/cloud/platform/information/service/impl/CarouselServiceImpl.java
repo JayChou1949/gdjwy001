@@ -86,10 +86,12 @@ public class CarouselServiceImpl extends ServiceImpl<CarouselMapper, Carousel> i
             case 4:
                 wrapper.eq(Carousel::getProject, belong);
                 break;
+            default:
+                break;
         }
         wrapper.eq(Carousel::getStatus,Carousel.STATUS_ONLINE);
         wrapper.orderByAsc(Carousel::getSortNum);
-        wrapper.orderByDesc(Carousel::getUpdatedTime);
+        wrapper.orderByDesc(Carousel::getUpdateTime);
         return this.list(wrapper);
     }
 

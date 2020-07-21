@@ -22,7 +22,7 @@ import java.util.Date;
 /**
  * <p>
  * 轮播图资讯 前端控制器
- * 后台操作轮播图接口，需验证登录
+ * TODO 后台操作轮播图接口，需验证登录
  * </p>
  *
  * @author wuxiaoxing
@@ -55,7 +55,9 @@ public class CarouselManageController {
             @ApiParam("类型") @RequestParam(required = false,defaultValue = "1") Integer type,
             @ApiParam("类型所属") @RequestParam(required = false) String belong,
             @ApiParam("轮播图名称") @RequestParam(required = false) String title){
-        //检测用户权限
+        /*
+         * TODO 检测用户权限
+         */
         if(!this.checkUserPermission(null)){
             return QueryResponseResult.fail("无权查看该区域数据");
         }
@@ -73,6 +75,8 @@ public class CarouselManageController {
                 break;
             case 4:
                 wrapper.like(Carousel::getProject, belong);
+                break;
+            default:
                 break;
         }
         //查询未上线
@@ -98,7 +102,6 @@ public class CarouselManageController {
     @GetMapping("/{id}")
     public QueryResponseResult<Carousel> CarouselInfo(@PathVariable String id) {
         Carousel Carousel = carouselService.getById(id);
-        //阅读量先写入redis，每天同步一次阅读量，防止数据丢失
         return QueryResponseResult.success(Carousel);
     }
     /**
@@ -107,14 +110,14 @@ public class CarouselManageController {
     @ApiOperation("创建轮播图")
     @GetMapping("/create")
     public QueryResponseResult<Carousel> create(Carousel Carousel) {
-        //判断管理员类型
+        //TODO 判断管理员类型
 
-        //判断管理员权限
+        //TODO 判断管理员权限
         if(!this.checkUserPermission(null)){
             return QueryResponseResult.fail("无权查看该区域数据");
         }
         Carousel.setCreator(null);
-        Carousel.setUpdatedTime(new Date());
+        Carousel.setUpdateTime(new Date());
         Carousel.setStatus(Carousel.STATUS_WAIT_ONLINE);
         carouselService.save(Carousel);
         return QueryResponseResult.success(Carousel);
@@ -126,7 +129,7 @@ public class CarouselManageController {
     @GetMapping("/delete/{id}")
     public QueryResponseResult<Carousel> delete(@PathVariable String id) {
         Carousel Carousel = carouselService.getById(id);
-        //判断管理员权限
+        //TODO 判断管理员权限
         if(!this.checkUserPermission(null)){
             return QueryResponseResult.fail("无权操作该区域数据");
         }
@@ -134,7 +137,7 @@ public class CarouselManageController {
             Carousel.setStatus(Carousel.STATUS_DELETE);
             carouselService.updateById(Carousel);
         }
-        //远程调用日志模块，记录操作人日志 sys_log
+        //TODO 远程调用日志模块，记录操作人日志 sys_log
         return QueryResponseResult.success("删除成功");
     }
     /**
@@ -143,9 +146,9 @@ public class CarouselManageController {
     @ApiOperation("编辑轮播图")
     @GetMapping("/edit")
     public QueryResponseResult<Carousel> edit(@RequestBody Carousel Carousel) {
-        //判断管理员类型
+        //TODO 判断管理员类型
 
-        //判断管理员权限
+        //TODO 判断管理员权限
         if(!this.checkUserPermission(null)){
             return QueryResponseResult.fail("无权查看该区域数据");
         }
@@ -194,7 +197,7 @@ public class CarouselManageController {
     }
 
     /**
-     * 检查用户权限
+     * TODO 检查用户权限
      */
     public static boolean checkUserPermission(User user) {
         return true;

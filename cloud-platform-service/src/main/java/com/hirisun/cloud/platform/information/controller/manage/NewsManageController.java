@@ -24,7 +24,7 @@ import java.util.Date;
 /**
  * <p>
  * 新闻资讯 前端控制器
- * 后台操作新闻接口，需验证登录
+ * TODO 后台操作新闻接口，需验证登录
  * </p>
  *
  * @author wuxiaoxing
@@ -57,14 +57,13 @@ public class NewsManageController {
             @ApiParam("类型") @RequestParam(required = false,defaultValue = "1") Integer type,
             @ApiParam("类型所属") @RequestParam(required = false) String belong,
             @ApiParam("新闻名称") @RequestParam(required = false) String title){
-        //检测用户权限
+        //TODO 检测用户权限
         if(!this.checkUserPermission(null)){
             return QueryResponseResult.fail("无权查看该区域数据");
         }
         //列表不查询新闻详情
         LambdaQueryWrapper<News> wrapper=new QueryWrapper<News>().lambda()
                 .select(News.class, info -> !info.getColumn().equals("CONTENT"));
-        //
         switch(type){
             case 1:
                 break;
@@ -76,6 +75,8 @@ public class NewsManageController {
                 break;
             case 4:
                 wrapper.like(News::getProject, belong);
+                break;
+            default:
                 break;
         }
         //查询未上线
@@ -104,7 +105,6 @@ public class NewsManageController {
     @GetMapping("/{id}")
     public QueryResponseResult<News> newsInfo(@PathVariable String id) {
         News news = newsService.getById(id);
-        //阅读量先写入redis，每天同步一次阅读量，防止数据丢失
         return QueryResponseResult.success(news);
     }
     /**
@@ -113,9 +113,9 @@ public class NewsManageController {
     @ApiOperation("创建新闻")
     @GetMapping("/create")
     public QueryResponseResult<News> create(News news) {
-        //判断管理员类型
+        //TODO 判断管理员类型
 
-        //判断管理员权限
+        //TODO 判断管理员权限
         if(!this.checkUserPermission(null)){
             return QueryResponseResult.fail("无权查看该区域数据");
         }
@@ -133,7 +133,7 @@ public class NewsManageController {
     @GetMapping("/delete/{id}")
     public QueryResponseResult<News> delete(@PathVariable String id) {
         News news = newsService.getById(id);
-        //判断管理员权限
+        //TODO 判断管理员权限
         if(!this.checkUserPermission(null)){
             return QueryResponseResult.fail("无权操作该区域数据");
         }
@@ -141,7 +141,7 @@ public class NewsManageController {
             news.setStatus(News.STATUS_DELETE);
             newsService.updateById(news);
         }
-        //远程调用日志模块，记录操作人日志 sys_log
+        //TODO 远程调用日志模块，记录操作人日志 sys_log
         return QueryResponseResult.success("删除成功");
     }
     /**
@@ -150,9 +150,9 @@ public class NewsManageController {
     @ApiOperation("编辑新闻")
     @GetMapping("/edit")
     public QueryResponseResult<News> edit(@RequestBody News news) {
-        //判断管理员类型
+        //TODO 判断管理员类型
 
-        //判断管理员权限
+        //TODO 判断管理员权限
         if(!this.checkUserPermission(null)){
             return QueryResponseResult.fail("无权查看该区域数据");
         }
@@ -169,9 +169,9 @@ public class NewsManageController {
     @GetMapping("/publish/{id}")
     public QueryResponseResult<News> publish(@PathVariable String id,
                                              @ApiParam("类型 1上线 0下线") @RequestParam(required = true) Integer type) {
-        //判断管理员类型
+        //TODO 判断管理员类型
 
-        //判断管理员权限
+        //TODO 判断管理员权限
         if(!this.checkUserPermission(null)){
             return QueryResponseResult.fail("无权查看该区域数据");
         }
@@ -197,9 +197,9 @@ public class NewsManageController {
         if (news==null) {
             return QueryResponseResult.fail("新闻信息不存在");
         }
-        //判断管理员类型
+        //TODO 判断管理员类型
 
-        //判断管理员权限
+        //TODO 判断管理员权限
         if(!this.checkUserPermission(null)){
             return QueryResponseResult.fail("无权查看该区域数据");
         }
@@ -230,6 +230,8 @@ public class NewsManageController {
                             .eq(News::getProject,news.getProject())
                             .set(News::getIsTop, 0));
                     break;
+                default:
+                    break;
             }
 
         }
@@ -242,7 +244,7 @@ public class NewsManageController {
 
 
     /**
-     * 检查用户权限
+     *TODO  检查用户权限
      */
     public static boolean checkUserPermission(User user) {
         return true;

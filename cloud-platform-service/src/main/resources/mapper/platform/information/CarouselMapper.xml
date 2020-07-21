@@ -9,7 +9,7 @@
         <result column="URL" property="url" />
         <result column="IMAGE_ID" property="imageId" />
         <result column="SORT_NUM" property="sortNum" />
-        <result column="UPDATED_TIME" property="updatedTime" />
+        <result column="UPDATE_TIME" property="updateTime" />
         <result column="STATUS" property="status" />
         <result column="CREATOR" property="creator" />
         <result column="LINK" property="link" />

@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.platform.information.bean.Carousel;
-import com.hirisun.cloud.platform.information.bean.News;
 import com.hirisun.cloud.platform.information.service.CarouselService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -54,12 +53,15 @@ public class CarouselController {
             case 4:
                 wrapper.like(Carousel::getProject, belong);
                 break;
+            default:
+                break;
         }
-        wrapper.eq(Carousel::getStatus,News.STATUS_ONLINE);
+        wrapper.eq(Carousel::getStatus,Carousel.STATUS_ONLINE);
         wrapper.eq(Carousel::getProvincial, type);
         wrapper.orderByAsc(Carousel::getSortNum);
-        wrapper.orderByDesc(Carousel::getUpdatedTime);
+        wrapper.orderByDesc(Carousel::getUpdateTime);
         List<Carousel> list=carouselService.list(wrapper);
+        //TODO 循环查出实际图片路径
 
         return QueryResponseResult.success(list);
     }
@@ -68,7 +70,7 @@ public class CarouselController {
      */
     @ApiOperation("轮播图详情")
     @GetMapping("/{id}")
-    public QueryResponseResult<Carousel> newsInfo(@PathVariable String id) {
+    public QueryResponseResult<Carousel> carouselInfo(@PathVariable String id) {
         Carousel carousel = carouselService.getById(id);
         return QueryResponseResult.success(carousel);
     }

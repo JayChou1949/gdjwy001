@@ -70,7 +70,7 @@ public class ThreePartyInterfaceController {
         }
         JSONObject json = null;
         //特殊处理，对部分接口内容进行排序
-        if(name.equals("ncovImportRecentAll")||name.equals("ncovImportImportantData")){
+        if("ncovImportRecentAll".equals(name)||"ncovImportImportantData".equals(name)){
             json=JSONObject.parseObject(threePartyInterface.getData(), Feature.OrderedField);
         }else{
             json=JSONObject.parseObject(threePartyInterface.getData());

@@ -3,11 +3,11 @@ package com.hirisun.cloud.platform.information.bean;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -25,19 +25,38 @@ public class News implements Serializable {
 
     private static final long serialVersionUID=1L;
 
-    //新闻状态 0审核 1待上线 2上线 3驳回 4删除
+    /**
+     * show 状态 0审核
+     */
     public static final Long STATUS_AUDIT=0L;
+    /**
+     * 状态 1待上线
+     */
     public static final Long STATUS_WAIT_ONLINE=1L;
+    /**
+     * 状态 2上线
+     */
     public static final Long STATUS_ONLINE=2L;
+    /**
+     * 状态 3驳回
+     */
     public static final Long STATUS_REJECT=3L;
+    /**
+     * 状态 4删除
+     */
     public static final Long STATUS_DELETE=4L;
 
-    //置顶状态 0无置顶 1置顶
+    /**
+     * 置顶状态 0无置顶
+     */
     public static final Integer TOP_NO=0;
+    /**
+     * 置顶状态 1置顶
+     */
     public static final Integer TOP_YES=1;
 
 
-    @TableId(value="ID",type = IdType.UUID)
+    @TableId(value="ID",type = IdType.ASSIGN_ID)
     private String id;
 
     @ApiModelProperty(value = "新闻标题")
@@ -52,7 +71,9 @@ public class News implements Serializable {
     @TableField("SORT_NUM")
     private Long sortNum;
 
+    @ApiModelProperty(value = "更新时间")
     @TableField("UPDATE_TIME")
+    @JsonFormat(pattern = "YYYY-MM-dd HH:mm:ss")
     private Date updateTime;
 
     @ApiModelProperty(value = "状态, 0:审核中 1: 待上线 2: 上线 3:驳回 4:删除")
@@ -77,6 +98,7 @@ public class News implements Serializable {
 
     @ApiModelProperty(value = "新闻时间")
     @TableField("TIME")
+    @JsonFormat(pattern = "YYYY-MM-dd HH:mm:ss")
     private Date time;
 
     @ApiModelProperty(value = "浏览量")

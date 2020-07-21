@@ -58,6 +58,8 @@ public class NewsController {
             case 4:
                 wrapper.like(News::getProject, belong);
                 break;
+            default:
+                break;
         }
         wrapper.eq(News::getStatus,News.STATUS_ONLINE);
         wrapper.eq(News::getProvincial, type);
@@ -77,7 +79,7 @@ public class NewsController {
     @GetMapping("/{id}")
     public QueryResponseResult<News> newsInfo(@PathVariable String id) {
         News news = newsService.getById(id);
-        //阅读量先写入redis，每天同步一次阅读量，防止数据丢失
+        //TODO 阅读量先写入redis，每天同步一次阅读量，防止数据丢失
         return QueryResponseResult.success(news);
     }
 

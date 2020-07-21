@@ -7,7 +7,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication(scanBasePackages = {"com.hirisun.cloud"})
-@MapperScan("com.hirisun.cloud.platform.information.mapper")
+@MapperScan({"com.hirisun.cloud.platform.information.mapper","com.hirisun.cloud.platform.document.mapper"})
 public class PlatformApplication {
 
     public static void main(String[] args) {

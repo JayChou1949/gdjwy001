@@ -1,11 +1,11 @@
 package com.hirisun.cloud.platform.information.bean;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -23,11 +23,25 @@ public class Carousel implements Serializable {
 
     private static final long serialVersionUID=1L;
 
-    //轮播图状态 0审核 1待上线 2上线 3驳回 4删除
+    /**
+     * show 状态 0审核
+     */
     public static final Long STATUS_AUDIT=0L;
+    /**
+     * 状态 1待上线
+     */
     public static final Long STATUS_WAIT_ONLINE=1L;
+    /**
+     * 状态 2上线
+     */
     public static final Long STATUS_ONLINE=2L;
+    /**
+     * 状态 3驳回
+     */
     public static final Long STATUS_REJECT=3L;
+    /**
+     * 状态 4删除
+     */
     public static final Long STATUS_DELETE=4L;
 
 
@@ -51,8 +65,9 @@ public class Carousel implements Serializable {
     private Long sortNum;
 
     @ApiModelProperty(value = "更新时间")
-    @TableField("UPDATED_TIME")
-    private Date updatedTime;
+    @TableField("UPDATE_TIME")
+    @JsonFormat(pattern = "YYYY-MM-dd HH:mm:ss")
+    private Date updateTime;
 
     @ApiModelProperty(value = "状态, 0:审核中 1: 待上线 2: 上线 3:驳回 4:删除")
     @TableField("STATUS")
@@ -86,6 +101,18 @@ public class Carousel implements Serializable {
     @TableField("PROJECT")
     private String project;
 
+    @ApiModelProperty(value = "图片路径")
+    @TableField(exist = false)
+    private String realUrl;
+
+
+    public String getRealUrl() {
+        return realUrl;
+    }
+
+    public void setRealUrl(String realUrl) {
+        this.realUrl = realUrl;
+    }
 
     public String getId() {
         return id;
@@ -127,12 +154,12 @@ public class Carousel implements Serializable {
         this.sortNum = sortNum;
     }
 
-    public Date getUpdatedTime() {
-        return updatedTime;
+    public Date getUpdateTime() {
+        return updateTime;
     }
 
-    public void setUpdatedTime(Date updatedTime) {
-        this.updatedTime = updatedTime;
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
     }
 
     public Long getStatus() {
@@ -207,7 +234,7 @@ public class Carousel implements Serializable {
         ", url=" + url +
         ", imageId=" + imageId +
         ", sortNum=" + sortNum +
-        ", updatedTime=" + updatedTime +
+        ", updateTime=" + updateTime +
         ", status=" + status +
         ", creator=" + creator +
         ", link=" + link +
