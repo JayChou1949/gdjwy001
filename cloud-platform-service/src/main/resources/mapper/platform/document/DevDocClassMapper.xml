@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hirisun.cloud.platform.document.mapper.DevDocClassMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hirisun.cloud.platform.document.bean.DevDocClass">
+        <result column="ID" property="id" />
+        <result column="NAME" property="name" />
+        <result column="SORT_NUM" property="sortNum" />
+        <result column="UPDATE_TIME" property="updateTime" />
+        <result column="CREATOR" property="creator" />
+        <result column="REMARK" property="remark" />
+        <result column="TYPE" property="type" />
+        <result column="IMAGE" property="image" />
+        <result column="PARENT_ID" property="parentId" />
+    </resultMap>
+
+</mapper>

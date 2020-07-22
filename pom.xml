@@ -12,6 +12,7 @@
         <module>cloud-file-service</module>
         <module>cloud-redis-service</module>
         <module>cloud-gateway-service</module>
+        <module>cloud-platform-service</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>

@@ -175,7 +175,7 @@ public class ThreePartyInterfaceTimer {
         List<String> labelList = new ArrayList<>();
         list.forEach(item->{
             //只查询非美亚的数据，来源美亚的数据id和name一致
-            if (!item.getId().equals(item.getName())) {
+            if (item.getId()!=null&&!item.getId().equals(item.getName())) {
                 labelList.add(item.getLabel());
             }
         });
@@ -183,7 +183,7 @@ public class ThreePartyInterfaceTimer {
         List<ThreePartyInterface> oldDataList=threePartyInterfaceService.getOldDataByParams(labelList);
         for (ThreePartyInterface threePartyInterface:list) {
             for (ThreePartyInterface oldData:oldDataList) {
-                if (threePartyInterface.getId().equals(oldData.getId())) {
+                if (threePartyInterface.getId()!=null&&threePartyInterface.getId().equals(oldData.getId())) {
                     threePartyInterface.setUpdateTime(new Date());
                     threePartyInterface.setData(oldData.getData());
                     threePartyInterfaceService.updateById(threePartyInterface);
