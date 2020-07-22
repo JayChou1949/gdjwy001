@@ -1,6 +1,7 @@
 package com.hirisun.cloud.ncov.service.impl;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,7 @@ import com.hirisun.cloud.model.ncov.contains.NcovFileupload;
 import com.hirisun.cloud.model.ncov.contains.NcovKey;
 import com.hirisun.cloud.model.ncov.vo.daas.DataGovernanceLevel2Vo;
 import com.hirisun.cloud.model.ncov.vo.daas.NcovDataOverviewVo;
+import com.hirisun.cloud.model.ncov.vo.file.FileUploadVo;
 import com.hirisun.cloud.model.ncov.vo.iaas.NcovHomePageIaasVo;
 import com.hirisun.cloud.model.ncov.vo.paas.NcovClusterApp;
 import com.hirisun.cloud.model.ncov.vo.paas.NcovClusterOverviewVo;
@@ -65,7 +67,7 @@ public class NcovFileUploadServiceImpl implements NcovFileUploadService {
 	 * 3、刷新缓存
 	 */
 	@Transactional(rollbackFor = Exception.class) 
-	public String fileUpload(String serviceType,String dataType, MultipartFile multipartFile) throws Exception {
+	public FileUploadVo fileUpload(String serviceType,String dataType, MultipartFile multipartFile) throws Exception {
 		
 		String fileName = multipartFile.getOriginalFilename();
 		String filePath = "";
@@ -85,9 +87,14 @@ public class NcovFileUploadServiceImpl implements NcovFileUploadService {
 				QueryResponseResult delete = fileUploadApi.deleteFileByFileId(fileOldId);
 				System.out.println(delete.getData());
 			}
+			FileUploadVo fileUploadVo = new FileUploadVo();
+			fileUploadVo.setDataType(dataType);
+			fileUploadVo.setFileName(fileName);
+			fileUploadVo.setFilePath(fileAccessPath+filePath);
+			return fileUploadVo;
+			
 		}
-		
-		return fileAccessPath+filePath;
+		return null;
 	}
 
 	/**
@@ -269,13 +276,12 @@ public class NcovFileUploadServiceImpl implements NcovFileUploadService {
 	/**
 	 * 根据服务类型获取所有文件(Ncov)
 	 */
-	public Map<String, String> getFileUrlByServiceType(String serviceType,String dataType) {
+	public Map<String, FileUploadVo> getFileUrlByServiceType(String serviceType,String dataType) {
 		
 		//serviceType 不能为空
 		if(StringUtils.isBlank(serviceType)) {
 			ExceptionCast.cast(CommonCode.INVALID_PARAM);
 		}
-		
 		Map<String, Object> columnMap  = new HashMap<String, Object>();
 		columnMap.put("SERVICE_TYPE", serviceType);
 		if(StringUtils.isNotBlank(dataType)) {
@@ -283,28 +289,15 @@ public class NcovFileUploadServiceImpl implements NcovFileUploadService {
 		}
 		List<FileUpload> fileList = fileUploadMapper.selectByMap(columnMap);
 		
-		Map<String, String> map = NcovFileupload.initUrlData();
+		Map<String, FileUploadVo> map = NcovFileupload.initUrlData();
 		if(CollectionUtils.isNotEmpty(fileList)) {
-			fileList.forEach(fileUpload->{map.put(fileUpload.getDataType(), fileAccessPath+fileUpload.getFilePath());});
+			fileList.forEach(fileUpload->{
+				FileUploadVo vo = map.get(fileUpload.getDataType());
+				vo.setFileName(fileUpload.getFileName());
+				vo.setFilePath(fileAccessPath+fileUpload.getFilePath());
+			});
 		}
 		return map;
 	}
 
-	@Override
-	public Map<String, String> getFileUriByServiceType(String serviceType,String dataType) {
-		
-		Map<String, Object> columnMap  = new HashMap<String, Object>();
-		columnMap.put("SERVICE_TYPE", serviceType);
-		if(StringUtils.isNotBlank(dataType)) {
-			columnMap.put("DATA_TYPE", dataType);
-		}
-		List<FileUpload> fileList = fileUploadMapper.selectByMap(columnMap);
-
-		Map<String, String> map = NcovFileupload.initUrlData();
-		if(CollectionUtils.isNotEmpty(fileList)) {
-			fileList.forEach(fileUpload->{map.put(fileUpload.getDataType(), fileUpload.getFilePath());});
-		}
-		return map;
-	}
-	
 }

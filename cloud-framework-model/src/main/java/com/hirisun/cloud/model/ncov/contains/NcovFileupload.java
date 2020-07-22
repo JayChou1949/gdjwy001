@@ -3,6 +3,8 @@ package com.hirisun.cloud.model.ncov.contains;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.hirisun.cloud.model.ncov.vo.file.FileUploadVo;
+
 public class NcovFileupload {
 
 	public final static String NCOV_FILE_TYPE = "NCOV";
@@ -20,18 +22,47 @@ public class NcovFileupload {
 	public final static String PAAS_APPDETAIL = "PAASAPPDETAIL";
 	public final static String REALTIME = "REALTIME";
 	
-	public static  Map<String, String> initUrlData(){
+	public static  Map<String, FileUploadVo> initUrlData(){
 		
-		Map<String, String> map = new HashMap<String, String>();
-		map.put(NcovFileupload.DAAS_DATA_ACCESS, "");
-		map.put(NcovFileupload.DAAS_DATA_GOVERNANCE, "");
-		map.put(NcovFileupload.DAAS_DATA_MODELING, "");
-		map.put(NcovFileupload.DAAS_DATA_SERVICE, "");
-		map.put(NcovFileupload.DAAS_DATA_SHARING, "");
-		map.put(NcovFileupload.IAAS_DESKTOP, "");
-		map.put(NcovFileupload.IAAS_VM, "");
-		map.put(NcovFileupload.PAAS_DATA, "");
-		map.put(NcovFileupload.REALTIME, "");
+		Map<String, FileUploadVo> map = new HashMap<String, FileUploadVo>();
+		FileUploadVo dataAccess = new FileUploadVo();
+		dataAccess.setDataType(NcovFileupload.DAAS_DATA_ACCESS);
+		map.put(NcovFileupload.DAAS_DATA_ACCESS, dataAccess);
+		
+		FileUploadVo dataGovernance = new FileUploadVo();
+		dataGovernance.setDataType(NcovFileupload.DAAS_DATA_GOVERNANCE);
+		map.put(NcovFileupload.DAAS_DATA_GOVERNANCE, dataGovernance);
+		
+		FileUploadVo dataModeling = new FileUploadVo();
+		dataModeling.setDataType(NcovFileupload.DAAS_DATA_MODELING);
+		map.put(NcovFileupload.DAAS_DATA_MODELING, dataModeling);
+		
+		FileUploadVo dataService = new FileUploadVo();
+		dataService.setDataType(NcovFileupload.DAAS_DATA_SERVICE);
+		map.put(NcovFileupload.DAAS_DATA_SERVICE, dataService);
+		
+		FileUploadVo dataSharing = new FileUploadVo();
+		dataSharing.setDataType(NcovFileupload.DAAS_DATA_SHARING);
+		map.put(NcovFileupload.DAAS_DATA_SHARING, dataSharing);
+		
+		FileUploadVo iaasDesktop = new FileUploadVo();
+		iaasDesktop.setDataType(NcovFileupload.IAAS_DESKTOP);
+		map.put(NcovFileupload.IAAS_DESKTOP, iaasDesktop);
+		
+		FileUploadVo iaasVm = new FileUploadVo();
+		iaasVm.setDataType(NcovFileupload.IAAS_VM);
+		map.put(NcovFileupload.IAAS_VM, iaasVm);
+		
+		FileUploadVo paasData = new FileUploadVo();
+		paasData.setDataType(NcovFileupload.PAAS_DATA);
+		map.put(NcovFileupload.PAAS_DATA, paasData);
+		
+		FileUploadVo realtime = new FileUploadVo();
+		realtime.setDataType(NcovFileupload.REALTIME);
+		map.put(NcovFileupload.REALTIME, realtime);
+		
 		return map;
 	}
+	
+	
 }

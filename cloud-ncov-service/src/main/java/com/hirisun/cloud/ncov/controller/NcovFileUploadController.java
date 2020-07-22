@@ -8,12 +8,15 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.hirisun.cloud.common.vo.QueryResponseResult;
+import com.hirisun.cloud.model.ncov.vo.file.FileUploadVo;
 import com.hirisun.cloud.ncov.service.NcovFileUploadService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 @Api("疫情excel文件数据上传接口")
 @RestController
@@ -40,15 +43,19 @@ public class NcovFileUploadController {
 	public QueryResponseResult upload(@RequestParam("serviceType") String serviceType,
 			@RequestParam("dataType") String dataType,@RequestParam("file") MultipartFile file) throws Exception {
 		
-		String filePath = ncovFileUploadService.fileUpload(serviceType, dataType,file);
-		return QueryResponseResult.success(filePath);
+		FileUploadVo fileUploadVo = ncovFileUploadService.fileUpload(serviceType, dataType,file);
+		if(fileUploadVo == null) return QueryResponseResult.fail(fileUploadVo);
+		return QueryResponseResult.success(fileUploadVo);
 	}
 	
 	@ApiOperation(value = "获取疫情excel文件下载地址")
 	@ApiImplicitParams({
         @ApiImplicitParam(name = "serviceType", value = "服务类型", required = true, paramType = "query"),
-        @ApiImplicitParam(name = "dataType", value = "数据类型", required = false, paramType = "query")
+        @ApiImplicitParam(name = "dataType", value = "数据类型", required = false,paramType = "query")
 	})
+	@ApiResponses(//响应参数说明
+            @ApiResponse(code=200,message="success",response= FileUploadVo.class)
+    )
 	@PostMapping (value="/url")
 	public QueryResponseResult getUrl(String serviceType,String dataType) throws Exception {
 		return QueryResponseResult.success(ncovFileUploadService.getFileUrlByServiceType(serviceType,dataType));

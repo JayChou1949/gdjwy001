@@ -50,10 +50,10 @@
 		sum(t.suspected) as suspected, 
 		sum(t.death) as death, 
 		sum(t.cure) as cure,
-		sum(t.yesterday_diagnosis) as yesterdayDiagnosis, 
-		sum(t.yesterday_suspected) as yesterdaySuspected, 
-		sum(t.yesterday_death) as yesterdayDeath, 
-		sum(t.yesterday_cure) as yesterdayCure
+		sum(t.yesterday_diagnosis) as yesterday_diagnosis, 
+		sum(t.yesterday_suspected) as yesterday_suspected, 
+		sum(t.yesterday_death) as yesterday_death, 
+		sum(t.yesterday_cure) as yesterday_cure
 	from t_ncov_realtime t
 		where t.region_type = #{regionType,jdbcType=DECIMAL} 
   </select>
