@@ -5,7 +5,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hirisun.cloud.common.util.ExcelUtil;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.common.vo.ResponseResult;
 import com.hirisun.cloud.model.ncov.vo.realtime.HomePageNcovRealtimeVo;
