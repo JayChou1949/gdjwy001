@@ -218,6 +218,7 @@ public class NcovRealtimeServiceImpl implements NcovRealtimeService {
 		return ncovRealtimeMapper.countNcovRealTime(regionType);
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public String exportNcovRealtimeByRegionType(String serviceType,String dataType,int regionType) {
 		

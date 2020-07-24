@@ -8,6 +8,10 @@ import com.hirisun.cloud.common.vo.ResultCode;
 public class CustomException extends RuntimeException {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -3414825343844388205L;
+	/**
      * 响应码
      */
     ResultCode resultCode;
