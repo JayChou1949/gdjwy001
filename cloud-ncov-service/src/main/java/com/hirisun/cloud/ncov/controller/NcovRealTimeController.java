@@ -2,6 +2,10 @@ package com.hirisun.cloud.ncov.controller;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hirisun.cloud.common.util.ExcelUtil;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.common.vo.ResponseResult;
 import com.hirisun.cloud.model.ncov.vo.realtime.HomePageNcovRealtimeVo;
@@ -76,4 +81,23 @@ public class NcovRealTimeController {
     	NcovRealtimeVo ncovRealtimeVo = ncovRealtimeService.countNcovRealTime(regionType);
         return QueryResponseResult.success(ncovRealtimeVo);
     }
+    
+    @ApiOperation(value = "后台疫情实时数据全省/全市导出excel", notes = "接口说明")
+    @ApiImplicitParams({
+    	@ApiImplicitParam(name = "serviceType", value = "服务类型", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "dataType", value = "数据类型", required = true,paramType = "query"),
+    	@ApiImplicitParam(name="regionType",value="区域类型1=省,2=市",required = true,paramType = "query")
+    })
+    @GetMapping("/region/export")
+    public QueryResponseResult regionExport(@RequestParam(required = true) String serviceType,
+    		@RequestParam(required = true) String dataType,
+    		@RequestParam(required = true) int regionType,
+    		HttpServletRequest request,HttpServletResponse response) {
+    	String filePath = ncovRealtimeService.exportNcovRealtimeByRegionType(serviceType,dataType,regionType);
+    	return QueryResponseResult.success(filePath);
+    }
+    
+    
+    
+    
 }

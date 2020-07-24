@@ -20,7 +20,8 @@ public class NcovFileupload {
 	public final static String PAAS_OVERVIEW = "PAASOVERVIEW";
 	public final static String PAAS_RESOURCE = "PAASRESOURCE";
 	public final static String PAAS_APPDETAIL = "PAASAPPDETAIL";
-	public final static String REALTIME = "REALTIME";
+	public final static String REALTIME_PROVICE = "REALTIMEPROVICE";
+	public final static String REALTIME_CITY = "REALTIMECITY";
 	
 	public static  Map<String, FileUploadVo> initUrlData(){
 		
@@ -57,9 +58,13 @@ public class NcovFileupload {
 		paasData.setDataType(NcovFileupload.PAAS_DATA);
 		map.put(NcovFileupload.PAAS_DATA, paasData);
 		
-		FileUploadVo realtime = new FileUploadVo();
-		realtime.setDataType(NcovFileupload.REALTIME);
-		map.put(NcovFileupload.REALTIME, realtime);
+		FileUploadVo realtimeProvice = new FileUploadVo();
+		realtimeProvice.setDataType(NcovFileupload.REALTIME_PROVICE);
+		map.put(NcovFileupload.REALTIME_PROVICE, realtimeProvice);
+		
+		FileUploadVo realtimeCity = new FileUploadVo();
+		realtimeCity.setDataType(NcovFileupload.REALTIME_CITY);
+		map.put(NcovFileupload.REALTIME_CITY, realtimeCity);
 		
 		return map;
 	}

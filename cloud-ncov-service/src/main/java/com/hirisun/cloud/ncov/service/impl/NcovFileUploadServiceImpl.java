@@ -1,7 +1,6 @@
 package com.hirisun.cloud.ncov.service.impl;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,7 +66,7 @@ public class NcovFileUploadServiceImpl implements NcovFileUploadService {
 	 * 3、刷新缓存
 	 */
 	@Transactional(rollbackFor = Exception.class) 
-	public FileUploadVo fileUpload(String serviceType,String dataType, MultipartFile multipartFile) throws Exception {
+	public FileUploadVo fileUpload(String serviceType,String dataType,MultipartFile multipartFile) throws Exception {
 		
 		String fileName = multipartFile.getOriginalFilename();
 		String filePath = "";
@@ -80,7 +79,7 @@ public class NcovFileUploadServiceImpl implements NcovFileUploadService {
 			//保存或更新数据
 			String fileOldId = saveFileUpload(serviceType,dataType ,fileName, filePath);
 			//刷新缓存
-			setCache(dataType, multipartFile);
+			setCache(dataType,multipartFile);
 			
 			//最后如果是更新数据,则尝试删除旧的excel文件(无法保证100%删除,可能存在网络原因),避免过多垃圾文件
 			if(StringUtils.isNotBlank(fileOldId)) {
@@ -106,7 +105,6 @@ public class NcovFileUploadServiceImpl implements NcovFileUploadService {
 	 * @return
 	 */
 	private String saveFileUpload(String serviceType,String dataType, String fileName, String fileId) {
-		System.out.println("访问路径: "+fileId);
 		Map<String, Object> columnMap  = new HashMap<String, Object>();
 		columnMap.put("DATA_TYPE", dataType);
 		List<FileUpload> fileList = fileUploadMapper.selectByMap(columnMap);
@@ -150,7 +148,7 @@ public class NcovFileUploadServiceImpl implements NcovFileUploadService {
 	 * @throws IOException
 	 * @throws Exception
 	 */
-	private void setCache(String dataType, MultipartFile multipartFile) throws IOException, Exception {
+	private void setCache(String dataType,MultipartFile multipartFile) throws IOException, Exception {
 		if(NcovFileupload.DAAS_DATA_SHARING.equals(dataType)) {
 			
 			List<NcovDataOverviewVo> dataSharingVos = NcovEcsImportUtil.getShardingMoelingExcelData(multipartFile.getInputStream(), 1, 0);
@@ -240,11 +238,15 @@ public class NcovFileUploadServiceImpl implements NcovFileUploadService {
 						NcovKey.HOME_PAGE_PAAS_APPDETAIL,json);
 			}
 			
-		}else if(NcovFileupload.REALTIME.equals(dataType)) {
+		}else if(NcovFileupload.REALTIME_PROVICE.equals(dataType)) {
 			
-			List<NcovRealtimeVo> provideList = NcovEcsImportUtil.getNcovRealtimeByExcel(multipartFile.getInputStream(), 0,1);
-			List<NcovRealtimeVo> cityList = NcovEcsImportUtil.getNcovRealtimeByExcel(multipartFile.getInputStream(), 1,1);
+			List<NcovRealtimeVo> provideList = NcovEcsImportUtil.getNcovRealtimeByExcel(multipartFile.getInputStream(),1);
 			ncovRealtimeService.importNcovRealtimeData(provideList);
+			
+			
+		}else if(NcovFileupload.REALTIME_CITY.equals(dataType)) {
+			
+			List<NcovRealtimeVo> cityList = NcovEcsImportUtil.getNcovRealtimeByExcel(multipartFile.getInputStream(),2);
 			ncovRealtimeService.importNcovRealtimeData(cityList);
 			
 			
@@ -298,6 +300,23 @@ public class NcovFileUploadServiceImpl implements NcovFileUploadService {
 			});
 		}
 		return map;
+	}
+
+	@Override
+	public FileUpload getNcovFileUploadByType(String serviceType, String dataType) {
+		
+		Map<String, Object> columnMap  = new HashMap<String, Object>();
+		columnMap.put("SERVICE_TYPE", serviceType);
+		columnMap.put("DATA_TYPE", dataType);
+		
+		List<FileUpload> fileList = fileUploadMapper.selectByMap(columnMap);
+		if(CollectionUtils.isNotEmpty(fileList))return fileList.get(0);
+		return null;
+	}
+
+	@Transactional(rollbackFor = Exception.class) 
+	public void updateFileUpload(FileUpload fileUpload) {
+		fileUploadMapper.updateById(fileUpload);
 	}
 
 }

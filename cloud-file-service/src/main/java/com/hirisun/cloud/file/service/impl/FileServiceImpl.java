@@ -3,7 +3,11 @@ package com.hirisun.cloud.file.service.impl;
 import com.hirisun.cloud.common.exception.ExceptionCast;
 import com.hirisun.cloud.file.service.FileService;
 import com.hirisun.cloud.file.vo.FileCode;
+import com.hirisun.cloud.model.ncov.vo.file.FileVo;
+
 import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.lang3.StringUtils;
 import org.csource.fastdfs.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -141,6 +145,38 @@ public class FileServiceImpl implements FileService {
         }
         return null;
 		
+		
+	}
+
+	@Override
+	public String fileUploadByByte(FileVo fileVo) {
+		
+		initFdfsConfig();
+		if (fileVo == null || StringUtils.isBlank(fileVo.getFileName()) || fileVo.getFileByte() == null) {
+            ExceptionCast.cast(FileCode.FILE_IS_NULL);
+        }
+        
+        try {
+            //创建tracker client
+            TrackerClient client = new TrackerClient();
+            //获取tracker server
+            TrackerServer server = client.getConnection();
+            //获取storage
+            StorageServer storage = client.getStoreStorage(server);
+            //创建 storage client
+            StorageClient1 storageClient = new StorageClient1(server, storage);
+            //获取文件原始名称
+            //获取文件扩展名
+            String fileName = fileVo.getFileName();
+            String extName = fileName.substring(fileName.lastIndexOf(".") + 1);
+            //上传文件并获得文件Id
+            String fileId = storageClient.upload_file1(fileVo.getFileByte(), extName, null);
+            return fileId;
+        } catch (Exception e) {
+            log.error("上传文件失败,具体信息为:{}", e.getMessage());
+            ExceptionCast.cast(FileCode.FDFS_UPLOAD_FAULT);
+        }
+        return null;
 		
 	}
 }

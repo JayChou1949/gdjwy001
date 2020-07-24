@@ -1,5 +1,9 @@
 package com.hirisun.cloud.ncov.service.impl;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,22 +11,34 @@ import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.alibaba.fastjson.JSON;
+import com.hirisun.cloud.api.file.FileUploadApi;
 import com.hirisun.cloud.api.redis.RedisApi;
 import com.hirisun.cloud.common.exception.CustomException;
 import com.hirisun.cloud.common.vo.CommonCode;
+import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.common.vo.ResponseResult;
 import com.hirisun.cloud.model.ncov.contains.NcovKey;
+import com.hirisun.cloud.model.ncov.vo.file.FileVo;
 import com.hirisun.cloud.model.ncov.vo.realtime.HomePageNcovRealtimeVo;
 import com.hirisun.cloud.model.ncov.vo.realtime.NcovRealtimeVo;
+import com.hirisun.cloud.ncov.bean.FileUpload;
 import com.hirisun.cloud.ncov.bean.NcovRealtime;
 import com.hirisun.cloud.ncov.mapper.NcovRealtimeMapper;
+import com.hirisun.cloud.ncov.service.NcovFileUploadService;
 import com.hirisun.cloud.ncov.service.NcovRealtimeService;
+
+import cn.afterturn.easypoi.excel.ExcelExportUtil;
+import cn.afterturn.easypoi.excel.entity.ExportParams;
 
 @Service
 public class NcovRealtimeServiceImpl implements NcovRealtimeService {
@@ -31,6 +47,13 @@ public class NcovRealtimeServiceImpl implements NcovRealtimeService {
 	private NcovRealtimeMapper ncovRealtimeMapper;
 	@Autowired
     private RedisApi redisApi;
+	@Autowired
+	private FileUploadApi fileUploadApi;
+	@Autowired
+	private NcovFileUploadService ncovFileUploadService;
+	
+	@Value("${file.access.path}")
+	private String fileAccessPath;
 	
 	/**
 	 * 获取首页 疫情实时数据,先读取缓存，没有则读取数据库
@@ -193,6 +216,43 @@ public class NcovRealtimeServiceImpl implements NcovRealtimeService {
 	@Override
 	public NcovRealtimeVo countNcovRealTime(Integer regionType) {
 		return ncovRealtimeMapper.countNcovRealTime(regionType);
+	}
+
+	@Override
+	public String exportNcovRealtimeByRegionType(String serviceType,String dataType,int regionType) {
+		
+		List<NcovRealtimeVo> list = ncovRealtimeMapper.findNcovRealtimeList(regionType);
+		if(CollectionUtils.isNotEmpty(list)) {
+			try {
+				//先删除原来可能存在的文件
+				FileUpload fileUpload = ncovFileUploadService.getNcovFileUploadByType(serviceType, dataType);
+				String fileId = fileUpload.getFilePath();
+				fileUploadApi.deleteFileByFileId(fileId);
+				
+				//再根据类型数据构造excel文件
+				ExportParams exportParams = new ExportParams(null,regionType==1?"全国省份数据":"全省各市数据");
+		        Workbook workbook = ExcelExportUtil.exportExcel(exportParams, NcovRealtimeVo.class, list);
+		        
+		        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		        workbook.write(bos);
+		        byte[] data = bos.toByteArray();
+		        
+		        FileVo fileVo = new FileVo();
+		        fileVo.setFileName("警务云首页实时数据-"+workbook.getSheetName(0)+".xls");
+		        fileVo.setFileByte(data);
+		        
+		        //再上传到文件服务器
+		        QueryResponseResult upload = fileUploadApi.uploadByte(fileVo);
+		        String filePath = upload.getData().toString();
+		        fileUpload.setFilePath(filePath);
+		        ncovFileUploadService.updateFileUpload(fileUpload);
+	            return fileAccessPath+filePath;
+	        } catch (IOException e) {
+	        	throw new CustomException(CommonCode.EXPORT_FAIL);
+	        }
+		}else {
+			throw new CustomException(CommonCode.EXPORT_FAIL);
+		}
 	}
 
 }

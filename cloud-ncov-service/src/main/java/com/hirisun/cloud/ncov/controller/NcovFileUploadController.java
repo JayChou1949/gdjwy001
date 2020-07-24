@@ -36,12 +36,15 @@ public class NcovFileUploadController {
         		"数据治理:DATAGOVERNANCE," + 
         		"大数据集群配置:PAASDATA," + 
         		"疫情桌面云数据配置:IAASDESKTOP," + 
-        		"虚拟机数据配置:IAASVM", required = true, paramType = "query"),
+        		"虚拟机数据配置:IAASVM,"+
+        		"疫情实时各省数据:REALTIMEPROVICE,"+
+        		"疫情实时各市数据:REALTIMECITY", required = true, paramType = "query"),
         @ApiImplicitParam(name = "file", value = "文件", required = true, paramType = "query")
 	})
 	@PostMapping (value="/upload")
-	public QueryResponseResult upload(@RequestParam("serviceType") String serviceType,
-			@RequestParam("dataType") String dataType,@RequestParam("file") MultipartFile file) throws Exception {
+	public QueryResponseResult upload(@RequestParam(name = "serviceType",required = true) String serviceType,
+			@RequestParam(name = "dataType",required = true) String dataType,
+			@RequestParam(name = "file",required = true) MultipartFile file) throws Exception {
 		
 		FileUploadVo fileUploadVo = ncovFileUploadService.fileUpload(serviceType, dataType,file);
 		if(fileUploadVo == null) return QueryResponseResult.fail(fileUploadVo);

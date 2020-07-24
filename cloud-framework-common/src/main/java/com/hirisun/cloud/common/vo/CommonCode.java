@@ -14,6 +14,7 @@ public enum CommonCode implements ResultCode{
     UPDATE_FAIL(1006,"数据更新失败"),
     DELETE_FAIL(1007,"数据删除失败"),
     IMPORT_FAIL(1008,"导入数据失败,请检查导入文件数据"),
+    EXPORT_FAIL(1009,"导出数据失败,请检查导数据是否异常"),
     SERVER_ERROR(9999,"系统繁忙，稍后重试");
     /**
      * 状态码

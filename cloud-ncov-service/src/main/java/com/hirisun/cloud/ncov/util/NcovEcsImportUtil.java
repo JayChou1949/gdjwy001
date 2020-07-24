@@ -284,17 +284,15 @@ public class NcovEcsImportUtil {
         return list;
     }
     
-    public static List<NcovRealtimeVo> getNcovRealtimeByExcel(InputStream inputStream,int row,int sheet){
+    public static List<NcovRealtimeVo> getNcovRealtimeByExcel(InputStream inputStream,int regionType){
     	
 		try{
             ImportParams params = new ImportParams();
-            params.setStartSheetIndex(row);
-            params.setSheetNum(sheet);
+            params.setStartSheetIndex(0);
             
             List<NcovRealtimeVo> list = ExcelImportUtil.importExcel(inputStream,NcovRealtimeVo.class,params);
             if(CollectionUtils.isNotEmpty(list)) {
-            	//excel sheet 0则是第一页省份数据,1则是广东省市区数据,RegionType = 1为省份,2=市区
-            	list.forEach(vo->{vo.setRegionType(row+1);});
+            	list.forEach(vo->{vo.setRegionType(regionType);});
             }
             return list;
         }catch (Exception e){

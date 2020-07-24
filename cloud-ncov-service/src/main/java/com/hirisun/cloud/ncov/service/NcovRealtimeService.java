@@ -2,7 +2,7 @@ package com.hirisun.cloud.ncov.service;
 
 import java.util.List;
 
-import org.apache.ibatis.annotations.Param;
+import org.apache.poi.ss.usermodel.Workbook;
 
 import com.hirisun.cloud.common.exception.CustomException;
 import com.hirisun.cloud.common.vo.ResponseResult;
@@ -25,6 +25,8 @@ public interface NcovRealtimeService {
 	public List<NcovRealtimeVo> findNcovRealtimeByRegionType(int regionType);
 	
 	NcovRealtimeVo countNcovRealTime(Integer regionType);
+	
+	public String exportNcovRealtimeByRegionType(String serviceType,String dataType,int regionType);
 	
 	
 }

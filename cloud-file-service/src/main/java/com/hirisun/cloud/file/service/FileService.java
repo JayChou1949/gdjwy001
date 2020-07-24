@@ -2,6 +2,8 @@ package com.hirisun.cloud.file.service;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.hirisun.cloud.model.ncov.vo.file.FileVo;
+
 /**
  * @author zhoufeng
  * @version 1.0
@@ -31,4 +33,12 @@ public interface FileService {
      * @return
      */
     byte[] downloadFileByFileId(String fileId);
+    
+    /**
+     * 文件名和二进制数据
+     * @param fileName
+     * @param data
+     * @return
+     */
+    String fileUploadByByte(FileVo fileVo);
 }

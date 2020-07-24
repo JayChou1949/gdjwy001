@@ -1,15 +1,20 @@
 package com.hirisun.cloud.file.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.file.service.FileService;
+import com.hirisun.cloud.model.ncov.vo.file.FileVo;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author zhoufeng
@@ -49,5 +54,13 @@ public class FileController {
         byte[] file = fileService.downloadFileByFileId(fileId);
         log.debug("<== 文件下载 fileId:{}", fileId);
         return QueryResponseResult.success(file);
+    }
+    
+    @ApiOperation(value = "文件上传(二进制和文件名上传)")
+    @PostMapping("/upload/byte")
+    public QueryResponseResult uploadByte(@RequestBody FileVo fileVo) {
+        String fileId = fileService.fileUploadByByte(fileVo);
+        log.debug("<== fileId:{}", fileId);
+        return QueryResponseResult.success(fileId);
     }
 }

@@ -5,6 +5,7 @@ import java.util.Map;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.hirisun.cloud.model.ncov.vo.file.FileUploadVo;
+import com.hirisun.cloud.ncov.bean.FileUpload;
 
 public interface NcovFileUploadService {
 
@@ -25,5 +26,17 @@ public interface NcovFileUploadService {
 	 * @throws Exception
 	 */
 	public Map<String, FileUploadVo> getFileUrlByServiceType(String serviceType,String dataType);
+	
+	/**
+	 * 根据服务类型和数据类型获取上传的文件
+	 * @param serviceType
+	 * @param dataType
+	 * @return
+	 */
+	public FileUpload getNcovFileUploadByType(String serviceType,String dataType);
+	
+	public void updateFileUpload(FileUpload fileUpload);
+	
+	
 	
 }
