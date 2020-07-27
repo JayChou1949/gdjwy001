@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: dev
+    active: pro
 ---
 spring:
   profiles: dev
@@ -41,4 +41,4 @@ spring:
       discovery:
         server-addr: 68.26.8.254:8848
 server:
-  port: 83
+  port: 10083
