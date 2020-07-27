@@ -1,8 +1,12 @@
 package com.hirisun.cloud.common.config;
 
+import com.hirisun.cloud.common.annotation.support.LoginUserHandlerMethodArgumentResolver;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.List;
 
 /**
  * @author zhoufeng
@@ -26,5 +30,14 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
                 .allowedMethods("POST", "GET", "PUT", "OPTIONS", "DELETE")
                 .maxAge(3600)
                 .allowCredentials(true);
+    }
+
+    /**
+     * 检查登录用户信息
+     * wxx
+     */
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+        argumentResolvers.add(new LoginUserHandlerMethodArgumentResolver());
     }
 }
