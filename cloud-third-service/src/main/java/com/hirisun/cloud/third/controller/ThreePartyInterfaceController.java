@@ -143,7 +143,7 @@ public class ThreePartyInterfaceController {
             data=response.body().string();
         }catch (Exception e){
             logger.error("catch exception:{}", e.getMessage());
-            logger.info("美亚接口异常[url:{},内容:{}]",url, ExceptionPrintUtil.getStackTraceInfo(e));
+            logger.error("美亚接口异常[url:{},内容:{}]",url, ExceptionPrintUtil.getStackTraceInfo(e));
         }finally {
             if(response!=null){
                 response.close();
@@ -166,7 +166,7 @@ public class ThreePartyInterfaceController {
             data = response.body().string();
         }catch (Exception e){
             logger.error("catch exception:{}", e.getMessage());
-            logger.info("美亚接口异常[url:{},内容:{}]",url, ExceptionPrintUtil.getStackTraceInfo(e));
+            logger.error("美亚接口异常[url:{},内容:{}]",url, ExceptionPrintUtil.getStackTraceInfo(e));
         }finally {
             if(response!=null){
                 response.close();
@@ -190,7 +190,7 @@ public class ThreePartyInterfaceController {
             data = response.body().string();
         }catch (Exception e){
             logger.error("catch exception:{}", e.getMessage());
-            logger.info("美亚接口异常[url:{},内容:{}]",url, ExceptionPrintUtil.getStackTraceInfo(e));
+            logger.error("美亚接口异常[url:{},内容:{}]",url, ExceptionPrintUtil.getStackTraceInfo(e));
         }finally {
             if(response!=null){
                 response.close();
@@ -215,7 +215,7 @@ public class ThreePartyInterfaceController {
             data = response.body().string();
         }catch (Exception e){
             logger.error("catch exception:{}", e.getMessage());
-            logger.info("美亚接口异常[url:{},内容:{}]",url, ExceptionPrintUtil.getStackTraceInfo(e));
+            logger.error("美亚接口异常[url:{},内容:{}]",url, ExceptionPrintUtil.getStackTraceInfo(e));
         }finally {
             if(response!=null){
                 response.close();

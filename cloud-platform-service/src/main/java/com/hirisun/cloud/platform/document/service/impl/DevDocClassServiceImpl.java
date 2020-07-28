@@ -28,6 +28,7 @@ public class DevDocClassServiceImpl extends ServiceImpl<DevDocClassMapper, DevDo
 
     @Override
     public List<DevDocClass> listWithTree() {
+        //TODO 设置redis时效
 //        List<DevDocClass> redisList= CacheUtils.getList("listWithTree:1",DevDocClass.class);
 //        if(redisList!=null&&redisList.size()>0){//有缓存，返回
 //            return redisList;

@@ -3,7 +3,7 @@ package com.hirisun.cloud.platform.document.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
-import com.hirisun.cloud.model.user.User;
+import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.platform.document.bean.DevDoc;
 import com.hirisun.cloud.platform.document.bean.DevDocClass;
 import com.hirisun.cloud.platform.document.service.DevDocClassService;
@@ -13,8 +13,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import org.springframework.stereotype.Controller;
 
 import java.util.HashMap;
 import java.util.List;
@@ -44,7 +42,7 @@ public class DevDocController {
      */
     @ApiOperation("分页获取文档列表")
     @GetMapping("/list")
-    public QueryResponseResult<DevDoc> list(User user,
+    public QueryResponseResult<DevDoc> list(UserVO user,
                                             @ApiParam("页码") @RequestParam(required = false,defaultValue = "1") Integer pageNum,
                                             @ApiParam("每页大小") @RequestParam(required = false,defaultValue = "10") Integer pageSize,
                                             @ApiParam("文档名称/内容") @RequestParam(required = false) String name,

@@ -76,13 +76,13 @@ public class ThreePartyInterfaceServiceImpl extends ServiceImpl<ThreePartyInterf
             response=OkHttpUtils.get(url, null);
             String data = response.body().string();
             if(JSONObject.parseObject(data).getInteger("code") != 0) {
-                logger.info("美亚接口异常[url:{}, label:{}, name:{}]",url,label,name);
+                logger.error("美亚接口异常[url:{}, label:{}, name:{}]",url,label,name);
                 return;
             }
             saveData(data,name,label);
             logger.info("美亚接口调用成功[url:{}, label:{}, name:{}]",url,label,name);
         } catch (Exception e) {
-            logger.info("美亚接口异常[url:{}, label:{}, name:{}]",url,label,name);
+            logger.error("美亚接口异常[url:{}, label:{}, name:{}]",url,label,name);
         }finally {
             if(response!=null){
                 response.close();
@@ -106,7 +106,7 @@ public class ThreePartyInterfaceServiceImpl extends ServiceImpl<ThreePartyInterf
             saveData(data,name,label);
             logger.info("美亚接口调用成功[url:{}, label:{}, name:{}]",url,label,name);
         } catch (Exception e) {
-            logger.info("美亚接口异常[url:{}, label:{}, name:{}]",url,label,name);
+            logger.error("美亚接口异常[url:{}, label:{}, name:{}]",url,label,name);
         }finally {
             if(response!=null){
                 response.close();
@@ -126,13 +126,13 @@ public class ThreePartyInterfaceServiceImpl extends ServiceImpl<ThreePartyInterf
             response=OkHttpUtils.postJson(url, json);
             String data = response.body().string();
             if(JSONObject.parseObject(data).getInteger("code") != 0) {
-                logger.info("美亚接口异常[url:{}, label:{}, name:{}]",url,label,name);
+                logger.error("美亚接口异常[url:{}, label:{}, name:{}]",url,label,name);
                 return;
             }
             saveData(data,name,label);
             logger.info("美亚接口调用成功[url:{}, label:{}, name:{}]",url,label,name);
         } catch (Exception e) {
-            logger.info("美亚接口异常[url:{}, label:{}, name:{}]",url,label,name);
+            logger.error("美亚接口异常[url:{}, label:{}, name:{}]",url,label,name);
         }finally {
             if(response!=null){
                 response.close();

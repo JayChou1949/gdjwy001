@@ -5,9 +5,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.hirisun.cloud.common.annotation.LoginUser;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
-import com.hirisun.cloud.model.user.User;
-import com.hirisun.cloud.platform.information.bean.Carousel;
+import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.platform.information.bean.News;
 import com.hirisun.cloud.platform.information.service.NewsService;
 import io.swagger.annotations.Api;
@@ -51,6 +51,7 @@ public class NewsManageController {
     @ApiOperation("新闻列表")
     @GetMapping("/page")
     public QueryResponseResult<News> list(
+            @LoginUser UserVO user,
             @ApiParam("页码") @RequestParam(required = false,defaultValue = "1") Integer pageNum,
             @ApiParam("每页大小") @RequestParam(required = false,defaultValue = "20") Integer pageSize,
             @ApiParam("状态") @RequestParam(required = false,defaultValue = "0") Integer status,
@@ -58,7 +59,7 @@ public class NewsManageController {
             @ApiParam("类型所属") @RequestParam(required = false) String belong,
             @ApiParam("新闻名称") @RequestParam(required = false) String title){
         //TODO 检测用户权限
-        if(!this.checkUserPermission(null)){
+        if(!this.checkUserPermission(user)){
             return QueryResponseResult.fail("无权查看该区域数据");
         }
         //列表不查询新闻详情
@@ -130,7 +131,7 @@ public class NewsManageController {
      * 删除新闻,逻辑删除
      */
     @ApiOperation("删除新闻")
-    @GetMapping("/delete/{id}")
+    @PostMapping("/delete/{id}")
     public QueryResponseResult<News> delete(@PathVariable String id) {
         News news = newsService.getById(id);
         //TODO 判断管理员权限
@@ -148,7 +149,7 @@ public class NewsManageController {
      * 编辑新闻
      */
     @ApiOperation("编辑新闻")
-    @GetMapping("/edit")
+    @PostMapping("/edit")
     public QueryResponseResult<News> edit(@RequestBody News news) {
         //TODO 判断管理员类型
 
@@ -166,7 +167,7 @@ public class NewsManageController {
      * 新闻上下线
      */
     @ApiOperation("新闻上/下线")
-    @GetMapping("/publish/{id}")
+    @PostMapping("/publish/{id}")
     public QueryResponseResult<News> publish(@PathVariable String id,
                                              @ApiParam("类型 1上线 0下线") @RequestParam(required = true) Integer type) {
         //TODO 判断管理员类型
@@ -190,7 +191,7 @@ public class NewsManageController {
      * 1.新闻有不同类型，每个类型只有一个新闻可以设置成置顶，同类型其余已置顶的状态会被更新
      */
     @ApiOperation("新闻置顶操作")
-    @GetMapping("/top/{id}")
+    @PostMapping("/top/{id}")
     public QueryResponseResult<News> edit(@PathVariable String id,
                                           @ApiParam("类型 1置顶 0取消置顶") @RequestParam(required = true) Integer type) {
         News news = newsService.getById(id);
@@ -246,7 +247,7 @@ public class NewsManageController {
     /**
      *TODO  检查用户权限
      */
-    public static boolean checkUserPermission(User user) {
+    public static boolean checkUserPermission(UserVO user) {
         return true;
     }
 

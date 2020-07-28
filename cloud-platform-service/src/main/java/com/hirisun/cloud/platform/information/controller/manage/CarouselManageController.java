@@ -3,10 +3,9 @@ package com.hirisun.cloud.platform.information.controller.manage;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
-import com.hirisun.cloud.model.user.User;
+import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.platform.information.bean.Carousel;
 import com.hirisun.cloud.platform.information.service.CarouselService;
 import io.swagger.annotations.Api;
@@ -108,7 +107,7 @@ public class CarouselManageController {
      * 创建轮播图
      */
     @ApiOperation("创建轮播图")
-    @GetMapping("/create")
+    @PostMapping("/create")
     public QueryResponseResult<Carousel> create(Carousel Carousel) {
         //TODO 判断管理员类型
 
@@ -126,7 +125,7 @@ public class CarouselManageController {
      * 删除轮播图,逻辑删除
      */
     @ApiOperation("删除轮播图")
-    @GetMapping("/delete/{id}")
+    @PostMapping("/delete/{id}")
     public QueryResponseResult<Carousel> delete(@PathVariable String id) {
         Carousel Carousel = carouselService.getById(id);
         //TODO 判断管理员权限
@@ -144,7 +143,7 @@ public class CarouselManageController {
      * 编辑轮播图
      */
     @ApiOperation("编辑轮播图")
-    @GetMapping("/edit")
+    @PostMapping("/edit")
     public QueryResponseResult<Carousel> edit(@RequestBody Carousel Carousel) {
         //TODO 判断管理员类型
 
@@ -162,7 +161,7 @@ public class CarouselManageController {
      * 轮播图上下线
      */
     @ApiOperation("轮播图上/下线")
-    @GetMapping("/publish/{id}")
+    @PostMapping("/publish/{id}")
     public QueryResponseResult<Carousel> publish(@PathVariable String id,
                                                  @ApiParam("类型 1上线 0下线") @RequestParam(required = true) Integer type) {
         //判断管理员类型
@@ -183,7 +182,7 @@ public class CarouselManageController {
     }
 
     @ApiOperation("手动排序上/下移动")
-    @GetMapping(value = "/move/{type}/{id}")
+    @PostMapping(value = "/move/{type}/{id}")
     public  QueryResponseResult<Carousel> move(
             @ApiParam("类型 up上移 down下移") @PathVariable String type,
             @ApiParam("轮播图id") @PathVariable String id,
@@ -199,7 +198,7 @@ public class CarouselManageController {
     /**
      * TODO 检查用户权限
      */
-    public static boolean checkUserPermission(User user) {
+    public static boolean checkUserPermission(UserVO user) {
         return true;
     }
 
