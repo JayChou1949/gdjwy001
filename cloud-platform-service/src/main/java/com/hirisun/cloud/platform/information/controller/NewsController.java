@@ -79,7 +79,8 @@ public class NewsController {
     @GetMapping("/{id}")
     public QueryResponseResult<News> newsInfo(@PathVariable String id) {
         News news = newsService.getById(id);
-        //TODO 阅读量先写入redis，每天同步一次阅读量，防止数据丢失
+        news.setViewCount(news.getViewCount()+1);
+        newsService.updateById(news);
         return QueryResponseResult.success(news);
     }
 

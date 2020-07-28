@@ -20,7 +20,7 @@ public class UserVO {
      */
     public static final Long USER_TYPE_NORMAL=0L;
     /**
-     * 用户类型-1 服务厂商
+     * 用户类型-1 服务厂商 省厅
      */
     public static final Long USER_TYPE_COMPANY=1L;
     /**

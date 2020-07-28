@@ -63,7 +63,7 @@
     <select id="getPage" resultMap="BaseResultMap">
         SELECT
         u.*,
-        (SELECT wm_concat(r.NAME) FROM SYS_ROLE r, S_USER_ROLE ur WHERE r.ID = ur.ROLE_ID AND ur.USER_ID = u.IDCARD) ROLE_NAME,
+        (SELECT wm_concat(r.NAME) FROM SYS_ROLE r, S_USER_ROLE ur WHERE r.ID = ur.ROLE_ID AND ur.USER_ID = u.ID_CARD) ROLE_NAME,
         (SELECT MANUFACTURER_NAME FROM TB_MANUFACTURERS m WHERE m.ID = u.COMPANY) COMPANY_NAME
         FROM T_USER u
         <where>
@@ -75,7 +75,7 @@
                 AND
                 (
                 u.NAME LIKE CONCAT(CONCAT('%',#{param.name}),'%')
-                OR u.IDCARD LIKE CONCAT(CONCAT('%',#{param.name}),'%')
+                OR u.ID_CARD LIKE CONCAT(CONCAT('%',#{param.name}),'%')
                 OR u.ORG_NAME LIKE CONCAT(CONCAT('%',#{param.name}),'%')
                 OR u.COMPANY LIKE CONCAT(CONCAT('%',#{param.name}),'%')
                 )

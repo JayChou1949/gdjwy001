@@ -53,7 +53,7 @@ public class UserManageController {
      * @return
      * TOTO 优化sql查询
      */
-    @ApiOperation("分页查询")
+    @ApiOperation("用户列表分页查询")
     @GetMapping("/page")
     public QueryResponseResult<User> list(
             @ApiParam("页码") @RequestParam(required = false,defaultValue = "1") Integer pageNum,
@@ -140,7 +140,7 @@ public class UserManageController {
     }
 
     @ApiOperation("消息通知设置")
-    @GetMapping("/notify/{notifyType}")
+    @PostMapping("/notify/{notifyType}")
     public QueryResponseResult changeNotifyType(HttpServletRequest request,
                                                 @LoginUser UserVO user,
                                                 @ApiParam("通知类型  0：短信 1:邮箱 2:微信,多个以逗号分隔") @PathVariable String notifyType) {
