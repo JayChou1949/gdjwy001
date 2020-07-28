@@ -1,5 +1,6 @@
 package com.hirisun.cloud.file.service;
 
+import com.hirisun.cloud.file.bean.FileSystem;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.hirisun.cloud.model.ncov.vo.file.FileVo;
@@ -18,27 +19,26 @@ public interface FileService {
      * @param file
      * @return
      */
-    String fdfs_upload(MultipartFile file);
+    String fdfs_upload(MultipartFile file,String businessKey,String businessTag);
     
     /**
      * 根据fileId删除文件
      * @param fileId
      * @return
      */
-    Integer deleteFileByFileId(String fileId);
+    Integer fdfs_delete(String fileId);
     
     /**
      * 根据fileId下载文件
      * @param fileId
      * @return
      */
-    byte[] downloadFileByFileId(String fileId);
-    
+    byte[] fdfs_download(String fileId);
+
     /**
-     * 文件名和二进制数据
-     * @param fileName
-     * @param data
+     * 根据文件系统Id获得文件信息信息
+     * @param fileId 文件系统ID
      * @return
      */
-    String fileUploadByByte(FileVo fileVo);
+    FileSystem getFileSystemById(String fileId);
 }

@@ -7,6 +7,9 @@ public enum FileCode implements ResultCode {
     FILE_IS_NULL(2201,"上传文件为空！"),
     FDFS_INIT_FAULT(2202,"FDFS初始化失败"),
     FDFS_UPLOAD_FAULT(2203,"FDFS上传文件失败"),
+    FDFS_DELETE_FAULT(2204,"FDFS删除文件失败"),
+    FDFS_DOWNLOAD_FAULT(2205,"FDFS下载文件失败"),
+    FILE_NO_EXISTS(2206,"文件不存在"),
     ;
     /**
      * 状态码
