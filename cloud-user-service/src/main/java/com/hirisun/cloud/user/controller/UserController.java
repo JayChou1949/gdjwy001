@@ -20,9 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
  * @author wuxiaoxing
  * @since 2020-07-23
  */
-@Api(description = "用户信息")
-@RestController
+@Api(tags = "用户信息")
 @RequestMapping("/user")
+@RestController
 public class UserController {
 
     @ApiOperation("获取登录用户信息")

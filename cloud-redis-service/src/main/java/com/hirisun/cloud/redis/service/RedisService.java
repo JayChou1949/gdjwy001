@@ -109,4 +109,22 @@ public interface RedisService {
      * @return
      */
     Boolean delete(String key);
+
+    /**
+     * 修改list下标的值
+     *
+     * @param key 键
+     * @param index 下标
+     * @param value 值
+     */
+    void setForList(String key, Integer index, Object value);
+
+    /**
+     * 删除list中其中一个元素
+     *
+     * @param key   键
+     * @param count 个数，0为只删除value的值
+     * @param value 值
+     */
+    public void removeValueForList(String key, Integer count, Object value);
 }

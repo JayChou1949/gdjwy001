@@ -23,42 +23,4 @@ import java.util.stream.Collectors;
 @Service
 public class DevDocClassServiceImpl extends ServiceImpl<DevDocClassMapper, DevDocClass> implements DevDocClassService {
 
-    @Autowired
-    private DevDocClassMapper devDocClassMapper;
-
-    @Override
-    public List<DevDocClass> listWithTree() {
-        //TODO 设置redis时效
-//        List<DevDocClass> redisList= CacheUtils.getList("listWithTree:1",DevDocClass.class);
-//        if(redisList!=null&&redisList.size()>0){//有缓存，返回
-//            return redisList;
-//        }
-        //一次性查出所有数据
-        List<DevDocClass> list=baseMapper.selectList(null);
-        List<DevDocClass> level1Menus= list.stream().filter(categoryEntity ->
-                categoryEntity.getParentId()==null
-        ).map((menu)->{
-            menu.setChildren(getChildrens(menu,list));
-            return menu;
-        }).sorted((menu1,menu2)->{
-            return (int)((menu1.getSortNum()==null?0:menu1.getSortNum())-(menu2.getSortNum()==null?0:menu2.getSortNum()));
-        }).collect(Collectors.toList());
-
-//        CacheUtils.saveList("listWithTree:1",level1Menus);
-        return level1Menus;
-    }
-
-
-    private List<DevDocClass> getChildrens(DevDocClass root,List<DevDocClass> all){
-        List<DevDocClass> level1Menus= all.stream().filter(categoryEntity ->
-                categoryEntity.getParentId()!=null&&categoryEntity.getParentId().equals(root.getId())
-        ).map((menu)->{
-            menu.setChildren(getChildrens(menu,all));
-            return menu;
-        }).sorted((menu1,menu2)->{
-            return (int)((menu1.getSortNum()==null?0:menu1.getSortNum())-(menu2.getSortNum()==null?0:menu2.getSortNum()));
-        }).collect(Collectors.toList());
-
-        return level1Menus;
-    }
 }

@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
  * @author wuxiaoxing
  * @since 2020-07-23
  */
-@Api(description = "系统角色管理")
+@Api(tags = "系统角色管理")
 @RestController
 @RequestMapping("/user/sysRoleManage")
 public class SysRoleManageController {
@@ -37,9 +37,9 @@ public class SysRoleManageController {
         return QueryResponseResult.success(sysRoleService.list());
     }
 
-    @ApiOperation("新增角色")
+    @ApiOperation("创建角色")
     @PostMapping("/create")
-    public QueryResponseResult create(@RequestBody SysRole role) {
+    public QueryResponseResult create(@ModelAttribute SysRole role) {
         if (role == null) {
             return QueryResponseResult.success("缺少参数");
         }
@@ -50,7 +50,7 @@ public class SysRoleManageController {
 
     @ApiOperation("修改角色")
     @PostMapping("/edit")
-    public QueryResponseResult<SysRole> edit(@RequestBody SysRole role) {
+    public QueryResponseResult<SysRole> edit(@ModelAttribute SysRole role) {
         if (role == null || StringUtils.isEmpty(role.getId())) {
             return QueryResponseResult.success("缺少参数");
         }
@@ -58,8 +58,8 @@ public class SysRoleManageController {
         return QueryResponseResult.success(role);
     }
     @ApiOperation("删除角色")
-    @PostMapping("/delete/{roleId}")
-    public QueryResponseResult delete(@ApiParam("角色id") @PathVariable String roleId) {
+    @PostMapping("/delete")
+    public QueryResponseResult delete(@ApiParam(value = "角色id",required = true) @RequestParam String roleId) {
         sysRoleService.removeById(roleId);
         return QueryResponseResult.success(null);
     }

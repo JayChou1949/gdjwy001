@@ -22,7 +22,7 @@ import java.util.List;
  * @author wuxiaoxing
  * @since 2020-07-15
  */
-@Api(description = "轮播资讯")
+@Api(tags = "轮播资讯")
 @RestController
 @RequestMapping("/api/carousel")
 public class CarouselController {

@@ -17,12 +17,5 @@ import java.util.Map;
  */
 public interface DevDocClassService extends IService<DevDocClass> {
 
-    /**
-     * 将文档分类数据组装成树形结构数据
-     * @return
-     */
-    List<DevDocClass> listWithTree();
-
-
 
 }

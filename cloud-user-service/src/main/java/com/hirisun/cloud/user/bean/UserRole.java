@@ -14,7 +14,7 @@ import io.swagger.annotations.ApiModelProperty;
  * @author wuxiaoxing
  * @since 2020-07-23
  */
-@TableName("S_USER_ROLE")
+@TableName("T_SYS_USER_ROLE")
 @ApiModel(value="UserRole对象", description="用户-角色关联表")
 public class UserRole implements Serializable {
 

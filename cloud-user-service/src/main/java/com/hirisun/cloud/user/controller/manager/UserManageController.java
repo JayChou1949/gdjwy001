@@ -34,7 +34,7 @@ import java.util.Map;
  * @author wuxiaoxing
  * @since 2020-07-24
  */
-@Api(description = "用户后台管理")
+@Api(tags = "用户后台管理")
 @RestController
 @RequestMapping("/user/userManage")
 public class UserManageController {
@@ -75,9 +75,10 @@ public class UserManageController {
      * @param userId
      * @return
      */
-    @ApiOperation("获取用户角色")
-    @GetMapping("/roles/{userId}")
-    public QueryResponseResult<SysRole> editRole(@ApiParam("用户身份证") @PathVariable String userId) {
+    @ApiOperation("根据用户身份证获取用户角色")
+    @GetMapping("/getRoleByUserId")
+    public QueryResponseResult<SysRole> editRole(@ApiParam(value = "用户身份证",required = true) @RequestParam String userId) {
+        //TODO 移除allRoles，前端不需要
         List<SysRole> sysRoleList = sysRoleService.list();
         List<SysRole> roleList = new ArrayList<>();
         List<UserRole> userRoleList = userRoleService.list(new QueryWrapper<UserRole>().lambda().select(UserRole::getRoleId).eq(UserRole::getUserId, userId));
@@ -89,17 +90,17 @@ public class UserManageController {
                 }
             });
         });
-        Map<String, List<SysRole>> roleMap = new HashMap<>();
-        roleMap.put("userRoles", roleList);
-        roleMap.put("allRoles", sysRoleList);
-        return QueryResponseResult.success(roleMap);
+//        Map<String, List<SysRole>> roleMap = new HashMap<>();
+//        roleMap.put("userRoles", roleList);
+//        roleMap.put("allRoles", sysRoleList);
+        return QueryResponseResult.success(roleList);
     }
 
     @ApiOperation("修改用户角色")
-    @PostMapping("/editRole/{userId}")
+    @PostMapping("/editRoleByUserId")
     public QueryResponseResult<SysRole> editRole(
-            @ApiParam("用户身份证") @PathVariable String userId,
-            @ApiParam("角色id,多个使用逗号(,)分隔") @RequestParam(required = true) String roleId) {
+            @ApiParam(value = "用户身份证",required = true)@RequestParam String userId,
+            @ApiParam(value = "角色id,多个使用逗号(,)分隔",required = true)@RequestParam String roleId) {
         /*
          * 1.移除用户角色
          * 2.批量保存用户角色
@@ -121,10 +122,10 @@ public class UserManageController {
      * 修改用户类型
      */
     @ApiOperation("修改用户类型")
-    @PostMapping("/{userId}/{type}")
+    @PostMapping("/editUserType")
     public QueryResponseResult editUserType(
-            @ApiParam("用户身份证") @PathVariable(required = true) String userId,
-            @ApiParam("类型,0：普通用户 1: 服务厂商 20:租户管理员 100：管理用户") @PathVariable(required = true) Long type,
+            @ApiParam(value = "用户身份证",required = true) @RequestParam String userId,
+            @ApiParam(value = "类型,0：普通用户 1: 服务厂商 20:租户管理员 100：管理用户",required = true) @RequestParam Long type,
             @ApiParam("地区") @RequestParam(required = false) String tenantArea,
             @ApiParam("警种") @RequestParam(required = false) String tenantPoliceCategory,
             @ApiParam("国家专项") @RequestParam(required = false) String nationalProject,
@@ -140,10 +141,10 @@ public class UserManageController {
     }
 
     @ApiOperation("消息通知设置")
-    @PostMapping("/notify/{notifyType}")
+    @PostMapping("/editUserNotifyType")
     public QueryResponseResult changeNotifyType(HttpServletRequest request,
                                                 @LoginUser UserVO user,
-                                                @ApiParam("通知类型  0：短信 1:邮箱 2:微信,多个以逗号分隔") @PathVariable String notifyType) {
+                                                @ApiParam(value = "通知类型  0：短信 1:邮箱 2:微信,多个以逗号分隔",required = true) @RequestParam String notifyType) {
         userService.update(new User(), new UpdateWrapper<User>().lambda()
                 .eq(User::getIdCard, user.getIdCard())
                 .set(User::getNotifyType, notifyType));

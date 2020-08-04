@@ -26,4 +26,6 @@ public interface NewsService extends IService<News> {
      */
     void setTop(News news,Integer type);
 
+    void deleteNews(News news,UserVO user);
+
 }

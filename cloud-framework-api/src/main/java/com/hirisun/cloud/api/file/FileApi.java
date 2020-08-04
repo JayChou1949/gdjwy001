@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @data 2020/7/9 14:30
  * @description
  */
-@FeignClient(name = "cloud-file-service", fallback = FileApiFallback.class)
+//@FeignClient(name = "cloud-file-service", fallback = FileApiFallback.class)
 public interface FileApi {
 
     /**

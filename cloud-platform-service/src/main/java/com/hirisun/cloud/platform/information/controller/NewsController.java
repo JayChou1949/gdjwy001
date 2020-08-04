@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
  * @author wuxiaoxing
  * @since 2020-07-14
  */
-@Api(description = "新闻资讯")
+@Api(tags = "新闻资讯")
 @RestController
 @RequestMapping("/api/news")
 public class NewsController {
@@ -37,6 +37,7 @@ public class NewsController {
      * 查询新闻列表
      * @return
      */
+    @ApiOperation("新闻列表")
     @GetMapping("/list")
     public QueryResponseResult<News> list(@ApiParam("页码") @RequestParam(required = false,defaultValue = "1") Integer pageNum,
                                           @ApiParam("每页大小") @RequestParam(required = false,defaultValue = "10") Integer pageSize,

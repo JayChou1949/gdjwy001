@@ -29,7 +29,7 @@ import java.util.Date;
  * @author wuxiaoxing
  * @since 2020-07-14
  */
-@Api(description = "平台管理轮播图管理")
+@Api(tags = "平台管理轮播图管理")
 @RestController
 @RequestMapping("/carouselManage")
 public class CarouselManageController {
@@ -94,8 +94,8 @@ public class CarouselManageController {
      * 轮播图详情
      */
     @ApiOperation("轮播图详情")
-    @GetMapping("/{id}")
-    public QueryResponseResult<Carousel> detail(@PathVariable String id) {
+    @GetMapping("/carouselDetail")
+    public QueryResponseResult<Carousel> detail(@ApiParam(value = "轮播图id",required = true) @RequestParam String id) {
         Carousel carousel = carouselService.getById(id);
         return QueryResponseResult.success(carousel);
     }
@@ -104,7 +104,7 @@ public class CarouselManageController {
      */
     @ApiOperation("创建轮播图")
     @PostMapping("/create")
-    public QueryResponseResult<Carousel> create(@LoginUser UserVO user, @RequestBody Carousel carousel) {
+    public QueryResponseResult<Carousel> create(@LoginUser UserVO user, @ModelAttribute Carousel carousel) {
         /**
          * 1.判断管理员类型
          * 2.判断管理员是否越权
@@ -128,8 +128,9 @@ public class CarouselManageController {
      * 删除轮播图,逻辑删除
      */
     @ApiOperation("删除轮播图")
-    @PostMapping("/delete/{id}")
-    public QueryResponseResult<Carousel> delete(@LoginUser UserVO user,@PathVariable String id) {
+    @PostMapping("/delete")
+    public QueryResponseResult<Carousel> delete(@LoginUser UserVO user,
+                                                @ApiParam(value = "轮播图id",required = true) @RequestParam String id) {
         Carousel carousel = carouselService.getById(id);
         if(carousel==null){
             return QueryResponseResult.fail("轮播图信息不存在");
@@ -150,7 +151,7 @@ public class CarouselManageController {
      */
     @ApiOperation("编辑轮播图")
     @PostMapping("/edit")
-    public QueryResponseResult<Carousel> edit(@LoginUser UserVO user,@RequestBody Carousel carousel) {
+    public QueryResponseResult<Carousel> edit(@LoginUser UserVO user,@ModelAttribute Carousel carousel) {
         /**
          * 1.判断管理员类型
          * 2.判断管理员是否越权
@@ -173,9 +174,9 @@ public class CarouselManageController {
      * 轮播图上下线
      */
     @ApiOperation("轮播图上/下线")
-    @PostMapping("/publish/{id}")
-    public QueryResponseResult<Carousel> publish(@PathVariable String id,
-                                                 @ApiParam("类型 1上线 0下线") @RequestParam(required = true) Integer type) {
+    @PostMapping("/publish")
+    public QueryResponseResult<Carousel> publish(@ApiParam(value = "轮播图id" ,required = true) @RequestParam String id,
+                                                 @ApiParam(value = "类型 1上线 0下线" ,required = true) @RequestParam Integer type) {
 
         Carousel Carousel = new Carousel();
         Carousel.setId(id);
@@ -189,12 +190,12 @@ public class CarouselManageController {
     }
 
     @ApiOperation("手动排序上/下移动")
-    @PostMapping(value = "/move/{type}/{id}")
+    @PostMapping(value = "/move")
     public  QueryResponseResult<Carousel> move(
-            @ApiParam("类型 up上移 down下移") @PathVariable String type,
-            @ApiParam("轮播图id") @PathVariable String id,
-            @ApiParam("类别") Integer provincial,
-            @ApiParam("类别所属")String belong){
+            @ApiParam(value = "类型 up上移 down下移",required = true) @RequestParam String type,
+            @ApiParam(value = "轮播图id",required = true) @RequestParam String id,
+            @ApiParam(value = "新闻类别,1省厅 2地市 3警种 4国家专项",required = true) @RequestParam Integer provincial,
+            @ApiParam("类别所属") @RequestParam String belong){
         //改变轮播图排序
         carouselService.movePosition(type,id,provincial,belong);
 

@@ -75,4 +75,14 @@ public class RedisApiFallback implements RedisApi {
 	public Boolean delete(String key) {
 		return false;
 	}
+
+    @Override
+    public void setForList(String key, Integer index, Object value) {
+
+    }
+
+    @Override
+    public void removeValueForList(String key, Integer count, Object value) {
+
+    }
 }

@@ -5,7 +5,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.hirisun.cloud.api.log.SysLogApi;
 import com.hirisun.cloud.common.annotation.LoginUser;
+import com.hirisun.cloud.common.util.IpUtil;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.platform.information.bean.News;
@@ -30,7 +32,7 @@ import java.util.Date;
  * @author wuxiaoxing
  * @since 2020-07-14
  */
-@Api(description = "平台管理新闻资讯管理")
+@Api(tags = "平台管理新闻资讯管理")
 @RestController
 @RequestMapping("/newsManage")
 public class NewsManageController {
@@ -49,7 +51,7 @@ public class NewsManageController {
             @LoginUser UserVO user,
             @ApiParam("页码") @RequestParam(required = false,defaultValue = "1") Integer pageNum,
             @ApiParam("每页大小") @RequestParam(required = false,defaultValue = "20") Integer pageSize,
-            @ApiParam("状态") @RequestParam(required = false,defaultValue = "0") Integer status,
+            @ApiParam("状态 0未上线 2已上线") @RequestParam(required = false,defaultValue = "0") Integer status,
             @ApiParam("类型") @RequestParam(required = false,defaultValue = "1") Integer type,
             @ApiParam("类型所属") @RequestParam(required = false) String belong,
             @ApiParam("新闻名称") @RequestParam(required = false) String title){
@@ -98,8 +100,8 @@ public class NewsManageController {
      * 新闻详情
      */
     @ApiOperation("新闻详情")
-    @GetMapping("/{id}")
-    public QueryResponseResult<News> newsInfo(@PathVariable String id) {
+    @GetMapping("/newsDetail")
+    public QueryResponseResult<News> newsInfo(@ApiParam(value = "新闻id",required = true) @RequestParam String id) {
         News news = newsService.getById(id);
         return QueryResponseResult.success(news);
     }
@@ -108,7 +110,7 @@ public class NewsManageController {
      */
     @ApiOperation("创建新闻")
     @GetMapping("/create")
-    public QueryResponseResult<News> create(@LoginUser UserVO user, @RequestBody News news) {
+    public QueryResponseResult<News> create(@LoginUser UserVO user, @ModelAttribute News news) {
         // 判断管理员类型
         if(NewsParamUtil.infomationPermission(user.getType())){
             return QueryResponseResult.fail("无权限操作新闻");
@@ -131,8 +133,9 @@ public class NewsManageController {
      * 删除新闻,逻辑删除
      */
     @ApiOperation("删除新闻")
-    @PostMapping("/delete/{id}")
-    public QueryResponseResult<News> delete(@LoginUser UserVO user,@PathVariable String id) {
+    @PostMapping("/delete")
+    public QueryResponseResult<News> delete(@LoginUser UserVO user,
+                                            @ApiParam(value = "新闻id",required = true) @RequestParam String id) {
         News news = newsService.getById(id);
         if(news==null){
             return QueryResponseResult.fail("新闻信息不存在");
@@ -144,8 +147,7 @@ public class NewsManageController {
             return QueryResponseResult.fail("无权操作该区域数据");
         }
         news.setStatus(News.STATUS_DELETE);
-        newsService.updateById(news);
-        //TODO 远程调用日志模块，记录操作人日志 sys_log
+        newsService.deleteNews(news,user);
         return QueryResponseResult.success("删除成功");
     }
     /**
@@ -153,7 +155,7 @@ public class NewsManageController {
      */
     @ApiOperation("编辑新闻")
     @PostMapping("/edit")
-    public QueryResponseResult<News> edit(@LoginUser UserVO user,@RequestBody News news) {
+    public QueryResponseResult<News> edit(@LoginUser UserVO user,@ModelAttribute News news) {
         /**
          * 1.判断管理员类型
          * 2.判断管理员是否越权
@@ -176,10 +178,10 @@ public class NewsManageController {
      * 新闻上下线
      */
     @ApiOperation("新闻上/下线")
-    @PostMapping("/publish/{id}")
-    public QueryResponseResult<News> publish(@LoginUser UserVO user,
-                                             @ApiParam("新闻id") @PathVariable String id,
-                                             @ApiParam("类型 1上线 0下线") @RequestParam(required = true) Integer type) {
+    @PostMapping("/publish")
+    public QueryResponseResult<News> publish(
+                                             @ApiParam(value = "新闻id",required = true) @RequestParam String id,
+                                             @ApiParam(value = "类型 1上线 0下线",required = true) @RequestParam Integer type) {
         News news = new News();
         news.setId(id);
         if(type.equals(1)){
@@ -195,9 +197,9 @@ public class NewsManageController {
      * 1.新闻有不同类型，每个类型只有一个新闻可以设置成置顶，同类型其余已置顶的状态会被更新
      */
     @ApiOperation("新闻置顶操作")
-    @PostMapping("/top/{id}")
-    public QueryResponseResult<News> edit(@PathVariable String id,
-                                          @ApiParam("类型 1置顶 0取消置顶") @RequestParam(required = true) Integer type) {
+    @PostMapping("/top")
+    public QueryResponseResult<News> edit(@ApiParam(value = "新闻id",required = true) @RequestParam String id,
+                                          @ApiParam(value = "类型 1置顶 0取消置顶",required = true) @RequestParam Integer type) {
         News news = newsService.getById(id);
         if (news==null) {
             return QueryResponseResult.fail("新闻信息不存在");

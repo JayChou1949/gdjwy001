@@ -17,7 +17,7 @@ import io.swagger.annotations.ApiModelProperty;
  * @author wuxiaoxing
  * @since 2020-07-23
  */
-@TableName("SYS_ROLE")
+@TableName("T_SYS_ROLE")
 @ApiModel(value="SysRole对象", description="角色")
 public class SysRole implements Serializable {
 

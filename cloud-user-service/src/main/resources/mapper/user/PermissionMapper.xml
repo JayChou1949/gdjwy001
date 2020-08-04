@@ -21,8 +21,8 @@
     <select id="listRoleMenu" resultType="com.hirisun.cloud.user.bean.Permission">
         SELECT
         p.*
-        FROM s_permission p
-        LEFT JOIN s_role_permission rp ON rp.pid=p.id
+        FROM t_sys_permission p
+        LEFT JOIN T_SYS_ROLE_PERMISSION rp ON rp.pid=p.id
         where
         rp.rid=#{param.rid}
         <if test="param.pid!=null">
@@ -37,9 +37,9 @@
     <select id="listUserMenu" resultMap="BaseResultMap">
         SELECT
         DISTINCT p.*
-        FROM s_permission p
-        LEFT JOIN s_role_permission rp ON rp.pid=p.id
-        LEFT JOIN s_user_role ur ON ur.role_id=rp.rid
+        FROM T_SYS_PERMISSION p
+        LEFT JOIN T_SYS_ROLE_PERMISSION rp ON rp.pid=p.id
+        LEFT JOIN T_SYS_USER_ROLE ur ON ur.role_id=rp.rid
         where
         ur.user_id=#{param.uid}
         <if test="param.pid!=null">

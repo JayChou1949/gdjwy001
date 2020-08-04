@@ -36,7 +36,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/api/threePartyInterface")
-@Api(description = "美亚daas数据治理")
+@Api(tags = "美亚daas数据治理")
 public class ThreePartyInterfaceController {
 
     //美亚ip、开放端口

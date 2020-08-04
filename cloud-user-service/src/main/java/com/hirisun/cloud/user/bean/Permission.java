@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.hirisun.cloud.model.common.Tree;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -18,9 +19,9 @@ import io.swagger.annotations.ApiModelProperty;
  * @author wuxiaoxing
  * @since 2020-07-23
  */
-@TableName("S_PERMISSION")
+@TableName("T_SYS_PERMISSION")
 @ApiModel(value="Permission对象", description="permission 权限表")
-public class Permission implements Serializable {
+public class Permission extends Tree<Permission> implements Serializable {
 
     private static final long serialVersionUID=1L;
 
@@ -46,8 +47,8 @@ public class Permission implements Serializable {
      */
     public static final Integer PERMISSION_STATUS_DISABLED=0;
 
-    @ApiModelProperty(value = "主键")
-    @TableId(value = "ID", type = IdType.UUID)
+    @ApiModelProperty(value = "主键，编辑菜单时必传")
+    @TableId(value = "ID", type = IdType.ASSIGN_ID)
     private String id;
 
     @ApiModelProperty(value = "上级ID")

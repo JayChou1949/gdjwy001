@@ -17,11 +17,6 @@ import java.util.Map;
  */
 public interface PermissionService extends IService<Permission> {
 
-    /**
-     * 将系统菜单数据组装成树形结构数据
-     * @return
-     */
-    List<Permission> listWithTree(List<Permission> list);
 
     /**
      * 菜单、角色菜单管理表 连表查询，根据角色id查询权限

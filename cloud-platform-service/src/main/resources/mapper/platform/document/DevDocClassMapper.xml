@@ -6,13 +6,13 @@
     <resultMap id="BaseResultMap" type="com.hirisun.cloud.platform.document.bean.DevDocClass">
         <result column="ID" property="id" />
         <result column="NAME" property="name" />
-        <result column="SORT_NUM" property="sortNum" />
+        <result column="SORT" property="sort" />
         <result column="UPDATE_TIME" property="updateTime" />
         <result column="CREATOR" property="creator" />
         <result column="REMARK" property="remark" />
         <result column="TYPE" property="type" />
         <result column="IMAGE" property="image" />
-        <result column="PARENT_ID" property="parentId" />
+        <result column="PID" property="pid" />
     </resultMap>
 
 </mapper>

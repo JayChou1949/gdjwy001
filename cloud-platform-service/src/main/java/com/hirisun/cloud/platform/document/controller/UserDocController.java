@@ -6,11 +6,9 @@ import com.hirisun.cloud.platform.document.bean.UserDoc;
 import com.hirisun.cloud.platform.document.service.UserDocService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -25,7 +23,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/userDoc")
-@Api(description = "用户文档")
+@Api(tags = "用户文档")
 public class UserDocController {
 
     @Autowired
@@ -35,8 +33,8 @@ public class UserDocController {
      * 根据适用业务获取用户文档
      */
     @ApiOperation("根据适用业务获取用户文档")
-    @GetMapping("/listUserDoc/{domainValue}")
-    public QueryResponseResult<UserDoc> listUserDoc(@PathVariable("domainValue") String domainValue) {
+    @GetMapping("/listUserDocByDomain")
+    public QueryResponseResult<UserDoc> listUserDoc(@ApiParam(value = "文档类型：用户指南",required = true) @RequestParam String domainValue) {
         LinkedList<UserDoc> list = userDocService.listByDomain(domainValue);
         return QueryResponseResult.success(list);
     }

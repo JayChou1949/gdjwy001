@@ -4,6 +4,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.hirisun.cloud.api.log.SysLogApi;
+import com.hirisun.cloud.common.util.IpUtil;
+import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.platform.information.bean.News;
 import com.hirisun.cloud.platform.information.mapper.NewsMapper;
@@ -30,6 +33,9 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper, News> implements Ne
 
     @Autowired
     private NewsMapper newsMapper;
+
+    @Autowired
+    private SysLogApi sysLogApi;
 
     @Override
     public Page selectPage(Page page, LambdaQueryWrapper queryWrapper) {
@@ -78,4 +84,13 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper, News> implements Ne
         news.setIsTop(type);
         this.updateById(news);
     }
+
+    @Override
+    public void deleteNews(News news,UserVO user) {
+        this.updateById(news);
+        // 远程调用日志模块，记录操作人日志 sys_log
+        sysLogApi.saveLog(user.getIdCard(),"删除新闻，新闻id："+news.getId(),"删除新闻", IpUtil.getIp());
+    }
+
+
 }
