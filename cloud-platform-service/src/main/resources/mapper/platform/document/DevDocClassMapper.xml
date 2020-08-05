@@ -15,4 +15,24 @@
         <result column="PID" property="pid" />
     </resultMap>
 
+    <select id="getPage" resultType="com.hirisun.cloud.platform.document.bean.DevDocClass">
+        SELECT D.*,C.NAME AS PARENT_NAME FROM T_DEV_DOC_CLASS D
+        LEFT JOIN T_DEV_DOC_CLASS C ON D.PID = C.ID
+        <where>
+            <if test="param.type != null and param.type != ''">
+                AND D.TYPE = #{param.type}
+            </if>
+            <if test="param.name != null and param.name != ''">
+                AND (
+                D.NAME like CONCAT(CONCAT('%',#{param.name}),'%')
+                OR C.NAME like CONCAT(CONCAT('%',#{param.name}),'%')
+                )
+            </if>
+            <if test="user.type != 100">
+                AND D.CREATOR = #{user.idcard}
+            </if>
+        </where>
+        ORDER BY D.SORT ASC, D.UPDATE_TIME DESC
+    </select>
+
 </mapper>

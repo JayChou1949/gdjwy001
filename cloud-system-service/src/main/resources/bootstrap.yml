@@ -11,6 +11,11 @@ spring:
         file-extension: yaml
       discovery:
         server-addr: 139.9.234.187:8848
+  swagger:
+    enabled: true
+    title: 云资源服务平台用户管理接口
+    version: v1.0
+    exclude-path: /error
 server:
   port: 8011
 ---

@@ -38,7 +38,7 @@ import java.util.Map;
 @Api(tags = "系统日志管理")
 @RestController
 @RequestMapping("/system/logManage")
-public class SysLogController implements SysLogApi {
+public class SysLogManageController implements SysLogApi {
 
     @Autowired
     private SysLogService sysLogService;

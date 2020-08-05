@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 @Api(tags = "数据字典管理")
 @RestController
 @RequestMapping("/system/dictManage")
-public class SysDictController {
+public class SysDictManageController {
 
     @Autowired
     private SysDictService sysDictService;

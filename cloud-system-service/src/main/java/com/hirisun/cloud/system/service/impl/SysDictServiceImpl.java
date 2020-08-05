@@ -99,17 +99,4 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
             }
         });
     }
-
-    private List<SysDict> getChildrens(SysDict root,List<SysDict> all){
-        List<SysDict> level1Menus= all.stream().filter(nodeEntity ->
-                nodeEntity.getPid()!=null&&nodeEntity.getPid().equals(root.getId())
-        ).map((menu)->{
-            menu.setChildren(getChildrens(menu,all));
-            return menu;
-        }).sorted((menu1,menu2)->{
-            return (int)((menu1.getSort()==null?999:menu1.getSort())-(menu2.getSort()==null?999:menu2.getSort()));
-        }).collect(Collectors.toList());
-
-        return level1Menus;
-    }
 }

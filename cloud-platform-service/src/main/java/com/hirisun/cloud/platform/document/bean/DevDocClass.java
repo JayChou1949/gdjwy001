@@ -1,5 +1,7 @@
 package com.hirisun.cloud.platform.document.bean;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
@@ -31,7 +33,7 @@ public class DevDocClass extends Tree<DevDocClass> implements Serializable {
 
     private static final long serialVersionUID=1L;
 
-    @TableField("ID")
+    @TableId(value = "ID", type = IdType.ASSIGN_UUID)
     private String id;
 
     @ApiModelProperty(value = "分类名称")

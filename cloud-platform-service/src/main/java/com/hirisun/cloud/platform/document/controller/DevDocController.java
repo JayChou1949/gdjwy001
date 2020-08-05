@@ -54,13 +54,13 @@ public class DevDocController {
         page.setCurrent(pageNum);
         page.setSize(pageSize);
         Map param=new HashMap();
-        param.put("isFront","1");
+        param.put("isFront",true);
         param.put("status",DevDocClass.STATUS_ONLINE);
         param.put("name", name);
         param.put("firstClass", firstClass);
         param.put("secondClass", secondClass);
-        param.put("user", user);
-        page = devDocService.getPage(page,param);
+//        param.put("user", user);
+        page = devDocService.getPage(page,user,param);
         List<DevDoc> records = page.getRecords();
         if (records != null && !records.isEmpty()) {
             for (DevDoc document : records) {//附件

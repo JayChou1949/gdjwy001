@@ -1,5 +1,7 @@
 package com.hirisun.cloud.platform.document.bean;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
@@ -7,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.hirisun.cloud.model.file.FileSystemVO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -24,7 +27,7 @@ public class DevDoc implements Serializable {
 
     private static final long serialVersionUID=1L;
 
-    @TableField("ID")
+    @TableId(value = "ID", type = IdType.ASSIGN_UUID)
     private String id;
 
     @ApiModelProperty(value = "文档标题")
@@ -55,7 +58,7 @@ public class DevDoc implements Serializable {
     @TableField("CONTENT")
     private String content;
 
-    @ApiModelProperty(value = "一级分类")
+    @ApiModelProperty(value = "一级分类",required = true)
     @TableField("FIRST_CLASS")
     private String firstClass;
 
@@ -76,10 +79,29 @@ public class DevDoc implements Serializable {
     @TableField(exist = false)
     private String secondClassName;
 
-//    @ApiModelProperty(value = "附件列表")
-//    @TableField(exist = false)
-//    private List<Files> filesList; //附件列表
+    @ApiModelProperty(value = "文件id")
+    @TableField("FILE_ID")
+    private String fileId;
 
+    @TableField(exist = false)
+    private String fileUrl;
+
+
+    public String getFileId() {
+        return fileId;
+    }
+
+    public void setFileId(String fileId) {
+        this.fileId = fileId;
+    }
+
+    public String getFileUrl() {
+        return fileUrl;
+    }
+
+    public void setFileUrl(String fileUrl) {
+        this.fileUrl = fileUrl;
+    }
 
     public String getId() {
         return id;

@@ -1,6 +1,7 @@
 package com.hirisun.cloud.platform.document.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.platform.document.bean.DevDocClass;
 import com.hirisun.cloud.platform.document.mapper.DevDocClassMapper;
 import com.hirisun.cloud.platform.document.service.DevDocClassService;
@@ -23,4 +24,10 @@ import java.util.stream.Collectors;
 @Service
 public class DevDocClassServiceImpl extends ServiceImpl<DevDocClassMapper, DevDocClass> implements DevDocClassService {
 
+    @Autowired
+    private DevDocClassMapper devDocClassMapper;
+    @Override
+    public Page getPage(Page page, UserVO user, Map map) {
+        return devDocClassMapper.getPage(page,user,map);
+    }
 }
