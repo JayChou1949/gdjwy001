@@ -15,21 +15,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.hirisun.cloud.api.file.FileUploadApi;
+import com.hirisun.cloud.api.file.FileApi;
 import com.hirisun.cloud.api.redis.RedisApi;
 import com.hirisun.cloud.common.exception.ExceptionCast;
 import com.hirisun.cloud.common.util.JsonUtils;
 import com.hirisun.cloud.common.util.LocalDateUtil;
 import com.hirisun.cloud.common.vo.CommonCode;
-import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.model.ncov.contains.NcovFileupload;
 import com.hirisun.cloud.model.ncov.contains.NcovKey;
 import com.hirisun.cloud.model.ncov.vo.daas.DataAccessVo;
-import com.hirisun.cloud.model.ncov.vo.daas.DataGovernanceLevel2Vo;
 import com.hirisun.cloud.model.ncov.vo.daas.DataGovernanceVo;
 import com.hirisun.cloud.model.ncov.vo.daas.DataModelingVo;
 import com.hirisun.cloud.model.ncov.vo.daas.DataSharingVo;
-import com.hirisun.cloud.model.ncov.vo.daas.NcovDataOverviewVo;
 import com.hirisun.cloud.model.ncov.vo.file.FileUploadVo;
 import com.hirisun.cloud.model.ncov.vo.iaas.NcovHomePageIaasVo;
 import com.hirisun.cloud.model.ncov.vo.paas.NcovClusterApp;
@@ -52,7 +49,7 @@ public class NcovFileUploadServiceImpl implements NcovFileUploadService {
 	@Autowired
 	private RedisApi redisApi;
 	@Autowired
-	private FileUploadApi fileUploadApi;
+	private FileApi fileApi;
 	@Autowired
 	private FileUploadMapper fileUploadMapper;
 	@Autowired
@@ -73,13 +70,10 @@ public class NcovFileUploadServiceImpl implements NcovFileUploadService {
 	public FileUploadVo fileUpload(String serviceType,String dataType,MultipartFile multipartFile) throws Exception {
 		
 		String fileName = multipartFile.getOriginalFilename();
-		String filePath = "";
 		
 		//先上传
-		QueryResponseResult upload = fileUploadApi.upload(multipartFile);
-		Integer code = upload.getCode();
-		if(code == 0) {
-			filePath = upload.getData().toString();
+		String filePath = fileApi.upload(multipartFile, NcovFileupload.NCOV_FILE_TYPE, "疫情模块数据文件.");
+		if(StringUtils.isNotBlank(filePath)) {
 			//保存或更新数据
 			String fileOldId = saveFileUpload(serviceType,dataType ,fileName, filePath);
 			//刷新缓存
@@ -87,8 +81,7 @@ public class NcovFileUploadServiceImpl implements NcovFileUploadService {
 			
 			//最后如果是更新数据,则尝试删除旧的excel文件(无法保证100%删除,可能存在网络原因),避免过多垃圾文件
 			if(StringUtils.isNotBlank(fileOldId)) {
-				QueryResponseResult delete = fileUploadApi.deleteFileByFileId(fileOldId);
-				System.out.println(delete.getData());
+				fileApi.delete(fileOldId);
 			}
 			FileUploadVo fileUploadVo = new FileUploadVo();
 			fileUploadVo.setDataType(dataType);

@@ -41,4 +41,11 @@ public interface FileService {
      * @return
      */
     FileSystem getFileSystemById(String fileId);
+    
+    /**
+     * 上传二进制格式的文件
+     * @param fileVo
+     * @return
+     */
+    public String uploadByte(FileVo fileVo);
 }

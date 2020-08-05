@@ -184,4 +184,60 @@ public class FileServiceImpl implements FileService {
         return fileSystemMapper.selectById(fileId);
     }
 
+	@Override
+	public String uploadByte(FileVo fileVo) {
+		
+		byte[] fileByte = fileVo.getFileByte();
+		
+        if (fileByte == null) {
+            ExceptionCast.cast(FileCode.FILE_IS_NULL);
+        }
+        
+        //初始化Fdfs配置信息
+        initFdfsConfig();
+        
+        try {
+            //创建tracker client
+            TrackerClient client = new TrackerClient();
+            //获取tracker server
+            TrackerServer server = client.getConnection();
+            //获取storage
+            StorageServer storage = client.getStoreStorage(server);
+            //创建 storage client
+            StorageClient1 storageClient = new StorageClient1(server, storage);
+            //文件字节
+            //获取文件原始名称
+            String originalFilename = fileVo.getFileName();
+            //获取文件扩展名
+            String extName = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
+            //上传文件并获得文件目录及Id
+            String fileId = storageClient.upload_file1(fileByte, extName, null);
+            //文件Id起始位置
+            int beginIndex = fileId.lastIndexOf("/") + 1;
+            //文件Id结束位置
+            int endIndex = fileId.lastIndexOf(".");
+            //文件id
+            String id = fileId.substring(beginIndex, endIndex);
+            //创建文件系统对象
+            FileSystem fileSystem = new FileSystem();
+            //设置文件系统属性
+            fileSystem.setId(id)
+                    .setFilePath(fileId)
+                    .setBusinessKey(fileVo.getBusinessKey())
+                    .setBusinessTag(fileVo.getBusinessTag())
+                    .setFileName(originalFilename)
+                    .setFileSize(fileVo.getFileSize())
+                    .setFileType(fileVo.getFileType())
+                    .setCreateDate(new Date())
+                    .setUpdateDate(new Date());
+            fileSystemMapper.insert(fileSystem);
+            return id;
+        } catch (Exception e) {
+            log.error("上传文件失败,具体信息为:{}", e.getMessage());
+            ExceptionCast.cast(FileCode.FDFS_UPLOAD_FAULT);
+        }
+        return null;
+    
+	}
+
 }
