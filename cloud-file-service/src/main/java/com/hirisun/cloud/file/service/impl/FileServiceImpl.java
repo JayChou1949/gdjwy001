@@ -1,18 +1,22 @@
 package com.hirisun.cloud.file.service.impl;
 
 import com.hirisun.cloud.common.exception.ExceptionCast;
+import com.hirisun.cloud.file.bean.FileSystem;
+import com.hirisun.cloud.file.mapper.FileSystemMapper;
 import com.hirisun.cloud.file.service.FileService;
 import com.hirisun.cloud.file.vo.FileCode;
 import com.hirisun.cloud.model.ncov.vo.file.FileVo;
 
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.commons.lang3.StringUtils;
 import org.csource.fastdfs.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Date;
 
 /**
  * @author zhoufeng
@@ -42,6 +46,8 @@ public class FileServiceImpl implements FileService {
     @Value("${cloud.fdfs.network_timeout_in_seconds}")
     int network_timeout_in_seconds;
 
+    @Autowired
+    private FileSystemMapper fileSystemMapper;
 
     /**
      * 初始化Fdfs配置信息
@@ -64,7 +70,7 @@ public class FileServiceImpl implements FileService {
      * @return
      */
     @Override
-    public String fdfs_upload(MultipartFile file) {
+    public String fdfs_upload(MultipartFile file, String businessKey, String businessTag) {
         //初始化Fdfs配置信息
         initFdfsConfig();
         if (file == null) {
@@ -85,9 +91,28 @@ public class FileServiceImpl implements FileService {
             String originalFilename = file.getOriginalFilename();
             //获取文件扩展名
             String extName = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
-            //上传文件并获得文件Id
+            //上传文件并获得文件目录及Id
             String fileId = storageClient.upload_file1(bytes, extName, null);
-            return fileId;
+            //文件Id起始位置
+            int beginIndex = fileId.lastIndexOf("/") + 1;
+            //文件Id结束位置
+            int endIndex = fileId.lastIndexOf(".");
+            //文件id
+            String id = fileId.substring(beginIndex, endIndex);
+            //创建文件系统对象
+            FileSystem fileSystem = new FileSystem();
+            //设置文件系统属性
+            fileSystem.setId(id)
+                    .setFilePath(fileId)
+                    .setBusinessKey(businessKey)
+                    .setBusinessTag(businessTag)
+                    .setFileName(file.getOriginalFilename())
+                    .setFileSize(file.getSize())
+                    .setFileType(file.getContentType())
+                    .setCreateDate(new Date())
+                    .setUpdateDate(new Date());
+            fileSystemMapper.insert(fileSystem);
+            return id;
         } catch (Exception e) {
             log.error("上传文件失败,具体信息为:{}", e.getMessage());
             ExceptionCast.cast(FileCode.FDFS_UPLOAD_FAULT);
@@ -95,13 +120,18 @@ public class FileServiceImpl implements FileService {
         return null;
     }
 
-	@Override
-	public Integer deleteFileByFileId(String fileId) {
-		
-
+    @Override
+    public Integer fdfs_delete(String id) {
         //初始化Fdfs配置信息
         initFdfsConfig();
         try {
+            //根据文件id获得文件路径信息
+            String filePath = fileSystemMapper.getFilePathById(id);
+            if (StringUtils.isBlank(filePath)) {
+                ExceptionCast.cast(FileCode.FILE_NO_EXISTS);
+            }
+            //删除文件信息
+            fileSystemMapper.deleteById(id);
             //创建tracker client
             TrackerClient client = new TrackerClient();
             //获取tracker server
@@ -110,24 +140,28 @@ public class FileServiceImpl implements FileService {
             StorageServer storage = client.getStoreStorage(server);
             //创建 storage client
             StorageClient1 storageClient = new StorageClient1(server, storage);
-            //获取文件扩展名
-            //上传文件并获得文件Id
-            return storageClient.delete_file1(fileId);
+            //删除文件
+            int count = storageClient.delete_file1(filePath);
+            return count;
         } catch (Exception e) {
             log.error("删除文件失败,具体信息为:{}", e.getMessage());
-            ExceptionCast.cast(FileCode.FDFS_UPLOAD_FAULT);
+            ExceptionCast.cast(FileCode.FDFS_DELETE_FAULT);
         }
-        return null;
-    
-		
-	}
+        return 0;
 
-	@Override
-	public byte[] downloadFileByFileId(String fileId) {
-		
-		//初始化Fdfs配置信息
+
+    }
+
+    @Override
+    public byte[] fdfs_download(String id) {
+        //初始化Fdfs配置信息
         initFdfsConfig();
         try {
+            //根据文件id获得文件路径信息
+            String filePath = fileSystemMapper.getFilePathById(id);
+            if (StringUtils.isBlank(filePath)) {
+                ExceptionCast.cast(FileCode.FILE_NO_EXISTS);
+            }
             //创建tracker client
             TrackerClient client = new TrackerClient();
             //获取tracker server
@@ -136,47 +170,18 @@ public class FileServiceImpl implements FileService {
             StorageServer storage = client.getStoreStorage(server);
             //创建 storage client
             StorageClient1 storageClient = new StorageClient1(server, storage);
-            //获取文件扩展名
             //上传文件并获得文件Id
-            return storageClient.download_file1(fileId);
+            return storageClient.download_file1(filePath);
         } catch (Exception e) {
             log.error("下载文件失败,具体信息为:{}", e.getMessage());
-            ExceptionCast.cast(FileCode.FDFS_UPLOAD_FAULT);
+            ExceptionCast.cast(FileCode.FDFS_DOWNLOAD_FAULT);
         }
         return null;
-		
-		
-	}
+    }
 
-	@Override
-	public String fileUploadByByte(FileVo fileVo) {
-		
-		initFdfsConfig();
-		if (fileVo == null || StringUtils.isBlank(fileVo.getFileName()) || fileVo.getFileByte() == null) {
-            ExceptionCast.cast(FileCode.FILE_IS_NULL);
-        }
-        
-        try {
-            //创建tracker client
-            TrackerClient client = new TrackerClient();
-            //获取tracker server
-            TrackerServer server = client.getConnection();
-            //获取storage
-            StorageServer storage = client.getStoreStorage(server);
-            //创建 storage client
-            StorageClient1 storageClient = new StorageClient1(server, storage);
-            //获取文件原始名称
-            //获取文件扩展名
-            String fileName = fileVo.getFileName();
-            String extName = fileName.substring(fileName.lastIndexOf(".") + 1);
-            //上传文件并获得文件Id
-            String fileId = storageClient.upload_file1(fileVo.getFileByte(), extName, null);
-            return fileId;
-        } catch (Exception e) {
-            log.error("上传文件失败,具体信息为:{}", e.getMessage());
-            ExceptionCast.cast(FileCode.FDFS_UPLOAD_FAULT);
-        }
-        return null;
-		
-	}
+    @Override
+    public FileSystem getFileSystemById(String fileId) {
+        return fileSystemMapper.selectById(fileId);
+    }
+
 }

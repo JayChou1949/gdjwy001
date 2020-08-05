@@ -1,6 +1,7 @@
 package com.hirisun.cloud.platform.document.mapper;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.platform.document.bean.DevDoc;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.hirisun.cloud.platform.document.bean.DevDocClass;
@@ -18,6 +19,6 @@ import java.util.Map;
  */
 public interface DevDocMapper extends BaseMapper<DevDoc> {
 
-    Page<DevDoc> getPage(Page<DevDoc> page, @Param("param") Map paramMap);
+    Page<DevDoc> getPage(Page<DevDoc> page,@Param("user") UserVO user, @Param("param") Map paramMap);
 
 }

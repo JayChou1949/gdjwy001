@@ -1,20 +1,15 @@
 package com.hirisun.cloud.file.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-
-import com.hirisun.cloud.common.vo.QueryResponseResult;
+import com.alibaba.fastjson.JSON;
+import com.hirisun.cloud.api.file.FileApi;
+import com.hirisun.cloud.file.bean.FileSystem;
 import com.hirisun.cloud.file.service.FileService;
-import com.hirisun.cloud.model.ncov.vo.file.FileVo;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author zhoufeng
@@ -27,40 +22,40 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/file")
 @RestController
 @Slf4j
-public class FileController {
+public class FileController implements FileApi {
 
     @Autowired
     private FileService fileService;
 
     @ApiOperation(value = "文件上传")
     @PostMapping("/upload")
-    public QueryResponseResult upload(MultipartFile file) {
-        String fileId = fileService.fdfs_upload(file);
-        log.debug("<== fileId:{}", fileId);
-        return QueryResponseResult.success(fileId);
+    @Override
+    public String upload(MultipartFile file, @RequestParam("businessKey") String businessKey, @RequestParam("businessTag") String businessTag) {
+        return fileService.fdfs_upload(file,businessKey,businessTag);
     }
-    
+
     @ApiOperation(value = "文件删除")
-    @PostMapping("/delete")
-    public QueryResponseResult deleteFileByFileId(String fileId) {
-        Integer success = fileService.deleteFileByFileId(fileId);
-        log.debug("<== 文件删除 fileId:{}", fileId);
-        return QueryResponseResult.success(success);
+    @DeleteMapping("/delete/{id}")
+    @Override
+    public boolean delete(@PathVariable("id") String id) {
+        Integer num = fileService.fdfs_delete(id);
+        log.debug("<== num:{}",num);
+        return num == 0;
     }
-    
+
     @ApiOperation(value = "文件下载")
-    @PostMapping("/download")
-    public QueryResponseResult downloadFileByFileId(String fileId) {
-        byte[] file = fileService.downloadFileByFileId(fileId);
-        log.debug("<== 文件下载 fileId:{}", fileId);
-        return QueryResponseResult.success(file);
+    @GetMapping("/download/{id}")
+    @Override
+    public byte[] download(@PathVariable("id") String id) {
+        return fileService.fdfs_download(id);
     }
-    
-    @ApiOperation(value = "文件上传(二进制和文件名上传)")
-    @PostMapping("/upload/byte")
-    public QueryResponseResult uploadByte(@RequestBody FileVo fileVo) {
-        String fileId = fileService.fileUploadByByte(fileVo);
-        log.debug("<== fileId:{}", fileId);
-        return QueryResponseResult.success(fileId);
+
+    @ApiOperation(value = "根据文件ID获得文件系统信息")
+    @GetMapping("file/{id}")
+    @Override
+    public String getFileSystemInfo(@PathVariable("id")String id) {
+        FileSystem fileSystem = fileService.getFileSystemById(id);
+        return JSON.toJSONString(fileSystem);
     }
+
 }

@@ -162,4 +162,28 @@ public class RedisController implements RedisApi {
     public Boolean delete(@PathVariable("key") String key) {
         return redisService.delete(key);
     }
+
+    @PostMapping("/setForList")
+    @ApiOperation("修改list下标的值")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "key", value = "键", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "index", value = "下标", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "value", value = "值", required = true, paramType = "query")
+    })
+    @Override
+    public void setForList(@RequestParam("key") String key,@RequestParam("index") Integer index, @RequestParam("value") Object value) {
+        redisService.setForList(key,index, value);
+    }
+
+    @PostMapping("/removeValueForList")
+    @ApiOperation("删除list其中的值")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "key", value = "键", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "count", value = "个数", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "value", value = "值", required = true, paramType = "query")
+    })
+    @Override
+    public void removeValueForList(@RequestParam("key") String key,@RequestParam("count") Integer count, @RequestParam("value") Object value) {
+        redisService.removeValueForList(key,count, value);
+    }
 }

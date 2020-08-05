@@ -1,11 +1,14 @@
 package com.hirisun.cloud.platform.document.bean;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+import com.hirisun.cloud.model.common.Tree;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -19,7 +22,7 @@ import io.swagger.annotations.ApiModelProperty;
  */
 @TableName("T_DEV_DOC_CLASS")
 @ApiModel(value="DevDocClass对象", description="文档分类表")
-public class DevDocClass implements Serializable {
+public class DevDocClass extends Tree<DevDocClass> implements Serializable {
 
     //文档分类状态 0审核 1待上线 2上线 3驳回 4删除
     public static final Long STATUS_AUDIT=0L;
@@ -30,7 +33,7 @@ public class DevDocClass implements Serializable {
 
     private static final long serialVersionUID=1L;
 
-    @TableField("ID")
+    @TableId(value = "ID", type = IdType.ASSIGN_UUID)
     private String id;
 
     @ApiModelProperty(value = "分类名称")
@@ -38,8 +41,8 @@ public class DevDocClass implements Serializable {
     private String name;
 
     @ApiModelProperty(value = "排序")
-    @TableField("SORT_NUM")
-    private Long sortNum;
+    @TableField("SORT")
+    private Integer sort;
 
     @TableField("UPDATE_TIME")
     private Date updateTime;
@@ -61,8 +64,8 @@ public class DevDocClass implements Serializable {
     private String image;
 
     @ApiModelProperty(value = "上级id")
-    @TableField("PARENT_ID")
-    private String parentId;
+    @TableField("PID")
+    private String pid;
 
     @TableField(exist = false)
     private List<DevDocClass> children;
@@ -84,13 +87,7 @@ public class DevDocClass implements Serializable {
         this.name = name;
     }
 
-    public Long getSortNum() {
-        return sortNum;
-    }
 
-    public void setSortNum(Long sortNum) {
-        this.sortNum = sortNum;
-    }
 
     public Date getUpdateTime() {
         return updateTime;
@@ -132,12 +129,24 @@ public class DevDocClass implements Serializable {
         this.image = image;
     }
 
-    public String getParentId() {
-        return parentId;
+    @Override
+    public Integer getSort() {
+        return sort;
     }
 
-    public void setParentId(String parentId) {
-        this.parentId = parentId;
+    @Override
+    public void setSort(Integer sort) {
+        this.sort = sort;
+    }
+
+    @Override
+    public String getPid() {
+        return pid;
+    }
+
+    @Override
+    public void setPid(String pid) {
+        this.pid = pid;
     }
 
     public List<DevDocClass> getChildren() {
@@ -153,13 +162,13 @@ public class DevDocClass implements Serializable {
         return "DevDocClass{" +
         "id=" + id +
         ", name=" + name +
-        ", sortNum=" + sortNum +
+        ", sort=" + sort +
         ", updateTime=" + updateTime +
         ", creator=" + creator +
         ", remark=" + remark +
         ", type=" + type +
         ", image=" + image +
-        ", parentId=" + parentId +
+        ", pid=" + pid +
         "}";
     }
 }

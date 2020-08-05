@@ -5,11 +5,14 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.hirisun.cloud.api.log.SysLogApi;
+import com.hirisun.cloud.common.annotation.LoginUser;
+import com.hirisun.cloud.common.util.IpUtil;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
-import com.hirisun.cloud.model.user.User;
-import com.hirisun.cloud.platform.information.bean.Carousel;
+import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.platform.information.bean.News;
 import com.hirisun.cloud.platform.information.service.NewsService;
+import com.hirisun.cloud.platform.information.util.NewsParamUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -24,13 +27,12 @@ import java.util.Date;
 /**
  * <p>
  * 新闻资讯 前端控制器
- * TODO 后台操作新闻接口，需验证登录
  * </p>
  *
  * @author wuxiaoxing
  * @since 2020-07-14
  */
-@Api(description = "平台管理新闻资讯管理")
+@Api(tags = "平台管理新闻资讯管理")
 @RestController
 @RequestMapping("/newsManage")
 public class NewsManageController {
@@ -40,25 +42,21 @@ public class NewsManageController {
     private static Logger logger = LoggerFactory.getLogger(NewsManageController.class);
 
     /**
-     * 后台管理接口需验证登录
-     */
-//    this.needLogin=true;
-
-    /**
      * 查询新闻列表
      * @return
      */
     @ApiOperation("新闻列表")
     @GetMapping("/page")
     public QueryResponseResult<News> list(
+            @LoginUser UserVO user,
             @ApiParam("页码") @RequestParam(required = false,defaultValue = "1") Integer pageNum,
             @ApiParam("每页大小") @RequestParam(required = false,defaultValue = "20") Integer pageSize,
-            @ApiParam("状态") @RequestParam(required = false,defaultValue = "0") Integer status,
+            @ApiParam("状态 0未上线 2已上线") @RequestParam(required = false,defaultValue = "0") Integer status,
             @ApiParam("类型") @RequestParam(required = false,defaultValue = "1") Integer type,
             @ApiParam("类型所属") @RequestParam(required = false) String belong,
             @ApiParam("新闻名称") @RequestParam(required = false) String title){
-        //TODO 检测用户权限
-        if(!this.checkUserPermission(null)){
+        // 检测用户权限
+        if(NewsParamUtil.checkUserInfomationPermission(user,type,belong)){
             return QueryResponseResult.fail("无权查看该区域数据");
         }
         //列表不查询新闻详情
@@ -102,8 +100,8 @@ public class NewsManageController {
      * 新闻详情
      */
     @ApiOperation("新闻详情")
-    @GetMapping("/{id}")
-    public QueryResponseResult<News> newsInfo(@PathVariable String id) {
+    @GetMapping("/newsDetail")
+    public QueryResponseResult<News> newsInfo(@ApiParam(value = "新闻id",required = true) @RequestParam String id) {
         News news = newsService.getById(id);
         return QueryResponseResult.success(news);
     }
@@ -112,14 +110,19 @@ public class NewsManageController {
      */
     @ApiOperation("创建新闻")
     @GetMapping("/create")
-    public QueryResponseResult<News> create(News news) {
-        //TODO 判断管理员类型
-
-        //TODO 判断管理员权限
-        if(!this.checkUserPermission(null)){
-            return QueryResponseResult.fail("无权查看该区域数据");
+    public QueryResponseResult<News> create(@LoginUser UserVO user, @ModelAttribute News news) {
+        // 判断管理员类型
+        if(NewsParamUtil.infomationPermission(user.getType())){
+            return QueryResponseResult.fail("无权限操作新闻");
         }
-        news.setCreator(null);
+
+        String newsBelong = StringUtils.isEmpty(news.getArea())
+                ? StringUtils.isEmpty(news.getPoliceCategory())?news.getProject():news.getPoliceCategory() : news.getArea();
+        // 判断管理员权限
+        if(NewsParamUtil.checkUserInfomationPermission(user,news.getProvincial(),newsBelong)){
+            return QueryResponseResult.fail("无权操作该区域数据");
+        }
+        news.setCreator(user.getIdCard());
         news.setUpdateTime(new Date());
         news.setViewCount(0L);
         news.setStatus(News.STATUS_WAIT_ONLINE);
@@ -130,33 +133,42 @@ public class NewsManageController {
      * 删除新闻,逻辑删除
      */
     @ApiOperation("删除新闻")
-    @GetMapping("/delete/{id}")
-    public QueryResponseResult<News> delete(@PathVariable String id) {
+    @PostMapping("/delete")
+    public QueryResponseResult<News> delete(@LoginUser UserVO user,
+                                            @ApiParam(value = "新闻id",required = true) @RequestParam String id) {
         News news = newsService.getById(id);
-        //TODO 判断管理员权限
-        if(!this.checkUserPermission(null)){
+        if(news==null){
+            return QueryResponseResult.fail("新闻信息不存在");
+        }
+        String newsBelong = StringUtils.isEmpty(news.getArea())
+                ? StringUtils.isEmpty(news.getPoliceCategory())?news.getProject():news.getPoliceCategory() : news.getArea();
+        // 判断管理员权限
+        if(NewsParamUtil.checkUserInfomationPermission(user,news.getProvincial(),newsBelong)){
             return QueryResponseResult.fail("无权操作该区域数据");
         }
-        if (news != null) {
-            news.setStatus(News.STATUS_DELETE);
-            newsService.updateById(news);
-        }
-        //TODO 远程调用日志模块，记录操作人日志 sys_log
+        news.setStatus(News.STATUS_DELETE);
+        newsService.deleteNews(news,user);
         return QueryResponseResult.success("删除成功");
     }
     /**
      * 编辑新闻
      */
     @ApiOperation("编辑新闻")
-    @GetMapping("/edit")
-    public QueryResponseResult<News> edit(@RequestBody News news) {
-        //TODO 判断管理员类型
-
-        //TODO 判断管理员权限
-        if(!this.checkUserPermission(null)){
-            return QueryResponseResult.fail("无权查看该区域数据");
+    @PostMapping("/edit")
+    public QueryResponseResult<News> edit(@LoginUser UserVO user,@ModelAttribute News news) {
+        /**
+         * 1.判断管理员类型
+         * 2.判断管理员是否越权
+         * 3.编辑操作将新闻状态改为待上线
+         */
+        if(NewsParamUtil.infomationPermission(user.getType())){
+            return QueryResponseResult.fail("无权限操作新闻");
         }
-        //编辑操作将新闻状态改为待上线
+        String newsBelong = StringUtils.isEmpty(news.getArea())
+                ? StringUtils.isEmpty(news.getPoliceCategory())?news.getProject():news.getPoliceCategory() : news.getArea();
+        if(NewsParamUtil.checkUserInfomationPermission(user,news.getProvincial(),newsBelong)){
+            return QueryResponseResult.fail("无权操作该区域数据");
+        }
         news.setStatus(News.STATUS_WAIT_ONLINE);
         newsService.updateById(news);
         return QueryResponseResult.success(news);
@@ -166,15 +178,10 @@ public class NewsManageController {
      * 新闻上下线
      */
     @ApiOperation("新闻上/下线")
-    @GetMapping("/publish/{id}")
-    public QueryResponseResult<News> publish(@PathVariable String id,
-                                             @ApiParam("类型 1上线 0下线") @RequestParam(required = true) Integer type) {
-        //TODO 判断管理员类型
-
-        //TODO 判断管理员权限
-        if(!this.checkUserPermission(null)){
-            return QueryResponseResult.fail("无权查看该区域数据");
-        }
+    @PostMapping("/publish")
+    public QueryResponseResult<News> publish(
+                                             @ApiParam(value = "新闻id",required = true) @RequestParam String id,
+                                             @ApiParam(value = "类型 1上线 0下线",required = true) @RequestParam Integer type) {
         News news = new News();
         news.setId(id);
         if(type.equals(1)){
@@ -190,65 +197,15 @@ public class NewsManageController {
      * 1.新闻有不同类型，每个类型只有一个新闻可以设置成置顶，同类型其余已置顶的状态会被更新
      */
     @ApiOperation("新闻置顶操作")
-    @GetMapping("/top/{id}")
-    public QueryResponseResult<News> edit(@PathVariable String id,
-                                          @ApiParam("类型 1置顶 0取消置顶") @RequestParam(required = true) Integer type) {
+    @PostMapping("/top")
+    public QueryResponseResult<News> edit(@ApiParam(value = "新闻id",required = true) @RequestParam String id,
+                                          @ApiParam(value = "类型 1置顶 0取消置顶",required = true) @RequestParam Integer type) {
         News news = newsService.getById(id);
         if (news==null) {
             return QueryResponseResult.fail("新闻信息不存在");
         }
-        //TODO 判断管理员类型
-
-        //TODO 判断管理员权限
-        if(!this.checkUserPermission(null)){
-            return QueryResponseResult.fail("无权查看该区域数据");
-        }
-        //获取当前新闻类型
-        if(type.equals(News.TOP_YES)){
-            //更新同类型其他新闻的置顶状态 1省厅 2地址 3警种 4国家专项
-            switch (news.getProvincial()) {
-                case 1:
-                    newsService.update(new News(), new UpdateWrapper<News>().lambda()
-                            .eq(News::getProvincial,news.getProvincial())
-                            .set(News::getIsTop, 0));
-                    break;
-                case 2:
-                    newsService.update(new News(), new UpdateWrapper<News>().lambda()
-                            .eq(News::getProvincial,news.getProvincial())
-                            .eq(News::getArea,news.getArea())
-                            .set(News::getIsTop, 0));
-                    break;
-                case 3:
-                    newsService.update(new News(), new UpdateWrapper<News>().lambda()
-                            .eq(News::getProvincial,news.getProvincial())
-                            .eq(News::getPoliceCategory,news.getPoliceCategory())
-                            .set(News::getIsTop, 0));
-                    break;
-                case 4:
-                    newsService.update(new News(), new UpdateWrapper<News>().lambda()
-                            .eq(News::getProvincial,news.getProvincial())
-                            .eq(News::getProject,news.getProject())
-                            .set(News::getIsTop, 0));
-                    break;
-                default:
-                    break;
-            }
-
-        }
-        news=new News();
-        news.setId(id);
-        news.setUpdateTime(new Date());
-        news.setIsTop(type);
-        return QueryResponseResult.success(news);
+        newsService.setTop(news,type);
+        return QueryResponseResult.success(null);
     }
-
-
-    /**
-     *TODO  检查用户权限
-     */
-    public static boolean checkUserPermission(User user) {
-        return true;
-    }
-
 }
 

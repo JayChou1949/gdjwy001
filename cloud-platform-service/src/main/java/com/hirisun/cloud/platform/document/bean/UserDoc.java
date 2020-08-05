@@ -1,5 +1,6 @@
 package com.hirisun.cloud.platform.document.bean;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -23,7 +24,7 @@ public class UserDoc implements Serializable {
 
     private static final long serialVersionUID=1L;
 
-    @TableId("ID")
+    @TableId(value = "ID", type = IdType.ASSIGN_UUID)
     private String id;
 
     @ApiModelProperty(value = "文档名称")
@@ -53,8 +54,20 @@ public class UserDoc implements Serializable {
     @TableField("UPDATE_TIME")
     private Date updateTime;
 
+    @ApiModelProperty(value = "文件id")
+    @TableField("FILE_ID")
+    private String fileId;
+
     @TableField(exist = false)
     private String fileUrl;
+
+    public String getFileId() {
+        return fileId;
+    }
+
+    public void setFileId(String fileId) {
+        this.fileId = fileId;
+    }
 
     public String getFileUrl() {
         return fileUrl;

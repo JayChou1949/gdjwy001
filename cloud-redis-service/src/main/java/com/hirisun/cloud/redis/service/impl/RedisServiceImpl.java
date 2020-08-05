@@ -77,4 +77,13 @@ public class RedisServiceImpl implements RedisService {
     public Boolean delete(String key) {
         return redisTemplate.delete(key);
     }
+
+    @Override
+    public void setForList(String key,Integer index,Object value) {
+        redisTemplate.opsForList().set(key,index,value);
+    }
+    @Override
+    public void removeValueForList(String key,Integer count,Object value) {
+        redisTemplate.opsForList().remove(key, count,value);
+    }
 }

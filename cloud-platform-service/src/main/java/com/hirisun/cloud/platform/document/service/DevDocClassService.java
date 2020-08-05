@@ -1,6 +1,7 @@
 package com.hirisun.cloud.platform.document.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.platform.document.bean.DevDocClass;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -16,13 +17,6 @@ import java.util.Map;
  * @since 2020-07-20
  */
 public interface DevDocClassService extends IService<DevDocClass> {
-
-    /**
-     * 将文档分类数据组装成树形结构数据
-     * @return
-     */
-    List<DevDocClass> listWithTree();
-
-
+    Page getPage(Page page, UserVO user, Map map);
 
 }

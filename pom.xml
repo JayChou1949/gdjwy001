@@ -14,6 +14,8 @@
         <module>cloud-gateway-service</module>
         <module>cloud-platform-service</module>
         <module>cloud-iaas-service</module>
+        <module>cloud-user-service</module>
+        <module>cloud-system-service</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.platform.information.bean.News;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.apache.poi.ss.formula.functions.T;
@@ -19,5 +20,12 @@ import org.apache.poi.ss.formula.functions.T;
 public interface NewsService extends IService<News> {
 
     Page selectPage(Page page, LambdaQueryWrapper queryWrapper);
+
+    /**
+     * 置顶操作
+     */
+    void setTop(News news,Integer type);
+
+    void deleteNews(News news,UserVO user);
 
 }

@@ -1,6 +1,7 @@
 package com.hirisun.cloud.platform.document.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.platform.document.bean.DevDoc;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hirisun.cloud.platform.document.bean.DevDocClass;
@@ -17,6 +18,8 @@ import java.util.Map;
  */
 public interface DevDocService extends IService<DevDoc> {
 
-    Page<DevDoc> getPage(Page<DevDoc> page, Map paramMap);
+    Page<DevDoc> getPage(Page<DevDoc> page,UserVO userVO, Map paramMap);
+
+    void saveOrUpdateDevDoc(UserVO userVO,DevDoc devDoc);
 
 }

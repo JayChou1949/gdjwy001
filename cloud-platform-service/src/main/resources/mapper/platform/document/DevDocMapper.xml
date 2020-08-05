@@ -15,10 +15,12 @@
         <result column="FIRST_CLASS" property="firstClass" />
         <result column="SECOND_CLASS" property="secondClass" />
         <result column="INTRO" property="intro" />
+        <result column="FILE_ID" property="fileId" />
+        <result column="FILE_URL" property="fileUrl" />
     </resultMap>
 
     <sql id="column_exclude_content">
-        D.ID,D.TITLE,D.IMAGE,D.UPDATE_TIME,D.SORT_NUM,D.INTRO
+        D.ID,D.TITLE,D.IMAGE,D.UPDATE_TIME,D.SORT_NUM,D.INTRO,D.FILE_ID
     </sql>
 
     <select id="getPage" resultType="com.hirisun.cloud.platform.document.bean.DevDoc">
@@ -54,11 +56,11 @@
         <!--
            1.门户不登录可以看到全部
            2.后台管理分数据权限
-            TODO 用户
-        <if test="param.user != null and param.user.type != 100 and !param.isFront">
-            AND D.CREATOR = #{param.user.idcard}
+           -->
+        <if test="user != null and user.type != 100 and !param.isFront">
+            AND D.CREATOR = #{ser.idcard}
         </if>
-        -->
+
         ORDER BY D.SORT_NUM ASC, D.UPDATE_TIME DESC
     </select>
 

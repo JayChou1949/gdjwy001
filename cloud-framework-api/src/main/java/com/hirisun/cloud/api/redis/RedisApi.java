@@ -1,6 +1,9 @@
 package com.hirisun.cloud.api.redis;
 
 
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -133,5 +136,24 @@ public interface RedisApi {
      */
     @DeleteMapping("/redis/delete/{key}")
 	Boolean delete(@PathVariable("key") String key);
+
+    /**
+     * 修改list下标的值
+     *
+     * @param key 键
+     * @param value 值
+     */
+    @PostMapping("/redis/setForList")
+    void setForList(@RequestParam("key") String key,@RequestParam("index") Integer index, @RequestParam("value") Object value);
+
+    /**
+     * 删除list下标的值
+     *
+     * @param key 键
+     * @param count 个数
+     * @param value 值
+     */
+    @PostMapping("/redis/removeValueForList")
+    void removeValueForList(@RequestParam("key") String key,@RequestParam("count") Integer count, @RequestParam("value") Object value);
 
 }
