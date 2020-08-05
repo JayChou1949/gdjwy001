@@ -1,15 +1,16 @@
 package com.hirisun.cloud.ncov.service.impl;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.BeanUtils;
@@ -21,12 +22,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.alibaba.fastjson.JSON;
-import com.hirisun.cloud.api.file.FileUploadApi;
+import com.hirisun.cloud.api.file.FileApi;
 import com.hirisun.cloud.api.redis.RedisApi;
 import com.hirisun.cloud.common.exception.CustomException;
 import com.hirisun.cloud.common.vo.CommonCode;
-import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.common.vo.ResponseResult;
+import com.hirisun.cloud.model.ncov.contains.NcovFileupload;
 import com.hirisun.cloud.model.ncov.contains.NcovKey;
 import com.hirisun.cloud.model.ncov.vo.file.FileVo;
 import com.hirisun.cloud.model.ncov.vo.realtime.HomePageNcovRealtimeVo;
@@ -48,7 +49,7 @@ public class NcovRealtimeServiceImpl implements NcovRealtimeService {
 	@Autowired
     private RedisApi redisApi;
 	@Autowired
-	private FileUploadApi fileUploadApi;
+	private FileApi fileApi;
 	@Autowired
 	private NcovFileUploadService ncovFileUploadService;
 	
@@ -218,7 +219,6 @@ public class NcovRealtimeServiceImpl implements NcovRealtimeService {
 		return ncovRealtimeMapper.countNcovRealTime(regionType);
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
 	public String exportNcovRealtimeByRegionType(String serviceType,String dataType,int regionType) {
 		
@@ -228,7 +228,7 @@ public class NcovRealtimeServiceImpl implements NcovRealtimeService {
 				//先删除原来可能存在的文件
 				FileUpload fileUpload = ncovFileUploadService.getNcovFileUploadByType(serviceType, dataType);
 				String fileId = fileUpload.getFilePath();
-				fileUploadApi.deleteFileByFileId(fileId);
+				fileApi.delete(fileId);
 				
 				//再根据类型数据构造excel文件
 				ExportParams exportParams = new ExportParams(null,regionType==1?"全国省份数据":"全省各市数据");
@@ -241,10 +241,13 @@ public class NcovRealtimeServiceImpl implements NcovRealtimeService {
 		        FileVo fileVo = new FileVo();
 		        fileVo.setFileName("警务云首页实时数据-"+workbook.getSheetName(0)+".xls");
 		        fileVo.setFileByte(data);
+		        fileVo.setBusinessKey(NcovFileupload.NCOV_FILE_TYPE);
+		        fileVo.setBusinessTag("警务云首页实时数据-"+workbook.getSheetName(0)+".xls");
+		        fileVo.setFileSize(Long.valueOf(data.length));
+		        fileVo.setFileType("application/vnd.ms-excel");
 		        
 		        //再上传到文件服务器
-		        QueryResponseResult upload = fileUploadApi.uploadByte(fileVo);
-		        String filePath = upload.getData().toString();
+		        String filePath = fileApi.uploadByte(fileVo);
 		        fileUpload.setFilePath(filePath);
 		        ncovFileUploadService.updateFileUpload(fileUpload);
 	            return fileAccessPath+filePath;
@@ -255,5 +258,4 @@ public class NcovRealtimeServiceImpl implements NcovRealtimeService {
 			throw new CustomException(CommonCode.EXPORT_FAIL);
 		}
 	}
-
 }

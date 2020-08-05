@@ -1,8 +1,15 @@
 package com.hirisun.cloud.api.file;
 
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.hirisun.cloud.model.ncov.vo.file.FileVo;
 
 /**
  * @author zhoufeng
@@ -11,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @data 2020/7/9 14:30
  * @description
  */
-//@FeignClient(name = "cloud-file-service", fallback = FileApiFallback.class)
+@FeignClient(name = "cloud-file-service", fallback = FileApiFallback.class)
 public interface FileApi {
 
     /**
@@ -47,4 +54,12 @@ public interface FileApi {
      */
     @GetMapping("file/{id}")
     String getFileSystemInfo(@PathVariable("id")String id);
+    
+    /**
+     * 上传文件
+     *
+     * @return
+     */
+    @PostMapping(value = "/file/upload/byte")
+    public String uploadByte(@RequestBody FileVo fileVo);
 }

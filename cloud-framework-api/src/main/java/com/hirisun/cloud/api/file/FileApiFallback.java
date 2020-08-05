@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.hirisun.cloud.model.ncov.vo.file.FileVo;
+
 /**
  * @author zhoufeng
  * @version 1.0
@@ -37,4 +39,10 @@ public class FileApiFallback implements FileApi {
         log.error("获取文件系统信息失败！");
         return "";
     }
+
+	@Override
+	public String uploadByte(FileVo fileVo) {
+		log.error("上传二进制文件失败！");
+        return "";
+	}
 }
