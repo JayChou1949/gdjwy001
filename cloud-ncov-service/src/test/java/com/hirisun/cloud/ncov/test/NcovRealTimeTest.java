@@ -4,17 +4,18 @@ import com.alibaba.fastjson.JSONObject;
 import com.hirisun.cloud.model.ncov.vo.realtime.HomePageNcovRealtimeVo;
 import com.hirisun.cloud.ncov.NcovApplication;
 import com.hirisun.cloud.ncov.service.NcovRealtimeService;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(classes = NcovApplication.class)
+@Slf4j
 public class NcovRealTimeTest {
 
 	@Autowired
 	private NcovRealtimeService ncovRealtimeService;
-	
-	
+
 	
 	
 	private String getData(){

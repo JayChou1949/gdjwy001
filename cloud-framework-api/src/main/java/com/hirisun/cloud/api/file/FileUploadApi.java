@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.model.ncov.vo.file.FileVo;
 
-@FeignClient(name = "cloud-file-service", fallback = FileUploadApiFallback.class)
+//@FeignClient(name = "cloud-file-service", fallback = FileUploadApiFallback.class)
 public interface FileUploadApi {
 
 	/**

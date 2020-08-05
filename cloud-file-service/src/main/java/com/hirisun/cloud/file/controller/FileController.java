@@ -8,6 +8,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,10 +29,10 @@ public class FileController implements FileApi {
     private FileService fileService;
 
     @ApiOperation(value = "文件上传")
-    @PostMapping("/upload")
+    @PostMapping(value = "/upload", produces = {MediaType.APPLICATION_JSON_VALUE}, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Override
-    public String upload(MultipartFile file, @RequestParam("businessKey") String businessKey, @RequestParam("businessTag") String businessTag) {
-        return fileService.fdfs_upload(file,businessKey,businessTag);
+    public String upload(@RequestPart("file") MultipartFile file, @RequestParam("businessKey") String businessKey, @RequestParam("businessTag") String businessTag) {
+        return fileService.fdfs_upload(file, businessKey, businessTag);
     }
 
     @ApiOperation(value = "文件删除")
@@ -39,7 +40,7 @@ public class FileController implements FileApi {
     @Override
     public boolean delete(@PathVariable("id") String id) {
         Integer num = fileService.fdfs_delete(id);
-        log.debug("<== num:{}",num);
+        log.debug("<== num:{}", num);
         return num == 0;
     }
 
@@ -53,7 +54,7 @@ public class FileController implements FileApi {
     @ApiOperation(value = "根据文件ID获得文件系统信息")
     @GetMapping("file/{id}")
     @Override
-    public String getFileSystemInfo(@PathVariable("id")String id) {
+    public String getFileSystemInfo(@PathVariable("id") String id) {
         FileSystem fileSystem = fileService.getFileSystemById(id);
         return JSON.toJSONString(fileSystem);
     }
