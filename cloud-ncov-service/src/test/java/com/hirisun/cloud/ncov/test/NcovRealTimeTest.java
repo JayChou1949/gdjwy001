@@ -1,17 +1,13 @@
 package com.hirisun.cloud.ncov.test;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
-
 import com.alibaba.fastjson.JSONObject;
 import com.hirisun.cloud.model.ncov.vo.realtime.HomePageNcovRealtimeVo;
 import com.hirisun.cloud.ncov.NcovApplication;
 import com.hirisun.cloud.ncov.service.NcovRealtimeService;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = NcovApplication.class)
 public class NcovRealTimeTest {
 
