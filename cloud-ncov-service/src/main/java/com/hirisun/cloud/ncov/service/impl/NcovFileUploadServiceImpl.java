@@ -24,7 +24,11 @@ import com.hirisun.cloud.common.vo.CommonCode;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.model.ncov.contains.NcovFileupload;
 import com.hirisun.cloud.model.ncov.contains.NcovKey;
+import com.hirisun.cloud.model.ncov.vo.daas.DataAccessVo;
 import com.hirisun.cloud.model.ncov.vo.daas.DataGovernanceLevel2Vo;
+import com.hirisun.cloud.model.ncov.vo.daas.DataGovernanceVo;
+import com.hirisun.cloud.model.ncov.vo.daas.DataModelingVo;
+import com.hirisun.cloud.model.ncov.vo.daas.DataSharingVo;
 import com.hirisun.cloud.model.ncov.vo.daas.NcovDataOverviewVo;
 import com.hirisun.cloud.model.ncov.vo.file.FileUploadVo;
 import com.hirisun.cloud.model.ncov.vo.iaas.NcovHomePageIaasVo;
@@ -151,48 +155,59 @@ public class NcovFileUploadServiceImpl implements NcovFileUploadService {
 	private void setCache(String dataType,MultipartFile multipartFile) throws IOException, Exception {
 		if(NcovFileupload.DAAS_DATA_SHARING.equals(dataType)) {
 			
-			List<NcovDataOverviewVo> dataSharingVos = NcovEcsImportUtil.getShardingMoelingExcelData(multipartFile.getInputStream(), 1, 0);
-			if(CollectionUtils.isNotEmpty(dataSharingVos)) {
-				String json = JsonUtils.objectToJson(dataSharingVos);
+			DataSharingVo dataSharingVo = NcovEcsImportUtil.getShardingExcelData(multipartFile.getInputStream());
+			if(dataSharingVo != null) {
+				String json = JsonUtils.objectToJson(dataSharingVo);
 				saveOrUpdate(NcovFileupload.DAAS_DATA_SHARING,
 						NcovKey.HOME_PAGE_DAAS_DATA_SHARING,json);
 			}
 			
 		}else if(NcovFileupload.DAAS_DATA_MODELING.equals(dataType)) {
 			
-			List<NcovDataOverviewVo> dataModelingVos = NcovEcsImportUtil.getShardingMoelingExcelData(multipartFile.getInputStream(), 1, 0);
-			if(CollectionUtils.isNotEmpty(dataModelingVos)) {
-				String json = JsonUtils.objectToJson(dataModelingVos);
+			DataModelingVo dataModelingVo = NcovEcsImportUtil.getMoelingExcelData(multipartFile.getInputStream());
+			if(dataModelingVo != null) {
+				String json = JsonUtils.objectToJson(dataModelingVo);
 				saveOrUpdate(NcovFileupload.DAAS_DATA_MODELING,
 						NcovKey.HOME_PAGE_DAAS_DATA_MODELING,json);
 			}
 			
 		}else if(NcovFileupload.DAAS_DATA_GOVERNANCE.equals(dataType)) {
 			
-			Map<String, List<DataGovernanceLevel2Vo>> dataGovernanceMap = NcovEcsImportUtil.getDataGovernanceMap(multipartFile.getInputStream());
-			if(MapUtils.isNotEmpty(dataGovernanceMap)) {
-				String json = JsonUtils.objectToJson(dataGovernanceMap);
+			DataGovernanceVo dataGovernanceVo = NcovEcsImportUtil.getDataGovernance(multipartFile.getInputStream());
+			if(dataGovernanceVo != null) {
+				String json = JsonUtils.objectToJson(dataGovernanceVo);
 				saveOrUpdate(NcovFileupload.DAAS_DATA_GOVERNANCE,
 						NcovKey.HOME_PAGE_DAAS_DATA_GOVERNANCE,json);
 			}
 			
 		}else if(NcovFileupload.DAAS_DATA_ACCESS.equals(dataType)) {
 			
-			Map<String, Long> dataAccess = NcovEcsImportUtil.getDataAccess(multipartFile.getInputStream());
-			if(MapUtils.isNotEmpty(dataAccess)) {
+			DataAccessVo dataAccess = NcovEcsImportUtil.getDataAccess(multipartFile.getInputStream());
+			
+			List<List<Object>> police = NcovEcsImportUtil.getDataAccessLevel3(multipartFile.getInputStream(),"公安",1,2);
+			List<List<Object>> other = NcovEcsImportUtil.getDataAccessLevel3(multipartFile.getInputStream(),"",1,1);
+			
+			if(dataAccess != null) {
 				
-				String json = JsonUtils.objectToJson(dataAccess);
+				dataAccess.setLevel3Police(police);
+				dataAccess.setLevel3Other(other);
+				
+	            //首页用到的数据
+	            String json = JsonUtils.objectToJson(dataAccess);
 				saveOrUpdate(NcovFileupload.DAAS_DATA_ACCESS,
 						NcovKey.HOME_PAGE_DAAS_DATA_ACCESS,json);
-				
 			}
+			
+			
 			
 		}else if(NcovFileupload.DAAS_DATA_SERVICE.equals(dataType)) {
 			
-			int ncovDataServiceCount = NcovEcsImportUtil.getNcovDataServiceCount(multipartFile.getInputStream());
-			
-			saveOrUpdate(NcovFileupload.DAAS_DATA_SERVICE,
-					NcovKey.HOME_PAGE_DAAS_DATA_SERVICE_COUNT,String.valueOf(ncovDataServiceCount));
+			Map<String, Map<String, Long>> map = NcovEcsImportUtil.getNcovDataServiceCount(multipartFile.getInputStream());
+			if(MapUtils.isNotEmpty(map)) {
+				String json = JsonUtils.objectToJson(map);
+				saveOrUpdate(NcovFileupload.DAAS_DATA_SERVICE,
+						NcovKey.HOME_PAGE_DAAS_DATA_SERVICE_COUNT,json);
+			}
 			
 		}else if(NcovFileupload.IAAS_VM.equals(dataType)) {
 			
@@ -220,9 +235,6 @@ public class NcovFileUploadServiceImpl implements NcovFileUploadService {
 				saveOrUpdate(NcovFileupload.PAAS_OVERVIEW,
 						NcovKey.HOME_PAGE_PAAS_OVERVIEW,json);
 			}
-			
-			
-			
 			
 			List<NcovClusterResourceVo> resourceList = NcovEcsImportUtil.getResourceList(multipartFile.getInputStream(),1);
 			if(CollectionUtils.isNotEmpty(resourceList)) {

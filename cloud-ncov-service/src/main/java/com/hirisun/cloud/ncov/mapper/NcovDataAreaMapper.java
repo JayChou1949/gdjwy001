@@ -2,9 +2,9 @@ package com.hirisun.cloud.ncov.mapper;
 
 import java.util.List;
 
-import com.hirisun.cloud.model.ncov.dto.daas.CallAndNameDTO;
-import com.hirisun.cloud.model.ncov.dto.daas.CallAndTimeDTO;
-import com.hirisun.cloud.model.ncov.dto.daas.NcovDataLongDTO;
+import com.hirisun.cloud.model.ncov.vo.daas.CallAndNameVo;
+import com.hirisun.cloud.model.ncov.vo.daas.CallAndTimeVo;
+import com.hirisun.cloud.model.ncov.vo.daas.NcovDataLongVo;
 
 
 public interface NcovDataAreaMapper {
@@ -21,21 +21,21 @@ public interface NcovDataAreaMapper {
 
     Long yesterdayCall(String time);
 
-    List<CallAndNameDTO> callByPolice();
+    List<CallAndNameVo> callByPolice();
 
-    List<CallAndNameDTO> callByArea();
+    List<CallAndNameVo> callByArea();
 
-    List<CallAndTimeDTO> callAll(String time);
+    List<CallAndTimeVo> callAll(String time);
 
-    List<CallAndTimeDTO> callByApp(String time);
+    List<CallAndTimeVo> callByApp(String time);
 
     List<String> serviceAll();
 
-    List<NcovDataLongDTO> serviceCallAll();
+    List<NcovDataLongVo> serviceCallAll();
 
-    List<NcovDataLongDTO> serviceCallLately7Days(String last7Time);
+    List<NcovDataLongVo> serviceCallLately7Days(String last7Time);
 
-    List<NcovDataLongDTO> serviceCallYesterday(String time);
+    List<NcovDataLongVo> serviceCallYesterday(String time);
 
-    List<NcovDataLongDTO> serviceOrder();
+    List<NcovDataLongVo> serviceOrder();
 }

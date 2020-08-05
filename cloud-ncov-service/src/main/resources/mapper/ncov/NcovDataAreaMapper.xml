@@ -36,28 +36,28 @@
         WHERE b.STATUS = 2 AND b.CATEGORY = '疫情专项' AND a.CURRENT_TIME = #{time}
     </select>
 
-    <select id="callByPolice" resultType="com.hirisun.cloud.model.ncov.dto.daas.CallAndNameDTO">
+    <select id="callByPolice" resultType="com.hirisun.cloud.model.ncov.vo.daas.CallAndNameVo">
         SELECT SUM(REQ_COUNT) count,a.POLICE_CATEGORY name FROM TB_APP_STATISTICS a
         INNER JOIN TB_SERVICE_INSTANCE i ON a.ACTUAL_ID = i.ACTUAL_ID
         INNER JOIN TB_BIGDATA b ON i.SERVICE_GUID=b.APIG_GUID AND b.APIPRODUCT_ID = a.PRODUCT_FAMILY_id
         WHERE b.STATUS = 2 AND b.CATEGORY = '疫情专项' AND a.AREA_NAME = '省厅' AND a.POLICE_CATEGORY IS NOT NULL GROUP BY a.POLICE_CATEGORY
     </select>
 
-    <select id="callByArea" resultType="com.hirisun.cloud.model.ncov.dto.daas.CallAndNameDTO">
+    <select id="callByArea" resultType="com.hirisun.cloud.model.ncov.vo.daas.CallAndNameVo">
         SELECT SUM(REQ_COUNT) count,a.AREA_NAME name FROM TB_APP_STATISTICS a
         INNER JOIN TB_SERVICE_INSTANCE i ON a.ACTUAL_ID = i.ACTUAL_ID
         INNER JOIN TB_BIGDATA b ON i.SERVICE_GUID=b.APIG_GUID AND b.APIPRODUCT_ID = a.PRODUCT_FAMILY_id
         WHERE b.STATUS = 2 AND b.CATEGORY = '疫情专项' AND a.AREA_NAME != '省厅' AND a.AREA_NAME IS NOT NULL GROUP BY a.AREA_NAME
     </select>
 
-    <select id="callAll" resultType="com.hirisun.cloud.model.ncov.dto.daas.CallAndTimeDTO">
+    <select id="callAll" resultType="com.hirisun.cloud.model.ncov.vo.daas.CallAndTimeVo">
         SELECT SUM(REQ_COUNT) count,a.CURRENT_TIME time FROM TB_APP_STATISTICS a
         INNER JOIN TB_SERVICE_INSTANCE i ON a.ACTUAL_ID = i.ACTUAL_ID
         INNER JOIN TB_BIGDATA b ON i.SERVICE_GUID=b.APIG_GUID AND b.APIPRODUCT_ID = a.PRODUCT_FAMILY_id
         WHERE b.STATUS = 2 AND b.CATEGORY = '疫情专项' AND a.CURRENT_TIME >= #{time} GROUP BY a.CURRENT_TIME ORDER BY a.CURRENT_TIME
     </select>
 
-    <select id="callByApp" resultType="com.hirisun.cloud.model.ncov.dto.daas.CallAndTimeDTO">
+    <select id="callByApp" resultType="com.hirisun.cloud.model.ncov.vo.daas.CallAndTimeVo">
         SELECT SUM(REQ_COUNT) count,a.CURRENT_TIME time FROM TB_APP_STATISTICS a
         INNER JOIN TB_SERVICE_INSTANCE i ON a.ACTUAL_ID = i.ACTUAL_ID
         INNER JOIN TB_BIGDATA b ON i.SERVICE_GUID=b.APIG_GUID AND b.APIPRODUCT_ID = a.PRODUCT_FAMILY_id
@@ -68,25 +68,25 @@
         SELECT NAME FROM TB_BIGDATA WHERE STATUS = 2 AND CATEGORY = '疫情专项' order by name
     </select>
 
-    <select id="serviceCallAll" resultType="com.hirisun.cloud.model.ncov.dto.daas.NcovDataLongDTO">
+    <select id="serviceCallAll" resultType="com.hirisun.cloud.model.ncov.vo.daas.NcovDataLongVo">
         SELECT b.NAME,SUM(REQ_COUNT) count FROM TB_APP_STATISTICS a
         LEFT JOIN TB_BIGDATA b ON a.PRODUCT_FAMILY_ID = b.APIPRODUCT_ID
         WHERE b.STATUS = 2 AND b.CATEGORY = '疫情专项' GROUP BY b.NAME
     </select>
 
-    <select id="serviceCallLately7Days" resultType="com.hirisun.cloud.model.ncov.dto.daas.NcovDataLongDTO">
+    <select id="serviceCallLately7Days" resultType="com.hirisun.cloud.model.ncov.vo.daas.NcovDataLongVo">
         SELECT b.NAME,SUM(REQ_COUNT) count FROM TB_APP_STATISTICS a
         LEFT JOIN TB_BIGDATA b ON a.PRODUCT_FAMILY_ID = b.APIPRODUCT_ID
         WHERE b.STATUS = 2 AND b.CATEGORY = '疫情专项' AND a.current_time >= #{last7Time} GROUP BY b.NAME
     </select>
 
-    <select id="serviceCallYesterday" resultType="com.hirisun.cloud.model.ncov.dto.daas.NcovDataLongDTO">
+    <select id="serviceCallYesterday" resultType="com.hirisun.cloud.model.ncov.vo.daas.NcovDataLongVo">
         SELECT b.NAME,SUM(REQ_COUNT) count FROM TB_APP_STATISTICS a
         LEFT JOIN TB_BIGDATA b ON a.PRODUCT_FAMILY_ID = b.APIPRODUCT_ID
         WHERE b.STATUS = 2 AND b.CATEGORY = '疫情专项' AND a.current_time = #{time} GROUP BY b.NAME
     </select>
 
-    <select id="serviceOrder" resultType="com.hirisun.cloud.model.ncov.dto.daas.NcovDataLongDTO">
+    <select id="serviceOrder" resultType="com.hirisun.cloud.model.ncov.vo.daas.NcovDataLongVo">
         SELECT b.NAME,COUNT(DISTINCT i.APP_NAME) count FROM TB_SERVICE_INSTANCE i
         LEFT JOIN TB_BIGDATA b ON i.SERVICE_GUID = b.APIG_GUID
         WHERE b.STATUS = 2 AND b.CATEGORY = '疫情专项' GROUP BY b.NAME

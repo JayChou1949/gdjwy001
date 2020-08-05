@@ -2,25 +2,33 @@ package com.hirisun.cloud.ncov.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Lists;
-import com.hirisun.cloud.api.file.FileUploadApi;
 import com.hirisun.cloud.common.util.UnitExcelExportUtil;
-import com.hirisun.cloud.common.vo.QueryResponseResult;
+import com.hirisun.cloud.model.ncov.vo.daas.DataAccessVo;
 import com.hirisun.cloud.model.ncov.vo.daas.DataGovernanceLevel2Vo;
+import com.hirisun.cloud.model.ncov.vo.daas.DataGovernanceVo;
+import com.hirisun.cloud.model.ncov.vo.daas.DataModelingVo;
+import com.hirisun.cloud.model.ncov.vo.daas.DataSharingVo;
+import com.hirisun.cloud.model.ncov.vo.daas.NcovDataLongVo;
 import com.hirisun.cloud.model.ncov.vo.daas.NcovDataOverviewVo;
+import com.hirisun.cloud.model.ncov.vo.daas.NcovDataVo;
 import com.hirisun.cloud.model.ncov.vo.iaas.NcovHomePageIaasVo;
 import com.hirisun.cloud.model.ncov.vo.paas.NcovClusterApp;
 import com.hirisun.cloud.model.ncov.vo.paas.NcovClusterOverviewVo;
@@ -29,18 +37,59 @@ import com.hirisun.cloud.model.ncov.vo.realtime.NcovRealtimeVo;
 
 import cn.afterturn.easypoi.excel.ExcelImportUtil;
 import cn.afterturn.easypoi.excel.entity.ImportParams;
-import cn.afterturn.easypoi.excel.entity.result.ExcelImportResult;
-import cn.afterturn.easypoi.excel.imports.ExcelImportService;
 
 @Component
 public class NcovEcsImportUtil {
 
-    private static FileUploadApi fileUploadApi;
-
-    @Autowired
-    public NcovEcsImportUtil(FileUploadApi fileUploadApi) {
-    	NcovEcsImportUtil.fileUploadApi = fileUploadApi;
+    public static DataSharingVo getShardingExcelData(InputStream inputStream) {
+    	
+    	Workbook workbook;
+    	DataSharingVo dataSharing = null;
+		try {
+			dataSharing =new DataSharingVo();
+			workbook = UnitExcelExportUtil.createWorkbook(inputStream);
+			
+			//总览数据
+	        List<List<Object>> overview = UnitExcelExportUtil.getDataListBySheet(workbook,1,0);
+	        List<NcovDataOverviewVo> ncovDataOverviewDtos = Lists.newArrayList();
+	        for (List<Object> objects : overview) {
+	            NcovDataOverviewVo ncovDataOverviewDto = new NcovDataOverviewVo();
+	            ncovDataOverviewDto.setName((String) objects.get(0));
+	            ncovDataOverviewDto.setCount((String) objects.get(1));
+	            ncovDataOverviewDto.setUnit((String) objects.get(2));
+	            ncovDataOverviewDtos.add(ncovDataOverviewDto);
+	        }
+	        dataSharing.setDataSharingOverview(ncovDataOverviewDtos);
+	        //单位下载
+	        List<List<Object>> unitDownload = UnitExcelExportUtil.getDataListBySheet(workbook,1,1);
+	        List<NcovDataVo> ncovDataDtos1 = Lists.newArrayList();
+	        for (List<Object> objects : unitDownload) {
+	        	NcovDataVo ncovDataDto = new NcovDataVo();
+	            ncovDataDto.setName((String) objects.get(1));
+	            ncovDataDto.setCount((String) objects.get(2));
+	            ncovDataDtos1.add(ncovDataDto);
+	        }
+	        Collections.sort(ncovDataDtos1);
+	        dataSharing.setUnitDownload(ncovDataDtos1.subList(0,10));
+	        //高频使用资源
+	        List<List<Object>> highFrequencyUse = UnitExcelExportUtil.getDataListBySheet(workbook,1,2);
+	        List<NcovDataVo> ncovDataDtos2 = Lists.newArrayList();
+	        for (List<Object> objects : highFrequencyUse) {
+	        	NcovDataVo ncovDataDto = new NcovDataVo();
+	            ncovDataDto.setName((String) objects.get(1));
+	            ncovDataDto.setCount((String) objects.get(2));
+	            ncovDataDtos2.add(ncovDataDto);
+	        }
+	        Collections.sort(ncovDataDtos2);
+	        dataSharing.setHighFrequencyUse(ncovDataDtos2.subList(0,10));
+	        return dataSharing;
+		} catch (InvalidFormatException | IOException e) {
+			e.printStackTrace();
+		}
+        
+        return null;
     }
+    
     
     /**
      * 上传
@@ -52,19 +101,79 @@ public class NcovEcsImportUtil {
      * @param sheetNum
      * @return
      */
-    public static List<NcovDataOverviewVo> getShardingMoelingExcelData(InputStream inputStream,
-  			 Integer num, Integer sheetNum) {
-  		
-    	List<NcovDataOverviewVo> dataSharingVos = new ArrayList<NcovDataOverviewVo>();
-		List<List<Object>> ncovDataList = getNcovDataList(inputStream, num, sheetNum);
-  		for (List<Object> objects : ncovDataList) {
-  			NcovDataOverviewVo ncovDataOverviewVo = new NcovDataOverviewVo();
-  			ncovDataOverviewVo.setName((String) objects.get(0));
-  			ncovDataOverviewVo.setCount((String) objects.get(1));
-  			ncovDataOverviewVo.setUnit((String) objects.get(2));
-  			dataSharingVos.add(ncovDataOverviewVo);
-  		}
-  		return dataSharingVos;
+    public static DataModelingVo getMoelingExcelData(InputStream inputStream) {
+
+    	
+    	DataModelingVo dataModeling = null;
+    	Workbook workbook = null;
+		try {
+			workbook = UnitExcelExportUtil.createWorkbook(inputStream);
+			dataModeling = new DataModelingVo();
+	        //总览数据
+	        List<List<Object>> overview = UnitExcelExportUtil.getDataListBySheet(workbook,1,0);
+	        List<NcovDataOverviewVo> ncovDataOverviewDtos = Lists.newArrayList();
+	        for (List<Object> objects : overview) {
+	        	NcovDataOverviewVo ncovDataOverviewDto = new NcovDataOverviewVo();
+	            ncovDataOverviewDto.setName((String) objects.get(0));
+	            ncovDataOverviewDto.setCount((String) objects.get(1));
+	            ncovDataOverviewDto.setUnit((String) objects.get(2));
+	            ncovDataOverviewDtos.add(ncovDataOverviewDto);
+	        }
+	        dataModeling.setDataModelingOverview(ncovDataOverviewDtos);
+	        //单位建模排名
+	        List<List<Object>> unitModeling = UnitExcelExportUtil.getDataListBySheet(workbook,1,1);
+	        List<NcovDataVo> ncovDataDtos1 = Lists.newArrayList();
+	        for (List<Object> objects : unitModeling) {
+	        	NcovDataVo ncovDataDto = new NcovDataVo();
+	            ncovDataDto.setName((String) objects.get(1));
+	            ncovDataDto.setCount((String) objects.get(2));
+	            ncovDataDtos1.add(ncovDataDto);
+	        }
+	        Collections.sort(ncovDataDtos1);
+	        dataModeling.setUnitModeling(ncovDataDtos1.subList(0,10));
+	        //公共模型建设单位排名
+	        List<List<Object>> publicModelConstructionUnit = UnitExcelExportUtil.getDataListBySheet(workbook,1,2);
+	        List<NcovDataVo> ncovDataDtos2 = Lists.newArrayList();
+	        for (List<Object> objects : publicModelConstructionUnit) {
+	        	NcovDataVo ncovDataDto = new NcovDataVo();
+	            ncovDataDto.setName((String) objects.get(1));
+	            ncovDataDto.setCount((String) objects.get(2));
+	            ncovDataDtos2.add(ncovDataDto);
+	        }
+	        Collections.sort(ncovDataDtos2);
+	        dataModeling.setPublicModelConstructionUnit(ncovDataDtos2.subList(0,10));
+	        //模型热度排名
+	        List<List<Object>> modelPopularity = UnitExcelExportUtil.getDataListBySheet(workbook,1,3);
+	        List<NcovDataVo> ncovDataDtos3 = Lists.newArrayList();
+	        for (List<Object> objects : modelPopularity) {
+	        	NcovDataVo ncovDataDto = new NcovDataVo();
+	            ncovDataDto.setName((String) objects.get(1));
+	            ncovDataDto.setCount((String) objects.get(2));
+	            ncovDataDtos3.add(ncovDataDto);
+	        }
+	        Collections.sort(ncovDataDtos3);
+	        dataModeling.setModelPopularity(ncovDataDtos3.subList(0,10));
+			
+		} catch (InvalidFormatException | IOException e) {
+			e.printStackTrace();
+		}finally {
+            if(workbook != null){
+                try {
+                    workbook.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if(inputStream !=null){
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        
+        return dataModeling;
   	}
     
     public static List<List<Object>> getNcovDataList(InputStream inputStream,Integer num,Integer sheetNum){
@@ -99,52 +208,173 @@ public class NcovEcsImportUtil {
     	
     }
     
-    /**
-     * 上传
-     * 首页 daas 数据接入
-     * 原来读 数据接入情况.xlsx
-     * @param fileId
-     * @param num
-     * @param sheetNum
-     * @return
-     */
-    public static Map<String,Long> getDataAccess(InputStream inputStream){
+    public static List<List<Object>> getDataAccessLevel3(InputStream inputStream,String from,
+    		Integer num, Integer sheetNum) throws Exception{
     	
-    	Map<String,Long> map = new HashMap<String,Long>();
+    	Workbook workbook = UnitExcelExportUtil.createWorkbook(inputStream);
+        List<List<Object>> data = new ArrayList<List<Object>>();
+        if ("公安".equals(from)){
+            data = UnitExcelExportUtil.getDataListBySheet(workbook,num,sheetNum);
+        }else {
+            data = UnitExcelExportUtil.getDataListBySheet(workbook,num,sheetNum);
+        }
+        return data;
+    }
+    
+    
+    public static DataAccessVo getDataAccess(InputStream inputStream) throws Exception{
     	
-        Workbook workbook = null;
-        try{
-            workbook = UnitExcelExportUtil.createWorkbook(inputStream);
-            List<List<Object>> dataList = UnitExcelExportUtil.getDataListByCellNumber(workbook,1,0,5);
-            
-            Long total = dataList.stream()
-             .mapToLong(list -> Long.valueOf(list.get(0).toString())).sum();
-            
-            Long yesterday = UnitExcelExportUtil.getDataListByCellNumber(workbook,1,0,6).stream()
-                    .mapToLong(list -> Long.valueOf(list.get(0).toString())).sum();
-            map.put("total", total);
-            map.put("yesterday", yesterday);
-            map.put("size", Long.valueOf(dataList.size()));
-        }catch (Exception e){
-            e.printStackTrace();
-        }finally {
-            if(workbook != null){
-                try {
-                    workbook.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+    	Workbook workbook = UnitExcelExportUtil.createWorkbook(inputStream);
+
+    	DataAccessVo dataAccess = new DataAccessVo();
+        List<List<Object>> overview = UnitExcelExportUtil.getDataListBySheet(workbook,1,0);
+        Long total = 0L;
+        Long yesterday = 0L;
+        List<Long> latelyFocus = Lists.newArrayList(0L,0L,0L,0L,0L,0L,0L);
+        List<Long> lately = Lists.newArrayList(0L,0L,0L,0L,0L,0L,0L);
+        Map<String,Boolean> focusMap = new HashMap<>();
+        for (List<Object> list : overview) {
+            total += Long.valueOf((String)list.get(5));
+            yesterday += Long.valueOf((String)list.get(6));
+            String ifFocus = (String)list.get(7);
+            if ("是".equals(ifFocus)){
+                focusMap.put((String)list.get(3),true);
             }
-            if(inputStream !=null){
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
+        }
+        dataAccess.setTotalCount(total);
+        dataAccess.setResourceCount(overview.size());
+        dataAccess.setYesterdayCount(yesterday);
+        List<List<Object>> policeData = UnitExcelExportUtil.getDataListBySheet(workbook,1,2);
+        Map<String,Map<String,Long>> typeMap = new HashMap<>();
+        Set<String> fromPolice = new HashSet<>();
+        for (List<Object> objects : policeData) {
+            String name = (String) objects.get(1);
+            fromPolice.add(name);
+            String type = (String) objects.get(4);
+            Long num = Long.valueOf((String)objects.get(6));
+            Long yesterdayByType = Long.valueOf((String)objects.get(13));
+            Map<String,Long> map = typeMap.get(type);
+            if (map==null){
+                Map<String,Long> countMap = new HashMap<>();
+                countMap.put("总数", num);
+                countMap.put("公安", num);
+                countMap.put("政府", 0L);
+                countMap.put("昨日增量", yesterdayByType);
+                typeMap.put(type,countMap);
+            }else {
+                Long all = map.get("总数");
+                map.put("总数", all+num);
+                Long police = map.get("公安");
+                map.put("公安", police+num);
+                Long yesterdayOld = map.get("昨日增量");
+                map.put("昨日增量",yesterdayByType+yesterdayOld);
+                typeMap.put(type,map);
+            }
+            for (int i = 0; i < 7; i++) {
+                Long day = lately.get(i);
+                lately.set(i,day+Long.valueOf((String)objects.get(i+7)));
+            }
+            String tableName = (String)objects.get(3);
+            if (focusMap.get(tableName)!=null){
+                for (int i = 0; i < 7; i++) {
+                    Long day = latelyFocus.get(i);
+                    latelyFocus.set(i,day+Long.valueOf((String)objects.get(i+7)));
                 }
             }
         }
-		return map;
+        dataAccess.setPoliceCount(fromPolice.size());
+        List<List<Object>> govData = UnitExcelExportUtil.getDataListBySheet(workbook,1,1);
+        Set<String> fromGov = new HashSet<>();
+        Map<String,Long> govDataMap = new HashMap<>();
+        for (List<Object> objects : govData) {
+            String name = (String) objects.get(1);
+            fromGov.add(name);
+            String type = (String) objects.get(4);
+            Long num = Long.valueOf((String)objects.get(6));
+            Long yesterdayByType = Long.valueOf((String)objects.get(13));
+            Map<String,Long> map = typeMap.get(type);
+            if (map==null){
+                Map<String,Long> countMap = new HashMap<>();
+                countMap.put("总数", num);
+                countMap.put("政府", num);
+                countMap.put("公安", 0L);
+                countMap.put("昨日增量", yesterdayByType);
+                typeMap.put(type,countMap);
+            }else {
+                Long all = map.get("总数");
+                map.put("总数", all+num);
+                Long gov = map.get("政府");
+                map.put("政府", gov+num);
+                Long yesterdayOld = map.get("昨日增量");
+                map.put("昨日增量",yesterdayByType+yesterdayOld);
+                typeMap.put(type,map);
+            }
+            for (int i = 0; i < 7; i++) {
+                Long day = lately.get(i);
+                lately.set(i,day+Long.valueOf((String)objects.get(i+7)));
+            }
+            String tableName = (String)objects.get(3);
+            if (focusMap.get(tableName)!=null){
+                for (int i = 0; i < 7; i++) {
+                    Long day = latelyFocus.get(i);
+                    latelyFocus.set(i,day+Long.valueOf((String)objects.get(i+7)));
+                }
+            }
+            String unitName = (String) objects.get(1);
+            Long aLong = govDataMap.get(unitName);
+            if (aLong!=null){
+                govDataMap.put(unitName,num+aLong);
+            }else {
+                govDataMap.put(unitName,num);
+            }
+            dataAccess.setGovData(mapSort(govDataMap));
+        }
+        dataAccess.setLately7Days(lately);
+        dataAccess.setLatelyFocus(latelyFocus);
+        dataAccess.setTime(getLatelyDaysTime());
+        dataAccess.setGovermentCount(fromGov.size());
+        dataAccess.setTypeMap(typeMap);
+        return dataAccess;
+    
+    }
+    
+    public static List<NcovDataLongVo> mapSort(Map<String,Long> map){
     	
+        List<NcovDataLongVo> ncovDataLongList = Lists.newArrayList();
+        
+        LinkedHashMap<String, Long> collect = map.entrySet().stream()
+        		.sorted(Map.Entry.comparingByValue()).limit(10)
+        		.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+                (oldValue, newValue) -> oldValue, LinkedHashMap<String, Long>::new));
+        
+        collect.forEach((key,value)->{
+        	ncovDataLongList.add(new NcovDataLongVo(key,value));
+        });
+        
+        return ncovDataLongList;
+    }
+    
+    private static List<String> getLatelyDaysTime(){
+        List<String> list = Lists.newArrayList();
+        for (int i = 6; i >= 0 ; i--) {
+            list.add(getTime(i));
+        }
+        return list;
+    }
+    
+    /**
+     * 获取之前的日期
+     * @param day 天数
+     * @return
+     */
+    private static String getTime(Integer day){
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        //  当前时间毫秒数
+        long timeMillis = System.currentTimeMillis();
+        //  七天前毫秒数
+        long sevenDaysMillis = timeMillis - day*24L*60*60*1000;
+        Date date =new Date(sevenDaysMillis);
+        return simpleDateFormat.format(date);
     }
     
     /**
@@ -156,21 +386,54 @@ public class NcovEcsImportUtil {
      * @param sheetNum
      * @return
      */
-    public static Map<String,List<DataGovernanceLevel2Vo>> getDataGovernanceMap(InputStream inputStream){
-    	
-        Workbook workbook = null;
-        Map<String,List<DataGovernanceLevel2Vo>> map = new HashMap<String,List<DataGovernanceLevel2Vo>>();
-        try{
-            workbook = UnitExcelExportUtil.createWorkbook(inputStream);
-            List<List<Object>> updateType = UnitExcelExportUtil.getDataListBySheet(workbook,1,2);
-            List<DataGovernanceLevel2Vo> updateTypeVos = setDataGovernanceData(updateType);
-            map.put("updateTypeVos", updateTypeVos);
-            List<List<Object>> updateCycle =UnitExcelExportUtil.getDataListBySheet(workbook,1,3);
-            List<DataGovernanceLevel2Vo> updateCycleVos = setDataGovernanceData(updateCycle);
-            map.put("updateCycleVos", updateCycleVos);
-        }catch (Exception e){
-            e.printStackTrace();
-        }finally {
+    public static DataGovernanceVo getDataGovernance(InputStream inputStream){
+    	Workbook workbook = null;
+		try {
+			workbook = UnitExcelExportUtil.createWorkbook(inputStream);
+			DataGovernanceVo dataGovernance=new DataGovernanceVo();
+	    	
+	        List<List<Object>> tableName = UnitExcelExportUtil.getDataListBySheet(workbook,1,0);
+	        Set<String> unitSet = new HashSet();
+	        for (List<Object> list : tableName) {
+	            String unitName = (String) list.get(1);
+	            unitSet.add(unitName);
+	        }
+	        dataGovernance.setNames(unitSet);
+	        List<List<Object>> dataSummary = UnitExcelExportUtil.getDataListBySheet(workbook,1,1);
+	        List<NcovDataVo> ncovDataDtos = Lists.newArrayList();
+	        for (List<Object> objects : dataSummary) {
+	        	NcovDataVo ncovDataDto = new NcovDataVo();
+	            ncovDataDto.setName((String) objects.get(1));
+	            ncovDataDto.setCount((String) objects.get(2));
+	            ncovDataDtos.add(ncovDataDto);
+	        }
+	        dataGovernance.setDataSummary(ncovDataDtos);
+	        List<DataGovernanceLevel2Vo> updateTypeDtos = Lists.newArrayList();
+	        List<List<Object>> updateType = UnitExcelExportUtil.getDataListBySheet(workbook,1,2);
+	        for (List<Object> objects : updateType) {
+	        	DataGovernanceLevel2Vo dataGovernanceLevel2 = new DataGovernanceLevel2Vo();
+	            dataGovernanceLevel2.setType((String) objects.get(1));
+	            dataGovernanceLevel2.setNum((String) objects.get(2));
+	            dataGovernanceLevel2.setSum((String) objects.get(3));
+	            dataGovernanceLevel2.setPercentage((String) objects.get(4));
+	            updateTypeDtos.add(dataGovernanceLevel2);
+	        }
+	        dataGovernance.setUpdateType(updateTypeDtos);
+	        List<List<Object>> updateCycle = UnitExcelExportUtil.getDataListBySheet(workbook,1,3);
+	        List<DataGovernanceLevel2Vo> updateCycleDtos = Lists.newArrayList();
+	        for (List<Object> objects : updateCycle) {
+	        	DataGovernanceLevel2Vo dataGovernanceLevel2 = new DataGovernanceLevel2Vo();
+	            dataGovernanceLevel2.setType((String) objects.get(1));
+	            dataGovernanceLevel2.setNum((String) objects.get(2));
+	            dataGovernanceLevel2.setSum((String) objects.get(3));
+	            dataGovernanceLevel2.setPercentage((String) objects.get(4));
+	            updateCycleDtos.add(dataGovernanceLevel2);
+	        }
+	        dataGovernance.setUpdateCycle(updateCycleDtos);
+	        return dataGovernance;
+		} catch (InvalidFormatException | IOException e) {
+			e.printStackTrace();
+		}finally {
             if(workbook != null){
                 try {
                     workbook.close();
@@ -186,7 +449,8 @@ public class NcovEcsImportUtil {
                 }
             }
         }
-        return map;
+    	
+        return null;
     	
     }
     
@@ -212,15 +476,19 @@ public class NcovEcsImportUtil {
      * @param sheetNum
      * @return
      */
-	public static int getNcovDataServiceCount(InputStream inputStream) {
+	public static Map<String, Map<String, Long>> getNcovDataServiceCount(InputStream inputStream) {
     	
         Workbook workbook = null;
-        Set<String> set = new HashSet<>();
+        Map<String, Map<String, Long>> map = new HashMap<String, Map<String, Long>>();
         try{
             workbook = UnitExcelExportUtil.createWorkbook(inputStream);
-            UnitExcelExportUtil.getDataListBySheet(workbook,3,0).forEach(objs->{set.add((String) objs.get(3));});
-            UnitExcelExportUtil.getDataListBySheet(workbook,3,1).forEach(objs->{set.add((String) objs.get(3));});
-            return set.size();
+            Map<String, Long> areaMap = converDataService(UnitExcelExportUtil.getDataListBySheet(workbook,3,0));
+            Map<String, Long> govMap = converDataService(UnitExcelExportUtil.getDataListBySheet(workbook,3,1));
+            
+            map.put("areaMap", areaMap);
+            map.put("govMap", govMap);
+            
+            return map;
         }catch (Exception e){
             e.printStackTrace();
         }finally {
@@ -239,10 +507,28 @@ public class NcovEcsImportUtil {
                 }
             }
         }
-        return 0;
+        return map;
     	
     }
 	
+	public static Map<String,Long> converDataService(List<List<Object>> list) {
+		
+		Map<String,Long> areaMap = new HashMap<>();
+        for (List<Object> objects : list) {
+            String name = (String) objects.get(3);
+            String call = (String) objects.get(6);
+            if (call==null){
+                call="0";
+            }
+            Long num = areaMap.get(name);
+            if (num == null){
+                areaMap.put(name,Long.valueOf(call));
+            }else {
+                areaMap.put(name,num+Long.valueOf(call));
+            }
+        }
+		return areaMap;
+	}
 	
 	
     /**
