@@ -40,9 +40,4 @@ public class FileApiFallback implements FileApi {
         return "";
     }
 
-	@Override
-	public String uploadByte(FileVo fileVo) {
-		log.error("上传二进制文件失败！");
-        return "";
-	}
 }
