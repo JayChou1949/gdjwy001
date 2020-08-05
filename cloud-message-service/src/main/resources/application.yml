@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: cloud-message-service
+topic:
+  test1
