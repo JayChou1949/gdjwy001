@@ -47,6 +47,6 @@ public class Test {
 
         MultipartFile multi = new CommonsMultipartFile(fileItem);
         String fileId = fileApi.upload(multi, "test", "test");
-        log.debug("<== fileId:{}",fileId);
+        log.debug("<== fileId:{}", fileId);
     }
 }

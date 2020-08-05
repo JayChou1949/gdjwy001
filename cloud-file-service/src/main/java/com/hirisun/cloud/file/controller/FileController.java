@@ -4,8 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.hirisun.cloud.api.file.FileApi;
 import com.hirisun.cloud.file.bean.FileSystem;
 import com.hirisun.cloud.file.service.FileService;
-import com.hirisun.cloud.model.ncov.vo.file.FileVo;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -60,15 +58,5 @@ public class FileController implements FileApi {
         FileSystem fileSystem = fileService.getFileSystemById(id);
         return JSON.toJSONString(fileSystem);
     }
-    
-    @ApiOperation(value = "上传二进制格式的文件")
-    @GetMapping("/upload/byte")
-    @Override
-	public String uploadByte(FileVo fileVo) {
-		
-    	String fileId = fileService.uploadByte(fileVo);
-    	log.info("上传二进制格式的文件返回的fileId:{}",fileId);
-		return fileId;
-	}
 
 }
