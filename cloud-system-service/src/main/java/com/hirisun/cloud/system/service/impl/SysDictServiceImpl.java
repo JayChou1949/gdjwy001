@@ -40,7 +40,7 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
      */
     @Override
     public List<SysDict> getSysDictList() {
-        List<Object> list =  redisApi.range("REDIS_SYS_DICT",0,-1);
+        List<Object> list =  redisApi.range(REDIS_SYS_DICT,0,-1);
         List<SysDict> dictList = new ArrayList();
         for (int x = 0; x < list.size(); x++) {
             SysDict dict = JSON.parseObject(list.get(x).toString(), SysDict.class);

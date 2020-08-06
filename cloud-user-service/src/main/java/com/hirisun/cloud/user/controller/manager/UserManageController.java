@@ -155,4 +155,26 @@ public class UserManageController {
         return QueryResponseResult.success("成功");
     }
 
+    @ApiOperation("根据用户名查询用户")
+    @GetMapping("/getReviewer")
+    public QueryResponseResult<User> getReviewer(@ApiParam(value = "机构id") @RequestParam(required = false) String orgId,
+                                                 @ApiParam(value = "用户名",required = true) @RequestParam String name) {
+        if (StringUtils.isEmpty(name)) {
+            return QueryResponseResult.fail("请输入用户名");
+        }
+        LambdaQueryWrapper<User> wrapper = new QueryWrapper<User>().lambda().like(User::getName, name);
+        if (!StringUtils.isEmpty(orgId)) {
+            wrapper.and(
+                    i->i.and(x->x.ne(User::getUserType,UserVO.POLICE_TYPE_EXTERNAL).eq(User::getOrgId,orgId))
+            ).or(
+                    i->i.and(x->x.eq(User::getUserType,UserVO.POLICE_TYPE_EXTERNAL).eq(User::getCompany,orgId))
+            );
+        }
+        wrapper.eq(User::getDeleted, "0");
+        List<User> userList = userService.list(wrapper);
+        userList.stream().filter(user -> UserVO.POLICE_TYPE_EXTERNAL.equals(user.getUserType()))
+                .forEach(user -> user.setOrgName(user.getCompanyName()));
+        return QueryResponseResult.success(userList);
+    }
+
 }

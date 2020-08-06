@@ -109,7 +109,7 @@ public class CarouselManageController {
          * 1.判断管理员类型
          * 2.判断管理员是否越权
          */
-        if(NewsParamUtil.infomationPermission(user.getType())){
+        if(!NewsParamUtil.infomationPermission(user.getType())){
             return QueryResponseResult.fail("无权限操作新闻");
         }
         String newsBelong = StringUtils.isEmpty(carousel.getArea())
@@ -157,7 +157,7 @@ public class CarouselManageController {
          * 2.判断管理员是否越权
          * 3.编辑操作将轮播图状态改为待上线
          */
-        if(NewsParamUtil.infomationPermission(user.getType())){
+        if(!NewsParamUtil.infomationPermission(user.getType())){
             return QueryResponseResult.fail("无权限操作轮播图");
         }
         String newsBelong = StringUtils.isEmpty(carousel.getArea())

@@ -49,6 +49,20 @@ public class UserVO {
      */
     public static final String NOTIFY_TYPE_WX="2";
 
+    /**
+     * 警务类型 10 民警
+     */
+    public static final Integer POLICE_TYPE_NORMAL=10;
+    /**
+     * 警务类型 10 辅警
+     */
+    public static final Integer POLICE_TYPE_ASSIST=20;
+    /**
+     * 警务类型 30 外部人员
+     */
+    public static final Integer POLICE_TYPE_EXTERNAL=30;
+
+
     @ApiModelProperty(value = "编号")
     private String id;
 

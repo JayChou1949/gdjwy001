@@ -2,19 +2,14 @@ package com.hirisun.cloud.platform.information.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.hirisun.cloud.api.log.SysLogApi;
+import com.hirisun.cloud.api.system.SystemApi;
 import com.hirisun.cloud.common.util.IpUtil;
-import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.platform.information.bean.News;
 import com.hirisun.cloud.platform.information.mapper.NewsMapper;
 import com.hirisun.cloud.platform.information.service.NewsService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.hirisun.cloud.platform.information.util.NewsParamUtil;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +30,7 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper, News> implements Ne
     private NewsMapper newsMapper;
 
     @Autowired
-    private SysLogApi sysLogApi;
+    private SystemApi systemApi;
 
     @Override
     public Page selectPage(Page page, LambdaQueryWrapper queryWrapper) {
@@ -89,7 +84,7 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper, News> implements Ne
     public void deleteNews(News news,UserVO user) {
         this.updateById(news);
         // 远程调用日志模块，记录操作人日志 sys_log
-        sysLogApi.saveLog(user.getIdCard(),"删除新闻，新闻id："+news.getId(),"删除新闻", IpUtil.getIp());
+        systemApi.saveLog(user.getIdCard(),"删除新闻，新闻id："+news.getId(),"删除新闻", IpUtil.getIp());
     }
 
 

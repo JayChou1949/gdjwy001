@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hirisun.cloud.workflow.mapper.WorkflowNodeMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hirisun.cloud.workflow.bean.WorkflowNode">
+        <id column="ID" property="id" />
+        <result column="WORKFLOW_ID" property="workflowId" />
+        <result column="NODE_NAME" property="nodeName" />
+        <result column="NEXT_NODE" property="nextNode" />
+        <result column="VERSION" property="version" />
+        <result column="IS_START" property="isStart" />
+        <result column="DEFAULT_HANDLER" property="defaultHandler" />
+        <result column="NOTICE_PERSION" property="noticePersion" />
+        <result column="ADVISER_PERSON" property="adviserPerson" />
+        <result column="MODELTYPE" property="modelType" />
+        <result column="NODE_FEATURE" property="nodeFeature" />
+        <result column="NODE_SORT" property="nodeFeature" />
+    </resultMap>
+
+</mapper>

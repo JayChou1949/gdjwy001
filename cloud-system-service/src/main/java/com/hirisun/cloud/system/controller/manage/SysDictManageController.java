@@ -1,24 +1,19 @@
 package com.hirisun.cloud.system.controller.manage;
 
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.hirisun.cloud.api.redis.RedisApi;
+import com.alibaba.fastjson.JSON;
 import com.hirisun.cloud.common.util.TreeUtils;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
-import com.hirisun.cloud.model.common.Tree;
 import com.hirisun.cloud.system.bean.SysDict;
 import com.hirisun.cloud.system.service.SysDictService;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import org.springframework.stereotype.Controller;
+import springfox.documentation.annotations.ApiIgnore;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -68,6 +63,28 @@ public class SysDictManageController {
         sysDictList=(List<SysDict>)TreeUtils.listWithTree(sysDictList);
         sysDictList=sysDictList.stream().filter(item->item.getValue()!=null&&item.getValue().equals(value)).collect(Collectors.toList());
         return QueryResponseResult.success(sysDictList);
+    }
+
+    @ApiIgnore
+    @ApiOperation(value = "feign调用获取数据字典列表")
+    @GetMapping("/feign/list")
+//    @Override
+    public String feignList() {
+        List<SysDict> dictList = sysDictService.getSysDictList();
+        dictList=(List<SysDict>)TreeUtils.listWithTree(dictList);
+        return JSON.toJSONString(dictList);
+    }
+
+
+    @ApiIgnore
+    @ApiOperation(value = "feign调用根据字典值获取数据字典列表")
+    @GetMapping("/feign/getByValue")
+//    @Override
+    public String feignGetByValue(@RequestParam("value") String value) {
+        List<SysDict> sysDictList = sysDictService.getSysDictList();
+        sysDictList=(List<SysDict>)TreeUtils.listWithTree(sysDictList);
+        sysDictList=sysDictList.stream().filter(item->item.getValue()!=null&&item.getValue().equals(value)).collect(Collectors.toList());
+        return JSON.toJSONString(sysDictList);
     }
 }
 

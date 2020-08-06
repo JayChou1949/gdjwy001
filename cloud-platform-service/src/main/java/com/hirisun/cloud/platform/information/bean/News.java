@@ -10,6 +10,7 @@ import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  * <p>
@@ -96,9 +97,10 @@ public class News implements Serializable {
     @TableField("IS_TOP")
     private Integer isTop;
 
-    @ApiModelProperty(value = "新闻时间")
+    @ApiModelProperty(value = "新闻时间,格式yyyy-MM-dd")
     @TableField("TIME")
-    @JsonFormat(pattern = "YYYY-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern="yyyy-MM-dd",timezone="GMT+8")
     private Date time;
 
     @ApiModelProperty(value = "浏览量")

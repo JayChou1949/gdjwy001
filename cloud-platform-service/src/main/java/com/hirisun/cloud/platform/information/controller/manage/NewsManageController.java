@@ -3,11 +3,8 @@ package com.hirisun.cloud.platform.information.controller.manage;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.hirisun.cloud.api.log.SysLogApi;
 import com.hirisun.cloud.common.annotation.LoginUser;
-import com.hirisun.cloud.common.util.IpUtil;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.platform.information.bean.News;
@@ -109,10 +106,10 @@ public class NewsManageController {
      * 创建新闻
      */
     @ApiOperation("创建新闻")
-    @GetMapping("/create")
+    @PostMapping("/create")
     public QueryResponseResult<News> create(@LoginUser UserVO user, @ModelAttribute News news) {
         // 判断管理员类型
-        if(NewsParamUtil.infomationPermission(user.getType())){
+        if(!NewsParamUtil.infomationPermission(user.getType())){
             return QueryResponseResult.fail("无权限操作新闻");
         }
 
@@ -161,7 +158,7 @@ public class NewsManageController {
          * 2.判断管理员是否越权
          * 3.编辑操作将新闻状态改为待上线
          */
-        if(NewsParamUtil.infomationPermission(user.getType())){
+        if(!NewsParamUtil.infomationPermission(user.getType())){
             return QueryResponseResult.fail("无权限操作新闻");
         }
         String newsBelong = StringUtils.isEmpty(news.getArea())

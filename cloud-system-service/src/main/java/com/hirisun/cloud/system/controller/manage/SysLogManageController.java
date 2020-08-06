@@ -1,10 +1,8 @@
 package com.hirisun.cloud.system.controller.manage;
 
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.hirisun.cloud.api.log.SysLogApi;
+import com.hirisun.cloud.api.system.SystemApi;
 import com.hirisun.cloud.common.annotation.LoginUser;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.model.user.UserVO;
@@ -13,12 +11,10 @@ import com.hirisun.cloud.system.service.SysLogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
@@ -38,7 +34,7 @@ import java.util.Map;
 @Api(tags = "系统日志管理")
 @RestController
 @RequestMapping("/system/logManage")
-public class SysLogManageController implements SysLogApi {
+public class SysLogManageController {
 
     @Autowired
     private SysLogService sysLogService;
@@ -77,7 +73,7 @@ public class SysLogManageController implements SysLogApi {
      * @param path 功能位置
      * @ip 本机ip
      */
-    @Override
+//    @Override
     @ApiIgnore
     @ApiOperation("保存系统日志")
     @GetMapping("/saveLog")
