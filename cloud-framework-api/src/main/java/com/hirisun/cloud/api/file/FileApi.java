@@ -57,7 +57,7 @@ public interface FileApi {
      * @param id 文件ID
      * @return
      */
-    @GetMapping("file/{id}")
+    @GetMapping("/file/file/{id}")
     String getFileSystemInfo(@PathVariable("id") String id);
 
     class FeignMultipartConfig {
