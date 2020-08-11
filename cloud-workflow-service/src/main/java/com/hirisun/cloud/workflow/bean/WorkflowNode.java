@@ -26,6 +26,11 @@ public class WorkflowNode implements Serializable {
 
     private static final long serialVersionUID=1L;
 
+    /**
+     * 环节顺序，从0开始
+     */
+    public static Integer NODE_SORT=1;
+
     @TableId(value = "ID", type = IdType.ASSIGN_ID)
     private String id;
 
@@ -53,17 +58,17 @@ public class WorkflowNode implements Serializable {
     @TableField("ADVISER_PERSON")
     private String adviserPerson;
 
-    @ApiModelProperty(value = "环节类型,（0系统环节 1自定义环节 2业务办理环节）")
-    @TableField("MODELTYPE")
-    private Integer modelType;
-
-    @ApiModelProperty(value = "环节拥有的功能，多个功能使用逗号(,)隔开。（1可审核 2可加办 3可实施 4可删除 5可修改 6可反馈 7可转发 8可回退）",required = true)
+    @ApiModelProperty(value = "环节拥有的功能，多个功能使用逗号(,)隔开。（1可审核 2可加办 3可实施 4可删除 5可修改 6可反馈 7可转发 8可回退 9可申请）",required = true)
     @TableField("NODE_FEATURE")
     private String nodeFeature;
 
-    @ApiModelProperty(value = "环节顺序")
+    @ApiModelProperty(value = "环节顺序，从1开始")
     @TableField("NODE_SORT")
     private Integer nodeSort;
+
+    @ApiModelProperty(value = "驳回位置顺序，从1开始")
+    @TableField("REJECT_NUM")
+    private Integer rejectNum;
 
     @Override
     public String toString() {
@@ -75,7 +80,6 @@ public class WorkflowNode implements Serializable {
         ", defaultHandler=" + defaultHandler +
         ", noticePersion=" + noticePersion +
         ", adviserPerson=" + adviserPerson +
-        ", modelType=" + modelType +
         "}";
     }
 }
