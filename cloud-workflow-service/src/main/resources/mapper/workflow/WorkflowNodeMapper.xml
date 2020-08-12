@@ -13,9 +13,9 @@
         <result column="DEFAULT_HANDLER" property="defaultHandler" />
         <result column="NOTICE_PERSION" property="noticePersion" />
         <result column="ADVISER_PERSON" property="adviserPerson" />
-        <result column="MODELTYPE" property="modelType" />
         <result column="NODE_FEATURE" property="nodeFeature" />
         <result column="NODE_SORT" property="nodeFeature" />
+        <result column="REJECT_NUM" property="rejectNum" />
     </resultMap>
 
 </mapper>

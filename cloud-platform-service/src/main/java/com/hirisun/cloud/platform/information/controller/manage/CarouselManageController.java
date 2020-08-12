@@ -80,7 +80,9 @@ public class CarouselManageController {
         }else{//已上线
             wrapper.eq(Carousel::getStatus,status);
         }
-        wrapper.like(Carousel::getTitle,title);
+        if (!StringUtils.isEmpty(title)) {
+            wrapper.like(Carousel::getTitle,title);
+        }
         wrapper.eq(Carousel::getProvincial, type);
         wrapper.orderByAsc(Carousel::getSortNum);
         Page<Carousel> page = new Page<>();

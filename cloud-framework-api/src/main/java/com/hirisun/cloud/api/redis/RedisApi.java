@@ -156,4 +156,12 @@ public interface RedisApi {
     @PostMapping("/redis/removeValueForList")
     void removeValueForList(@RequestParam("key") String key,@RequestParam("count") Integer count, @RequestParam("value") Object value);
 
+    /**
+     * 获取增量值
+     *
+     * @param key 键
+     */
+    @PostMapping("/redis/increment")
+    public Long increment(@RequestParam("key") String key);
+
 }

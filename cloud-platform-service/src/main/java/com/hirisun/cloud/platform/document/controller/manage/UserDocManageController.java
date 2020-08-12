@@ -52,17 +52,14 @@ public class UserDocManageController {
                                             @ApiParam("每页大小") @RequestParam(required = false,defaultValue = "10") Integer pageSize,
                                             @ApiParam("状态 1待上线 2已上线") @RequestParam(required = false,defaultValue = "1") Integer status,
                                             @ApiParam("关键词") @RequestParam(required = false) String keyword,
-                                            @ApiParam("一级分类") @RequestParam(required = false) String firstClass,
-                                            @ApiParam("二级分类") @RequestParam(required = false) String secondClass) {
+                                            @ApiParam("适用业务，根据数据字典查询") @RequestParam(required = false) String domain) {
         Page<UserDoc> page = new Page<>();
         page.setCurrent(pageNum);
         page.setSize(pageSize);
         Map param=new HashMap();
-        param.put("isFront", false);
         param.put("status",status);
         param.put("name", keyword);
-        param.put("firstClass", firstClass);
-        param.put("secondClass", secondClass);
+        param.put("domain", domain);
         page = userDocService.getPage(page,user,param);
         return QueryResponseResult.success(page);
     }

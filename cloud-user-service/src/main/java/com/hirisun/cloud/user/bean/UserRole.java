@@ -2,7 +2,9 @@ package com.hirisun.cloud.user.bean;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.TableField;
+
 import java.io.Serializable;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -15,10 +17,10 @@ import io.swagger.annotations.ApiModelProperty;
  * @since 2020-07-23
  */
 @TableName("T_SYS_USER_ROLE")
-@ApiModel(value="UserRole对象", description="用户-角色关联表")
+@ApiModel(value = "UserRole对象", description = "用户-角色关联表")
 public class UserRole implements Serializable {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
     @TableField("USER_ID")
     private String userId;
@@ -46,8 +48,8 @@ public class UserRole implements Serializable {
     @Override
     public String toString() {
         return "UserRole{" +
-        "userId=" + userId +
-        ", roleId=" + roleId +
-        "}";
+                "userId=" + userId +
+                ", roleId=" + roleId +
+                "}";
     }
 }

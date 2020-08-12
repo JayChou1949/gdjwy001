@@ -23,12 +23,13 @@ public interface UserService extends IService<User> {
 
     /**
      * 修改用户类型
-     * @param userId 身份证
-     * @param type 用户类型
-     * @param areas  地市
+     *
+     * @param userId          身份证
+     * @param type            用户类型
+     * @param areas           地市
      * @param policeCategory  警种
      * @param nationalProject 国家专项
-     * @param defaultTenant  是否第一管理员 1是 0否
+     * @param defaultTenant   是否第一管理员 1是 0否
      */
-    void editUserType(String userId, Long type, String areas, String policeCategory, String nationalProject,String defaultTenant);
+    void editUserType(String userId, Long type, String areas, String policeCategory, String nationalProject, String defaultTenant);
 }

@@ -4,18 +4,18 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.hirisun.cloud.user.bean.Permission">
-        <result column="ID" property="id" />
-        <result column="PID" property="pid" />
-        <result column="NAME" property="name" />
-        <result column="TYPE" property="type" />
-        <result column="SORT" property="sort" />
-        <result column="URL" property="url" />
-        <result column="PERM_CODE" property="permCode" />
-        <result column="ICON" property="icon" />
-        <result column="DESCRIPTION" property="description" />
-        <result column="STATUS" property="status" />
-        <result column="CREATE_TIME" property="createTime" />
-        <result column="MODIFIED_TIME" property="modifiedTime" />
+        <result column="ID" property="id"/>
+        <result column="PID" property="pid"/>
+        <result column="NAME" property="name"/>
+        <result column="TYPE" property="type"/>
+        <result column="SORT" property="sort"/>
+        <result column="URL" property="url"/>
+        <result column="PERM_CODE" property="permCode"/>
+        <result column="ICON" property="icon"/>
+        <result column="DESCRIPTION" property="description"/>
+        <result column="STATUS" property="status"/>
+        <result column="CREATE_TIME" property="createTime"/>
+        <result column="MODIFIED_TIME" property="modifiedTime"/>
     </resultMap>
 
     <select id="listRoleMenu" resultType="com.hirisun.cloud.user.bean.Permission">

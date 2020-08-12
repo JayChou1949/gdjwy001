@@ -3,6 +3,7 @@ package com.hirisun.cloud.user.bean;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.TableField;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -18,10 +19,10 @@ import io.swagger.annotations.ApiModelProperty;
  * @since 2020-07-23
  */
 @TableName("T_SYS_ROLE_PERMISSION")
-@ApiModel(value="RolePermission对象", description="role_permission 角色权限表")
+@ApiModel(value = "RolePermission对象", description = "role_permission 角色权限表")
 public class RolePermission implements Serializable {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
 
     @ApiModelProperty(value = "角色ID")
@@ -33,11 +34,11 @@ public class RolePermission implements Serializable {
     private String pid;
 
     @ApiModelProperty(value = "创建时间")
-    @TableField(value="CREATE_TIME", fill = FieldFill.INSERT)
+    @TableField(value = "CREATE_TIME", fill = FieldFill.INSERT)
     private Date createTime;
 
     @ApiModelProperty(value = "修改时间")
-    @TableField(value="MODIFIED_TIME", fill = FieldFill.INSERT_UPDATE)
+    @TableField(value = "MODIFIED_TIME", fill = FieldFill.INSERT_UPDATE)
     private Date modifiedTime;
 
 
@@ -76,10 +77,10 @@ public class RolePermission implements Serializable {
     @Override
     public String toString() {
         return "RolePermission{" +
-        "rid=" + rid +
-        ", pid=" + pid +
-        ", createTime=" + createTime +
-        ", modifiedTime=" + modifiedTime +
-        "}";
+                "rid=" + rid +
+                ", pid=" + pid +
+                ", createTime=" + createTime +
+                ", modifiedTime=" + modifiedTime +
+                "}";
     }
 }

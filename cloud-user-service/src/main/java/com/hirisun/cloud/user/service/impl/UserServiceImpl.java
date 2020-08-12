@@ -34,22 +34,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public IPage<User> getPage(IPage<User> page, Map map) {
-        return userMapper.getPage(page,map);
+        return userMapper.getPage(page, map);
     }
 
 
     /**
      * 修改用户类型
-     * @param userId 身份证
-     * @param type 用户类型
-     * @param areas  地市
+     *
+     * @param userId          身份证
+     * @param type            用户类型
+     * @param areas           地市
      * @param policeCategory  警种
      * @param nationalProject 国家专项
-     * @param defaultTenant  是否第一管理员 1是 0否
+     * @param defaultTenant   是否第一管理员 1是 0否
      */
     @Transactional
     @Override
-    public void editUserType(String userId, Long type, String areas, String policeCategory, String nationalProject,String defaultTenant) {
+    public void editUserType(String userId, Long type, String areas, String policeCategory, String nationalProject, String defaultTenant) {
         // 清空租户管理员对应的警种或地市
         if (!UserVO.USER_TYPE_TENANT_MANAGER.equals(type)) {
             this.update(new User(), new UpdateWrapper<User>().lambda()
@@ -58,7 +59,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                     .set(User::getTenantArea, null)
                     .set(User::getTenantPoliceCategory, null)
                     .set(User::getDefaultTenant, null));
-        }else{
+        } else {
             if ("省厅".equals(policeCategory)) {
                 new Exception("地市不能设置为省厅");
             }
@@ -74,12 +75,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 if (StringUtils.isNotEmpty(areas)) {
                     User u = this.getOne(checkUser.eq(User::getTenantArea, areas));
                     if (u != null) {
-                         new Exception("该地市已经设置过第一租户管理员: " + u.getName());
+                        new Exception("该地市已经设置过第一租户管理员: " + u.getName());
                     }
                     this.update(new User(), updateUser
                             .set(User::getTenantArea, areas)
                             .set(User::getTenantPoliceCategory, null)
-                            .set(User::getNationalProject,null));
+                            .set(User::getNationalProject, null));
                 } else if (StringUtils.isNotEmpty(policeCategory)) {
                     User u = this.getOne(checkUser.eq(User::getPoliceCategory, policeCategory));
                     if (u != null) {
@@ -88,8 +89,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                     this.update(new User(), updateUser
                             .set(User::getTenantArea, null)
                             .set(User::getTenantPoliceCategory, policeCategory)
-                            .set(User::getNationalProject,null));
-                }else if(StringUtils.isNotEmpty(nationalProject)){ //如果国家专项
+                            .set(User::getNationalProject, null));
+                } else if (StringUtils.isNotEmpty(nationalProject)) { //如果国家专项
                     User u = this.getOne(checkUser.eq(User::getNationalProject, nationalProject));
                     if (u != null) {
                         new Exception("该专项已经设置过第一租户管理员: " + u.getName());
@@ -97,7 +98,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                     this.update(new User(), updateUser
                             .set(User::getTenantArea, null)
                             .set(User::getTenantPoliceCategory, null)
-                            .set(User::getNationalProject,nationalProject));
+                            .set(User::getNationalProject, nationalProject));
                 }
             } else {
                 LambdaUpdateWrapper<User> updateUser = new UpdateWrapper<User>().lambda()
@@ -108,17 +109,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                     this.update(new User(), updateUser
                             .set(User::getTenantArea, areas)
                             .set(User::getTenantPoliceCategory, null)
-                            .set(User::getNationalProject,null));
+                            .set(User::getNationalProject, null));
                 } else if (StringUtils.isNotEmpty(policeCategory)) {
                     this.update(new User(), updateUser
                             .set(User::getTenantArea, null)
                             .set(User::getTenantPoliceCategory, policeCategory)
-                            .set(User::getNationalProject,null));
-                }else if(StringUtils.isNotEmpty(nationalProject)){
+                            .set(User::getNationalProject, null));
+                } else if (StringUtils.isNotEmpty(nationalProject)) {
                     this.update(new User(), updateUser
                             .set(User::getTenantArea, null)
                             .set(User::getTenantPoliceCategory, null)
-                            .set(User::getNationalProject,nationalProject));
+                            .set(User::getNationalProject, nationalProject));
                 }
             }
         }

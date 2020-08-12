@@ -19,8 +19,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +41,9 @@ import java.util.Map;
 @RestController
 @RequestMapping("/workflow/workflowManage")
 public class WorkflowManageController {
+
+    private static final Logger logger = LoggerFactory.getLogger(WorkflowManageController.class);
+
     @Autowired
     private WorkflowService workflowService;
 
@@ -113,6 +119,25 @@ public class WorkflowManageController {
         workflow.setFlowStatus(Workflow.STATUS_DELETE);
         workflowService.updateById(workflow);
         return QueryResponseResult.success(null);
+    }
+
+    /**
+     * IPDS订单选择流程（s->saasService）
+     * @param resourceType
+     * @param area
+     * @param serviceId
+     * @return
+     */
+    @ApiIgnore
+    @ApiOperation("根据参数选择并返回申请流程")
+    @PostMapping("/feign/chooseWorkFlow")
+    public String  chooseWorkFlow(@RequestParam Integer resourceType,
+                                  @RequestParam String serviceId,
+                                  @RequestParam(required = false) String area,
+                                  @RequestParam(required = false) String policeCategory,
+                                  @RequestParam(required = false) String nationalSpecialProject) {
+       Workflow workflow= workflowService.chooseWorkFlow(resourceType, area, policeCategory, serviceId, nationalSpecialProject);
+        return JSON.toJSONString(workflow);
     }
 }
 

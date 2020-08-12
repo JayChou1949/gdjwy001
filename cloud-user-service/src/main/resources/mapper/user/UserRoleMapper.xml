@@ -4,8 +4,8 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.hirisun.cloud.user.bean.UserRole">
-        <result column="USER_ID" property="userId" />
-        <result column="ROLE_ID" property="roleId" />
+        <result column="USER_ID" property="userId"/>
+        <result column="ROLE_ID" property="roleId"/>
     </resultMap>
 
 </mapper>

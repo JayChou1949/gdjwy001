@@ -127,4 +127,11 @@ public interface RedisService {
      * @param value 值
      */
     public void removeValueForList(String key, Integer count, Object value);
+
+    /**
+     * 获取增量值
+     *
+     * @param redisKey   键
+     */
+    public Long increment(String redisKey);
 }

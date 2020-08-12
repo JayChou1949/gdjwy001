@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hirisun.cloud.order.mapper.ApplyInfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hirisun.cloud.order.bean.ApplyInfo">
+        <result column="ID" property="id" />
+        <result column="COMPANY" property="company" />
+        <result column="USER_NAME" property="userName" />
+        <result column="USER_PHONE" property="userPhone" />
+        <result column="PROJECT_NAME" property="projectName" />
+        <result column="APP_NAME" property="appName" />
+        <result column="REMARK" property="remark" />
+        <result column="CREATOR" property="creator" />
+        <result column="STATUS" property="status" />
+        <result column="SERVICE_TYPE_ID" property="serviceTypeId" />
+        <result column="RESOURCE_TYPE" property="resourceType" />
+        <result column="CREATE_TIME" property="createTime" />
+        <result column="MODIFIED_TIME" property="modifiedTime" />
+        <result column="CREATOR_NAME" property="creatorName" />
+        <result column="SERVICE_TYPE_NAME" property="serviceTypeName" />
+        <result column="FORM_NUM" property="formNum" />
+        <result column="ORDER_NUMBER" property="orderNumber" />
+        <result column="ACCOUNT" property="account" />
+        <result column="EXPLANATION" property="explanation" />
+        <result column="VENDOR" property="vendor" />
+        <result column="BUILD_UNIT" property="buildUnit" />
+        <result column="BUILD_PRINCIPAL" property="buildPrincipal" />
+        <result column="BUILD_PRINCIPAL_PHONE" property="buildPrincipalPhone" />
+        <result column="BUILD_MANAGER" property="buildManager" />
+        <result column="BUILD_MANAGER_PHONE" property="buildManagerPhone" />
+        <result column="CONTRACT_UNIT" property="contractUnit" />
+        <result column="CONTRACT_PRINCIPAL" property="contractPrincipal" />
+        <result column="CONTRACT_PRINCIPAL_PHONE" property="contractPrincipalPhone" />
+        <result column="CONTRACT_HANDLER" property="contractHandler" />
+        <result column="CONTRACT_HANDLER_PHONE" property="contractHandlerPhone" />
+        <result column="CONTRACT_PRINCIPAL_IDCARD" property="contractPrincipalIdcard" />
+        <result column="POLICE_CATEGORY" property="policeCategory" />
+        <result column="APPLY_TIME" property="applyTime" />
+        <result column="CREATOR_UNIT" property="creatorUnit" />
+        <result column="CREATOR_PHONE" property="creatorPhone" />
+        <result column="CONTRACT_ORG_CODE" property="contractOrgCode" />
+        <result column="CONTRACT_INPUT_TYPE" property="contractInputType" />
+        <result column="BUILD_MODE" property="buildMode" />
+        <result column="DRAFT" property="draft" />
+        <result column="APP_NAME_INPUT_TYPE" property="appNameInputType" />
+        <result column="AREA_NAME" property="areaName" />
+        <result column="HW_POLICE_CATEGORY" property="hwPoliceCategory" />
+        <result column="CLUSTER_TYPE" property="clusterType" />
+        <result column="GOV_UNIT" property="govUnit" />
+        <result column="GOV_ORG_CODE" property="govOrgCode" />
+        <result column="GOV_PRINCIPAL" property="govPrincipal" />
+        <result column="GOV_PRINCIPAL_POST_TYPE" property="govPrincipalPostType" />
+        <result column="GOV_PRINCIPAL_PHONE" property="govPrincipalPhone" />
+        <result column="GOV_PRINCIPAL_IDCARD" property="govPrincipalIdcard" />
+        <result column="APPLY_TYPE" property="applyType" />
+        <result column="NATIONAL_SPECIAL_PROJECT" property="nationalSpecialProject" />
+        <result column="SERVICE_SOURCE" property="serviceSource" />
+    </resultMap>
+
+</mapper>

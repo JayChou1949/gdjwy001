@@ -86,4 +86,9 @@ public class RedisServiceImpl implements RedisService {
     public void removeValueForList(String key,Integer count,Object value) {
         redisTemplate.opsForList().remove(key, count,value);
     }
+    @Override
+    public Long increment(String redisKey){
+        return redisTemplate.opsForValue().increment(redisKey, 1L);
+    }
+
 }
