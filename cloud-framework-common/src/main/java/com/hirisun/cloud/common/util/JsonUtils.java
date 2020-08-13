@@ -34,6 +34,19 @@ public class JsonUtils {
          return null;
      }
      
+     public static <T> T voToBean(Object obj, Class<T> beanType) {
+    	 
+    	 String objectToJson = objectToJson(obj);
+         try {
+             T result = MAPPER.readValue(objectToJson, beanType);
+             return result;
+         } catch (Exception e) {
+             e.printStackTrace();
+         }
+ 
+         return null;
+     }
+     
      public static <T> T jsonToMapList(String jsonData, TypeReference<T> beanType) {
          try {
              T result = MAPPER.readValue(jsonData, beanType);
@@ -84,13 +97,11 @@ public class JsonUtils {
      
      public static void main(String[] args) {
 		
-    	 String json = "{\"updateCycleVos\":[{\"num\":\"42\",\"percentage\":\"0.4667\",\"sum\":\"90\",\"type\":\"实时\"},{\"num\":\"19\",\"percentage\":\"0.2111\",\"sum\":\"90\",\"type\":\"按天\"},{\"num\":\"9\",\"percentage\":\"0.1\",\"sum\":\"90\",\"type\":\"按月\"},{\"num\":\"20\",\"percentage\":\"0.2222\",\"sum\":\"90\",\"type\":\"一次性\"}],\"updateTypeVos\":[{\"num\":\"57\",\"percentage\":\"0.6333\",\"sum\":\"90\",\"type\":\"自动同步\"},{\"num\":\"23\",\"percentage\":\"0.2556\",\"sum\":\"90\",\"type\":\"文件拷贝\"}]}";
-    	 
-    	 TypeReference<Map<String,List<DataGovernanceLevel2Vo>>> typeReference = new TypeReference<Map<String,List<DataGovernanceLevel2Vo>>>() {};
-    	 Map<String, List<DataGovernanceLevel2Vo>> readValue = jsonToMapList(json,typeReference);
-		 System.out.println(readValue);
-    	 
-    	 
+//    	 String json = "{\"updateCycleVos\":[{\"num\":\"42\",\"percentage\":\"0.4667\",\"sum\":\"90\",\"type\":\"实时\"},{\"num\":\"19\",\"percentage\":\"0.2111\",\"sum\":\"90\",\"type\":\"按天\"},{\"num\":\"9\",\"percentage\":\"0.1\",\"sum\":\"90\",\"type\":\"按月\"},{\"num\":\"20\",\"percentage\":\"0.2222\",\"sum\":\"90\",\"type\":\"一次性\"}],\"updateTypeVos\":[{\"num\":\"57\",\"percentage\":\"0.6333\",\"sum\":\"90\",\"type\":\"自动同步\"},{\"num\":\"23\",\"percentage\":\"0.2556\",\"sum\":\"90\",\"type\":\"文件拷贝\"}]}";
+//    	 
+//    	 TypeReference<Map<String,List<DataGovernanceLevel2Vo>>> typeReference = new TypeReference<Map<String,List<DataGovernanceLevel2Vo>>>() {};
+//    	 Map<String, List<DataGovernanceLevel2Vo>> readValue = jsonToMapList(json,typeReference);
+//		 System.out.println(readValue);
     	 
 	}
      

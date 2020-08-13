@@ -7,10 +7,10 @@ spring:
   cloud:
     nacos:
       config:
-        server-addr: 139.9.234.187:8848
+        server-addr: 192.168.11.65:8848
         file-extension: yaml
       discovery:
-        server-addr: 139.9.234.187:8848
+        server-addr: 192.168.11.65:8848
   swagger:
     enabled: true
     title: 云资源服务平台系统管理接口

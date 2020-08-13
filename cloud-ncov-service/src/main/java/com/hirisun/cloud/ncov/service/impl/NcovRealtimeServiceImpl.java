@@ -1,20 +1,30 @@
 package com.hirisun.cloud.ncov.service.impl;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import com.alibaba.fastjson.JSON;
 import com.hirisun.cloud.api.file.FileApi;
@@ -229,20 +239,8 @@ public class NcovRealtimeServiceImpl implements NcovRealtimeService {
 				ExportParams exportParams = new ExportParams(null,regionType==1?"全国省份数据":"全省各市数据");
 		        Workbook workbook = ExcelExportUtil.exportExcel(exportParams, NcovRealtimeVo.class, list);
 		        
-		        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		        workbook.write(bos);
-		        byte[] data = bos.toByteArray();
-		        
-		        FileVo fileVo = new FileVo();
-		        fileVo.setFileName("警务云首页实时数据-"+workbook.getSheetName(0)+".xls");
-		        fileVo.setFileByte(data);
-		        fileVo.setBusinessKey(NcovFileupload.NCOV_FILE_TYPE);
-		        fileVo.setBusinessTag("警务云首页实时数据-"+workbook.getSheetName(0)+".xls");
-		        fileVo.setFileSize(Long.valueOf(data.length));
-		        fileVo.setFileType("application/vnd.ms-excel");
-		        
 		        //再上传到文件服务器
-		        String filePath = fileApi.uploadByte(fileVo);
+		        String filePath = uploadFile(workbook);
 		        fileUpload.setFilePath(filePath);
 		        ncovFileUploadService.updateFileUpload(fileUpload);
 	            return fileAccessPath+filePath;
@@ -253,4 +251,24 @@ public class NcovRealtimeServiceImpl implements NcovRealtimeService {
 			throw new CustomException(CommonCode.EXPORT_FAIL);
 		}
 	}
+	
+	private String uploadFile(Workbook workbook) throws IOException {
+		
+		String fileName = "警务云首页实时数据-"+workbook.getSheetName(0)+".xls";
+		
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        workbook.write(bos);
+        
+        FileItem fileItem = new DiskFileItemFactory().createItem("file",
+        		"application/vnd.ms-excel", true, fileName);
+        
+        OutputStream outputStream = fileItem.getOutputStream();
+        InputStream inputStream = new ByteArrayInputStream(bos.toByteArray());
+        IOUtils.copy(inputStream, outputStream);
+        
+		MultipartFile multi = new CommonsMultipartFile(fileItem );
+		String filePath = fileApi.upload(multi, NcovFileupload.NCOV_FILE_TYPE, fileName);
+		return filePath;
+	}
+	
 }

@@ -18,6 +18,9 @@
         <module>cloud-user-service</module>
         <module>cloud-system-service</module>
         <module>cloud-workflow-service</module>
+        <module>cloud-saas-service</module>
+        <module>cloud-daas-service</module>
+        <module>cloud-paas-service</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -43,7 +46,6 @@
         <druid.version>1.1.22</druid.version>
         <hikaricp.version>3.4.5</hikaricp.version>
         <commons-lang.version>2.6</commons-lang.version>
-        <fastjson.version>1.2.71</fastjson.version>
         <commons-io.version>2.7</commons-io.version>
         <feign.version>1.4.7.RELEASE</feign.version>
         <mybatis-plus.version>3.3.2</mybatis-plus.version>
@@ -169,12 +171,6 @@
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-starter-feign</artifactId>
                 <version>${feign.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>fastjson</artifactId>
-                <version>${fastjson.version}</version>
             </dependency>
 
             <dependency>

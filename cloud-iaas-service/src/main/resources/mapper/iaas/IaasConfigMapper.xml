@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hirisun.cloud.iaas.mapper.config.IaasConfigMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hirisun.cloud.iaas.bean.config.IaasConfig">
+        <id column="ID" jdbcType="VARCHAR" property="id" />
+        <result column="NAME" jdbcType="VARCHAR" property="name" />
+        <result column="SUB_TYPE" jdbcType="VARCHAR" property="subType" />
+        <result column="SORT" jdbcType="NUMERIC" property="sort" />
+        <result column="VERSION_CODE" jdbcType="NUMERIC" property="versionCode" />
+        <result column="URL" jdbcType="NUMERIC" property="url" />
+        <result column="IMAGE" jdbcType="NUMERIC" property="image" />
+        <result column="DESCRIPTION" jdbcType="NUMERIC" property="description" />
+        <result column="TAG_DESC" jdbcType="NUMERIC" property="tagDesc" />
+        <result column="AP_NUM" jdbcType="NUMERIC" property="apNum" />
+        <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="MODIFIED_TIME" jdbcType="TIMESTAMP" property="modifiedTime" />
+        <result column="STATUS" jdbcType="NUMERIC" property="status" />
+        <result column="CREATOR" jdbcType="VARCHAR" property="creator" />
+        <result column="TOP" jdbcType="NUMERIC" property="top" />
+        <result column="SUB_PAGE_URL" jdbcType="VARCHAR" property="subPageUrl" />
+        <result column="BUILD_STATUS" jdbcType="NUMERIC" property="buildStatus" />
+        <result column="SUB_PAGE_PERMISSION" jdbcType="NUMERIC" property="subPagePermission" />
+        <result column="HOME" jdbcType="VARCHAR" property="home" />
+        <result column="CAN_APPLICATION" jdbcType="VARCHAR" property="canApplication" />
+        <result column="HAS_DOC" jdbcType="VARCHAR" property="hasDoc" />
+        <result column="FORM_NUM" jdbcType="VARCHAR" property="formNum" />
+        <result column="SHORT_NAME" jdbcType="VARCHAR" property="shortName" />
+        <result column="INSTRUCTIONS" jdbcType="VARCHAR" property="instructions" />
+        <result column="WORK_FLOW_ID" jdbcType="VARCHAR" property="workFlowId" />
+        <result column="SUB_TYPE_NAME" jdbcType="VARCHAR" property="subTypeName" />
+        <result column="FORM_NUM_MODIFY" jdbcType="VARCHAR" property="formNumModify" />
+        <!-- <association property="user" column="CREATOR" select="com.upd.hwcloud.dao.UserMapper.findUserByIdcard" /> -->
+    </resultMap>
+    <select id="getPage" resultMap="BaseResultMap">
+        SELECT S.* <!-- ,(SELECT NAME FROM SYS_DICT D WHERE D.ID = S.SUB_TYPE) SUB_TYPE_NAME -->
+        FROM T_IAAS_CONFIG S
+        WHERE
+        <if test="status != null">
+                STATUS = #{status}</if>
+        <if test="name != null and name != ''">
+            AND NAME LIKE CONCAT(CONCAT('%',#{name}),'%')
+        </if>
+        <if test="subType != null and subType != ''">
+            AND SUB_TYPE = #{subType}
+        </if>
+        <if test="user.type != 100">
+            AND CREATOR = #{user.idcard}
+        </if>
+        ORDER BY SORT ASC, MODIFIED_TIME DESC
+    </select>
+    <select id="getLabel" resultMap="BaseResultMap">
+        select s.ID,s.TAG_DESC
+        from T_IAAS_CONFIG s
+
+        where s.STATUS = 2 and s.TAG_DESC is not null
+        <if test="home != null">
+            and s.HOME = #{home}
+        </if>
+        <if test="canApplication != null">
+            and s.CAN_APPLICATION = #{canApplication}
+        </if>
+    </select>
+
+
+    <select id="getPageByCondition" resultType="com.hirisun.cloud.iaas.bean.config.IaasConfig">
+        select DISTINCT s.*
+        from T_IAAS_CONFIG s
+
+        where s.STATUS = 2
+        <if test="home != null">
+            and s.HOME = #{home}
+        </if>
+        <if test="canApplication != null">
+            and s.CAN_APPLICATION = #{canApplication}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and s.NAME like CONCAT(CONCAT('%',#{keyword}),'%')
+        </if>
+        <if test="label != null and label != ''">
+            and s.TAG_DESC like CONCAT(CONCAT('%',#{label}),'%')
+        </if>
+        order by s.SORT asc,s.MODIFIED_TIME desc,s.BUILD_STATUS asc
+    </select>
+</mapper>

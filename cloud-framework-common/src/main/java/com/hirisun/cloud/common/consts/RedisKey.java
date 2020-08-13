@@ -12,5 +12,10 @@ public interface RedisKey {
     public static String MONITOR_LOG="MONITOR_LOG";
 
     public static String ABNORMAL_LOG="ABNORMAL_LOG";
+    
+    /**
+     * daas列表配置
+     */
+    String KEY_DAAS_COLUMN_CONFIG = "daas:column:config";
 
 }
