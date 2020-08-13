@@ -1,7 +1,6 @@
 spring:
   application:
     name: cloud-platform-service
-
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

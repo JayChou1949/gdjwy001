@@ -12,9 +12,24 @@ spring:
         shared-configs: cloud-common.yaml,db.yaml
       discovery:
         server-addr: 139.9.234.187:8848
+    alibaba:
+      seata:
+        tx-service-group: txt_seata_group
 ribbon:
   ReadTimeout: 60000
   ConnectTimeout: 60000
+seata:
+  application-id: ${spring.application.name}
+  tx-service-group: txt_seata_group
+  enable-auto-data-source-proxy: true
+  config:
+    type: nacos
+    nacos:
+      server-addr: 139.9.234.187:8848
+  registry:
+    type: nacos
+    nacos:
+      server-addr: 139.9.234.187:8848
 server:
   port: 8006
 ---
@@ -28,6 +43,9 @@ spring:
         shared-configs: cloud-common.yaml,db.yaml
       discovery:
         server-addr: 139.9.234.187:8848
+    alibaba:
+      seata:
+        tx-service-group: txt_seata_group
 server:
   port: 9006
 ---
@@ -41,5 +59,8 @@ spring:
         shared-configs: cloud-common.yaml,db.yaml
       discovery:
         server-addr: 68.26.8.254:8848
+    alibaba:
+      seata:
+        tx-service-group: txt_seata_group
 server:
   port: 10086
