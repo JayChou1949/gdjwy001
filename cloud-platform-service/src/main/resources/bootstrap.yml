@@ -9,13 +9,9 @@ spring:
       config:
         server-addr: 139.9.234.187:8848
         file-extension: yaml
+        shared-configs: cloud-common.yaml,db.yaml
       discovery:
         server-addr: 139.9.234.187:8848
-  swagger:
-    enabled: true
-    title: 云资源服务平台平台管理接口
-    version: v1.0
-    exclude-path: /error
 ribbon:
   ReadTimeout: 60000
   ConnectTimeout: 60000
@@ -29,6 +25,7 @@ spring:
       config:
         server-addr: 139.9.234.187:8848
         file-extension: yaml
+        shared-configs: cloud-common.yaml,db.yaml
       discovery:
         server-addr: 139.9.234.187:8848
 server:
@@ -41,6 +38,7 @@ spring:
       config:
         server-addr: 68.26.8.254:8848
         file-extension: yaml
+        shared-configs: cloud-common.yaml,db.yaml
       discovery:
         server-addr: 68.26.8.254:8848
 server:
