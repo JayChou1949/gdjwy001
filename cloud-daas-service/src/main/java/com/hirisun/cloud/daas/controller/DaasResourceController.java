@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -64,7 +63,7 @@ public class DaasResourceController {
 	
 	@ApiOperation("获取大数据目录详情")
     @GetMapping(value = "/detail")
-    public ResponseResult detail(@PathVariable String id) {
+    public ResponseResult detail(String id) {
 		DaasResource daasResource = daasResourceService.getDaasResourceById(id);
 		return QueryResponseResult.success(daasResource);
     }
@@ -120,5 +119,5 @@ public class DaasResourceController {
     	List columnConfig = daasResourceService.getColumnConfig();
         return QueryResponseResult.success(columnConfig);
     }
-	
+    
 }

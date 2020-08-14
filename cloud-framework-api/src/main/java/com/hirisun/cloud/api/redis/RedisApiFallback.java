@@ -27,13 +27,8 @@ public class RedisApiFallback implements RedisApi {
     }
 
     @Override
-    public String get(String key) {
-        return "1111";
-    }
-
-    @Override
     public String getStrValue(String key) {
-        return "abc";
+        return "";
     }
 
     @Override
@@ -48,7 +43,7 @@ public class RedisApiFallback implements RedisApi {
 
     @Override
     public Boolean expire(String key, long timeout, TimeUnit timeUnit) {
-        return null;
+        return false;
     }
 
     @Override
@@ -58,7 +53,7 @@ public class RedisApiFallback implements RedisApi {
 
     @Override
     public Boolean hasKey(String key) {
-        return null;
+        return false;
     }
 
     @Override
