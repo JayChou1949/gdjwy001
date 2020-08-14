@@ -20,32 +20,32 @@ import io.swagger.annotations.ApiModelProperty;
  * @since 2020-07-23
  */
 @TableName("T_SYS_PERMISSION")
-@ApiModel(value="Permission对象", description="permission 权限表")
+@ApiModel(value = "Permission对象", description = "permission 权限表")
 public class Permission extends Tree<Permission> implements Serializable {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * 菜单类型 0菜单
      */
-    public static final Integer PERMISSION_TYPE_MENU=0;
+    public static final Integer PERMISSION_TYPE_MENU = 0;
     /**
      * 菜单类型 1按钮
      */
-    public static final Integer PERMISSION_TYPE_BUTTON=1;
+    public static final Integer PERMISSION_TYPE_BUTTON = 1;
     /**
      * 菜单类型 2其他
      */
-    public static final Integer PERMISSION_TYPE_OTHER=2;
+    public static final Integer PERMISSION_TYPE_OTHER = 2;
 
     /**
      * 菜单状态 1可用
      */
-    public static final Integer PERMISSION_STATUS_ENABLED=1;
+    public static final Integer PERMISSION_STATUS_ENABLED = 1;
     /**
      * 菜单状态 1不可用
      */
-    public static final Integer PERMISSION_STATUS_DISABLED=0;
+    public static final Integer PERMISSION_STATUS_DISABLED = 0;
 
     @ApiModelProperty(value = "主键，编辑菜单时必传")
     @TableId(value = "ID", type = IdType.ASSIGN_ID)
@@ -55,7 +55,7 @@ public class Permission extends Tree<Permission> implements Serializable {
     @TableField("PID")
     private String pid;
 
-    @ApiModelProperty(value = "权限名" ,required = true)
+    @ApiModelProperty(value = "权限名", required = true)
     @TableField("NAME")
     private String name;
 
@@ -207,18 +207,18 @@ public class Permission extends Tree<Permission> implements Serializable {
     @Override
     public String toString() {
         return "Permission{" +
-        "id=" + id +
-        ", pid=" + pid +
-        ", name=" + name +
-        ", type=" + type +
-        ", sort=" + sort +
-        ", url=" + url +
-        ", permCode=" + permCode +
-        ", icon=" + icon +
-        ", description=" + description +
-        ", status=" + status +
-        ", createTime=" + createTime +
-        ", modifiedTime=" + modifiedTime +
-        "}";
+                "id=" + id +
+                ", pid=" + pid +
+                ", name=" + name +
+                ", type=" + type +
+                ", sort=" + sort +
+                ", url=" + url +
+                ", permCode=" + permCode +
+                ", icon=" + icon +
+                ", description=" + description +
+                ", status=" + status +
+                ", createTime=" + createTime +
+                ", modifiedTime=" + modifiedTime +
+                "}";
     }
 }

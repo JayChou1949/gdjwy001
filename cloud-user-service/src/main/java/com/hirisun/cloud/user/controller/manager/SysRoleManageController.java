@@ -57,9 +57,10 @@ public class SysRoleManageController {
         sysRoleService.updateById(role);
         return QueryResponseResult.success(role);
     }
+
     @ApiOperation("删除角色")
     @PostMapping("/delete")
-    public QueryResponseResult delete(@ApiParam(value = "角色id",required = true) @RequestParam String roleId) {
+    public QueryResponseResult delete(@ApiParam(value = "角色id", required = true) @RequestParam String roleId) {
         sysRoleService.removeById(roleId);
         return QueryResponseResult.success(null);
     }

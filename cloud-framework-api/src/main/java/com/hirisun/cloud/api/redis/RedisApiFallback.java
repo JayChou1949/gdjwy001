@@ -85,4 +85,9 @@ public class RedisApiFallback implements RedisApi {
     public void removeValueForList(String key, Integer count, Object value) {
 
     }
+
+    @Override
+    public Long increment(String key) {
+        return null;
+    }
 }

@@ -14,4 +14,13 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface WorkflowService extends IService<Workflow> {
     boolean saveOrUpdateWorkflow(UserVO user,Workflow workflow,String list);
+
+    /**
+     * IPDS订单选择流程（s->saasService）
+     * @param resourceType
+     * @param area
+     * @param serviceId
+     * @return
+     */
+    public Workflow chooseWorkFlow(Integer resourceType, String area, String policeCategory, String serviceId, String nationalSpecialProject);
 }

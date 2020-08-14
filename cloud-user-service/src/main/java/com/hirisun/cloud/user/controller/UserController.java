@@ -28,9 +28,9 @@ public class UserController {
     @ApiOperation("获取登录用户信息")
     @RequestMapping(value = "/getUserInfo", method = RequestMethod.GET)
     public QueryResponseResult<UserVO> getUserInfo(@LoginUser UserVO user) {
-        if(user != null){
+        if (user != null) {
             String orgName = user.getOrgName();
-            if(!orgName.isEmpty()){
+            if (!orgName.isEmpty()) {
                 //根据用户单位名称中的信息去匹配所属地区和警种
                 String policeCategory = AreaPoliceCategoryUtils.getPoliceCategory(orgName);
                 String areaName = AreaPoliceCategoryUtils.getAreaName(orgName);

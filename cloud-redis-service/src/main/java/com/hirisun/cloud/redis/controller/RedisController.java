@@ -186,4 +186,14 @@ public class RedisController implements RedisApi {
     public void removeValueForList(@RequestParam("key") String key,@RequestParam("count") Integer count, @RequestParam("value") Object value) {
         redisService.removeValueForList(key,count, value);
     }
+
+    @PostMapping("/increment")
+    @ApiOperation("获取增量值")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "key", value = "键", required = true, paramType = "query")
+    })
+    @Override
+    public Long increment(@RequestParam("key") String key) {
+        return redisService.increment(key);
+    }
 }

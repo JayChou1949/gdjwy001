@@ -2,15 +2,18 @@ package com.hirisun.cloud.file.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.hirisun.cloud.api.file.FileApi;
+import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.file.bean.FileSystem;
 import com.hirisun.cloud.file.service.FileService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * @author zhoufeng
@@ -28,6 +31,7 @@ public class FileController implements FileApi {
     @Autowired
     private FileService fileService;
 
+    @ApiIgnore
     @ApiOperation(value = "文件上传")
     @PostMapping(value = "/upload", produces = {MediaType.APPLICATION_JSON_VALUE}, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Override
@@ -35,6 +39,7 @@ public class FileController implements FileApi {
         return fileService.fdfs_upload(file, businessKey, businessTag);
     }
 
+    @ApiIgnore
     @ApiOperation(value = "文件删除")
     @DeleteMapping("/delete/{id}")
     @Override
@@ -44,6 +49,7 @@ public class FileController implements FileApi {
         return num == 0;
     }
 
+    @ApiIgnore
     @ApiOperation(value = "文件下载")
     @GetMapping("/download/{id}")
     @Override
@@ -51,12 +57,28 @@ public class FileController implements FileApi {
         return fileService.fdfs_download(id);
     }
 
+    @ApiIgnore
     @ApiOperation(value = "根据文件ID获得文件系统信息")
-    @GetMapping("file/{id}")
+    @GetMapping("/file/{id}")
     @Override
     public String getFileSystemInfo(@PathVariable("id") String id) {
         FileSystem fileSystem = fileService.getFileSystemById(id);
         return JSON.toJSONString(fileSystem);
+    }
+
+    @ApiOperation(value = "前端文件上传",notes = "前端文件上传")
+    @PostMapping(value = "/uploadFile")
+    public QueryResponseResult uploadFile(@RequestPart("file") MultipartFile file,
+                                          @ApiParam(value = "所属一级菜单名",required = true) @RequestParam("businessKey") String businessKey,
+                                          @ApiParam(value = "所属二级菜单名",required = true) @RequestParam("businessTag") String businessTag) {
+        return QueryResponseResult.success(fileService.fdfs_upload(file, businessKey, businessTag));
+    }
+
+    @ApiOperation(value = "根据文件ID获得文件信息",notes = "前端根据文件ID获得文件信息")
+    @GetMapping("/getFileById")
+    public QueryResponseResult<FileSystem> getFileById(@ApiParam(value = "文件id",required = true) @RequestParam(value = "id",required = true) String id) {
+        FileSystem fileSystem = fileService.getFileSystemById(id);
+        return QueryResponseResult.success(fileSystem);
     }
 
 }

@@ -51,7 +51,7 @@ public class DocClassManageController {
                                             @ApiParam("页码") @RequestParam(required = false,defaultValue = "1") Integer pageNum,
                                             @ApiParam("每页大小") @RequestParam(required = false,defaultValue = "10") Integer pageSize,
                                             @ApiParam("分类名称") @RequestParam(required = false) String name,
-                                            @ApiParam(value = "分类类型 0全部分类 1一级分类 2二级分类",required = true) @RequestParam String type
+                                            @ApiParam(value = "分类类型 0全部分类 1一级分类 2二级分类",required = false) @RequestParam Integer type
                                             ) {
         Page<DevDocClass> page = new Page<>();
         page.setCurrent(pageNum);

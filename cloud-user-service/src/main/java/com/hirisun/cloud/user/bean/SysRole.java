@@ -18,12 +18,12 @@ import io.swagger.annotations.ApiModelProperty;
  * @since 2020-07-23
  */
 @TableName("T_SYS_ROLE")
-@ApiModel(value="SysRole对象", description="角色")
+@ApiModel(value = "SysRole对象", description = "角色")
 public class SysRole implements Serializable {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
-    @TableId(value = "ID", type = IdType.UUID)
+    @TableId(value = "ID", type = IdType.ASSIGN_UUID)
     private String id;
 
     @ApiModelProperty(value = "序号")
@@ -38,11 +38,11 @@ public class SysRole implements Serializable {
     @TableField("NAME")
     private String name;
 
-    @TableField(value="CREATE_TIME", fill = FieldFill.INSERT)
+    @TableField(value = "CREATE_TIME", fill = FieldFill.INSERT)
     @JsonFormat(pattern = "YYYY-MM-dd HH:mm:ss")
     private Date createTime;
 
-    @TableField(value="MODIFIED_TIME", fill = FieldFill.INSERT_UPDATE)
+    @TableField(value = "MODIFIED_TIME", fill = FieldFill.INSERT_UPDATE)
     @JsonFormat(pattern = "YYYY-MM-dd HH:mm:ss")
     private Date modifiedTime;
 
@@ -110,13 +110,13 @@ public class SysRole implements Serializable {
     @Override
     public String toString() {
         return "SysRole{" +
-        "id=" + id +
-        ", num=" + num +
-        ", pid=" + pid +
-        ", name=" + name +
-        ", createTime=" + createTime +
-        ", modifiedTime=" + modifiedTime +
-        ", description=" + description +
-        "}";
+                "id=" + id +
+                ", num=" + num +
+                ", pid=" + pid +
+                ", name=" + name +
+                ", createTime=" + createTime +
+                ", modifiedTime=" + modifiedTime +
+                ", description=" + description +
+                "}";
     }
 }

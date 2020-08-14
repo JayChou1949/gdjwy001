@@ -28,6 +28,20 @@ public class WorkflowActivity implements Serializable {
 
     private static final long serialVersionUID=1L;
 
+    /**
+     * 环节状态 0待办 1已提交 2已回退 3已呈批 4已抢占 5已终止 6已转发
+     */
+    public static final Integer STATUS_WAITING=0;
+    /**
+     * 环节状态 0待办 1已提交 2已回退 3已呈批 4已抢占 5已终止 6已转发
+     */
+    public static final Integer STATUS_SUBMIT=1;
+
+    /**
+     * 环节状态  4已抢占
+     */
+    public static final Integer STATUS_PREEMPT=4;
+
     @TableId(value = "ID", type = IdType.ASSIGN_ID)
     private String id;
 
@@ -64,7 +78,7 @@ public class WorkflowActivity implements Serializable {
 
     @ApiModelProperty(value = " 0:是  1:不是")
     @TableField("IS_START")
-    private BigDecimal isStart;
+    private Integer isStart;
 
     @ApiModelProperty(value = "直接上级环节")
     @TableField("PRE_ACTIVITY_ID")

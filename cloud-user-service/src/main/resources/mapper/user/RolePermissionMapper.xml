@@ -4,10 +4,10 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.hirisun.cloud.user.bean.RolePermission">
-        <result column="RID" property="rid" />
-        <result column="PID" property="pid" />
-        <result column="CREATE_TIME" property="createTime" />
-        <result column="MODIFIED_TIME" property="modifiedTime" />
+        <result column="RID" property="rid"/>
+        <result column="PID" property="pid"/>
+        <result column="CREATE_TIME" property="createTime"/>
+        <result column="MODIFIED_TIME" property="modifiedTime"/>
     </resultMap>
 
 </mapper>

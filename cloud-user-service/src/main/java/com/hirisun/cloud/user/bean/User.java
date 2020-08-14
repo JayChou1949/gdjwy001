@@ -3,6 +3,7 @@ package com.hirisun.cloud.user.bean;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableField;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -18,10 +19,10 @@ import io.swagger.annotations.ApiModelProperty;
  * @since 2020-07-23
  */
 @TableName("T_USER")
-@ApiModel(value="User对象", description="用户表")
+@ApiModel(value = "User对象", description = "用户表")
 public class User implements Serializable {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "编号")
     @TableId("ID")
@@ -684,58 +685,58 @@ public class User implements Serializable {
     @Override
     public String toString() {
         return "User{" +
-        "id=" + id +
-        ", userType=" + userType +
-        ", name=" + name +
-        ", idCard=" + idCard +
-        ", nation=" + nation +
-        ", sex=" + sex +
-        ", birth=" + birth +
-        ", createTime=" + createTime +
-        ", photo=" + photo +
-        ", orgId=" + orgId +
-        ", orgName=" + orgName +
-        ", address=" + address +
-        ", sortNo=" + sortNo +
-        ", manType=" + manType +
-        ", rank=" + rank +
-        ", title=" + title +
-        ", policeId=" + policeId +
-        ", policeName=" + policeName +
-        ", company=" + company +
-        ", companyPerson=" + companyPerson +
-        ", personMobile=" + personMobile +
-        ", project=" + project +
-        ", deleted=" + deleted +
-        ", policeCategory=" + policeCategory +
-        ", policeNumber=" + policeNumber +
-        ", mobilePrivte=" + mobilePrivte +
-        ", mobileWork=" + mobileWork +
-        ", phone=" + phone +
-        ", qqAccount=" + qqAccount +
-        ", email=" + email +
-        ", wxAccount=" + wxAccount +
-        ", birthStr=" + birthStr +
-        ", createTimeStr=" + createTimeStr +
-        ", type=" + type +
-        ", notifyType=" + notifyType +
-        ", auxiliaryType=" + auxiliaryType +
-        ", jobType=" + jobType +
-        ", postType=" + postType +
-        ", isParentOrg=" + isParentOrg +
-        ", tenantArea=" + tenantArea +
-        ", tenantPoliceCategory=" + tenantPoliceCategory +
-        ", defaultTenant=" + defaultTenant +
-        ", belongArea=" + belongArea +
-        ", belongPoliceType=" + belongPoliceType +
-        ", userNumber=" + userNumber +
-        ", govCode=" + govCode +
-        ", deleteTime=" + deleteTime +
-        ", post=" + post +
-        ", govId=" + govId +
-        ", govName=" + govName +
-        ", personNeltype=" + personNeltype +
-        ", nationalProject=" + nationalProject +
-        "}";
+                "id=" + id +
+                ", userType=" + userType +
+                ", name=" + name +
+                ", idCard=" + idCard +
+                ", nation=" + nation +
+                ", sex=" + sex +
+                ", birth=" + birth +
+                ", createTime=" + createTime +
+                ", photo=" + photo +
+                ", orgId=" + orgId +
+                ", orgName=" + orgName +
+                ", address=" + address +
+                ", sortNo=" + sortNo +
+                ", manType=" + manType +
+                ", rank=" + rank +
+                ", title=" + title +
+                ", policeId=" + policeId +
+                ", policeName=" + policeName +
+                ", company=" + company +
+                ", companyPerson=" + companyPerson +
+                ", personMobile=" + personMobile +
+                ", project=" + project +
+                ", deleted=" + deleted +
+                ", policeCategory=" + policeCategory +
+                ", policeNumber=" + policeNumber +
+                ", mobilePrivte=" + mobilePrivte +
+                ", mobileWork=" + mobileWork +
+                ", phone=" + phone +
+                ", qqAccount=" + qqAccount +
+                ", email=" + email +
+                ", wxAccount=" + wxAccount +
+                ", birthStr=" + birthStr +
+                ", createTimeStr=" + createTimeStr +
+                ", type=" + type +
+                ", notifyType=" + notifyType +
+                ", auxiliaryType=" + auxiliaryType +
+                ", jobType=" + jobType +
+                ", postType=" + postType +
+                ", isParentOrg=" + isParentOrg +
+                ", tenantArea=" + tenantArea +
+                ", tenantPoliceCategory=" + tenantPoliceCategory +
+                ", defaultTenant=" + defaultTenant +
+                ", belongArea=" + belongArea +
+                ", belongPoliceType=" + belongPoliceType +
+                ", userNumber=" + userNumber +
+                ", govCode=" + govCode +
+                ", deleteTime=" + deleteTime +
+                ", post=" + post +
+                ", govId=" + govId +
+                ", govName=" + govName +
+                ", personNeltype=" + personNeltype +
+                ", nationalProject=" + nationalProject +
+                "}";
     }
 }

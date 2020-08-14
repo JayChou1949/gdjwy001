@@ -26,6 +26,21 @@ public class WorkflowInstance implements Serializable {
 
     private static final long serialVersionUID=1L;
 
+    /**
+     * 实例状态 0办理中
+     */
+    public static Integer INSTANCE_STATUS_WORKING = 0;
+    /**
+     * 实例状态 1已完成
+     */
+    public static Integer INSTANCE_STATUS_COMPLETE = 1;
+    /**
+     * 实例状态  2终止
+     */
+    public static Integer INSTANCE_STATUS_TERMINATE = 2;
+
+
+
     @TableId(value = "ID", type = IdType.ASSIGN_ID)
     private String id;
 

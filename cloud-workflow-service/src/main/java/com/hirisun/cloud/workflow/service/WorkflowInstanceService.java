@@ -1,5 +1,6 @@
 package com.hirisun.cloud.workflow.service;
 
+import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.workflow.bean.WorkflowInstance;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -13,4 +14,14 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface WorkflowInstanceService extends IService<WorkflowInstance> {
 
+
+    /**
+     * 保存工作流审批信息
+     * @param createPersonId
+     * @param flowId
+     * @param businessId
+     * @return
+     */
+    public void launchInstanceOfWorkflow(String createPersonId, String flowId, String businessId);
 }
+

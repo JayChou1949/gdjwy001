@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -111,6 +112,13 @@ public class DaasResourceController {
     public ResponseResult getServiceDetail(String serviceId){
     	DaasResource daasResource = daasResourceService.getServiceByServiceId(serviceId);
         return QueryResponseResult.success(daasResource);
+    }
+    
+    @ApiOperation("获取一键申请页面表格列配置")
+    @RequestMapping(value = "/get/columnConfig", method = RequestMethod.GET)
+    public ResponseResult getColumnConfig() {
+    	List columnConfig = daasResourceService.getColumnConfig();
+        return QueryResponseResult.success(columnConfig);
     }
 	
 }

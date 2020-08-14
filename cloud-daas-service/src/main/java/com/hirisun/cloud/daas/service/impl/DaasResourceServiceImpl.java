@@ -59,7 +59,7 @@ public class DaasResourceServiceImpl implements DaasResourceService {
     	
     	Object object = redisApi.get(RedisKey.KEY_DAAS_COLUMN_CONFIG);
     	if(object != null) {
-    		configJson = object.toString();
+    		return (List) object;
     	}
     	
         if (StringUtils.isEmpty(configJson)) {
