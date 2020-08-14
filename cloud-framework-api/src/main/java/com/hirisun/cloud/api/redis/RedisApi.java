@@ -22,7 +22,7 @@ public interface RedisApi {
     /**
      * 添加永不过期的值
      *
-     * @param key 键
+     * @param key   键
      * @param value 值
      */
     @PostMapping("/redis/setForPerpetual")
@@ -31,9 +31,9 @@ public interface RedisApi {
     /**
      * 添加值并设置过期时间
      *
-     * @param key 键
-     * @param value 值
-     * @param timeout 过期时间
+     * @param key      键
+     * @param value    值
+     * @param timeout  过期时间
      * @param timeUnit 时间单位
      */
     @PostMapping("/redis/setForTerminable")
@@ -46,11 +46,12 @@ public interface RedisApi {
      * @param key 键
      * @return
      */
-    @GetMapping("/redis/get/{key}")
+    @GetMapping(value = "/redis/get/{key}", produces = "application/json")
     Object get(@PathVariable("key") String key);
 
     /**
      * 通过键获得一个字符串
+     *
      * @param key 键
      * @return 字符串值
      */
@@ -69,9 +70,9 @@ public interface RedisApi {
     /**
      * 根据键获得制定范围的值列表
      *
-     * @param key 键
+     * @param key   键
      * @param start 起始值
-     * @param end 结束值
+     * @param end   结束值
      * @return 值列表
      */
     @GetMapping("/redis/range")
@@ -80,8 +81,8 @@ public interface RedisApi {
     /**
      * 为某个键设置过期时间
      *
-     * @param key 键
-     * @param timeout 过期时间
+     * @param key      键
+     * @param timeout  过期时间
      * @param timeUnit 时间单位
      * @return
      */
@@ -91,7 +92,7 @@ public interface RedisApi {
     /**
      * 根据键删除值
      *
-     * @param key 键
+     * @param key   键
      * @param count 删除个数
      * @param value 值
      * @return 删除个数
@@ -112,7 +113,7 @@ public interface RedisApi {
     /**
      * 从左添加值到List
      *
-     * @param key 键
+     * @param key   键
      * @param value 值
      * @return
      */
@@ -122,7 +123,7 @@ public interface RedisApi {
     /**
      * 获得某个键的过期时间
      *
-     * @param key 键
+     * @param key      键
      * @param timeUnit 时间单位
      * @return
      */
@@ -131,30 +132,31 @@ public interface RedisApi {
 
     /**
      * 根据键删除值
+     *
      * @param key 键
      * @return 是否删除成功
      */
     @DeleteMapping("/redis/delete/{key}")
-	Boolean delete(@PathVariable("key") String key);
+    Boolean delete(@PathVariable("key") String key);
 
     /**
      * 修改list下标的值
      *
-     * @param key 键
+     * @param key   键
      * @param value 值
      */
     @PostMapping("/redis/setForList")
-    void setForList(@RequestParam("key") String key,@RequestParam("index") Integer index, @RequestParam("value") Object value);
+    void setForList(@RequestParam("key") String key, @RequestParam("index") Integer index, @RequestParam("value") Object value);
 
     /**
      * 删除list下标的值
      *
-     * @param key 键
+     * @param key   键
      * @param count 个数
      * @param value 值
      */
     @PostMapping("/redis/removeValueForList")
-    void removeValueForList(@RequestParam("key") String key,@RequestParam("count") Integer count, @RequestParam("value") Object value);
+    void removeValueForList(@RequestParam("key") String key, @RequestParam("count") Integer count, @RequestParam("value") Object value);
 
     /**
      * 获取增量值
