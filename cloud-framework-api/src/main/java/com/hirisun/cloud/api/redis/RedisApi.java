@@ -41,15 +41,6 @@ public interface RedisApi {
             , @RequestParam("timeout") long timeout, @RequestParam("timeUnit") final TimeUnit timeUnit);
 
     /**
-     * 通过键获得一个值
-     *
-     * @param key 键
-     * @return
-     */
-    @GetMapping(value = "/redis/get/{key}", produces = "application/json")
-    String get(@PathVariable("key") String key);
-
-    /**
      * 通过键获得一个字符串
      *
      * @param key 键

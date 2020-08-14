@@ -63,14 +63,6 @@ public class RedisController implements RedisApi {
         redisService.setForTerminable(key, value, timeout, timeUnit);
     }
 
-    @GetMapping(value = "/get/{key}",produces="application/json")
-    @ApiOperation("通过键获得一个值")
-    @ApiImplicitParam(name = "key", value = "键", required = true, paramType = "path")
-    @Override
-    public String get(@PathVariable("key") String key) {
-        return redisService.get(key);
-    }
-
     @GetMapping("/getStrValue/{key}")
     @ApiOperation(("通过键获得一个字符串"))
     @ApiImplicitParam(name = "key", value = "键", required = true, paramType = "path")
