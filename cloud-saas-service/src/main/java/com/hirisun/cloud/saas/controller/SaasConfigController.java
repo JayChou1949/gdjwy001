@@ -3,10 +3,9 @@ package com.hirisun.cloud.saas.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -41,7 +40,7 @@ public class SaasConfigController {
     )
     @PostMapping(value = "/create")
     public QueryResponseResult create(@LoginUser UserVO user, 
-    		@RequestBody SaasConfig saasConfig) {
+    		@ModelAttribute SaasConfig saasConfig) {
     	
     	String saasId = saasConfigService.create(user, saasConfig);
     	return QueryResponseResult.success(saasId);
@@ -124,7 +123,7 @@ public class SaasConfigController {
             @ApiResponse(code = 200, message = "success", response = ResponseResult.class)
     )
     @PostMapping(value = "/edit")
-    public ResponseResult edit(@RequestBody SaasConfig saas) {
+    public ResponseResult edit(@ModelAttribute SaasConfig saas) {
     	saasConfigService.edit(saas);
     	return QueryResponseResult.success();
     }

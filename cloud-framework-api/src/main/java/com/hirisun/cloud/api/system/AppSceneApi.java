@@ -3,6 +3,7 @@ package com.hirisun.cloud.api.system;
 import java.util.List;
 
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -20,19 +21,19 @@ public interface AppSceneApi {
      */
     @ApiOperation("保存应用场景及优势")
     @PostMapping("/system/appscene/save")
-	public void save(@RequestBody SubpageParam param);
+	public void save(@ModelAttribute SubpageParam param);
 	
     /**
      * 根据master id 获取应用场景
      */
     @ApiOperation("根据master id 获取应用场景")
     @PostMapping("/system/appscene/get")
-	public List<AppSceneVo> getByMasterId(@RequestBody SubpageParam param);
+	public List<AppSceneVo> getByMasterId(@ModelAttribute SubpageParam param);
 	
     /**
      * 根据master id 删除应用场景
      */
     @ApiOperation("根据master id 删除应用场景")
     @PostMapping("/system/appscene/remove")
-	public void remove(@RequestBody SubpageParam param);
+	public void remove(@ModelAttribute SubpageParam param);
 }

@@ -2,8 +2,8 @@ package com.hirisun.cloud.iaas.controller.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,7 +39,7 @@ public class IaasConfigController {
             @ApiResponse(code = 200, message = "成功返回id", response = String.class)
     )
     @GetMapping("/create")
-    public QueryResponseResult create(@LoginUser UserVO user,@RequestBody IaasConfig iaas) {
+    public QueryResponseResult create(@LoginUser UserVO user,@ModelAttribute IaasConfig iaas) {
 		
 		String iaasConfigId = iaasConfigService.create(user, iaas);
         return QueryResponseResult.success(iaasConfigId);
@@ -127,7 +127,7 @@ public class IaasConfigController {
     @ApiOperation("修改服务信息")
     @RequestMapping(value = "/edit", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseResult edit(@LoginUser UserVO user, @RequestBody IaasConfig iaas) {
+    public ResponseResult edit(@LoginUser UserVO user, @ModelAttribute IaasConfig iaas) {
     	String id = iaasConfigService.edit(user, iaas);
     	return QueryResponseResult.success(id);
     }

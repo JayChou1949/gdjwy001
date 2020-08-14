@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -70,7 +71,7 @@ public class DaasResourceController {
 
     @ApiOperation("修改大数据目录")
     @PostMapping(value = "/edit")
-    public ResponseResult edit(@RequestBody DaasResource daasResource) {
+    public ResponseResult edit(@ModelAttribute DaasResource daasResource) {
         
     	daasResourceService.edit(daasResource);
         return ResponseResult.success();
@@ -78,7 +79,7 @@ public class DaasResourceController {
 
     @ApiOperation("保存一键申请页面表格列配置")
     @PostMapping(value = "/save/column/config")
-    public ResponseResult saveColumnConfig(@RequestBody List<String> config) {
+    public ResponseResult saveColumnConfig(@ModelAttribute List<String> config) {
     	daasResourceService.saveColumnConfig(config);
     	return ResponseResult.success();
     }

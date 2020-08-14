@@ -2,9 +2,9 @@ package com.hirisun.cloud.iaas.controller.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,7 +31,7 @@ public class IaasSubpageController {
     @ApiOperation("新增")
     @PostMapping(value = "/create")
     @ResponseBody
-    public ResponseResult create(@LoginUser UserVO user, @RequestBody IaasSubpageConfig iaas) {
+    public ResponseResult create(@LoginUser UserVO user, @ModelAttribute IaasSubpageConfig iaas) {
         iaasSubpageService.saveIaasPage(user,iaas);
         return ResponseResult.success();
     }
@@ -40,7 +40,7 @@ public class IaasSubpageController {
     @ApiOperation("修改二级页面配置信息")
     @PostMapping(value = "/edit")
     @ResponseBody
-    public ResponseResult edit(@LoginUser UserVO user, @RequestBody IaasSubpageConfig iaas) {
+    public ResponseResult edit(@LoginUser UserVO user, @ModelAttribute IaasSubpageConfig iaas) {
         iaasSubpageService.updateIaasPage(user,iaas);
         return ResponseResult.success();
     }

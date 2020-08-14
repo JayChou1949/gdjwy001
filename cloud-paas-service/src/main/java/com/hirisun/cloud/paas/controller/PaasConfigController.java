@@ -1,8 +1,8 @@
 package com.hirisun.cloud.paas.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -39,7 +39,7 @@ public class PaasConfigController {
     )
     @PostMapping(value = "/create")
     @ResponseBody
-    public QueryResponseResult create(@LoginUser UserVO user, @RequestBody PaasConfig paas) {
+    public QueryResponseResult create(@LoginUser UserVO user, @ModelAttribute PaasConfig paas) {
 		paas.setCreator(user.getIdCard());
 		String passId = paasConfigService.create(paas);
         return QueryResponseResult.success(passId);
@@ -124,7 +124,7 @@ public class PaasConfigController {
     )
     @PostMapping(value = "/edit")
     @ResponseBody
-    public ResponseResult edit(@LoginUser UserVO user, @RequestBody PaasConfig paas) {
+    public ResponseResult edit(@LoginUser UserVO user, @ModelAttribute PaasConfig paas) {
     	paasConfigService.edit(paas);
     	return QueryResponseResult.success();
     }

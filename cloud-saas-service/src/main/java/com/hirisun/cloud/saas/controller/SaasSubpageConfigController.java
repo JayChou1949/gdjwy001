@@ -10,9 +10,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -59,7 +59,7 @@ public class SaasSubpageConfigController {
     @ApiOperation("新增")
     @PostMapping(value = "/create")
     @ResponseBody
-    public ResponseResult create(@LoginUser UserVO user, @RequestBody SaasSubpageConfig saas) {
+    public ResponseResult create(@LoginUser UserVO user, @ModelAttribute SaasSubpageConfig saas) {
     	saasSubpageConfigService.saveSaasPage(user,saas);
         return ResponseResult.success();
     }
@@ -68,7 +68,7 @@ public class SaasSubpageConfigController {
     @ApiOperation("修改二级页面配置信息")
     @PostMapping(value = "/edit")
     @ResponseBody
-    public ResponseResult edit(@LoginUser UserVO user, @RequestBody SaasSubpageConfig saas) {
+    public ResponseResult edit(@LoginUser UserVO user, @ModelAttribute SaasSubpageConfig saas) {
     	saasSubpageConfigService.updateIaasPage(user,saas);
         return ResponseResult.success();
     }
@@ -84,7 +84,7 @@ public class SaasSubpageConfigController {
     
     @ApiImplicitParam(name="saasId", value="服务id", required = true, paramType="path", dataType="String")
     @PostMapping(value = "/conf/save/{saasId}")
-    public ResponseResult save(@PathVariable String saasId, @RequestBody SaasSubpageConf conf) {
+    public ResponseResult save(@PathVariable String saasId, @ModelAttribute SaasSubpageConf conf) {
         saasSubpageConfService.save(saasId, conf);
         return ResponseResult.success();
     }
