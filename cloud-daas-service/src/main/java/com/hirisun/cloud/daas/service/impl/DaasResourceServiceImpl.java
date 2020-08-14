@@ -55,12 +55,7 @@ public class DaasResourceServiceImpl implements DaasResourceService {
     @Override
     public List getColumnConfig() {
     	
-    	String configJson = null;
-    	
-    	Object object = redisApi.get(RedisKey.KEY_DAAS_COLUMN_CONFIG);
-    	if(object != null) {
-    		return (List) object;
-    	}
+    	String configJson = redisApi.getStrValue(RedisKey.KEY_DAAS_COLUMN_CONFIG);
     	
         if (StringUtils.isEmpty(configJson)) {
             List<String> m = new ArrayList<>();
@@ -77,7 +72,7 @@ public class DaasResourceServiceImpl implements DaasResourceService {
 
     @Override
     public void saveColumnConfig(List config) {
-        String configJson = JSONArray.toJSONString(config);
+    	String configJson = JSONArray.toJSONString(config);
         redisApi.setForPerpetual(RedisKey.KEY_DAAS_COLUMN_CONFIG, configJson);
     }
 

@@ -74,6 +74,5 @@ public interface DaasResourceService {
     DaasResource getServiceByServiceId(String serviceId);
 
 	boolean serviceAlter2DaaS(ServiceAlterVo serviceAlter,String serviceId);
-
-
+	
 }
