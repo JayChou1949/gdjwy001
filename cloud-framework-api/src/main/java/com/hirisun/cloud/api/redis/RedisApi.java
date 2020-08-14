@@ -47,7 +47,7 @@ public interface RedisApi {
      * @return
      */
     @GetMapping(value = "/redis/get/{key}", produces = "application/json")
-    Object get(@PathVariable("key") String key);
+    String get(@PathVariable("key") String key);
 
     /**
      * 通过键获得一个字符串

@@ -1,5 +1,6 @@
 package com.hirisun.cloud.redis.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.hirisun.cloud.redis.service.RedisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -33,9 +34,9 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public Object get(String key) {
+    public String get(String key) {
         Object o = redisTemplate.opsForValue().get(key);
-        return o;
+        return JSON.toJSONString(o);
     }
 
     @Override

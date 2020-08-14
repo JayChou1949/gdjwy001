@@ -27,7 +27,7 @@ public class RedisApiFallback implements RedisApi {
     }
 
     @Override
-    public Object get(String key) {
+    public String get(String key) {
         return "1111";
     }
 

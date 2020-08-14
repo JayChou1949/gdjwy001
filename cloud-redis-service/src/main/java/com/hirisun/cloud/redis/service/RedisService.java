@@ -37,7 +37,7 @@ public interface RedisService {
      * @param key 键
      * @return 值
      */
-    Object get(String key);
+    String get(String key);
 
     /**
      * keys操作

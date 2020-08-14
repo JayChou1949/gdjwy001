@@ -67,7 +67,7 @@ public class RedisController implements RedisApi {
     @ApiOperation("通过键获得一个值")
     @ApiImplicitParam(name = "key", value = "键", required = true, paramType = "path")
     @Override
-    public Object get(@PathVariable("key") String key) {
+    public String get(@PathVariable("key") String key) {
         return redisService.get(key);
     }
 
@@ -76,9 +76,7 @@ public class RedisController implements RedisApi {
     @ApiImplicitParam(name = "key", value = "键", required = true, paramType = "path")
     @Override
     public String getStrValue(@PathVariable("key") String key) {
-        Object value = redisService.get(key);
-        if(value == null) return null;
-        return value.toString();
+        return redisService.get(key);
     }
 
     @GetMapping("/keys")
