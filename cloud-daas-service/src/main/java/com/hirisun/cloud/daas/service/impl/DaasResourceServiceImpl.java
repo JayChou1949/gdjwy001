@@ -1,36 +1,30 @@
 package com.hirisun.cloud.daas.service.impl;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
-
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.hirisun.cloud.api.redis.RedisApi;
 import com.hirisun.cloud.common.consts.RedisKey;
 import com.hirisun.cloud.common.util.AreaPoliceCategoryUtils;
 import com.hirisun.cloud.daas.bean.DaasResource;
 import com.hirisun.cloud.daas.mapper.DaasResourceMapper;
 import com.hirisun.cloud.daas.service.DaasResourceService;
-import com.hirisun.cloud.model.daas.vo.ServiceIssueVo;
-import com.hirisun.cloud.model.daas.vo.ServiceQualityVo;
-import com.hirisun.cloud.model.daas.vo.ServiceRequestVo;
-import com.hirisun.cloud.model.daas.vo.ServiceSubscribeVo;
-import com.hirisun.cloud.model.daas.vo.YqServiceDetailVo;
-import com.hirisun.cloud.model.daas.vo.YqStatisticsVo;
+import com.hirisun.cloud.model.daas.vo.*;
 import com.hirisun.cloud.model.param.PageParam;
 import com.hirisun.cloud.model.param.ServiceIssueParam;
 import com.hirisun.cloud.model.param.ServiceSubscribeParam;
 import com.hirisun.cloud.model.service.alter.vo.ServiceAlterVo;
 import com.hirisun.cloud.model.service.publish.vo.ServicePublishVo;
+import com.hirisun.cloud.redis.service.RedisService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 @Service
 public class DaasResourceServiceImpl implements DaasResourceService {
@@ -38,7 +32,7 @@ public class DaasResourceServiceImpl implements DaasResourceService {
     @Autowired
     private DaasResourceMapper daasResourceMapper;
     @Autowired
-    private RedisApi redisApi;
+    private RedisService redisService;
 
     @Override
     public Page<DaasResource> getPage(Page<DaasResource> page, String name, String dataFrom, 
@@ -55,7 +49,7 @@ public class DaasResourceServiceImpl implements DaasResourceService {
     @Override
     public List getColumnConfig() {
     	
-    	String configJson = redisApi.getStrValue(RedisKey.KEY_DAAS_COLUMN_CONFIG);
+    	String configJson = redisService.get(RedisKey.KEY_DAAS_COLUMN_CONFIG);
     	
         if (StringUtils.isEmpty(configJson)) {
             List<String> m = new ArrayList<>();
@@ -65,7 +59,7 @@ public class DaasResourceServiceImpl implements DaasResourceService {
             m.add("category");
             m.add("createTime");
             configJson = JSONArray.toJSONString(m);
-            redisApi.setForPerpetual(RedisKey.KEY_DAAS_COLUMN_CONFIG, configJson);
+            redisService.setForPerpetual(RedisKey.KEY_DAAS_COLUMN_CONFIG, configJson);
         }
         return JSONArray.parseObject(configJson, LinkedList.class);
     }
@@ -73,12 +67,12 @@ public class DaasResourceServiceImpl implements DaasResourceService {
     @Override
     public void saveColumnConfig(List config) {
     	String configJson = JSONArray.toJSONString(config);
-        redisApi.setForPerpetual(RedisKey.KEY_DAAS_COLUMN_CONFIG, configJson);
+        redisService.setForPerpetual(RedisKey.KEY_DAAS_COLUMN_CONFIG, configJson);
     }
 
     @Override
     public void resetColumnConfig() {
-        redisApi.delete(RedisKey.KEY_DAAS_COLUMN_CONFIG);
+        redisService.delete(RedisKey.KEY_DAAS_COLUMN_CONFIG);
     }
 
     @Override

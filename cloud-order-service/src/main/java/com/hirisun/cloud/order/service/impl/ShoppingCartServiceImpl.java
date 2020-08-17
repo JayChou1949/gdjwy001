@@ -4,10 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.battcn.boot.swagger.model.Order;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
-import com.hirisun.cloud.api.redis.RedisApi;
 import com.hirisun.cloud.api.workflow.WorkflowApi;
 import com.hirisun.cloud.common.constant.FormCode;
 import com.hirisun.cloud.common.constant.RedisKey;
@@ -16,8 +14,6 @@ import com.hirisun.cloud.common.contains.ResourceType;
 import com.hirisun.cloud.common.exception.CustomException;
 import com.hirisun.cloud.common.util.AreaPoliceCategoryUtils;
 import com.hirisun.cloud.common.util.UUIDUtil;
-import com.hirisun.cloud.common.vo.CommonCode;
-import com.hirisun.cloud.model.ncov.vo.daas.DataGovernanceVo;
 import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.model.workflow.*;
 import com.hirisun.cloud.order.bean.ApplyInfo;
@@ -27,6 +23,7 @@ import com.hirisun.cloud.order.service.ApplyInfoService;
 import com.hirisun.cloud.order.service.ShoppingCartService;
 import com.hirisun.cloud.order.util.SubmitRequest;
 import com.hirisun.cloud.order.vo.OrderCode;
+import com.hirisun.cloud.redis.service.RedisService;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -58,14 +55,12 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
     @Autowired
     private WorkflowApi workflowApi;
 
-    @Autowired
-    private ShoppingCartMapper shoppingCartMapper;
 
     @Autowired
     private ApplyInfoService applyInfoService;
 
     @Autowired
-    private RedisApi redisApi;
+    private RedisService redisService;
 
     /**
      * 加入购物车
@@ -247,11 +242,11 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
         // 生成单号
         String yyyyMMdd = DateFormatUtils.format(new Date(), "yyyyMMdd");
         String redisKey = RedisKey.KEY_ORDER_NUM_PREFIX + yyyyMMdd;
-        Long increment = redisApi.increment(redisKey);
+        Long increment = redisService.increment(redisKey);
         if (increment == null) {
             throw new CustomException(OrderCode.CREATE_ORDER_NUMER_ERROR);
         }
-        redisApi.expire(redisKey, 1L, TimeUnit.DAYS);
+        redisService.expire(redisKey, 1L, TimeUnit.DAYS);
         return String.format("%s%04d", yyyyMMdd, increment);
     }
 }

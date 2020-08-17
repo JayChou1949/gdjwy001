@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.hirisun.cloud.redis.service.RedisService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -28,7 +29,6 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import com.alibaba.fastjson.JSON;
 import com.hirisun.cloud.api.file.FileApi;
-import com.hirisun.cloud.api.redis.RedisApi;
 import com.hirisun.cloud.common.exception.CustomException;
 import com.hirisun.cloud.common.vo.CommonCode;
 import com.hirisun.cloud.common.vo.ResponseResult;
@@ -52,7 +52,7 @@ public class NcovRealtimeServiceImpl implements NcovRealtimeService {
 	@Autowired
 	private NcovRealtimeMapper ncovRealtimeMapper;
 	@Autowired
-    private RedisApi redisApi;
+    private RedisService redisService;
 	@Autowired
 	private FileApi fileApi;
 	@Autowired
@@ -66,7 +66,7 @@ public class NcovRealtimeServiceImpl implements NcovRealtimeService {
 	 */
 	public HomePageNcovRealtimeVo getHomePageNcovRealtimeVo() {
 		
-		String resString = redisApi.getStrValue(NcovKey.HOME_PAGE_NCOV_REALTIME);
+		String resString = redisService.get(NcovKey.HOME_PAGE_NCOV_REALTIME);
 		if(StringUtils.isNotBlank(resString))return JSON.parseObject(resString,HomePageNcovRealtimeVo.class);
 		
 		HomePageNcovRealtimeVo vo = setHomePageNcovRealtimeCache();
@@ -209,7 +209,7 @@ public class NcovRealtimeServiceImpl implements NcovRealtimeService {
 	 */
 	public HomePageNcovRealtimeVo setHomePageNcovRealtimeCache() {
 		HomePageNcovRealtimeVo vo = getHomePageNcovRealtime();
-		redisApi.setForPerpetual(NcovKey.HOME_PAGE_NCOV_REALTIME, JSON.toJSONString(vo));
+		redisService.setForPerpetual(NcovKey.HOME_PAGE_NCOV_REALTIME, JSON.toJSONString(vo));
 		return vo;
 	}
 

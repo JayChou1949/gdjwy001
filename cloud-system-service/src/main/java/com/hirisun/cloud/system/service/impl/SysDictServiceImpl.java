@@ -1,22 +1,19 @@
 package com.hirisun.cloud.system.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.hirisun.cloud.api.redis.RedisApi;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hirisun.cloud.common.constant.RedisKey;
-import com.hirisun.cloud.common.util.TreeUtils;
 import com.hirisun.cloud.common.util.UUIDUtil;
+import com.hirisun.cloud.redis.service.RedisService;
 import com.hirisun.cloud.system.bean.SysDict;
 import com.hirisun.cloud.system.mapper.SysDictMapper;
 import com.hirisun.cloud.system.service.SysDictService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -30,7 +27,7 @@ import java.util.stream.Collectors;
 public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> implements SysDictService {
 
     @Autowired
-    private RedisApi redisApi;
+    private RedisService redisService;
 
 
     /**
@@ -39,7 +36,7 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
      */
     @Override
     public List<SysDict> getSysDictList() {
-        List<Object> list =  redisApi.range(RedisKey.REDIS_SYS_DICT,0,-1);
+        List<Object> list =  redisService.range(RedisKey.REDIS_SYS_DICT,0,-1);
         List<SysDict> dictList = new ArrayList();
         for (int x = 0; x < list.size(); x++) {
             SysDict dict = JSON.parseObject(list.get(x).toString(), SysDict.class);
@@ -57,14 +54,14 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
         if (StringUtils.isEmpty(sysDict.getId())) {
             String id = UUIDUtil.getUUID();
             sysDict.setId(id);
-            redisApi.leftPush(RedisKey.REDIS_SYS_DICT, JSON.toJSONString(sysDict) );
+            redisService.leftPush(RedisKey.REDIS_SYS_DICT, JSON.toJSONString(sysDict) );
         } else {
             /**
              * 1.查出所有字典
              * 2.查询目标字典下标
              * 3.替换目标字典内容
              */
-            List<Object> list =  redisApi.range(RedisKey.REDIS_SYS_DICT,0,-1);
+            List<Object> list =  redisService.range(RedisKey.REDIS_SYS_DICT,0,-1);
             if(list==null||list.size()==0){
                 return;
             }
@@ -79,7 +76,7 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
                 }
             }
             if (dictMatch) {
-                redisApi.setForList(RedisKey.REDIS_SYS_DICT,targetIndex,JSON.toJSONString(sysDict));
+                redisService.setForList(RedisKey.REDIS_SYS_DICT,targetIndex,JSON.toJSONString(sysDict));
             }
         }
     }
@@ -90,11 +87,11 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
      */
     @Override
     public void removeDict(String id) {
-        List<Object> list =  redisApi.range("REDIS_SYS_DICT",0,-1);
+        List<Object> list =  redisService.range("REDIS_SYS_DICT",0,-1);
         list.forEach(item->{
             SysDict dict = JSON.parseObject(item.toString(), SysDict.class);
             if (dict.getId().equals(id)) {
-                redisApi.removeValueForList(RedisKey.REDIS_SYS_DICT, 0,item);
+                redisService.removeValueForList(RedisKey.REDIS_SYS_DICT, 0,item);
             }
         });
     }

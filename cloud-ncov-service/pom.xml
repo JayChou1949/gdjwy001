@@ -26,8 +26,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
+            <groupId>com.hirisun.cloud</groupId>
+            <artifactId>cloud-redis-service</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>

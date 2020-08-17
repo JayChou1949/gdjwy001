@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.hirisun.cloud.redis.service.RedisService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -16,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.hirisun.cloud.api.file.FileApi;
-import com.hirisun.cloud.api.redis.RedisApi;
 import com.hirisun.cloud.common.exception.ExceptionCast;
 import com.hirisun.cloud.common.util.JsonUtils;
 import com.hirisun.cloud.common.util.LocalDateUtil;
@@ -47,7 +47,7 @@ import com.hirisun.cloud.ncov.util.NcovEcsImportUtil;
 public class NcovFileUploadServiceImpl implements NcovFileUploadService {
 
 	@Autowired
-	private RedisApi redisApi;
+	private RedisService redisService;
 	@Autowired
 	private FileApi fileApi;
 	@Autowired
@@ -276,7 +276,7 @@ public class NcovFileUploadServiceImpl implements NcovFileUploadService {
 		}
 		//新增或更新成功才刷新内存
 		if(success >0 ) {
-			redisApi.setForPerpetual(redisKey, json);
+			redisService.setForPerpetual(redisKey, json);
 		}
 	}
 	
