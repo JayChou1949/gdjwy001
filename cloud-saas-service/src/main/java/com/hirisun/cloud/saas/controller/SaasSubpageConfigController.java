@@ -30,10 +30,10 @@ import com.hirisun.cloud.model.daas.vo.InnerServiceOverview;
 import com.hirisun.cloud.model.daas.vo.ServiceOverview;
 import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.saas.bean.SaasConfig;
-import com.hirisun.cloud.saas.bean.SaasSubpageConf;
+import com.hirisun.cloud.saas.bean.SaasInfoConfig;
 import com.hirisun.cloud.saas.bean.SaasSubpageConfig;
 import com.hirisun.cloud.saas.service.SaasConfigService;
-import com.hirisun.cloud.saas.service.SaasSubpageConfService;
+import com.hirisun.cloud.saas.service.SaasInfoConfigService;
 import com.hirisun.cloud.saas.service.SaasSubpageConfigService;
 
 import cn.afterturn.easypoi.excel.ExcelExportUtil;
@@ -50,7 +50,7 @@ public class SaasSubpageConfigController {
 	@Autowired
     private SaasSubpageConfigService saasSubpageConfigService;
 	@Autowired
-	private SaasSubpageConfService saasSubpageConfService;
+	private SaasInfoConfigService saasSubpageConfService;
 	@Autowired
 	private SaasConfigService saasConfigService;
 	
@@ -84,7 +84,7 @@ public class SaasSubpageConfigController {
     
     @ApiImplicitParam(name="saasId", value="服务id", required = true, paramType="path", dataType="String")
     @PostMapping(value = "/conf/save/{saasId}")
-    public ResponseResult save(@PathVariable String saasId, @ModelAttribute SaasSubpageConf conf) {
+    public ResponseResult save(@PathVariable String saasId, @ModelAttribute SaasInfoConfig conf) {
         saasSubpageConfService.save(saasId, conf);
         return ResponseResult.success();
     }
@@ -92,8 +92,8 @@ public class SaasSubpageConfigController {
     @ApiImplicitParam(name="saasId", value="服务id", required = true, paramType="path", dataType="String")
     @GetMapping(value = "/conf/detail")
     public ResponseResult detail(String saasId) {
-        SaasSubpageConf conf = saasSubpageConfService.getOne(new QueryWrapper<SaasSubpageConf>().lambda()
-                .eq(SaasSubpageConf::getMasterId, saasId));
+        SaasInfoConfig conf = saasSubpageConfService.getOne(new QueryWrapper<SaasInfoConfig>().lambda()
+                .eq(SaasInfoConfig::getMasterId, saasId));
         return QueryResponseResult.success(conf);
     }
     

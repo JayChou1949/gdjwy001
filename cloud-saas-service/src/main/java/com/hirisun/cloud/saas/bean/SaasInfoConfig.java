@@ -6,16 +6,8 @@ import com.baomidou.mybatisplus.extension.activerecord.Model;
 import java.io.Serializable;
 import java.util.Date;
 
-/**
- * <p>
- * SAAS服务资源配置
- * </p>
- *
- * @author wuc
- * @since 2019-08-06
- */
-@TableName("TB_SAAS_SUBPAGE_CONF")
-public class SaasSubpageConf extends Model<SaasSubpageConf> {
+@TableName("T_SAAS_INFO_CONFIG")
+public class SaasInfoConfig extends Model<SaasInfoConfig> {
 
     private static final long serialVersionUID = 1L;
 
@@ -69,7 +61,7 @@ public class SaasSubpageConf extends Model<SaasSubpageConf> {
         return id;
     }
 
-    public SaasSubpageConf setId(String id) {
+    public SaasInfoConfig setId(String id) {
         this.id = id;
         return this;
     }
@@ -78,7 +70,7 @@ public class SaasSubpageConf extends Model<SaasSubpageConf> {
         return masterId;
     }
 
-    public SaasSubpageConf setMasterId(String masterId) {
+    public SaasInfoConfig setMasterId(String masterId) {
         this.masterId = masterId;
         return this;
     }
@@ -87,7 +79,7 @@ public class SaasSubpageConf extends Model<SaasSubpageConf> {
         return createTime;
     }
 
-    public SaasSubpageConf setCreateTime(Date createTime) {
+    public SaasInfoConfig setCreateTime(Date createTime) {
         this.createTime = createTime;
         return this;
     }
@@ -96,7 +88,7 @@ public class SaasSubpageConf extends Model<SaasSubpageConf> {
         return modifiedTime;
     }
 
-    public SaasSubpageConf setModifiedTime(Date modifiedTime) {
+    public SaasInfoConfig setModifiedTime(Date modifiedTime) {
         this.modifiedTime = modifiedTime;
         return this;
     }
@@ -105,7 +97,7 @@ public class SaasSubpageConf extends Model<SaasSubpageConf> {
         return useCount;
     }
 
-    public SaasSubpageConf setUseCount(String useCount) {
+    public SaasInfoConfig setUseCount(String useCount) {
         this.useCount = useCount;
         return this;
     }
@@ -114,7 +106,7 @@ public class SaasSubpageConf extends Model<SaasSubpageConf> {
         return userCount;
     }
 
-    public SaasSubpageConf setUserCount(String userCount) {
+    public SaasInfoConfig setUserCount(String userCount) {
         this.userCount = userCount;
         return this;
     }
@@ -123,7 +115,7 @@ public class SaasSubpageConf extends Model<SaasSubpageConf> {
         return policeCategoryCount;
     }
 
-    public SaasSubpageConf setPoliceCategoryCount(String policeCategoryCount) {
+    public SaasInfoConfig setPoliceCategoryCount(String policeCategoryCount) {
         this.policeCategoryCount = policeCategoryCount;
         return this;
     }
@@ -132,7 +124,7 @@ public class SaasSubpageConf extends Model<SaasSubpageConf> {
         return areaCount;
     }
 
-    public SaasSubpageConf setAreaCount(String areaCount) {
+    public SaasInfoConfig setAreaCount(String areaCount) {
         this.areaCount = areaCount;
         return this;
     }
@@ -141,7 +133,7 @@ public class SaasSubpageConf extends Model<SaasSubpageConf> {
         return status;
     }
 
-    public SaasSubpageConf setStatus(String status) {
+    public SaasInfoConfig setStatus(String status) {
         this.status = status;
         return this;
     }
