@@ -42,8 +42,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 
-@Api("后台-服务管理-基础设施服务(IaaS)-二级页面")
-@RequestMapping("/paas/subpage")
+@Api("后台-服务管理-(软件服务 Saas)-二级页面")
+@RequestMapping("/saas/subpage")
 @RestController
 public class SaasSubpageConfigController {
 	
