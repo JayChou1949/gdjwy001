@@ -39,16 +39,15 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
         <spring-cloud.version>Hoxton.SR1</spring-cloud.version>
+        <spring-cloud-alibaba.version>2.2.1.RELEASE</spring-cloud-alibaba.version>
         <lombok.version>1.18.10</lombok.version>
         <guava.version>28.1-jre</guava.version>
-        <nacos.version>2.2.1.RELEASE</nacos.version>
         <ojdbc6.version>11.2.0.4</ojdbc6.version>
         <mybatis-spring-boot.version>2.1.3</mybatis-spring-boot.version>
         <druid.version>1.1.22</druid.version>
         <hikaricp.version>3.4.5</hikaricp.version>
         <commons-lang.version>2.6</commons-lang.version>
         <commons-io.version>2.7</commons-io.version>
-        <feign.version>1.4.7.RELEASE</feign.version>
         <mybatis-plus.version>3.3.2</mybatis-plus.version>
         <swagger-spring-boot.version>2.1.5-RELEASE</swagger-spring-boot.version>
         <poi.version>3.15</poi.version>
@@ -60,7 +59,6 @@
         <fastjson.version>1.2.72</fastjson.version>
         <fastdfs-client-java.version>1.27.0.0</fastdfs-client-java.version>
         <seata.version>1.3.0</seata.version>
-        <spring-cloud-starter-alibaba-seata.version>2.2.1.RELEASE</spring-cloud-starter-alibaba-seata.version>
     </properties>
 
     <dependencyManagement>
@@ -130,18 +128,15 @@
             <dependency>
                 <groupId>com.alibaba.cloud</groupId>
                 <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
-                <version>${nacos.version}</version>
+                <version>${spring-cloud-alibaba.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>com.alibaba.cloud</groupId>
                 <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
-                <version>${nacos.version}</version>
+                <version>${spring-cloud-alibaba.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-starter-hystrix</artifactId>
-                <version>${feign.version}</version>
-            </dependency>
+
             <dependency>
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
@@ -153,6 +148,7 @@
                 <artifactId>HikariCP</artifactId>
                 <version>${hikaricp.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-generator</artifactId>
@@ -168,12 +164,6 @@
                 <groupId>org.mybatis.spring.boot</groupId>
                 <artifactId>mybatis-spring-boot-starter</artifactId>
                 <version>${mybatis-spring-boot.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-starter-feign</artifactId>
-                <version>${feign.version}</version>
             </dependency>
 
             <dependency>
@@ -200,7 +190,7 @@
             <dependency>
                 <groupId>com.alibaba.cloud</groupId>
                 <artifactId>spring-cloud-alibaba-dependencies</artifactId>
-                <version>${nacos.version}</version>
+                <version>${spring-cloud-alibaba.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -229,7 +219,7 @@
             <dependency>
                 <groupId>com.alibaba.cloud</groupId>
                 <artifactId>spring-cloud-starter-alibaba-seata</artifactId>
-                <version>${spring-cloud-starter-alibaba-seata.version}</version>
+                <version>${spring-cloud-alibaba.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>io.seata</groupId>
