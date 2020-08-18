@@ -1,3 +1,5 @@
 spring:
   application:
     name: cloud-order-service
+  main:
+    allow-bean-definition-overriding: true

@@ -7,11 +7,11 @@ spring:
   cloud:
     nacos:
       config:
-        server-addr: 192.168.11.65:8848
+        server-addr: 139.9.234.187:8848
         file-extension: yaml
-        shared-configs: cloud-common.yaml,db.yaml,redis.yaml
+        shared-configs: share-config.yaml,cloud-common.yaml,db.yaml,redis.yaml
       discovery:
-        server-addr: 192.168.11.65:8848
+        server-addr: 139.9.234.187:8848
 server:
   port: 8000
 ---
@@ -22,7 +22,7 @@ spring:
       config:
         server-addr: 139.9.234.187:8848
         file-extension: yaml
-        shared-configs: cloud-common.yaml,db.yaml,redis.yaml
+        shared-configs: share-config.yaml,cloud-common.yaml,db.yaml,redis.yaml
       discovery:
         server-addr: 139.9.234.187:8848
 server:
@@ -35,7 +35,7 @@ spring:
       config:
         server-addr: 68.26.8.254:8848
         file-extension: yaml
-        shared-configs: cloud-common.yaml,db.yaml,redis.yaml
+        shared-configs: share-config.yaml,cloud-common.yaml,db.yaml,redis.yaml
       discovery:
         server-addr: 68.26.8.254:8848
 server:

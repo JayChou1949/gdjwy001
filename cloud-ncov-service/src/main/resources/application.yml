@@ -5,6 +5,7 @@ spring:
       max-file-size: 10MB
   application:
     name: cloud-ncov-service
-
+  main:
+    allow-bean-definition-overriding: true
 server:
   max-http-header-size: 1024000

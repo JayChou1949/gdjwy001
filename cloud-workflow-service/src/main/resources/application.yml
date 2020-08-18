@@ -1,3 +1,5 @@
 spring:
   application:
     name: cloud-workflow-service
+  main:
+    allow-bean-definition-overriding: true
