@@ -1,9 +1,10 @@
-package com.hirisun.cloud.order.service.impl;
+package com.hirisun.cloud.order.service.apply.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.hirisun.cloud.order.bean.ApplyInfo;
-import com.hirisun.cloud.order.mapper.ApplyInfoMapper;
-import com.hirisun.cloud.order.service.ApplyInfoService;
+import com.hirisun.cloud.order.bean.apply.ApplyInfo;
+import com.hirisun.cloud.order.mapper.application.ApplyInfoMapper;
+import com.hirisun.cloud.order.service.apply.ApplyInfoService;
+
 import org.springframework.stereotype.Service;
 
 /**

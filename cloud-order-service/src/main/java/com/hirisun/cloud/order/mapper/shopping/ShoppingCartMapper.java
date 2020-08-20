@@ -1,7 +1,7 @@
-package com.hirisun.cloud.order.mapper;
+package com.hirisun.cloud.order.mapper.shopping;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.hirisun.cloud.order.bean.ShoppingCart;
+import com.hirisun.cloud.order.bean.shopping.ShoppingCart;
 
 /**
  * <p>

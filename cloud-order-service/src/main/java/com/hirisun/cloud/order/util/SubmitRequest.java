@@ -2,7 +2,8 @@ package com.hirisun.cloud.order.util;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.google.common.base.Converter;
-import com.hirisun.cloud.order.bean.ApplyInfo;
+import com.hirisun.cloud.order.bean.apply.ApplyInfo;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;

@@ -1,4 +1,4 @@
-package com.hirisun.cloud.order.bean;
+package com.hirisun.cloud.order.bean.apply;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;

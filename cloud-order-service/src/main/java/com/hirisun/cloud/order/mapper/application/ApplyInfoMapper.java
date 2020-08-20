@@ -1,7 +1,7 @@
-package com.hirisun.cloud.order.mapper;
+package com.hirisun.cloud.order.mapper.application;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.hirisun.cloud.order.bean.ApplyInfo;
+import com.hirisun.cloud.order.bean.apply.ApplyInfo;
 
 /**
  * <p>

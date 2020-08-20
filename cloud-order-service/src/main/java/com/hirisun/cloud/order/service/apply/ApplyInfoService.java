@@ -1,7 +1,7 @@
-package com.hirisun.cloud.order.service;
+package com.hirisun.cloud.order.service.apply;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.hirisun.cloud.order.bean.ApplyInfo;
+import com.hirisun.cloud.order.bean.apply.ApplyInfo;
 
 /**
  * <p>

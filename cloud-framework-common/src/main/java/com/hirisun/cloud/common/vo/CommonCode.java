@@ -15,6 +15,15 @@ public enum CommonCode implements ResultCode{
     DELETE_FAIL(1007,"数据删除失败"),
     IMPORT_FAIL(1008,"导入数据失败,请检查导入文件数据"),
     EXPORT_FAIL(1009,"导出数据失败,请检查导数据是否异常"),
+    ACTIVITY_ID_NULL(1010,"当前环节ID不能为空"),
+    CIRCULATION_INFO_NULL(1011,"流转信息不能为空"),
+    PROCESS_LINK_NULL(1012,"当前环节对应的流程环节为空，请传入流程定义环节信息!"),
+    LINK_NULL(1013,"当前环节信息为空,流转失败!"),
+    FLOW_HANDLER_NULL(1014,"流程未配置处理人!"),
+    HANDLER_NULL(1015,"办理人不能为空!"),
+    LINK_END_NULL(1016,"未找到结束环节!"),
+    REPEATED_PROCESSING(1017,"该任务已经处理，不能重复处理!"),
+    FLOW_INSTANCE_NULL(1018,"未找到相关流程实例!"),
     SERVER_ERROR(9999,"系统繁忙，稍后重试");
     /**
      * 状态码

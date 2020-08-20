@@ -1,4 +1,19 @@
-package com.hirisun.cloud.order.service.impl;
+package com.hirisun.cloud.order.service.apply.impl;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -15,29 +30,19 @@ import com.hirisun.cloud.common.exception.CustomException;
 import com.hirisun.cloud.common.util.AreaPoliceCategoryUtils;
 import com.hirisun.cloud.common.util.UUIDUtil;
 import com.hirisun.cloud.model.user.UserVO;
-import com.hirisun.cloud.model.workflow.*;
-import com.hirisun.cloud.order.bean.ApplyInfo;
-import com.hirisun.cloud.order.bean.ShoppingCart;
-import com.hirisun.cloud.order.mapper.ShoppingCartMapper;
-import com.hirisun.cloud.order.service.ApplyInfoService;
-import com.hirisun.cloud.order.service.ShoppingCartService;
+import com.hirisun.cloud.model.workflow.AdvanceBeanVO;
+import com.hirisun.cloud.model.workflow.WorkflowActivityVO;
+import com.hirisun.cloud.model.workflow.WorkflowInstanceVO;
+import com.hirisun.cloud.model.workflow.WorkflowNodeVO;
+import com.hirisun.cloud.model.workflow.WorkflowVO;
+import com.hirisun.cloud.order.bean.apply.ApplyInfo;
+import com.hirisun.cloud.order.bean.shopping.ShoppingCart;
+import com.hirisun.cloud.order.mapper.shopping.ShoppingCartMapper;
+import com.hirisun.cloud.order.service.apply.ApplyInfoService;
+import com.hirisun.cloud.order.service.apply.ShoppingCartService;
 import com.hirisun.cloud.order.util.SubmitRequest;
 import com.hirisun.cloud.order.vo.OrderCode;
 import com.hirisun.cloud.redis.service.RedisService;
-import org.apache.commons.lang.time.DateFormatUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -71,8 +76,8 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
     public void createCart(UserVO user, ShoppingCart shoppingCart) {
         logger.debug("create shoppingCart -> {}",shoppingCart);
 
-        shoppingCart.setResourceType(FormCode.serviceResourceTypeValueMap.get(shoppingCart.getFormNum()));
-        shoppingCart.setStatus(ShoppingCart.STATUS_WAIT_SUBMIT);
+        shoppingCart.setResourceType(Long.valueOf(FormCode.serviceResourceTypeValueMap.get(shoppingCart.getFormNum())));
+//        shoppingCart.setStatus(ShoppingCart.STATUS_WAIT_SUBMIT);
 
         this.save(shoppingCart);
         //TODO 保存附件  表单信息
@@ -182,10 +187,11 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
         }
         List<String> idList = Splitter.on(",").omitEmptyStrings().trimResults().splitToList(ids);
 
-        return this.list(new QueryWrapper<ShoppingCart>().lambda()
-                .eq(ShoppingCart::getCreatorIdCard,idCard)
-                .eq(ShoppingCart::getStatus,ShoppingCart.STATUS_WAIT_SUBMIT)
-                .in(ShoppingCart::getId,idList));
+//        return this.list(new QueryWrapper<ShoppingCart>().lambda()
+//                .eq(ShoppingCart::getCreatorIdCard,idCard)
+//                .eq(ShoppingCart::getStatus,ShoppingCart.STATUS_WAIT_SUBMIT)
+//                .in(ShoppingCart::getId,idList));
+        return null;
 
 
     }
@@ -217,25 +223,25 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
         info.setServiceTypeId(shoppingCart.getServiceTypeId());
         info.setServiceTypeName(shoppingCart.getServiceTypeName());
         //流程选择（重要选择流程逻辑）
-        String workflowStr = workflowApi.chooseWorkFlow(
-                shoppingCart.getResourceType(),
-                info.getServiceTypeId(),
-                info.getAreaName(),
-                info.getPoliceCategory(),
-                info.getNationalSpecialProject());
+//        String workflowStr = workflowApi.chooseWorkFlow(
+//                shoppingCart.getResourceType(),
+//                info.getServiceTypeId(),
+//                info.getAreaName(),
+//                info.getPoliceCategory(),
+//                info.getNationalSpecialProject());
 
 
-        if(StringUtils.isEmpty(workflowStr)){
-            logger.error("购物车ID:{} 资源类型:{} 地市:{} 警种: {} 服务ID:{} 国家专项:{}",shoppingCart.getId(),shoppingCart.getResourceType(),info.getAreaName(),info.getPoliceCategory(),info.getServiceTypeId(),info.getNationalSpecialProject());
-            throw new CustomException(OrderCode.WORKFLOW_MISSING);
-        }
-        WorkflowVO workflow = JSON.parseObject(workflowStr, WorkflowVO.class);
-        info.setWorkFlowId(workflow.getId());
-        info.setResourceType(shoppingCart.getResourceType());
-        info.setFormNum(shoppingCart.getFormNum());
-        info.setOrderNumber(genOrderNum());
-        info.setHwPoliceCategory(AreaPoliceCategoryUtils.getPoliceCategory(baseInfo.getAppName()));
-        applyInfoService.save(info);
+//        if(StringUtils.isEmpty(workflowStr)){
+//            logger.error("购物车ID:{} 资源类型:{} 地市:{} 警种: {} 服务ID:{} 国家专项:{}",shoppingCart.getId(),shoppingCart.getResourceType(),info.getAreaName(),info.getPoliceCategory(),info.getServiceTypeId(),info.getNationalSpecialProject());
+//            throw new CustomException(OrderCode.WORKFLOW_MISSING);
+//        }
+//        WorkflowVO workflow = JSON.parseObject(workflowStr, WorkflowVO.class);
+//        info.setWorkFlowId(workflow.getId());
+//        info.setResourceType(shoppingCart.getResourceType());
+//        info.setFormNum(shoppingCart.getFormNum());
+//        info.setOrderNumber(genOrderNum());
+//        info.setHwPoliceCategory(AreaPoliceCategoryUtils.getPoliceCategory(baseInfo.getAppName()));
+//        applyInfoService.save(info);
         return info;
     }
     private String genOrderNum() {
