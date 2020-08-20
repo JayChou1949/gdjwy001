@@ -131,4 +131,77 @@ public class WorkflowInstanceServiceImpl extends ServiceImpl<WorkflowInstanceMap
             new CustomException(WorkflowCode.WORKFLOW_CREATE_FAIL);
         }
     }
+
+    /**
+     * 创建起始流程实例，创建实例和第一个流程活动
+     * @param creatorName 创建人
+     * @param businessId    应用id
+     *
+     * 新建一个流程类型，所有地市都使用该流程
+     */
+    @Override
+    public void launchInstanceByArea(String creatorName, String businessId,String resourceType ) {
+        Workflow workflow = workflowService.getOne(new QueryWrapper<Workflow>().lambda().eq(Workflow::getDefaultProcess, resourceType));
+
+//        Workflow workFlow = workflowService.getById(flowId);
+        logger.info("launch version :{}",workflow.getVersion());
+        if (workflow == null) {
+            logger.debug("没有流程配置信息");
+            new CustomException(WorkflowCode.WORKFLOW_MISSING);
+        }
+        // 得到流程定义的开始环节
+        WorkflowNode workFlowModel = workflowNodeService.getOne(new QueryWrapper<WorkflowNode>().lambda()
+                .eq(WorkflowNode::getWorkflowId,workflow.getId())
+                .eq(WorkflowNode::getNodeSort,WorkflowNode.NODE_SORT)
+                .eq(WorkflowNode::getVersion,workflow.getVersion()));
+        if (workFlowModel == null) {
+            logger.info("此流程没有定义开始环节,请联系管理员!");
+            new CustomException(WorkflowCode.WORKFLOW_MISSING_START_NODE);
+        }
+        UserVO user=null;
+//        String userStr = userApi.getUserByIdCard(createPersonId);
+//        if (!StringUtils.isEmpty(userStr)) {
+//            user=JSON.parseObject(userStr, UserVO.class);
+//        }
+        logger.debug("创建流程实例的用户：{}",user);
+        // 生成实例的ID
+        String insId = UUIDUtil.getUUID();
+        // 创建流程实例对象
+        WorkflowInstance instance = new WorkflowInstance();
+        instance.setId(insId);
+        instance.setCreator(creatorName);
+        instance.setCreateTime(new Date());
+        instance.setCreatorOrgId(user==null?null:user.getOrgId());
+        instance.setInstanceStatus(WorkflowInstance.INSTANCE_STATUS_WORKING);
+        instance.setWorkflowId(workflow.getId());
+        instance.setBusinessId(businessId);
+        instance.setVersion(workflow.getVersion());
+
+        // 创建开始环节信息
+        WorkflowActivity firstActivity = new WorkflowActivity();
+
+        //如果是外部提交则user为空，直接存传递过来的申请人身份证,否则存登陆人身份证
+        firstActivity.setCreator(creatorName);
+        firstActivity.setHandlePersons(null);
+        firstActivity.setActivityStatus(WorkflowActivity.STATUS_WAITING);
+
+        firstActivity.setCreateTime(new Date());
+        firstActivity.setInstanceId(insId);
+        firstActivity.setNodeId(workFlowModel.getId());
+        firstActivity.setIsStart(0);
+        firstActivity.setReciveTime(new Date());
+        String actId = UUIDUtil.getUUID();
+        firstActivity.setId(actId);
+
+        // 保存流程实例
+        boolean createInstanceResult = workflowInstanceService.save(instance);
+        // 发起流程的第一个环节,申请环节
+        boolean createActiviteResult = workflowActivityService.save(firstActivity);
+        if (createActiviteResult && createInstanceResult) {
+            return ;
+        } else {
+            logger.info("发起流程失败");
+            new CustomException(WorkflowCode.WORKFLOW_CREATE_FAIL);
+        }
+    }
 }

@@ -27,7 +27,12 @@ public class WorkflowNode implements Serializable {
     private static final long serialVersionUID=1L;
 
     /**
-     * 环节顺序，从0开始
+     * 环节功能 3 可实施
+     */
+    public static final String NODE_ABILITY_IMPL = "3";
+
+    /**
+     * 环节顺序，从1开始
      */
     public static Integer NODE_SORT=1;
 
@@ -69,6 +74,14 @@ public class WorkflowNode implements Serializable {
     @ApiModelProperty(value = "驳回位置顺序，从1开始")
     @TableField("REJECT_NUM")
     private Integer rejectNum;
+
+    @ApiModelProperty(value = "环节状态名")
+    @TableField(exist = false)
+    private Integer nodeStatus;
+
+    @ApiModelProperty(value = "环节状态")
+    @TableField(exist = false)
+    private String nodeStatusCode;
 
     @Override
     public String toString() {

@@ -94,9 +94,9 @@ public class PermissionManageController {
     }
 
     @ApiOperation("新增菜单")
-    @PostMapping("/create")
+    @PutMapping("/create")
     public QueryResponseResult<Permission> create(
-            @ModelAttribute Permission permission) {
+            @RequestBody Permission permission) {
         permission.setStatus(Permission.PERMISSION_STATUS_ENABLED);
         permission.setType(Permission.PERMISSION_TYPE_MENU);
         permissionService.save(permission);
@@ -104,9 +104,9 @@ public class PermissionManageController {
     }
 
     @ApiOperation("编辑菜单")
-    @PostMapping("/editPermission")
+    @PutMapping("/editPermission")
     public QueryResponseResult<Permission> edit(
-            @ModelAttribute Permission permission) {
+            @RequestBody Permission permission) {
         permissionService.updateById(permission);
         return QueryResponseResult.success(null);
     }

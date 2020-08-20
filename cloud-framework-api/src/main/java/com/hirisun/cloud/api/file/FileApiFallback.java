@@ -6,6 +6,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.hirisun.cloud.model.ncov.vo.file.FileVo;
 
+import java.util.List;
+
 /**
  * @author zhoufeng
  * @version 1.0
@@ -39,5 +41,11 @@ public class FileApiFallback implements FileApi {
         log.error("获取文件系统信息失败！");
         return "";
     }
+
+    @Override
+    public String getFileByIds(List<String> ids) {
+        return null;
+    }
+
 
 }

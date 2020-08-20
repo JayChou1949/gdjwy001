@@ -92,8 +92,8 @@ public class UserDocManageController {
     }
 
     @ApiOperation("新增文档")
-    @PostMapping("/saveOrUpdate")
-    public QueryResponseResult<UserDoc> saveOrUpdate(@LoginUser UserVO user, @ModelAttribute UserDoc devDoc) {
+    @PutMapping("/saveOrUpdate")
+    public QueryResponseResult<UserDoc> saveOrUpdate(@LoginUser UserVO user, @RequestBody UserDoc devDoc) {
         userDocService.saveOrUpdateUserDoc(user, devDoc);
         return QueryResponseResult.success(null);
     }

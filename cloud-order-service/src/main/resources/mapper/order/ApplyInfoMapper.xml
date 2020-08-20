@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.hirisun.cloud.order.mapper.ApplyInfoMapper">
+<mapper namespace="com.hirisun.cloud.order.mapper.apply.ApplyInfoMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.hirisun.cloud.order.bean.ApplyInfo">
+    <resultMap id="BaseResultMap" type="com.hirisun.cloud.order.bean.apply.ApplyInfo">
         <result column="ID" property="id" />
         <result column="COMPANY" property="company" />
         <result column="USER_NAME" property="userName" />
@@ -57,5 +57,58 @@
         <result column="NATIONAL_SPECIAL_PROJECT" property="nationalSpecialProject" />
         <result column="SERVICE_SOURCE" property="serviceSource" />
     </resultMap>
+
+    <sql id="publicQuery">
+        and ai.RESOURCE_TYPE = #{param.resourceType}
+        <choose>
+            <when test="param.status == null or param.status == ''">
+                AND ai.STATUS not in (-1,0)
+            </when>
+            <when test="param.status == 1">
+                AND ai.STATUS in (1,7,101,102)
+            </when>
+            <when test="param.status == 5">
+                AND ai.STATUS in (5,8)
+            </when>
+            <otherwise>
+                AND ai.STATUS = #{param.status}
+            </otherwise>
+        </choose>
+        <!-- 可以按申请人/申请单号查询 -->
+        <if test="param.userName != null and param.userName != ''">
+            AND ai.CREATOR_NAME like #{param.userName}
+        </if>
+        <if test="param.orderNumber != null and param.orderNumber !=''">
+            and  ai.ORDER_NUMBER like #{param.orderNumber}
+        </if>
+        <if test="param.appName != null and param.appName !=''">
+            and   ai.APP_NAME like #{param.appName}
+        </if>
+    </sql>
+
+    <select id="getPage" resultMap="BaseResultMap">
+        SELECT distinct(ai.id),ai.order_number,ai.CREATOR_NAME,ai.APPLY_TIME,ai.CREATOR_UNIT,ai.STATUS,ai.MODIFIED_TIME,ins.ID instanceId
+        from   T_WORKFLOW_ACTIVITY act,T_WORKFLOW_INSTANCE ins,T_APPLY_INFO ai
+        ,T_WORKFLOW_NODE m
+        <where>
+            and ai.ID=ins.BUSINESS_ID and act.INSTANCE_ID = ins.ID  and m.ID=act.NODE_ID
+            and act.HANDLE_PERSONS =#{user.idCard}
+            AND act.ACTIVITY_STATUS=0 AND act.ACTIVITY_TYPE is NULL
+            <if test="(param.startDate != null and param.startDate != '') and (param.endDate != null and param.endDate != '')">
+                AND TO_CHAR(ai.CREATE_TIME,'YYYY-MM-DD') &gt;= #{param.startDate}
+                AND TO_CHAR(ai.CREATE_TIME,'YYYY-MM-DD') &lt;= #{param.endDate}
+            </if>
+            <!-- 选择处理人为:我 -->
+            <if test="user.type != 100">
+                and (act.HANDLE_PERSONS =  #{user.idCard} or m.NOTICE_PERSION like concat(concat('%', #{user.idCard}),'%') )
+            </if>
+
+            <if test="param.serviceName != null and param.serviceName !=''">
+                and ai.SERVICE_TYPE_NAME like #{param.serviceName}
+            </if>
+            <include refid="publicQuery"/>
+        </where>
+        ORDER BY ai.MODIFIED_TIME DESC
+    </select>
 
 </mapper>

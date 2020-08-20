@@ -3,6 +3,7 @@ package com.hirisun.cloud.common.util;
 
 
 import com.hirisun.cloud.model.common.Tree;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,6 +39,37 @@ public class TreeUtils {
         }).sorted((menu1,menu2)->{
             return (int)((menu1.getSort()==null?999:menu1.getSort())-(menu2.getSort()==null?999:menu2.getSort()));
         }).collect(Collectors.toList());
+        levelMenus.forEach(dict->{
+            if (CollectionUtils.isEmpty(dict.getChildren())) {
+                dict.setChildren(null);
+            }
+        });
+        return levelMenus;
+    }
+
+    /**
+     * 将普通list数据转换成树形结构,从指点节点开始
+     */
+    public static List<? extends Tree> listWithTreeByPid(List<? extends Tree> list,String pid) {
+
+        /**
+         * 1.过滤出父节点
+         * 2.节点添加子集
+         * 3.排序
+         */
+        List<? extends Tree> levelMenus= list.stream().filter(nodeEntity ->
+                pid.equals(nodeEntity.getPid())
+        ).map((menu)->{
+            menu.setChildren(getChildrens(menu,list));
+            return menu;
+        }).sorted((menu1,menu2)->{
+            return (int)((menu1.getSort()==null?999:menu1.getSort())-(menu2.getSort()==null?999:menu2.getSort()));
+        }).collect(Collectors.toList());
+        levelMenus.forEach(dict->{
+            if (CollectionUtils.isEmpty(dict.getChildren())) {
+                dict.setChildren(null);
+            }
+        });
         return levelMenus;
     }
 
@@ -50,7 +82,11 @@ public class TreeUtils {
         }).sorted((menu1,menu2)->{
             return (int)((menu1.getSort()==null?999:menu1.getSort())-(menu2.getSort()==null?999:menu2.getSort()));
         }).collect(Collectors.toList());
-
+        levelMenus.forEach(dict->{
+            if (CollectionUtils.isEmpty(dict.getChildren())) {
+                dict.setChildren(null);
+            }
+        });
         return levelMenus;
     }
 }

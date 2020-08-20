@@ -1,6 +1,7 @@
 package com.hirisun.cloud.system.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hirisun.cloud.common.constant.RedisKey;
 import com.hirisun.cloud.common.util.UUIDUtil;
@@ -29,6 +30,18 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
     @Autowired
     private RedisService redisService;
 
+
+    /**
+     * 把数据字典数据表数据插入到redis中
+     * @return
+     */
+    @Override
+    public void syncSysDictData() {
+        List<SysDict> list = this.list(new QueryWrapper<>());
+        list.forEach(sysDict->{
+            redisService.leftPush(RedisKey.REDIS_SYS_DICT, JSON.toJSONString(sysDict) );
+        });
+    }
 
     /**
      * 获取数据字典

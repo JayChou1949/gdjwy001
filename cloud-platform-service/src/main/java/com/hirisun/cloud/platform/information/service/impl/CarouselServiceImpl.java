@@ -1,17 +1,26 @@
 package com.hirisun.cloud.platform.information.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.hirisun.cloud.api.file.FileApi;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
+import com.hirisun.cloud.model.file.FileSystemVO;
+import com.hirisun.cloud.platform.document.bean.DevDoc;
 import com.hirisun.cloud.platform.information.bean.Carousel;
 import com.hirisun.cloud.platform.information.mapper.CarouselMapper;
 import com.hirisun.cloud.platform.information.service.CarouselService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import springfox.documentation.spring.web.json.Json;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -23,6 +32,9 @@ import java.util.List;
  */
 @Service
 public class CarouselServiceImpl extends ServiceImpl<CarouselMapper, Carousel> implements CarouselService {
+
+    @Autowired
+    private FileApi fileApi;
 
     /**
      * 上/下移动轮播图位置
@@ -66,6 +78,116 @@ public class CarouselServiceImpl extends ServiceImpl<CarouselMapper, Carousel> i
             swapCarouselSortNum(targetCarousel,next);
         }
         return QueryResponseResult.success("操作成功");
+    }
+
+    @Override
+    public List<Carousel> allList(Integer type, String belong) {
+        //列表不查询新闻详情
+        LambdaQueryWrapper<Carousel> wrapper=new QueryWrapper<Carousel>().lambda()
+                .select(Carousel.class, info -> !info.getColumn().equals("CONTENT"));
+        switch(type){
+            case 1:
+                break;
+            case 2:
+                wrapper.like(Carousel::getArea,belong);
+                break;
+            case 3:
+                wrapper.like(Carousel::getPoliceCategory,belong);
+                break;
+            case 4:
+                wrapper.like(Carousel::getProject, belong);
+                break;
+            default:
+                break;
+        }
+        wrapper.eq(Carousel::getStatus,Carousel.STATUS_ONLINE);
+        wrapper.eq(Carousel::getProvincial, type);
+        wrapper.orderByAsc(Carousel::getSortNum);
+        wrapper.orderByDesc(Carousel::getUpdateTime);
+        List<Carousel> carouselList=this.list(wrapper);
+        // 循环查出实际图片路径
+        List<String> imageIds = carouselList.stream().map(Carousel::getImageId).distinct().collect(Collectors.toList());
+        String fileStr = fileApi.getFileByIds(imageIds);
+        List<FileSystemVO> fileList = new ArrayList<>();
+        if (!StringUtils.isEmpty(fileStr)) {
+            fileList = JSON.parseArray(fileStr, FileSystemVO.class);
+        }
+        for (Carousel carousel : carouselList) {
+            for (FileSystemVO fileSystemVO : fileList) {
+                if (carousel.getImageId().equals(fileSystemVO.getId())) {
+                    carousel.setRealUrl(fileSystemVO.getFilePath());
+                    break;
+                }
+            }
+        }
+        return carouselList;
+    }
+
+    @Override
+    public Page<Carousel> getPage(Integer pageNum, Integer pageSize,Integer status,Integer type,String belong,String title) {
+        //列表不查询轮播图详情
+        LambdaQueryWrapper<Carousel> wrapper=new QueryWrapper<Carousel>().lambda()
+                .select(Carousel.class, info -> !info.getColumn().equals("CONTENT"));
+        switch(type){
+            case 1:
+                break;
+            case 2:
+                wrapper.like(Carousel::getArea,belong);
+                break;
+            case 3:
+                wrapper.like(Carousel::getPoliceCategory,belong);
+                break;
+            case 4:
+                wrapper.like(Carousel::getProject, belong);
+                break;
+            default:
+                break;
+        }
+        //查询未上线
+        if(status==null||status.equals(0)){
+            wrapper.in(Carousel::getStatus,Carousel.STATUS_AUDIT,Carousel.STATUS_REJECT);
+        }else{//已上线
+            wrapper.eq(Carousel::getStatus,status);
+        }
+        if (!org.apache.commons.lang3.StringUtils.isEmpty(title)) {
+            wrapper.like(Carousel::getTitle,title);
+        }
+        wrapper.eq(Carousel::getProvincial, type);
+        wrapper.orderByAsc(Carousel::getSortNum);
+        Page<Carousel> page = new Page<>();
+        page.setCurrent(pageNum);
+        page.setSize(pageSize);
+        page=this.page(page,wrapper);
+        List<Carousel> records = page.getRecords();
+        // 循环查出实际图片路径
+        List<String> imageIds = records.stream().map(Carousel::getImageId).distinct().collect(Collectors.toList());
+        String fileStr = fileApi.getFileByIds(imageIds);
+        List<FileSystemVO> fileList = new ArrayList<>();
+        if (!StringUtils.isEmpty(fileStr)) {
+            fileList = JSON.parseArray(fileStr, FileSystemVO.class);
+        }
+        for (Carousel carousel : records) {
+            for (FileSystemVO fileSystemVO : fileList) {
+                if (carousel.getImageId().equals(fileSystemVO.getId())) {
+                    carousel.setRealUrl(fileSystemVO.getFilePath());
+                    break;
+                }
+            }
+        }
+        return page;
+    }
+
+    @Override
+    public Carousel getCarouselDetail(String id) {
+        Carousel carousel = this.getById(id);
+        if (carousel != null) {
+            String fileStr = fileApi.getFileSystemInfo(carousel.getImageId());
+            if (!StringUtils.isEmpty(fileStr)) {
+                FileSystemVO fileSystemVO = JSON.parseObject(fileStr, FileSystemVO.class);
+                carousel.setRealUrl(fileSystemVO.getFilePath());
+            }
+        }
+        return carousel;
     }
 
     /**

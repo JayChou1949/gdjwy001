@@ -2,7 +2,6 @@ package com.hirisun.cloud.workflow.bean;
 
 import com.baomidou.mybatisplus.annotation.*;
 
-import java.time.LocalDateTime;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.LinkedList;
@@ -58,12 +57,12 @@ public class Workflow implements Serializable {
 
     @ApiModelProperty(value = "创建时间")
     @TableField(value = "CREATE_TIME", fill = FieldFill.INSERT)
-    @JsonFormat(pattern = "YYYY-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date createTime;
 
     @ApiModelProperty(value = "修改时间")
     @TableField(value = "MODIFIED_TIME", fill = FieldFill.INSERT_UPDATE)
-    @JsonFormat(pattern = "YYYY-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "YYYY-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date modifiedTime;
 
     @ApiModelProperty(value = "默认流程标记")
@@ -99,9 +98,9 @@ public class Workflow implements Serializable {
     private String creatorOrgId;
 
 
-//    @ApiModelProperty(value = "环节列表")
-//    @TableField(exist = false)
-//    private LinkedList<WorkflowNode> nodeList;
+    @ApiModelProperty(value = "环节列表")
+    @TableField(exist = false)
+    private LinkedList<WorkflowNode> nodeList;
 
     @Override
     public String toString() {

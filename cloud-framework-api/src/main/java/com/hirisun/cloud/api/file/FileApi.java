@@ -1,6 +1,7 @@
 package com.hirisun.cloud.api.file;
 
 import feign.form.spring.SpringFormEncoder;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
@@ -10,6 +11,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import springfox.documentation.annotations.ApiIgnore;
+
+import java.util.List;
 
 
 /**
@@ -19,7 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @data 2020/7/9 14:30
  * @description
  */
-@FeignClient(name = "cloud-file-service", fallback = FileApiFallback.class,configuration = FileApi.FeignMultipartConfig.class)
+@FeignClient(name = "cloud-file-service",configuration = FileApi.FeignMultipartConfig.class)
 public interface FileApi {
 
     /**
@@ -70,4 +74,14 @@ public interface FileApi {
             return new SpringFormEncoder(new SpringEncoder(messageConverters));
         }
     }
+
+    /**
+     * 根据文件ID串获得多个文件
+     *
+     * @param ids 文件ID串，用逗号分割
+     * @return
+     */
+    @ApiOperation(value = "根据文件ID串获得文件系统信息")
+    @GetMapping("/file/file/getFileByIds")
+    public String getFileByIds(@RequestParam("ids") List<String> ids);
 }

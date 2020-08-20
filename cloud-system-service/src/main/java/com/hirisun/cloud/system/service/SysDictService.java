@@ -20,4 +20,6 @@ public interface SysDictService extends IService<SysDict> {
     void saveOrUpdateDict(SysDict sysDict);
 
     void removeDict(String id);
+
+    void syncSysDictData();
 }

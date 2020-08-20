@@ -2,7 +2,6 @@ package com.hirisun.cloud.system.bean;
 
 import com.baomidou.mybatisplus.annotation.*;
 
-import java.time.LocalDateTime;
 import java.io.Serializable;
 import java.util.Date;
 

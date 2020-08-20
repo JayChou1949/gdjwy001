@@ -3,7 +3,7 @@ package com.hirisun.cloud.model.user;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * @author zhoufeng
@@ -82,10 +82,10 @@ public class UserVO {
     private String sex;
 
     @ApiModelProperty(value = "出生日期")
-    private LocalDateTime birth;
+    private Date birth;
 
     @ApiModelProperty(value = "创建时间")
-    private LocalDateTime createTime;
+    private Date createTime;
 
     @ApiModelProperty(value = "照片id")
     private String photo;

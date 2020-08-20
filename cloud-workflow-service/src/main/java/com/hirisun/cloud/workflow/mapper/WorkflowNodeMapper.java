@@ -1,7 +1,9 @@
 package com.hirisun.cloud.workflow.mapper;
 
+import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.workflow.bean.WorkflowNode;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
@@ -12,5 +14,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @since 2020-08-05
  */
 public interface WorkflowNodeMapper extends BaseMapper<WorkflowNode> {
+
+    WorkflowNode getNextNodeById(@Param("id") String id);
 
 }

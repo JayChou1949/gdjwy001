@@ -9,6 +9,10 @@ public enum OrderCode implements ResultCode {
     WORKFLOW_ACTIVITY_MISSING(2503,"未找到对应的流程活动信息!"),
     WORKFLOW_MISSING(2504,"流程未找到!"),
     CREATE_ORDER_NUMER_ERROR(2505,"申请单号生成错误,请重试!"),
+    USER_SELECT_ERROR(2506, "用户查询失败！"),
+    APPLY_MISSING(2507,"审批信息未找到!"),
+    USER_CANT_EDIT_OTHER_USER_APPLY(2508,"只能删除自己的申请!"),
+    FALLBACK_ID_NOT_NULL(2508,"回退环节ID不能为空,回退失败!")
     ;
     /**
      * 状态码

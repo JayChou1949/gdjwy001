@@ -1,12 +1,11 @@
 package com.hirisun.cloud.platform.document.bean;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.io.Serializable;
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -54,12 +53,25 @@ public class UserDoc implements Serializable {
     @TableField("UPDATE_TIME")
     private Date updateTime;
 
+    @ApiModelProperty(value = "创建时间")
+    @TableField(value = "CREATE_TIME", fill = FieldFill.INSERT)
+    @JsonFormat(pattern = "YYYY-MM-dd HH:mm:ss")
+    private Date createTime;
+
     @ApiModelProperty(value = "文件id")
     @TableField("FILE_ID")
     private String fileId;
 
     @TableField(exist = false)
     private String fileUrl;
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
 
     public String getFileId() {
         return fileId;

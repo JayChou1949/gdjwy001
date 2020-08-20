@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.util.List;
+
 /**
  * @author zhoufeng
  * @version 1.0
@@ -63,6 +65,14 @@ public class FileController implements FileApi {
     @Override
     public String getFileSystemInfo(@PathVariable("id") String id) {
         FileSystem fileSystem = fileService.getFileSystemById(id);
+        return JSON.toJSONString(fileSystem);
+    }
+    @ApiIgnore
+    @ApiOperation(value = "根据文件ID串获得文件系统信息")
+    @GetMapping("/file/getFileByIds")
+    @Override
+    public String getFileByIds(@RequestParam("ids") List<String> ids) {
+        List<FileSystem> fileSystem = fileService.getFileByIds(ids);
         return JSON.toJSONString(fileSystem);
     }
 

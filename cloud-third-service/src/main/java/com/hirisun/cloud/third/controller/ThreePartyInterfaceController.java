@@ -130,7 +130,7 @@ public class ThreePartyInterfaceController {
      * jsonobject 带上分页信息
      */
     @ApiOperation("数据目录列表")
-    @RequestMapping(value = "/pageQuery", method = RequestMethod.POST)
+    @RequestMapping(value = "/pageQuery", method = {RequestMethod.PUT, RequestMethod.POST})
     public Object pageQuery(@RequestBody JSONObject jsonObject)throws Exception {
         String jsonString = jsonObject.getJSONObject("dataJson").toJSONString();
         jsonObject.remove("dataJson");

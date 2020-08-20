@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * <p>
@@ -53,9 +53,9 @@ public class ApplyInfoVO implements Serializable {
     @ApiModelProperty(value = "资源类型 1:IAAS 2:DAAS 3:PAAS 4:saas应用 5saas服务")
     private Integer resourceType;
 
-    private LocalDateTime createTime;
+    private Date createTime;
 
-    private LocalDateTime modifiedTime;
+    private Date modifiedTime;
 
     @ApiModelProperty(value = "申请人姓名")
     private String creatorName;
@@ -112,7 +112,7 @@ public class ApplyInfoVO implements Serializable {
     @ApiModelProperty(value = "警种")
     private String policeCategory;
 
-    private LocalDateTime applyTime;
+    private Date applyTime;
 
     @ApiModelProperty(value = "申请人单位")
     private String creatorUnit;

@@ -1,8 +1,11 @@
 package com.hirisun.cloud.platform.information.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.platform.information.bean.Carousel;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
 
 /**
  * <p>
@@ -23,4 +26,9 @@ public interface CarouselService extends IService<Carousel> {
      */
     QueryResponseResult<Carousel> movePosition(String type, String id, Integer provincial, String  belong);
 
+    List<Carousel> allList(Integer type,String belong);
+
+    Page<Carousel> getPage(Integer pageNum, Integer pageSize,Integer status,Integer type,String belong,String title);
+
+    Carousel getCarouselDetail(String id);
 }

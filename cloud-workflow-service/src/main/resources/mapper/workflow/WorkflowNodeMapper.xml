@@ -18,4 +18,10 @@
         <result column="REJECT_NUM" property="rejectNum" />
     </resultMap>
 
+    <select id="getNextNodeById" resultMap="BaseResultMap">
+        select r.* from t_workflow_node l left join T_WORKFLOW_NODE r on l.NODE_SORT+1=r.NODE_SORT and l.WORKFLOW_ID=r.WORKFLOW_ID and l.VERSION=r.VERSION
+
+        where l.id=#{id} and r.id is not null
+    </select>
+
 </mapper>

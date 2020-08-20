@@ -1,5 +1,8 @@
 package com.hirisun.cloud.file.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hirisun.cloud.common.exception.ExceptionCast;
 import com.hirisun.cloud.file.bean.FileSystem;
 import com.hirisun.cloud.file.mapper.FileSystemMapper;
@@ -17,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author zhoufeng
@@ -28,7 +32,7 @@ import java.util.Date;
 @RefreshScope
 @Slf4j
 @Service
-public class FileServiceImpl implements FileService {
+public class FileServiceImpl extends ServiceImpl<FileSystemMapper, FileSystem> implements FileService {
 
     /**
      * trackerServer 地址
@@ -149,7 +153,6 @@ public class FileServiceImpl implements FileService {
         }
         return 0;
 
-
     }
 
     @Override
@@ -182,6 +185,12 @@ public class FileServiceImpl implements FileService {
     @Override
     public FileSystem getFileSystemById(String fileId) {
         return fileSystemMapper.selectById(fileId);
+    }
+
+    @Override
+    public List<FileSystem> getFileByIds(List<String> fileIds) {
+        return this.list(new QueryWrapper<FileSystem>().lambda()
+                .in(FileSystem::getId, fileIds));
     }
 
 	@Override

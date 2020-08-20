@@ -51,6 +51,14 @@ public class WorkflowNodeVO implements Serializable {
     @ApiModelProperty(value = "驳回位置顺序，从1开始")
     private Integer rejectNum;
 
+    @ApiModelProperty(value = "环节状态名")
+    private Integer nodeStatus;
+
+    @ApiModelProperty(value = "环节状态")
+    private String nodeStatusCode;
+
+
+
     @Override
     public String toString() {
         return "WorkflowNode{" +

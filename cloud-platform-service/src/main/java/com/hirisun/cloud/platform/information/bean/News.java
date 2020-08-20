@@ -1,9 +1,7 @@
 package com.hirisun.cloud.platform.information.bean;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -77,6 +75,11 @@ public class News implements Serializable {
     @JsonFormat(pattern = "YYYY-MM-dd HH:mm:ss")
     private Date updateTime;
 
+    @ApiModelProperty(value = "创建时间")
+    @TableField(value = "CREATE_TIME", fill = FieldFill.INSERT)
+    @JsonFormat(pattern = "YYYY-MM-dd HH:mm:ss")
+    private Date createTime;
+
     @ApiModelProperty(value = "状态, 0:审核中 1: 待上线 2: 上线 3:驳回 4:删除")
     @TableField("STATUS")
     private Long status;
@@ -127,6 +130,13 @@ public class News implements Serializable {
     @TableField("PROJECT")
     private String project;
 
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
 
     public String getId() {
         return id;

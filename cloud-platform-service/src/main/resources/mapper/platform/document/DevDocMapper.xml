@@ -15,19 +15,19 @@
         <result column="FIRST_CLASS" property="firstClass" />
         <result column="SECOND_CLASS" property="secondClass" />
         <result column="INTRO" property="intro" />
-        <result column="FILE_ID" property="fileId" />
-        <result column="FILE_URL" property="fileUrl" />
+        <result column="CREATE_TIME" property="createTime" />
     </resultMap>
 
     <sql id="column_exclude_content">
-        D.ID,D.TITLE,D.IMAGE,D.UPDATE_TIME,D.SORT_NUM,D.INTRO,D.FILE_ID
+        D.ID,D.TITLE,D.IMAGE,D.UPDATE_TIME,D.SORT_NUM,D.INTRO
     </sql>
 
     <select id="getPage" resultType="com.hirisun.cloud.platform.document.bean.DevDoc">
         SELECT
         <include refid="column_exclude_content" />,
         (SELECT c1.NAME FROM T_DEV_DOC_CLASS c1 WHERE D.FIRST_CLASS = c1.ID) AS firstClassName,
-        (SELECT c2.NAME FROM T_DEV_DOC_CLASS c2 WHERE D.SECOND_CLASS = c2.ID) AS secondClassName
+        (SELECT c2.NAME FROM T_DEV_DOC_CLASS c2 WHERE D.SECOND_CLASS = c2.ID) AS secondClassName,
+        (SELECT COUNT(*) FROM T_DEV_DOC_FILE F WHERE F.DOC_ID = D.ID) AS num
         FROM T_DEV_DOC D
         WHERE
         <choose>
@@ -58,7 +58,7 @@
            2.后台管理分数据权限
            -->
         <if test="user != null and user.type != 100 and !param.isFront">
-            AND D.CREATOR = #{ser.idcard}
+            AND D.CREATOR = #{ser.idCard}
         </if>
 
         ORDER BY D.SORT_NUM ASC, D.UPDATE_TIME DESC

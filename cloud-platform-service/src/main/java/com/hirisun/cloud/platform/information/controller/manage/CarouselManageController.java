@@ -56,39 +56,7 @@ public class CarouselManageController {
         if(NewsParamUtil.checkUserInfomationPermission(user,type,belong)){
             return QueryResponseResult.fail("无权查看该区域数据");
         }
-        //列表不查询轮播图详情
-        LambdaQueryWrapper<Carousel> wrapper=new QueryWrapper<Carousel>().lambda()
-                .select(Carousel.class, info -> !info.getColumn().equals("CONTENT"));
-        switch(type){
-            case 1:
-                break;
-            case 2:
-                wrapper.like(Carousel::getArea,belong);
-                break;
-            case 3:
-                wrapper.like(Carousel::getPoliceCategory,belong);
-                break;
-            case 4:
-                wrapper.like(Carousel::getProject, belong);
-                break;
-            default:
-                break;
-        }
-        //查询未上线
-        if(status==null||status.equals(0)){
-            wrapper.in(Carousel::getStatus,Carousel.STATUS_AUDIT,Carousel.STATUS_REJECT);
-        }else{//已上线
-            wrapper.eq(Carousel::getStatus,status);
-        }
-        if (!StringUtils.isEmpty(title)) {
-            wrapper.like(Carousel::getTitle,title);
-        }
-        wrapper.eq(Carousel::getProvincial, type);
-        wrapper.orderByAsc(Carousel::getSortNum);
-        Page<Carousel> page = new Page<>();
-        page.setCurrent(pageNum);
-        page.setSize(pageSize);
-        page=carouselService.page(page,wrapper);
+        Page<Carousel> page = carouselService.getPage(pageNum, pageSize, status, type, belong, title);
         return QueryResponseResult.success(page);
     }
 
@@ -98,15 +66,15 @@ public class CarouselManageController {
     @ApiOperation("轮播图详情")
     @GetMapping("/carouselDetail")
     public QueryResponseResult<Carousel> detail(@ApiParam(value = "轮播图id",required = true) @RequestParam String id) {
-        Carousel carousel = carouselService.getById(id);
+        Carousel carousel = carouselService.getCarouselDetail(id);
         return QueryResponseResult.success(carousel);
     }
     /**
      * 创建轮播图
      */
     @ApiOperation("创建轮播图")
-    @PostMapping("/create")
-    public QueryResponseResult<Carousel> create(@LoginUser UserVO user, @ModelAttribute Carousel carousel) {
+    @PutMapping("/create")
+    public QueryResponseResult<Carousel> create(@LoginUser UserVO user, @RequestBody Carousel carousel) {
         /**
          * 1.判断管理员类型
          * 2.判断管理员是否越权
@@ -152,8 +120,8 @@ public class CarouselManageController {
      * 编辑轮播图
      */
     @ApiOperation("编辑轮播图")
-    @PostMapping("/edit")
-    public QueryResponseResult<Carousel> edit(@LoginUser UserVO user,@ModelAttribute Carousel carousel) {
+    @PutMapping("/edit")
+    public QueryResponseResult<Carousel> edit(@LoginUser UserVO user,@RequestBody Carousel carousel) {
         /**
          * 1.判断管理员类型
          * 2.判断管理员是否越权

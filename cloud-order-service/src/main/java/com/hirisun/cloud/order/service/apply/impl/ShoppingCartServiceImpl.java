@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import com.hirisun.cloud.order.continer.ShoppingCartStatus;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -133,7 +134,7 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
             }
             WorkflowInstanceVO instance = JSON.parseObject(instanceStr, WorkflowInstanceVO.class);
 
-            String activityStr = workflowApi.getWorkflowActivityByParams(WorkflowActivityVO.STATUS_WAITING,instance.getId());
+            String activityStr = workflowApi.getOneWorkflowActivityByParams(WorkflowActivityVO.STATUS_WAITING,instance.getId());
             if (StringUtils.isEmpty(activityStr)) {
                 logger.info("未找到对应的流程活动信息！");
                 throw new CustomException(OrderCode.WORKFLOW_ACTIVITY_MISSING);
@@ -152,7 +153,13 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
                 logger.info("未找到对应的流程环节信息！");
                 throw new CustomException(OrderCode.WORKFLOW_MISSING);
             }
-            WorkflowNodeVO nextNode=JSON.parseObject(nodeStr, WorkflowNodeVO.class);
+            WorkflowNodeVO nextNode=null;
+            List<WorkflowNodeVO> nextNodeList=JSON.parseArray(nodeStr, WorkflowNodeVO.class);
+            if (CollectionUtils.isNotEmpty(nextNodeList)) {
+                nextNode = nextNodeList.get(0);
+            }else{
+                throw new CustomException(OrderCode.WORKFLOW_MISSING);
+            }
 
             //环节处理人map key:环节ID value:审核人id ，分割
             modelMapToPerson.put(nextNode.getId(),
@@ -175,6 +182,26 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
     }
 
     /**
+     * 地市提交流程申请
+     * @param submitRequest
+     */
+    @Override
+    public void workflowSubmitByArea(SubmitRequest submitRequest,String ids,String area) {
+        logger.info("submitRequest -> {}",submitRequest);
+        ApplyInfo baseInfo = submitRequest.convertToApplicationInfo();
+        logger.info("baseInfo -> {}",baseInfo);
+        //根据购物车生成订单(其中包括订单选择哪个流程，用于后面的发起流程)
+        ApplyInfo info = configAndSaveBaseInfoByArea(baseInfo);
+        /**
+         * TODO 保存第三方提交数据为json
+         */
+
+        String flag=workflowApi.launchInstanceByArea(baseInfo.getCreatorName(),info.getId(),"IAAS");
+        logger.info("launchInstanceByArea:{}",flag);
+
+    }
+
+    /**
      * 获取当前用户选择Item中，待提交状态的Item。
      * @param idCard 当前用户身份证号
      * @param ids 购物车Items的Id字符串
@@ -187,11 +214,10 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
         }
         List<String> idList = Splitter.on(",").omitEmptyStrings().trimResults().splitToList(ids);
 
-//        return this.list(new QueryWrapper<ShoppingCart>().lambda()
-//                .eq(ShoppingCart::getCreatorIdCard,idCard)
-//                .eq(ShoppingCart::getStatus,ShoppingCart.STATUS_WAIT_SUBMIT)
-//                .in(ShoppingCart::getId,idList));
-        return null;
+        return this.list(new QueryWrapper<ShoppingCart>().lambda()
+                .eq(ShoppingCart::getCreatorIdCard,idCard)
+                .eq(ShoppingCart::getStatus, ShoppingCartStatus.WAIT_SUBMIT)
+                .in(ShoppingCart::getId,idList));
 
 
     }
@@ -223,25 +249,52 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
         info.setServiceTypeId(shoppingCart.getServiceTypeId());
         info.setServiceTypeName(shoppingCart.getServiceTypeName());
         //流程选择（重要选择流程逻辑）
-//        String workflowStr = workflowApi.chooseWorkFlow(
-//                shoppingCart.getResourceType(),
-//                info.getServiceTypeId(),
-//                info.getAreaName(),
-//                info.getPoliceCategory(),
-//                info.getNationalSpecialProject());
+        String workflowStr = workflowApi.chooseWorkFlow(
+                shoppingCart.getResourceType().intValue(),
+                info.getServiceTypeId(),
+                info.getAreaName(),
+                info.getPoliceCategory(),
+                info.getNationalSpecialProject());
 
 
-//        if(StringUtils.isEmpty(workflowStr)){
-//            logger.error("购物车ID:{} 资源类型:{} 地市:{} 警种: {} 服务ID:{} 国家专项:{}",shoppingCart.getId(),shoppingCart.getResourceType(),info.getAreaName(),info.getPoliceCategory(),info.getServiceTypeId(),info.getNationalSpecialProject());
-//            throw new CustomException(OrderCode.WORKFLOW_MISSING);
-//        }
-//        WorkflowVO workflow = JSON.parseObject(workflowStr, WorkflowVO.class);
-//        info.setWorkFlowId(workflow.getId());
-//        info.setResourceType(shoppingCart.getResourceType());
-//        info.setFormNum(shoppingCart.getFormNum());
-//        info.setOrderNumber(genOrderNum());
-//        info.setHwPoliceCategory(AreaPoliceCategoryUtils.getPoliceCategory(baseInfo.getAppName()));
-//        applyInfoService.save(info);
+        if(StringUtils.isEmpty(workflowStr)){
+            logger.error("购物车ID:{} 资源类型:{} 地市:{} 警种: {} 服务ID:{} 国家专项:{}",shoppingCart.getId(),shoppingCart.getResourceType(),info.getAreaName(),info.getPoliceCategory(),info.getServiceTypeId(),info.getNationalSpecialProject());
+            throw new CustomException(OrderCode.WORKFLOW_MISSING);
+        }
+        WorkflowVO workflow = JSON.parseObject(workflowStr, WorkflowVO.class);
+        info.setWorkFlowId(workflow.getId());
+        info.setResourceType(shoppingCart.getResourceType().intValue());
+        info.setFormNum(shoppingCart.getFormNum());
+        info.setOrderNumber(genOrderNum());
+        info.setHwPoliceCategory(AreaPoliceCategoryUtils.getPoliceCategory(baseInfo.getAppName()));
+        applyInfoService.save(info);
+        return info;
+    }
+    /**
+     * 配置和保存购物车订单
+     * @param baseInfo  申请工单
+     */
+    private ApplyInfo configAndSaveBaseInfoByArea(ApplyInfo baseInfo){
+        /**
+         * 1. iaas和paas申请从购物车中取申请说明，daas和saas从申请单中取申请说明
+         * 2. 根据资源类型、地市、警种、国家专项、服务是否绑定流程等信息，获取到服务对应的申请流程
+         */
+        ApplyInfo info = new ApplyInfo();
+        BeanUtils.copyProperties(baseInfo,info);
+        info.setId(UUIDUtil.getUUID());
+        logger.debug("ID -> {}",info.getId());
+        info.setCreator(null);
+        info.setCreatorName(null);
+        info.setStatus(ApplyInfoStatus.SHOPPING_CART.getCode());
+        info.setExplanation(baseInfo.getExplanation());
+        info.setServiceTypeId(baseInfo.getServiceTypeId());
+        info.setServiceTypeName(baseInfo.getServiceTypeName());
+
+        info.setResourceType(baseInfo.getResourceType());
+//        info.setFormNum(baseInfo.getFormNum());
+        info.setOrderNumber(genOrderNum());
+        info.setHwPoliceCategory(AreaPoliceCategoryUtils.getPoliceCategory(baseInfo.getAppName()));
+        applyInfoService.save(info);
         return info;
     }
     private String genOrderNum() {

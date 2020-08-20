@@ -25,7 +25,7 @@ public class SysDict extends Tree<SysDict> implements Serializable {
 
     private static final long serialVersionUID=1L;
 
-    @TableId(value = "ID", type = IdType.ASSIGN_UUID)
+    @TableId(value = "ID")
     private String id;
 
     @ApiModelProperty(value = "排序")

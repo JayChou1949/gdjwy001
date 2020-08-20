@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author wuxiaoxing
@@ -185,12 +186,29 @@ public class UserManageController {
      * @return
      */
     @ApiIgnore
-    @ApiOperation("根据用户身份证获取用户角色")
+    @ApiOperation("根据用户身份证查询用户")
     @GetMapping("/feign/getUserByIdCard")
     public String getUserByIdCard(@ApiParam(value = "用户身份证", required = true) @RequestParam String idCard) {
 
         User user = userService.getOne(new QueryWrapper<User>().lambda().eq(User::getIdCard, idCard));
         return JSON.toJSONString(user);
+    }
+
+    /**
+     * feign调用，提供查询用户方法，根据id list查询多个用户
+     *
+     * @param idCardList
+     * @return
+     */
+    @ApiIgnore
+    @ApiOperation("根据用户身份证列表获取用户列表")
+    @GetMapping("/feign/getUserByIdCardList")
+    public String getUserByIdCardList(@ApiParam(value = "用户身份证列表", required = true) @RequestParam List<String> idCardList) {
+        List<String> distinctIdCardList = idCardList.stream().distinct().collect(Collectors.toList());
+
+        List<User> userList = userService.list(new QueryWrapper<User>().lambda().in(User::getIdCard, idCardList).isNotNull(User::getName));
+
+        return JSON.toJSONString(userList);
     }
 
 }

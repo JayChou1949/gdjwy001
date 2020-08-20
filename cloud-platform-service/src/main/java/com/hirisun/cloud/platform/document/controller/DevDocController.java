@@ -76,14 +76,9 @@ public class DevDocController {
     @ApiOperation("开发文档详情")
     @GetMapping("/devDocDetail")
     public QueryResponseResult<DevDoc> detail(@ApiParam(value = "开发文档id",required = true) @RequestParam String id) {
-        DevDoc document = devDocService.getById(id);
+        Map map=devDocService.getDetailById(id);
+        return QueryResponseResult.success(map);
 
-        //TODO 与文件绑定
-//        List<Files> filesList = this.findDocList(document.getId());
-//        if(filesList != null) {
-//            document.setFilesList(filesList);
-//        }
-        return QueryResponseResult.success(document);
     }
 
     /**

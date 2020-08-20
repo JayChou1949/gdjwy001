@@ -1,8 +1,6 @@
 package com.hirisun.cloud.order.bean.apply;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hirisun.cloud.model.user.UserVO;
 import io.swagger.annotations.ApiModel;
@@ -10,7 +8,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -29,7 +26,7 @@ public class ApplyInfo<S, I> implements Serializable {
 
     private static final long serialVersionUID=1L;
 
-    @TableField("ID")
+    @TableId(value = "ID", type = IdType.ASSIGN_UUID)
     private String id;
 
     @ApiModelProperty(value = "开发公司")
@@ -157,7 +154,8 @@ public class ApplyInfo<S, I> implements Serializable {
     private String policeCategory;
 
     @TableField("APPLY_TIME")
-    private LocalDateTime applyTime;
+    @JsonFormat(pattern = "YYYY-MM-dd HH:mm:ss")
+    private Date applyTime;
 
     @ApiModelProperty(value = "申请人单位")
     @TableField("CREATOR_UNIT")
@@ -396,6 +394,9 @@ public class ApplyInfo<S, I> implements Serializable {
      */
     @TableField(exist = false)
     private String explanationSaas;
+
+    @TableField(exist = false)
+    private String instanceId;
 
 
     @Override

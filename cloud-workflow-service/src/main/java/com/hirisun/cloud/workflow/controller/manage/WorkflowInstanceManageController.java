@@ -57,6 +57,20 @@ public class WorkflowInstanceManageController {
     }
 
     /**
+     * 执行保存应用申请实例
+     * @param flowId    流程id
+     * @param businessId    服务id
+     */
+    @ApiIgnore
+    @ApiOperation("执行保存应用申请实例")
+    @PostMapping("/feign/launchInstanceByArea")
+    public String  launchInstanceByArea(@RequestParam String creatorName,@RequestParam  String flowId,@RequestParam String businessId) throws Exception {
+        logger.info("/feign/launchInstanceByArea：{},{},{}",creatorName,flowId,businessId);
+        workflowInstanceService.launchInstanceByArea(creatorName, flowId, businessId);
+        return "success";
+    }
+
+    /**
      * 根据服务id获取流程实例
      * @param businessId    服务id
      */
@@ -67,6 +81,19 @@ public class WorkflowInstanceManageController {
         logger.info("/feign/getWorkflowInstanceByBusinessId：{}",businessId);
         WorkflowInstance instance = workflowInstanceService.getOne(new QueryWrapper<WorkflowInstance>().lambda().eq(WorkflowInstance::getBusinessId,businessId));
         return JSON.toJSONString(instance);
+    }
+
+    /**
+     * 根据流程实例id获取流程实例信息
+     */
+    @ApiIgnore
+    @ApiOperation("根据流程实例id获取流程实例信息")
+    @PostMapping("/feign/getInstanceById")
+    public String getInstanceById(@RequestParam String instanceId) {
+        logger.info("/feign/getInstanceById：{}",instanceId);
+
+        WorkflowInstance workflowInstance = workflowInstanceService.getById(instanceId);
+        return JSON.toJSONString(workflowInstance);
     }
 
 }

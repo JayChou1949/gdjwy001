@@ -13,4 +13,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface WorkflowNodeService extends IService<WorkflowNode> {
 
+    WorkflowNode getNextNodeById(String nodeId);
+
 }

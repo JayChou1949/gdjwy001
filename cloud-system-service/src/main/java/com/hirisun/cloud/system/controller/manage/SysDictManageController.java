@@ -9,12 +9,14 @@ import com.hirisun.cloud.system.service.SysDictService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -42,8 +44,8 @@ public class SysDictManageController {
     }
 
     @ApiOperation("添加/修改字典")
-    @PostMapping("/saveOrUpdate")
-    public QueryResponseResult<SysDict> saveOrUpdate(@ModelAttribute SysDict sysDict) {
+    @PutMapping("/saveOrUpdate")
+    public QueryResponseResult<SysDict> saveOrUpdate(@RequestBody SysDict sysDict) {
         sysDictService.saveOrUpdateDict(sysDict);
         return QueryResponseResult.success(sysDict);
     }
@@ -60,7 +62,16 @@ public class SysDictManageController {
          * 查询相关的数据
          */
         List<SysDict> sysDictList = sysDictService.getSysDictList();
-        sysDictList=(List<SysDict>)TreeUtils.listWithTree(sysDictList);
+        SysDict targetSysDict=null;
+        Optional<SysDict> target=sysDictList.stream().filter(item->item.getValue()!=null&&item.getValue().equals(value)).findFirst();
+        if(target.isPresent()){
+            targetSysDict= target.get();
+        }
+        if(StringUtils.isEmpty(targetSysDict.getPid())){
+            sysDictList=(List<SysDict>)TreeUtils.listWithTree(sysDictList);
+        }else{
+            sysDictList=(List<SysDict>)TreeUtils.listWithTreeByPid(sysDictList,targetSysDict.getPid());
+        }
         sysDictList=sysDictList.stream().filter(item->item.getValue()!=null&&item.getValue().equals(value)).collect(Collectors.toList());
         return QueryResponseResult.success(sysDictList);
     }
@@ -85,6 +96,14 @@ public class SysDictManageController {
         sysDictList=(List<SysDict>)TreeUtils.listWithTree(sysDictList);
         sysDictList=sysDictList.stream().filter(item->item.getValue()!=null&&item.getValue().equals(value)).collect(Collectors.toList());
         return JSON.toJSONString(sysDictList);
+    }
+
+    @ApiIgnore
+    @ApiOperation(value = "同步数据字典数据表数据到redis")
+    @GetMapping("/syncSysDictData")
+    public String syncSysDictData() {
+        sysDictService.syncSysDictData();
+        return JSON.toJSONString(null);
     }
 }
 

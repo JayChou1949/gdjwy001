@@ -38,8 +38,8 @@ public class SysRoleManageController {
     }
 
     @ApiOperation("创建角色")
-    @PostMapping("/create")
-    public QueryResponseResult create(@ModelAttribute SysRole role) {
+    @PutMapping("/create")
+    public QueryResponseResult create(@RequestBody SysRole role) {
         if (role == null) {
             return QueryResponseResult.success("缺少参数");
         }
@@ -49,8 +49,8 @@ public class SysRoleManageController {
     }
 
     @ApiOperation("修改角色")
-    @PostMapping("/edit")
-    public QueryResponseResult<SysRole> edit(@ModelAttribute SysRole role) {
+    @PutMapping("/edit")
+    public QueryResponseResult<SysRole> edit(@RequestBody SysRole role) {
         if (role == null || StringUtils.isEmpty(role.getId())) {
             return QueryResponseResult.success("缺少参数");
         }

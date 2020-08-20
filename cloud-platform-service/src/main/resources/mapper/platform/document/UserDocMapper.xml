@@ -14,6 +14,7 @@
         <result column="UPDATE_TIME" property="updateTime" />
         <result column="FILE_ID" property="fileId" />
         <result column="FILE_URL" property="fileUrl" />
+        <result column="CREATE_TIME" property="createTime" />
     </resultMap>
 
     <select id="listByDomain" resultType="com.hirisun.cloud.platform.document.bean.UserDoc">
@@ -34,7 +35,7 @@
             and d.NAME like CONCAT(CONCAT('%',#{param.name}),'%')
         </if>
         <if test="user.type != 100">
-            and d.CREATOR = #{user.idcard}
+            and d.CREATOR = #{user.idCard}
         </if>
         order by d.DOMAIN,d.SORT
     </select>

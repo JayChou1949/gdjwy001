@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -62,7 +63,6 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
      * 流程类型-省厅 3
      */
     private final int FLOW_TYPE_PROLICE=3;
-
     /**
      * 流程类型-国家专项 4
      */
@@ -72,51 +72,6 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
      * 默认区域名 省厅
      */
     private String defaultArea="省厅";
-
-
-    /**
-     * 根据预设类型获取指定的环节
-     * @param type 1 申请 2本单位审批 3二级管理员审批 4反馈
-     * @param workflowId 工作流id
-     * @return
-     */
-    public WorkflowNode getWorkflowByType(Integer type,String workflowId){
-        WorkflowNode node = new WorkflowNode();
-        node.setId(UUIDUtil.getUUID());
-        String nodeName="";
-        Integer nodeSort=1;
-        String nodeFeature="1";
-        //nodeFeature 环节功能 1可审核 2可加办 3可实施 4可删除 5可修改 6可反馈 7可转发 8可回退
-        switch (type) {
-            case 1:
-                nodeName="申请";
-                nodeSort=1;
-                nodeFeature="1,5";
-                break;
-            case 2:
-                nodeName="本单位审批";
-                nodeSort=2;
-                nodeFeature = "1,2,7,8";
-                break;
-            case 3:
-                nodeName="二级管理员审批";
-                nodeFeature="1";
-                nodeSort=2;
-                break;
-            case 9:
-                nodeName="反馈";
-                nodeFeature="6";
-                break;
-            default:
-                break;
-        }
-        node.setWorkflowId(workflowId);
-        node.setNodeName(nodeName);
-        node.setNodeSort(nodeSort);
-        node.setVersion(0);
-        node.setNodeFeature(nodeFeature);
-        return node;
-    }
 
     /**
      * 更新或保存工作流
@@ -143,12 +98,16 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         List<WorkflowNode> nodeList = JSON.parseArray(list, WorkflowNode.class);
         int sort=1;
         for (WorkflowNode node : nodeList) {
+            node.setId(UUIDUtil.getUUID());
             node.setWorkflowId(workflow.getId());
             node.setNodeSort(sort);
             node.setVersion(version);
             sort++;
         }
         workflow.setVersion(version);
+        workflow.setCreator(user.getName());
+        workflow.setCreatorId(user.getIdCard());
+        workflow.setCreatorOrgId(user.getOrgId());
         this.updateById(workflow);
         workflowNodeService.saveBatch(nodeList);
         return true;
@@ -175,6 +134,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         for (WorkflowNode node : nodeList) {
             node.setNodeSort(sort);
             node.setWorkflowId(workflowId);
+            node.setVersion(0);
             allNodeList.add(node);
             sort++;
         }
@@ -182,6 +142,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         workflow.setCreatorId(user.getIdCard());
         workflow.setCreatorOrgId(user.getOrgId());
         workflow.setId(workflowId);
+        workflow.setVersion(0);
         this.save(workflow);
         workflowNodeService.saveBatch(allNodeList);
         return true;

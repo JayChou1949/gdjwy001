@@ -1,13 +1,12 @@
 package com.hirisun.cloud.platform.document.bean;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hirisun.cloud.model.common.Tree;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -47,6 +46,11 @@ public class DevDocClass extends Tree<DevDocClass> implements Serializable {
     @TableField("UPDATE_TIME")
     private Date updateTime;
 
+    @ApiModelProperty(value = "创建时间")
+    @TableField(value = "CREATE_TIME", fill = FieldFill.INSERT)
+    @JsonFormat(pattern = "YYYY-MM-dd HH:mm:ss")
+    private Date createTime;
+
     @ApiModelProperty(value = "创建人")
     @TableField("CREATOR")
     private String creator;
@@ -70,6 +74,13 @@ public class DevDocClass extends Tree<DevDocClass> implements Serializable {
     @TableField(exist = false)
     private List<DevDocClass> children;
 
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
 
     public String getId() {
         return id;

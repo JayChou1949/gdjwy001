@@ -29,4 +29,12 @@ public interface ShoppingCartService extends IService<ShoppingCart> {
      */
     void submit(UserVO user, SubmitRequest submitRequest);
 
+    /**
+     * 地市流程提交
+     * @param submitRequest
+     * @param ids
+     * @param area
+     */
+    public void workflowSubmitByArea(SubmitRequest submitRequest, String ids, String area);
+
 }

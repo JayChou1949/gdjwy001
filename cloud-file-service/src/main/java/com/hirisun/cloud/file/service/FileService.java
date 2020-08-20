@@ -5,6 +5,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.hirisun.cloud.model.ncov.vo.file.FileVo;
 
+import java.util.List;
+
 /**
  * @author zhoufeng
  * @version 1.0
@@ -48,4 +50,11 @@ public interface FileService {
      * @return
      */
     public String uploadByte(FileVo fileVo);
+
+    /**
+     * 通过文件id串查询多个文件
+     * @param fileIds
+     * @return
+     */
+    public List<FileSystem> getFileByIds(List<String> fileIds);
 }

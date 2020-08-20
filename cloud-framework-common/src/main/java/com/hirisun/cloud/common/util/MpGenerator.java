@@ -38,7 +38,7 @@ public class MpGenerator {
         gc.setBaseResultMap(true);
         // XML columnList
         gc.setBaseColumnList(false);
-        gc.setAuthor("dps");
+        gc.setAuthor("wuxiaoxing");
         gc.setSwagger2(true);
 
         // 自定义文件命名，注意 %s 会自动填充表实体属性！
@@ -56,9 +56,6 @@ public class MpGenerator {
         dsc.setUsername("gd_jwymh");
         dsc.setPassword("gdjwymh");
         dsc.setUrl("jdbc:oracle:thin:@139.9.242.131:1521/jwymh");
-//        dsc.setUsername("CLOUD_USER");
-//        dsc.setPassword("CLOUD_USER");
-//        dsc.setUrl("jdbc:oracle:thin:@139.9.245.85:1521/orcl");
         mpg.setDataSource(dsc);
 
         // 策略配置
@@ -67,8 +64,11 @@ public class MpGenerator {
         strategy.setTablePrefix(new String[]{"t_"});//去掉表前缀
         strategy.setNaming(NamingStrategy.underline_to_camel);
         // 需要生成的表
-        strategy.setInclude("T_NCOV_REALTIME");
-//        strategy.setInclude("TB_WFM_WORKFLOW");
+        strategy.setInclude("T_SAAS_APPLICATION_MERGE"
+
+        );
+//        strategy.setInclude("T_USER","S_PERMISSION","S_ROLE_PERMISSION","SYS_ROLE","S_USER_ROLE");
+//        strategy.setInclude("T_WFM_WORKFLOW");
 //        strategy.setSuperServiceClass(null);
 //        strategy.setSuperServiceImplClass(null);
 //        strategy.setSuperMapperClass(null);
@@ -77,7 +77,7 @@ public class MpGenerator {
 
         // 包配置
         PackageConfig pc = new PackageConfig();
-        pc.setParent("com.hirisun.cloud.ncov");
+        pc.setParent("com.hirisun.cloud.order");
         pc.setController("controller");
         pc.setService("service");
         pc.setServiceImpl("service.impl");

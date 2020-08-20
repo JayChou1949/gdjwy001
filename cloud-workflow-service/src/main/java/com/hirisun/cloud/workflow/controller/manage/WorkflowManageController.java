@@ -84,7 +84,7 @@ public class WorkflowManageController {
 
     @ApiOperation("流程配置明细")
     @GetMapping("/detail")
-    public QueryResponseResult<Workflow> detail(@LoginUser UserVO user,
+    public QueryResponseResult<WorkflowVO> detail(@LoginUser UserVO user,
                                                 @ApiParam(value = "流程配置id",required = true) @RequestParam String id) {
         /**
          * 1.查询流程配置
@@ -93,6 +93,7 @@ public class WorkflowManageController {
         Workflow workflow = workflowService.getById(id);
         List<WorkflowNode> nodeList = workflowNodeService.list(new QueryWrapper<WorkflowNode>().lambda()
                 .eq(WorkflowNode::getWorkflowId,workflow.getId())
+                .eq(WorkflowNode::getVersion,workflow.getVersion())
                 .orderByAsc(WorkflowNode::getNodeSort));
         Map map = new HashMap<>();
         map.put("workflow", workflow);
@@ -101,16 +102,16 @@ public class WorkflowManageController {
     }
 
     @ApiOperation("新增/编辑申请流程配置")
-    @PostMapping("/saveOrUpdate")
+    @PutMapping("/saveOrUpdate")
     public QueryResponseResult<WorkflowVO> saveOrUpdate(@LoginUser UserVO user,
-                                                        @ModelAttribute Workflow workflow ,
-                                                        @ApiParam(value = "环节列表,需要封装成json数组传入",required = true) @RequestParam String nodeList) {
-        boolean flag=workflowService.saveOrUpdateWorkflow(user, workflow,nodeList);
+                                                        @RequestBody Workflow workflow) {
+        boolean flag=workflowService.saveOrUpdateWorkflow(user, workflow,JSON.toJSONString(workflow.getNodeList()));
         if(!flag){
             return QueryResponseResult.fail(null);
         }
         return QueryResponseResult.success(null);
     }
+
     @ApiOperation("删除申请流程配置")
     @PostMapping("/delete")
     public QueryResponseResult<Workflow> delete(@ApiParam(value = "流程配置id",required = true) @RequestParam String id) {
@@ -139,5 +140,20 @@ public class WorkflowManageController {
        Workflow workflow= workflowService.chooseWorkFlow(resourceType, area, policeCategory, serviceId, nationalSpecialProject);
         return JSON.toJSONString(workflow);
     }
+
+    /**
+     * 根据流程id获取流程信息
+     */
+    @ApiIgnore
+    @ApiOperation("根据流程id获取流程信息")
+    @PostMapping("/feign/getWorkflowById")
+    public String getWorkflowById(@RequestParam String workflowId) {
+        logger.info("/feign/getWorkflowById：{},{},{}",workflowId);
+
+        Workflow workflow = workflowService.getById(workflowId);
+        return JSON.toJSONString(workflow);
+    }
+
+
 }
 

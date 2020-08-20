@@ -18,6 +18,7 @@
         <result column="POLICE_CATEGORY" property="policeCategory" />
         <result column="AREA" property="area" />
         <result column="PROJECT" property="project" />
+        <result column="CREATE_TIME" property="createTime" />
     </resultMap>
 
 </mapper>

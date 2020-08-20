@@ -13,7 +13,12 @@ public enum WorkflowCode implements ResultCode {
     CART_AREA_CAN_NOT_NULL(2407,"地区名为空,请确认订单信息!"),
     WORKFLOW_MISSING(2409,"流程配置未找到!"),
     WORKFLOW_MISSING_START_NODE(2410,"此流程没有定义开始环节,请联系管理员!"),
-    WORKFLOW_CREATE_FAIL(2411,"发起流程失败")
+    WORKFLOW_CREATE_FAIL(2411,"发起流程失败"),
+    WORKFLOW_NODE_NOT_NULL(2412,"环节ID不能为空"),
+    WORKFLOW_ACTIVITY_NODE_ID_NOT_NULL(2413,"当前环节对应的流程环节为空，请传入流程定义环节信息"),
+    WORKFLOW_ACTIVITY_STATUS_ERROR(2414,"该任务已经处理，不能重复处理"),
+    WORKFLOW_NODE_NO_HANDLER(2415,"流程未配置处理人")
+
     ;
     /**
      * 状态码

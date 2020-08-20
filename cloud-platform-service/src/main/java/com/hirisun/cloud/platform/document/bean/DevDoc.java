@@ -1,9 +1,7 @@
 package com.hirisun.cloud.platform.document.bean;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -46,6 +44,11 @@ public class DevDoc implements Serializable {
     @JsonFormat(pattern = "YYYY-MM-dd HH:mm:ss")
     private Date updateTime;
 
+    @ApiModelProperty(value = "创建时间")
+    @TableField(value = "CREATE_TIME", fill = FieldFill.INSERT)
+    @JsonFormat(pattern = "YYYY-MM-dd HH:mm:ss")
+    private Date createTime;
+
     @ApiModelProperty(value = "状态, 0:审核中 1: 待上线 2: 上线 3:驳回 4:删除")
     @TableField("STATUS")
     private Long status;
@@ -79,28 +82,37 @@ public class DevDoc implements Serializable {
     @TableField(exist = false)
     private String secondClassName;
 
-    @ApiModelProperty(value = "文件id")
-    @TableField("FILE_ID")
-    private String fileId;
-
+    @ApiModelProperty(value = "文件id,多个使用逗号分割")
     @TableField(exist = false)
-    private String fileUrl;
+    private String fileIds;
+
+    @ApiModelProperty(value = "附件数量")
+    @TableField(exist = false)
+    private String num; //附件数量
 
 
-    public String getFileId() {
-        return fileId;
+    public Date getCreateTime() {
+        return createTime;
     }
 
-    public void setFileId(String fileId) {
-        this.fileId = fileId;
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 
-    public String getFileUrl() {
-        return fileUrl;
+    public String getNum() {
+        return num;
     }
 
-    public void setFileUrl(String fileUrl) {
-        this.fileUrl = fileUrl;
+    public void setNum(String num) {
+        this.num = num;
+    }
+
+    public String getFileIds() {
+        return fileIds;
+    }
+
+    public void setFileIds(String fileIds) {
+        this.fileIds = fileIds;
     }
 
     public String getId() {

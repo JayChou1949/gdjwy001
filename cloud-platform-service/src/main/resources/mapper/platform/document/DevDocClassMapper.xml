@@ -13,6 +13,7 @@
         <result column="TYPE" property="type" />
         <result column="IMAGE" property="image" />
         <result column="PID" property="pid" />
+        <result column="CREATE_TIME" property="createTime" />
     </resultMap>
 
     <select id="getPage" resultType="com.hirisun.cloud.platform.document.bean.DevDocClass">
@@ -29,7 +30,7 @@
                 )
             </if>
             <if test="user.type != 100">
-                AND D.CREATOR = #{user.idcard}
+                AND D.CREATOR = #{user.idCard}
             </if>
         </where>
         ORDER BY D.SORT ASC, D.UPDATE_TIME DESC

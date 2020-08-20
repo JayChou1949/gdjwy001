@@ -106,8 +106,8 @@ public class NewsManageController {
      * 创建新闻
      */
     @ApiOperation("创建新闻")
-    @PostMapping("/create")
-    public QueryResponseResult<News> create(@LoginUser UserVO user, @ModelAttribute News news) {
+    @PutMapping("/create")
+    public QueryResponseResult<News> create(@LoginUser UserVO user, @RequestBody News news) {
         // 判断管理员类型
         if(!NewsParamUtil.infomationPermission(user.getType())){
             return QueryResponseResult.fail("无权限操作新闻");
@@ -151,8 +151,8 @@ public class NewsManageController {
      * 编辑新闻
      */
     @ApiOperation("编辑新闻")
-    @PostMapping("/edit")
-    public QueryResponseResult<News> edit(@LoginUser UserVO user,@ModelAttribute News news) {
+    @PutMapping("/edit")
+    public QueryResponseResult<News> edit(@LoginUser UserVO user,@RequestBody News news) {
         /**
          * 1.判断管理员类型
          * 2.判断管理员是否越权

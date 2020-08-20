@@ -22,4 +22,8 @@ public interface DevDocService extends IService<DevDoc> {
 
     void saveOrUpdateDevDoc(UserVO userVO,DevDoc devDoc);
 
+    Map getDetailById(String id);
+
+    void deleteById(UserVO user,String id);
+
 }

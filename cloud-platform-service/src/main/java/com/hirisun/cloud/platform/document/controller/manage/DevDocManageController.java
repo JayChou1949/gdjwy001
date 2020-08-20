@@ -3,6 +3,7 @@ package com.hirisun.cloud.platform.document.controller.manage;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hirisun.cloud.api.file.FileApi;
 import com.hirisun.cloud.common.annotation.LoginUser;
@@ -14,8 +15,11 @@ import com.hirisun.cloud.model.ncov.vo.daas.HomePageDataVo;
 import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.platform.document.bean.DevDoc;
 import com.hirisun.cloud.platform.document.bean.DevDocClass;
+import com.hirisun.cloud.platform.document.bean.DevDocFile;
 import com.hirisun.cloud.platform.document.service.DevDocClassService;
+import com.hirisun.cloud.platform.document.service.DevDocFileService;
 import com.hirisun.cloud.platform.document.service.DevDocService;
+import com.hirisun.cloud.platform.information.bean.Carousel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -23,9 +27,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -44,8 +50,10 @@ public class DevDocManageController {
     @Autowired
     private DevDocService devDocService;
 
+
+
     @Autowired
-    private FileApi fileApi;
+    private DevDocFileService devDocFileService;
 
     /**
      * 分页获取文档列表
@@ -81,43 +89,20 @@ public class DevDocManageController {
     @ApiOperation("开发文档详情")
     @GetMapping("/devDocDetail")
     public QueryResponseResult<DevDoc> detail(@ApiParam(value = "开发文档id",required = true) @RequestParam String id) {
-
-        DevDoc devDoc = devDocService.getById(id);
-
-        JSONObject imageFile=null;
-        JSONObject docFile=null;
-        if (!StringUtils.isEmpty(devDoc.getImage())) {
-            String imageJsonStr=fileApi.getFileSystemInfo(devDoc.getImage());
-            if (!StringUtils.isEmpty(imageJsonStr)) {
-                imageFile = JSON.parseObject(imageJsonStr);
-            }
-        }
-        if (!StringUtils.isEmpty(devDoc.getFileId())) {
-            String fileJsonStr=fileApi.getFileSystemInfo(devDoc.getFileId());
-            if (!StringUtils.isEmpty(fileJsonStr)) {
-                docFile = JSON.parseObject(fileJsonStr);
-            }
-        }
-        Map map = new HashMap();
-        map.put("devDoc", devDoc);
-        map.put("imageFile", imageFile);
-        map.put("docFile", docFile);
+        Map map=devDocService.getDetailById(id);
         return QueryResponseResult.success(map);
     }
 
     @ApiOperation("删除文档")
     @PostMapping(value = "/delete")
     public QueryResponseResult delete(@LoginUser UserVO user, @ApiParam(value = "开发文档id",required = true) @RequestParam String id) {
-        DevDoc document = devDocService.getById(id);
-        document.setStatus(ReviewStatus.DELETE.getCode());
-        devDocService.updateById(document);
-//        new Log(user.getIdcard(),"文档id："+id,"删除文档", IpUtil.getIp()).insert();
+        devDocService.deleteById(user,id);
         return QueryResponseResult.success(null);
     }
 
-    @ApiOperation("新增文档")
-    @PostMapping("/saveOrUpdate")
-    public QueryResponseResult<DevDoc> saveOrUpdate(@LoginUser UserVO user, @ModelAttribute DevDoc devDoc) {
+    @ApiOperation("新增或修改文档")
+    @PutMapping("/saveOrUpdate")
+    public QueryResponseResult<DevDoc> saveOrUpdate(@LoginUser UserVO user, @RequestBody DevDoc devDoc) {
         devDocService.saveOrUpdateDevDoc(user, devDoc);
         return QueryResponseResult.success(null);
     }
