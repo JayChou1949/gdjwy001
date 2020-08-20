@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.upd.hwcloud.dao.ServiceAlterMapper">
+<mapper namespace="com.hirisun.cloud.order.mapper.publish.ServicePublishMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.upd.hwcloud.bean.entity.ServiceAlter">
+    <resultMap id="BaseResultMap" type="com.hirisun.cloud.order.bean.publish.ServicePublish">
         <id column="ID" property="id" />
         <result column="CREATE_TIME" property="createTime" />
         <result column="MODIFIED_TIME" property="modifiedTime" />
         <result column="CREATOR" property="creator" />
-        <result column="API_PRODUCT_ID" property="apiProductId" />
         <result column="STATUS" property="status" />
         <result column="CREATOR_NAME" property="creatorName" />
         <result column="ORDER_NUMBER" property="orderNumber" />
@@ -51,13 +50,13 @@
         <result column="COLLECTION_UNIT" property="collectionUnit" />
     </resultMap>
 
-    <select id="getByActId" resultType="com.upd.hwcloud.bean.entity.ServiceAlter">
-        select ai.ORDER_NUMBER from TB_SERVICE_ALTER ai left join TB_WFM_INSTANCE ins on ai.ID=ins.BUSINESSID
+    <select id="getByActId" resultType="com.hirisun.cloud.order.bean.publish.ServicePublish">
+        select ai.ORDER_NUMBER from TB_SERVICE_PUBLISH ai left join TB_WFM_INSTANCE ins on ai.ID=ins.BUSINESSID
         left join TB_WFM_ACTIVITY act on act.INSTANCEID=ins.ID
         where act.ID = #{activityId}
     </select>
 
-    <sql id="alterQuery">
+    <sql id="publicQuery">
         <choose>
             <when test="p.status == null or p.status == ''">
                 AND ai.STATUS not in (-1,0)
@@ -110,9 +109,9 @@
 
     <select id="getPage" resultMap="BaseResultMap">
         SELECT distinct ai.*,ins.ID instanceId
-        from TB_WFM_ACTIVITY act,TB_WFM_INSTANCE ins,TB_SERVICE_ALTER ai ,TB_WFM_WORKFLOWMODEL m
+        from TB_WFM_ACTIVITY act,TB_WFM_INSTANCE ins,TB_SERVICE_PUBLISH ai ,TB_WFM_WORKFLOWMODEL m
         <where>
-            <include refid="alterQuery"/>
+            <include refid="publicQuery"/>
             and ai.ID=ins.BUSINESSID and act.INSTANCEID = ins.ID  and m.ID=act.MODELID and ai.ORDER_NUMBER IS NOT NULL
             <if test="(p.startDate != null and p.startDate != '') and (p.endDate != null and p.endDate != '')">
                 AND TO_CHAR(ai.CREATE_TIME,'YYYY-MM-DD') &gt;= #{p.startDate}
@@ -145,9 +144,9 @@
 
     <select id="getPageBank" resultMap="BaseResultMap">
         SELECT distinct ai.*,(SELECT to_char(wm_concat(distinct U . NAME)) FROM TB_WFM_ACTIVITY act1,TB_USER U WHERE u.IDCARD=ACT1.HANDLEPERSONIDS AND ACT1.ACTIVITYSTATUS='待办' 	AND act1.INSTANCEID = ins. ID AND ACT1.ACTIVITYTYPE is NULL)  AS PROCESSING_PERSON
-        from  TB_SERVICE_ALTER ai,TB_WFM_ACTIVITY act,TB_WFM_INSTANCE ins,TB_WFM_WORKFLOWMODEL m
+        from  TB_SERVICE_PUBLISH ai,TB_WFM_ACTIVITY act,TB_WFM_INSTANCE ins,TB_WFM_WORKFLOWMODEL m
         <where>
-            <include refid="alterQuery"/>
+            <include refid="publicQuery"/>
             and ai.ID=ins.BUSINESSID and act.INSTANCEID = ins.ID  and m.ID=act.MODELID and ai.ORDER_NUMBER IS NOT NULL
             <if test="(p.startDate != null and p.startDate != '') and (p.endDate != null and p.endDate != '')">
                 AND TO_CHAR(ai.CREATE_TIME,'YYYY-MM-DD') &gt;= #{p.startDate}
@@ -174,7 +173,7 @@
 
     <select id="getWorkbenchApplyPage" resultMap="BaseResultMap">
         select r.*,p.PROCESSING_PERSON from (SELECT distinct ai.*
-        from TB_WFM_ACTIVITY act,TB_WFM_INSTANCE ins,TB_SERVICE_ALTER ai ,TB_WFM_WORKFLOWMODEL m
+        from TB_WFM_ACTIVITY act,TB_WFM_INSTANCE ins,TB_SERVICE_PUBLISH ai ,TB_WFM_WORKFLOWMODEL m
         <where>
             <include refid="workbenchQuery"/>
             and ai.ID=ins.BUSINESSID and act.INSTANCEID = ins.ID  and m.ID=act.MODELID and ai.WHERE_FROM='1'
@@ -214,7 +213,7 @@
 
     <select id="getWorkbenchApplyPageBank" resultMap="BaseResultMap">
         SELECT distinct ai.*,(SELECT to_char(wm_concat(distinct U . NAME)) FROM TB_WFM_ACTIVITY act1,TB_USER U WHERE u.IDCARD=ACT1.HANDLEPERSONIDS AND ACT1.ACTIVITYSTATUS='待办' 	AND act1.INSTANCEID = ins. ID AND ACT1.ACTIVITYTYPE is NULL)  AS PROCESSING_PERSON
-        from  TB_SERVICE_ALTER ai,TB_WFM_ACTIVITY act,TB_WFM_INSTANCE ins,TB_WFM_WORKFLOWMODEL m
+        from  TB_SERVICE_PUBLISH ai,TB_WFM_ACTIVITY act,TB_WFM_INSTANCE ins,TB_WFM_WORKFLOWMODEL m
         <where>
             <include refid="workbenchQuery"/>
             and ai.ID=ins.BUSINESSID and act.INSTANCEID = ins.ID  and m.ID=act.MODELID and ai.WHERE_FROM='1'
@@ -251,8 +250,8 @@
     </select>
 
 
-    <select id="getResourcePage" resultType="com.upd.hwcloud.bean.vo.workbench.ResourceOverviewVO">
-        select * from TB_SERVICE_ALTER where STATUS = 3 AND WHERE_FROM = 1
+    <select id="getResourcePage" resultType="com.hirisun.cloud.model.workbench.vo.ResourceOverviewVO">
+        select * from TB_SERVICE_PUBLISH where STATUS = 3 AND WHERE_FROM = 1
         <if test="p.queryVO.creator !=null and p.queryVO.creator !=''">
             and   CREATOR= #{p.queryVO.creator}
         </if>
@@ -269,7 +268,7 @@
 
     </select>
     <select id="getPageFromMY" resultMap="BaseResultMap">
-        SELECT tsp.* FROM TB_SERVICE_ALTER tsp
+        SELECT tsp.* FROM TB_SERVICE_PUBLISH tsp
         <where>
             and tsp.WHERE_FROM='2' and tsp.SERVICE_TYPE = 'DAAS'
             <if test="(p.startDate != null and p.startDate != '') and (p.endDate != null and p.endDate != '')">
@@ -297,9 +296,9 @@
         SELECT NAME FROM SYS_DICT WHERE ID = #{id}
     </select>
 
-    <select id="getAlterTodoCount" resultType="java.lang.Integer">
+    <select id="getPublishTodoCount" resultType="java.lang.Integer">
         SELECT count(DISTINCT ai.ID)
-        FROM TB_SERVICE_ALTER ai join TB_WFM_INSTANCE ins on ins.BUSINESSID = ai.ID
+        FROM TB_SERVICE_PUBLISH ai join TB_WFM_INSTANCE ins on ins.BUSINESSID = ai.ID
         join TB_WFM_ACTIVITY act  on act.INSTANCEID = ins.ID
         WHERE ai.STATUS in (1,2,7,101,102) and  ai.WHERE_FROM='1'
         <if test="user.idcard !=null and user.idcard !=''">
@@ -309,9 +308,9 @@
         and act.ACTIVITYSTATUS = '待办'
     </select>
 
-    <select id="getAlterTodo" resultType="java.lang.Integer">
+    <select id="getPublishTodo" resultType="java.lang.Integer">
         SELECT count(DISTINCT ai.ID)
-        FROM TB_SERVICE_ALTER ai join TB_WFM_INSTANCE ins on ins.BUSINESSID = ai.ID
+        FROM TB_SERVICE_PUBLISH ai join TB_WFM_INSTANCE ins on ins.BUSINESSID = ai.ID
         join TB_WFM_ACTIVITY act  on act.INSTANCEID = ins.ID
         WHERE ai.STATUS in (1,2,7,101,102) and  ai.WHERE_FROM='1'
         <if test="idCard !=null and idCard !=''">
@@ -323,7 +322,7 @@
 
     <select id="getReviewCount" resultType="java.lang.Integer">
         SELECT count(DISTINCT ai.ID)
-        FROM TB_SERVICE_ALTER ai join TB_WFM_INSTANCE ins on ins.BUSINESSID = ai.ID join TB_WFM_ACTIVITY act  on act.INSTANCEID = ins.ID
+        FROM TB_SERVICE_PUBLISH ai join TB_WFM_INSTANCE ins on ins.BUSINESSID = ai.ID join TB_WFM_ACTIVITY act  on act.INSTANCEID = ins.ID
         WHERE ai.STATUS in (1,7,101,102) and ai.WHERE_FROM='1'
         <if test="p.queryVO.policeCategory !=null and p.queryVO.policeCategory !=''">
             and  ai.POLICE_CATEGORY = #{p.queryVO.policeCategory}
@@ -339,7 +338,7 @@
 
     <select id="getImplCount" resultType="java.lang.Integer">
         SELECT count(DISTINCT ai.ID)
-        FROM TB_SERVICE_ALTER ai join TB_WFM_INSTANCE ins on ins.BUSINESSID = ai.ID join TB_WFM_ACTIVITY act  on act.INSTANCEID = ins.ID
+        FROM TB_SERVICE_PUBLISH ai join TB_WFM_INSTANCE ins on ins.BUSINESSID = ai.ID join TB_WFM_ACTIVITY act  on act.INSTANCEID = ins.ID
         WHERE ai.STATUS = 2 and ai.WHERE_FROM='1'
         <if test="p.queryVO.policeCategory !=null and p.queryVO.policeCategory !=''">
             and  ai.POLICE_CATEGORY = #{p.queryVO.policeCategory}
@@ -354,7 +353,7 @@
     </select>
 
     <select id="getRejectCount" resultType="java.lang.Integer">
-        select count(*) from TB_SERVICE_ALTER a where a.STATUS in (5,6,8) and a.WHERE_FROM='1'
+        select count(*) from TB_SERVICE_PUBLISH a where a.STATUS in (5,6,8) and a.WHERE_FROM='1'
         <if test="p.queryVO.policeCategory !=null and p.queryVO.policeCategory !=''">
             and  a.POLICE_CATEGORY like #{p.queryVO.policeCategory}
             and  (a.AREA_NAME = '省厅' or a.AREA_NAME is null)
@@ -369,7 +368,7 @@
     </select>
 
     <select id="getUseCount" resultType="java.lang.Integer">
-        select count(*) from TB_SERVICE_ALTER a where a.STATUS = 3 and a.WHERE_FROM='1'
+        select count(*) from TB_SERVICE_PUBLISH a where a.STATUS = 3 and a.WHERE_FROM='1'
         <if test="p.queryVO.policeCategory !=null and p.queryVO.policeCategory !=''">
             and  a.POLICE_CATEGORY like #{p.queryVO.policeCategory}
             and  (a.AREA_NAME = '省厅' or a.AREA_NAME is null)
@@ -382,5 +381,5 @@
             and a.CREATOR = #{p.queryVO.creator}
         </if>
     </select>
-    
+
 </mapper>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hirisun.cloud.order.mapper.workflow.WorkflowmodelMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hirisun.cloud.order.bean.workflow.Workflowmodel">
+        <id column="ID" property="id" />
+        <result column="WORKFLOWID" property="workflowid" />
+        <result column="MODELNAME" property="modelname" />
+        <result column="NEXTMODELIDS" property="nextmodelids" />
+        <result column="VERSION" property="version" />
+        <result column="ISSTART" property="isstart" />
+        <result column="HANDLEMODEL" property="handlemodel" />
+        <result column="DEFAULTHANDLEPERSON" property="defaulthandleperson" />
+        <result column="MODELSTATUSCLASSNME" property="modelstatusclassnme" />
+        <result column="ISONLINE" property="isonline" />
+        <result column="NOTICEPERON" property="noticeperon" />
+        <result column="ADVISERPERSON" property="adviserperson" />
+        <result column="PRENOTICEACT" property="prenoticeact" />
+        <result column="MODELTYPE" property="modeltype" />
+    </resultMap>
+    <select id="getSubordinateModel" resultMap="BaseResultMap">
+	    select w1.* from TB_WFM_WORKFLOWMODEL w1 left join TB_WFM_WORKFLOWMODEL w2 on w1.id=w2.nextmodelIds where w2.id=#{id,jdbcType=VARCHAR}
+	</select>
+
+    <select id="getMaxVersion" resultType="java.lang.Integer">
+        SELECT MAX(VERSION) from TB_WFM_WORKFLOWMODEL where id = #{id}
+    </select>
+    <select id="getByParams" resultMap="BaseResultMap" parameterType="com.hirisun.cloud.order.bean.workflow.Workflowmodel">
+        select *
+        from TB_WFM_WORKFLOWMODEL model
+        <where>
+            <if test="workflowid != null ">and model.workflowid = #{workflowid}</if>
+            <if test="modelname != null ">and model.modelname = #{modelname}</if>
+            <if test="isonline != null ">and model.isonline = #{isonline}</if>
+            <if test="version != null ">and model.version = #{version}</if>
+        </where>
+    </select>
+</mapper>
