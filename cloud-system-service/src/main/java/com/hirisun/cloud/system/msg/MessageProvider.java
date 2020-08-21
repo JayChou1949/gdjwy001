@@ -1,17 +1,20 @@
-package com.hirisun.cloud.order.component;
+package com.hirisun.cloud.system.msg;
 
+import com.alibaba.fastjson.JSON;
 import com.dragonsoft.mq.client.model.entity.MessageInfoDTO;
 import com.dragonsoft.mq.client.spring.service.ProducerService;
-import com.upd.hwcloud.bean.contains.NotifyType;
-import com.upd.hwcloud.bean.dto.Message;
-import com.upd.hwcloud.bean.entity.User;
-import com.upd.hwcloud.common.utils.EnvironmentUtils;
-import com.upd.hwcloud.common.utils.UUIDUtil;
-import com.upd.hwcloud.service.IUserService;
+import com.hirisun.cloud.api.user.UserApi;
+import com.hirisun.cloud.common.contains.NotifyType;
+import com.hirisun.cloud.common.util.EnvironmentUtils;
+import com.hirisun.cloud.common.util.UUIDUtil;
+import com.hirisun.cloud.model.user.UserVO;
+import com.hirisun.cloud.system.vo.Message;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
@@ -21,6 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Component
+@RefreshScope
 public class MessageProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(MessageProvider.class);
@@ -32,7 +36,7 @@ public class MessageProvider {
     @Resource
     private TaskExecutor taskExecutor;
     @Autowired
-    private IUserService userService;
+    private UserApi userApi;
     @Value("${msg.topic}")
     private String TOPIC;
     @Value("${msg.template.submit_success}")
@@ -63,13 +67,13 @@ public class MessageProvider {
         taskExecutor.execute(() -> {
             for (Message m : message) {
                 String content = m.getContent();
-                User user = m.getUser();
+                UserVO user = m.getUser();
                 sendMessage(content, user);
             }
         });
     }
 
-    private void sendMessage(String content, User user) {
+    private void sendMessage(String content, UserVO user) {
         try {
             String profile = EnvironmentUtils.getCurrentProfile(app);
             if (EnvironmentUtils.ONLINE_PROFILES.contains(profile)) {
@@ -89,7 +93,7 @@ public class MessageProvider {
                             producerService.sendMsg(TOPIC, msg,0);
                         }
                         if (NotifyType.WX.getCode().equals(type)) {
-                            MessageInfoDTO msg = getWxMsg(user.getIdcard(), String.format(content, "微信"));
+                            MessageInfoDTO msg = getWxMsg(user.getIdCard(), String.format(content, "微信"));
                             producerService.sendMsg(TOPIC, msg,0);
                         }
                     }
@@ -101,31 +105,6 @@ public class MessageProvider {
             logger.error("kafka消息发送失败", e);
         }
     }
-
-//    /**
-//     * @param receiver 接受者，多个以逗号分隔
-//     * @param content 消息内容
-//     * @return true: 发送成功
-//     */
-//    private boolean sendMessage(String content, String... receiver){
-//        if (receiver != null && receiver.length > 0) {
-//            String receiverJoin = StringUtils.join(receiver, ",");
-//            MessageInfoDTO messageInfoDTO = getMsg(receiverJoin, content);//构造消息对象
-//            /*
-//                返回 Map<String,Object> 对象，包含code和message两个key。
-//                键值对信息为：
-//                code	message
-//                200	    发送成功
-//                1301	发送超时
-//                1302	未返回结果
-//                1303	未返回消息位移
-//             */
-//            Map<String,Object> map = producerService.sendMsg(TOPIC, messageInfoDTO,0);
-//            String code = map.get("code").toString();
-//            return "200".equals(code);
-//        }
-//        return false;
-//    }
 
     /**
      * 发送手机短信
@@ -182,7 +161,7 @@ public class MessageProvider {
     /**
      * 构造提交成功短信通知消息
      */
-    public Message buildSuccessMessage(User submitor, String bizName, String orderNum) {
+    public Message buildSuccessMessage(UserVO submitor, String bizName, String orderNum) {
         if (submitor == null) {
             logger.error("to send user is null");
             return null;
@@ -196,8 +175,8 @@ public class MessageProvider {
     /**
      * 构造发送给处理人的短信消息
      */
-    public Message buildProcessingMessage(String bizName, String orderNumber,String userId) {
-        User user = userService.findUserByIdcard(userId);
+    public Message buildProcessingMessage(String bizName, String orderNumber,String creatorId) {
+        UserVO user = getUserByIdCard(creatorId);
         if (user == null) {
             logger.error("to send user is null");
             return null;
@@ -205,7 +184,7 @@ public class MessageProvider {
         return buildProcessingMessage(bizName,orderNumber,user);
     }
 
-    private Message buildProcessingMessage(String bizName,String orderNumber,User user) {
+    private Message buildProcessingMessage(String bizName,String orderNumber,UserVO user) {
         Message toProcessingPerson = new Message();
         toProcessingPerson.setContent(String.format(msgProcessingPerson, user.getName(),bizName,orderNumber));
         toProcessingPerson.setUser(user);
@@ -214,9 +193,10 @@ public class MessageProvider {
 
     /**
      * 构造完成申请短信通知消息
+     * @param creatorId 身份证
      */
-    public Message buildCompleteMessage(String creator, String bizName, String orderNum) {
-        User user = userService.findUserByIdcard(creator);
+    public Message buildCompleteMessage(String creatorId, String bizName, String orderNum) {
+        UserVO user = getUserByIdCard(creatorId);
         if (user == null) {
             logger.error("to send user is null");
             return null;
@@ -230,8 +210,8 @@ public class MessageProvider {
     /**
      * 构造审核不通过的通知消息
      */
-    public Message buildRejectMessage(String creator, String bizName) {
-        User user = userService.findUserByIdcard(creator);
+    public Message buildRejectMessage(String creatorId, String bizName) {
+        UserVO user = getUserByIdCard(creatorId);
         if (user == null) {
             logger.error("to send user is null");
             return null;
@@ -245,8 +225,8 @@ public class MessageProvider {
     /**
      * 构造缩配短信通知消息
      */
-    public Message buildRecoverMessage(String userId, String bizName, String orderNum,String month,String day) {
-        User user = userService.findUserByIdcard(userId);
+    public Message buildRecoverMessage(String creatorId, String bizName, String orderNum,String month,String day) {
+        UserVO user = getUserByIdCard(creatorId);
         if (user == null) {
             logger.error("to send user is null");
             return null;
@@ -256,6 +236,13 @@ public class MessageProvider {
         toUser.setUser(user);
         return toUser;
     }
-
-
+    public UserVO getUserByIdCard(String idCard){
+        String userStr = userApi.getUserByIdCard(idCard);
+        if(StringUtils.isEmpty(userStr)){
+            logger.error("feign user is not null");
+            return null;
+        }
+        UserVO user = JSON.parseObject(userStr, UserVO.class);
+        return user;
+    }
 }
