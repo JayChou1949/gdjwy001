@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.hirisun.cloud.api.system.SmsApi;
 import com.hirisun.cloud.api.system.SystemApi;
 import com.hirisun.cloud.common.annotation.LoginUser;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
@@ -25,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +48,9 @@ public class WorkflowManageController {
 
     @Autowired
     private WorkflowService workflowService;
+
+    @Autowired
+    private SmsApi smsApi;
 
     @Autowired
     private WorkflowNodeService workflowNodeService;
@@ -75,6 +80,7 @@ public class WorkflowManageController {
             wrapper.like(Workflow::getFlowName, name);
         }
         wrapper.eq(Workflow::getFlowStatus, Workflow.STATUS_NORMAL);
+        wrapper.orderByDesc(Workflow::getCreateTime);
         Page<Workflow> page = new Page<>();
         page.setCurrent(pageNum);
         page.setSize(pageSize);
@@ -86,19 +92,8 @@ public class WorkflowManageController {
     @GetMapping("/detail")
     public QueryResponseResult<WorkflowVO> detail(@LoginUser UserVO user,
                                                 @ApiParam(value = "流程配置id",required = true) @RequestParam String id) {
-        /**
-         * 1.查询流程配置
-         * 2.查询对应环节
-         */
-        Workflow workflow = workflowService.getById(id);
-        List<WorkflowNode> nodeList = workflowNodeService.list(new QueryWrapper<WorkflowNode>().lambda()
-                .eq(WorkflowNode::getWorkflowId,workflow.getId())
-                .eq(WorkflowNode::getVersion,workflow.getVersion())
-                .orderByAsc(WorkflowNode::getNodeSort));
-        Map map = new HashMap<>();
-        map.put("workflow", workflow);
-        map.put("nodeList", nodeList);
-        return QueryResponseResult.success(map);
+        Map detail = workflowService.getDetailById(id);
+        return QueryResponseResult.success(detail);
     }
 
     @ApiOperation("新增/编辑申请流程配置")
@@ -154,6 +149,11 @@ public class WorkflowManageController {
         return JSON.toJSONString(workflow);
     }
 
-
+    @ApiOperation("短信发送")
+    @GetMapping("/sendMsg")
+    public QueryResponseResult sendMsg() {
+        smsApi.buildCompleteMessage("410184198209096919","wxx业务办理","202002020201");
+        return QueryResponseResult.success(null);
+    }
 }
 

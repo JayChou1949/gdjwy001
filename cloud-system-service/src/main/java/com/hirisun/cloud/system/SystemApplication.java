@@ -7,9 +7,9 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-@SpringBootApplication(scanBasePackages = {"com.hirisun.cloud"})
+@SpringBootApplication(scanBasePackages = {"com.hirisun.cloud","com.dragonsoft.mq"})
 @MapperScan("com.hirisun.cloud.system.mapper")
-@EnableFeignClients("com.hirisun.cloud.api.redis")
+@EnableFeignClients("com.hirisun.cloud.api.*")
 public class SystemApplication {
 
     public static void main(String[] args) {

@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.hirisun.cloud.api.user.UserApi;
 import com.hirisun.cloud.common.constant.FormCode;
 import com.hirisun.cloud.common.contains.ResourceType;
 import com.hirisun.cloud.common.exception.CustomException;
@@ -26,10 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -50,6 +48,9 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
     @Autowired
     private WorkflowServiceBindingService workflowServiceBindingService;
+
+    @Autowired
+    private UserApi userApi;
 
     /**
      * 流程类型-省厅 1
@@ -176,6 +177,93 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             logger.info("DaasOrSaasService");
             return DaasOrSaasServiceHandle(resourceType,area,policeCategory,nationalSpecialProject);
         }
+    }
+
+
+
+    @Override
+    public Map getDetailById(String id) {
+        Map resultMap = new HashMap<>();
+        /**
+         * 1.查询流程配置
+         * 2.查询对应环节
+         * 3.输出处理人名称
+         */
+        Workflow workflow = this.getById(id);
+        List<WorkflowNode> nodeList = workflowNodeService.list(new QueryWrapper<WorkflowNode>().lambda()
+                .eq(WorkflowNode::getWorkflowId,workflow.getId())
+                .eq(WorkflowNode::getVersion,workflow.getVersion())
+                .orderByAsc(WorkflowNode::getNodeSort));
+        resultMap.put("workflow", workflow);
+        resultMap.put("nodeList", nodeList);
+        Map<String,String> userMap = new HashMap();
+        for (WorkflowNode workflowNode : nodeList) {
+            userMapPackage(userMap, workflowNode.getDefaultHandler());
+            userMapPackage(userMap, workflowNode.getNoticePersion());
+            userMapPackage(userMap, workflowNode.getAdviserPerson());
+        }
+        if (CollectionUtils.isEmpty(nodeList)) {
+            return resultMap;
+        }
+        List<String> userIdList = new ArrayList<>();
+        for (String str : userMap.values()) {
+            userIdList.add(str);
+        }
+        if (CollectionUtils.isEmpty(userIdList)) {
+            return resultMap;
+        }
+        String userListStr = userApi.getUserByIdCardList(userIdList);
+        List<UserVO> userList = null;
+        if (StringUtils.isNotEmpty(userListStr)&&!"null".equals(userListStr)) {
+            userList = JSON.parseArray(userListStr,UserVO.class);
+        }
+        for (WorkflowNode workflowNode : nodeList) {
+            StringBuffer defaultHandlers = userIdConvertToName(workflowNode.getDefaultHandler(), userList);
+            StringBuffer noticePersions = userIdConvertToName(workflowNode.getNoticePersion(), userList);
+            StringBuffer adviserPerson = userIdConvertToName(workflowNode.getAdviserPerson(), userList);
+            if (defaultHandlers.length() > 0) {
+                workflowNode.setDefaultHandlerName(defaultHandlers.substring(1).toString());
+            }
+            if (noticePersions.length() > 0) {
+                workflowNode.setNoticePersionName(noticePersions.substring(1).toString());
+            }
+            if (adviserPerson.length() > 0) {
+                workflowNode.setAdviserPersonName(adviserPerson.substring(1).toString());
+            }
+        }
+        resultMap.put("workflow", workflow);
+        resultMap.put("nodeList", nodeList);
+        return resultMap;
+    }
+
+    /**
+     * 将用户身份证存入map内
+     */
+    private void userMapPackage(Map<String,String> userMap,String userStr){
+        if (StringUtils.isNotEmpty(userStr)) {
+            String[] handlerArr = userStr.split(",");
+            for (String str : handlerArr) {
+                userMap.put(str, str);
+            }
+        }
+    }
+    /**
+     * 匹配用户id，将用户id转换成用户名称
+     * @return
+     */
+    private StringBuffer userIdConvertToName(String userStr,List<UserVO> userList){
+        StringBuffer defaultHandlers = new StringBuffer();
+        if (StringUtils.isNotEmpty(userStr)) {
+            String[] handlerArr = userStr.split(",");
+            for (String str : handlerArr) {
+                for (UserVO user : userList) {
+                    if (str.equals(user.getIdCard())) {
+                        defaultHandlers.append("," + user.getName());
+                    }
+                }
+            }
+        }
+        return defaultHandlers;
     }
 
     /**

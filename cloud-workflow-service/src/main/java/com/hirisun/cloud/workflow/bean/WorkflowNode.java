@@ -51,7 +51,7 @@ public class WorkflowNode implements Serializable {
     @TableField("VERSION")
     private Integer version;
 
-    @ApiModelProperty(value = "默认处理人",required = true)
+    @ApiModelProperty(value = "默认处理人")
     @TableField("DEFAULT_HANDLER")
     private String defaultHandler;
 
@@ -82,6 +82,18 @@ public class WorkflowNode implements Serializable {
     @ApiModelProperty(value = "环节状态")
     @TableField(exist = false)
     private String nodeStatusCode;
+
+    @ApiModelProperty(value = "默认处理人名称")
+    @TableField(exist = false)
+    private String defaultHandlerName;
+
+    @ApiModelProperty(value = "通知人名称")
+    @TableField(exist = false)
+    private String noticePersionName;
+
+    @ApiModelProperty(value = "参与人名称")
+    @TableField(exist = false)
+    private String adviserPersonName;
 
     @Override
     public String toString() {

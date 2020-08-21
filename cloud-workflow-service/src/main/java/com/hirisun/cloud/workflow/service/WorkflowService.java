@@ -4,6 +4,8 @@ import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.workflow.bean.Workflow;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.Map;
+
 /**
  * <p>
  * 流程定义表 服务类
@@ -23,4 +25,6 @@ public interface WorkflowService extends IService<Workflow> {
      * @return
      */
     public Workflow chooseWorkFlow(Integer resourceType, String area, String policeCategory, String serviceId, String nationalSpecialProject);
+
+    public Map getDetailById(String id);
 }
