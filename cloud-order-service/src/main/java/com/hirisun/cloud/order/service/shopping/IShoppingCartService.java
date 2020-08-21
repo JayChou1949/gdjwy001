@@ -6,7 +6,7 @@ import java.util.Map;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.order.bean.shopping.ShoppingCart;
-import com.hirisun.cloud.order.util.SubmitRequest;
+import com.hirisun.cloud.order.vo.SubmitRequest;
 
 /**
  *  服务类

@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hirisun.cloud.model.app.param.SubpageParam;
 import com.hirisun.cloud.model.file.FilesVo;
+import com.hirisun.cloud.model.param.FilesParam;
 import com.hirisun.cloud.system.bean.Files;
 
 public interface FilesService extends IService<Files> {
@@ -52,4 +53,8 @@ public interface FilesService extends IService<Files> {
     void remove(String masterId);
     
     List<FilesVo> findBySubpageId(String subpageId);
+    
+    void saveBatch(FilesParam filesParam);
+
+	void deleteBatch(FilesParam param);
 }

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class OrderNumUtil {
 	
+	
     /**
      * 生成单号,格式 yyyyMMdd0001,利用redis递增
      * @param prefix redis保存递增值key前缀

@@ -24,6 +24,10 @@ public enum CommonCode implements ResultCode{
     LINK_END_NULL(1016,"未找到结束环节!"),
     REPEATED_PROCESSING(1017,"该任务已经处理，不能重复处理!"),
     FLOW_INSTANCE_NULL(1018,"未找到相关流程实例!"),
+    APPLY_CODE_ERROR(1019,"申请表单编码不正确，请联系系统管理员!"),
+    PROJECT_NULL(1020,"请选择需提交的项!"),
+    SUBMITREQUEST_CONVERT_FAIL(1021,"SubmitRequest Convert Fail"),
+    CONVERT_ERROR(1022,"不支持逆向转化"),
     SERVER_ERROR(9999,"系统繁忙，稍后重试");
     /**
      * 状态码

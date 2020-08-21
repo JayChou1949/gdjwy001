@@ -22,7 +22,7 @@ public interface WorkflowInstanceService extends IService<WorkflowInstance> {
      * @param businessId
      * @return
      */
-    public void launchInstanceOfWorkflow(String createPersonId, String flowId, String businessId);
+    public String launchInstanceOfWorkflow(String createPersonId, String flowId, String businessId);
 
 
     public void launchInstanceByArea(String creatorName, String businessId, String resourceType);

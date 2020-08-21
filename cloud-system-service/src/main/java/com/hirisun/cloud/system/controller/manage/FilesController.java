@@ -2,11 +2,13 @@ package com.hirisun.cloud.system.controller.manage;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hirisun.cloud.model.app.param.SubpageParam;
+import com.hirisun.cloud.model.param.FilesParam;
 import com.hirisun.cloud.system.service.FilesService;
 
 import io.swagger.annotations.Api;
@@ -40,5 +42,19 @@ public class FilesController {
     @GetMapping("/find")
     public void find(@RequestBody SubpageParam param) {
 		filesService.findBySubpageId(param.getSubpageId());
+	}
+	
+	@ApiIgnore
+    @ApiOperation("批量保存文件信息")
+    @PostMapping("/save/batch")
+    public void saveBatch(@RequestBody FilesParam param) {
+		filesService.saveBatch(param);
+	}
+	
+	@ApiIgnore
+    @ApiOperation("根据文件id集合批量删除文件信息")
+    @PostMapping("/save/delete")
+    public void deleteBatch(@RequestBody FilesParam param) {
+		filesService.deleteBatch(param);
 	}
 }

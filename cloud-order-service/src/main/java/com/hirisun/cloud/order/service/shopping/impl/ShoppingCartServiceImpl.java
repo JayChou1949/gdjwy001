@@ -10,17 +10,33 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.hirisun.cloud.api.system.FilesApi;
+import com.hirisun.cloud.api.workflow.WorkflowApi;
+import com.hirisun.cloud.common.constant.RedisKey;
+import com.hirisun.cloud.common.contains.ApplicationInfoStatus;
 import com.hirisun.cloud.common.contains.ResourceType;
+import com.hirisun.cloud.common.exception.CustomException;
+import com.hirisun.cloud.common.util.UUIDUtil;
+import com.hirisun.cloud.common.vo.CommonCode;
+import com.hirisun.cloud.model.app.param.SubpageParam;
+import com.hirisun.cloud.model.file.FilesVo;
+import com.hirisun.cloud.model.param.FilesParam;
 import com.hirisun.cloud.model.user.UserVO;
+import com.hirisun.cloud.order.bean.application.ApplicationInfo;
 import com.hirisun.cloud.order.bean.shopping.ShoppingCart;
 import com.hirisun.cloud.order.continer.FormNum;
 import com.hirisun.cloud.order.continer.HandlerWrapper;
 import com.hirisun.cloud.order.continer.IApplicationHandler;
 import com.hirisun.cloud.order.continer.ShoppingCartStatus;
 import com.hirisun.cloud.order.mapper.shopping.ShoppingCartMapper;
+import com.hirisun.cloud.order.service.activity.IActivityService;
+import com.hirisun.cloud.order.service.application.IApplicationInfoService;
 import com.hirisun.cloud.order.service.daas.IDaasApplicationService;
+import com.hirisun.cloud.order.service.saas.ISaasServiceApplicationService;
 import com.hirisun.cloud.order.service.shopping.IShoppingCartService;
+import com.hirisun.cloud.order.vo.SubmitRequest;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -70,6 +86,9 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper,
     private IFilesService filesService;
 
     @Autowired
+    private FilesApi filesApi;
+    
+    @Autowired
     private IDaasApplicationService daasApplicationService;
 
     @Autowired
@@ -89,6 +108,9 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper,
 
     @Autowired
     private MessageProvider messageProvider;
+    
+    @Autowired
+    private WorkflowApi workflowApi;
 
 
     @Transactional(rollbackFor = Throwable.class)
@@ -99,7 +121,7 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper,
         ShoppingCart shoppingCart = parseShoppingCart(json,hw.getApplicationType());
         logger.debug("parseShoppingCart -> {}",shoppingCart);
 
-        shoppingCart.setResourceType(hw.getFormNum().getResourceType().getCode());
+        shoppingCart.setResourceType(Long.valueOf(hw.getFormNum().getResourceType().getCode()));
         shoppingCart.setFormNum(hw.getFormNum().name());
         shoppingCart.setStatus(ShoppingCartStatus.WAIT_SUBMIT.getCode());
         this.save(shoppingCart);
@@ -150,7 +172,12 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper,
             if(handler != null){
                 shoppingCart.setServerList(handler.getByShoppingCartId(shoppingCart.getId()));
             }
-            List<Files> filesList = filesService.list(new QueryWrapper<Files>().lambda().eq(Files::getRefId, id));
+            
+            SubpageParam param = new SubpageParam();
+            param.setRefId(id);
+			List<FilesVo> filesList = filesApi.find(param);
+            
+//            List<Files> filesList = filesService.list(new QueryWrapper<Files>().lambda().eq(Files::getRefId, id));
             shoppingCart.setFileList(filesList);
         }
         return shoppingCart;
@@ -203,7 +230,7 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper,
 
     @Transactional(rollbackFor = Throwable.class)
     @Override
-    public void submit(User user,SubmitRequest submitRequest) {
+    public void submit(UserVO user,SubmitRequest submitRequest) {
 
 
         logger.debug("submitRequest -> {}",submitRequest);
@@ -214,13 +241,15 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper,
         //获取提交购物车集合
         if(StringUtils.equals("all",submitRequest.getShoppingCartIds())){
             shoppingCartItems = this.list(new QueryWrapper<ShoppingCart>().lambda()
-                                            .eq(ShoppingCart::getCreatorIdCard,user.getIdcard())
+                                            .eq(ShoppingCart::getCreatorIdCard,user.getIdCard())
                                             .eq(ShoppingCart::getStatus,ShoppingCartStatus.WAIT_SUBMIT.getCode()));
         }else {
-            shoppingCartItems = getShoppingCartItems(user.getIdcard(),submitRequest.getShoppingCartIds());
+            shoppingCartItems = getShoppingCartItems(user.getIdCard(),submitRequest.getShoppingCartIds());
         }
         if(StringUtils.isBlank(submitRequest.getShoppingCartIds())){
-            throw  new BaseException("请选择需提交的项");
+        	
+        	throw new CustomException(CommonCode.PROJECT_NULL);
+//            throw  new BaseException("请选择需提交的项");
         }
         List<String> idList;
         if(StringUtils.equals("all",submitRequest.getShoppingCartIds())){
@@ -250,12 +279,12 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper,
         int withoutDsNum = shoppingCartListWithoutDS.size();
 
         //对非DS先将文件关联到每个购物车
-        List<Files> fileList  = submitRequest.getFileList();
+        List<FilesVo> fileList  = submitRequest.getFileList();
         if(CollectionUtils.isNotEmpty(fileList)){
-            List<Files> splitFileList = Lists.newArrayList();
+            List<FilesVo> splitFileList = Lists.newArrayList();
             for(String id:withoutDsIdList){
-                for(Files f:fileList){
-                    Files nf =  new Files();
+                for(FilesVo f:fileList){
+                	FilesVo nf =  new FilesVo();
                     BeanUtils.copyProperties(f,nf);
                     nf.setId(null);
                     nf.setRefId(id);
@@ -263,11 +292,21 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper,
                     splitFileList.add(nf);
                 }
             }
-            filesService.saveBatch(splitFileList);
+            
+            FilesParam param = new FilesParam();
+            param.setFiles(splitFileList);
+			filesApi.saveBatch(param);
+            
+//            filesService.saveBatch(splitFileList);
             logger.debug("id size -> {} fileList size ->{} splitFileList -> {}",withoutDsIdList.size(),fileList.size(),splitFileList.size());
             //删除原记录
-            List<String> originFileId = fileList.stream().map(Files::getId).distinct().collect(Collectors.toList());
-            filesService.removeByIds(originFileId);
+            List<String> originFileId = fileList.stream().map(FilesVo::getId).distinct().collect(Collectors.toList());
+            param.setFilesIdList(originFileId);
+            filesApi.deleteBatch(param);
+//          filesService.removeByIds(originFileId);
+            
+            
+            
         }
         //IaaS 和 PaaS购物车 分单（遍历IaaS PaaS购物车）
         for (ShoppingCart shoppingCart:shoppingCartListWithoutDS){
@@ -282,7 +321,10 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper,
                 handler.refAppInfoFromShoppingCart(shoppingCart.getId(),info.getId());
             }
             //新生成的订单发起流程
-           R r =  instanceService.launchInstanceOfWorkFlow(user.getIdcard(),info.getWorkFlowId(),info.getId());
+            
+            workflowApi.launchInstanceOfWorkflow(user.getIdCard(),info.getWorkFlowId(),info.getId());
+            
+           R r =  instanceService.launchInstanceOfWorkFlow(user.getIdCard(),info.getWorkFlowId(),info.getId());
             logger.debug("launchInstance -> {}",r);
         }
 
@@ -521,7 +563,7 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper,
      * 处理需要合并的购物车资源(DaaS ,SaaS)
      * @param allItems 全部购物车
      */
-    private void merge(User user,List<ShoppingCart> allItems,ApplicationInfo baseInfo,List<ApplicationInfo> infoList){
+    private void merge(UserVO user,List<ShoppingCart> allItems,ApplicationInfo baseInfo,List<ApplicationInfo> infoList){
 
         //获取所有DaaS购物车
         List<ShoppingCart> daaSItems = getDaaSItems(allItems);
@@ -543,7 +585,7 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper,
      * @param shoppingCartList DAAS或SAAS购物车集合
      * @param baseInfo 订单基本信息
      */
-    private ApplicationInfo dealMerge(User user,List<ShoppingCart> shoppingCartList,ApplicationInfo baseInfo){
+    private ApplicationInfo dealMerge(UserVO user,List<ShoppingCart> shoppingCartList,ApplicationInfo baseInfo){
         if(CollectionUtils.isNotEmpty(shoppingCartList)){
             //取第一个DaaS/SaaS购物车
             ShoppingCart shoppingCart = shoppingCartList.get(0);
@@ -565,13 +607,13 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper,
      * @param shoppingCart
      * @param baseInfo
      */
-    private ApplicationInfo configAndSaveBaseInfo(User user,ShoppingCart shoppingCart,ApplicationInfo baseInfo){
+    private ApplicationInfo configAndSaveBaseInfo(UserVO user,ShoppingCart shoppingCart,ApplicationInfo baseInfo){
         HandlerWrapper hw = FormNum.getHandlerWrapperByName(context,shoppingCart.getFormNum());
         ApplicationInfo info = new ApplicationInfo();
         BeanUtils.copyProperties(baseInfo,info);
         info.setId(UUIDUtil.getUUID());
         logger.debug("ID -> {}",info.getId());
-        info.setCreator(user.getIdcard());
+        info.setCreator(user.getIdCard());
         info.setCreatorName(user.getName());
         info.setStatus(ApplicationInfoStatus.SHOPPING_CART.getCode());
         //iaas和paas申请从购物车中取申请说明，daas和saas从申请单中取申请说明
@@ -629,10 +671,18 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper,
         filesService.update(new Files(),new UpdateWrapper<Files>().lambda().eq(Files::getRefId,shoppingCartId).set(Files::getRefId,appInfoId));
     }
 
-    private void refFiles(List<Files> files, String refId) {
+    private void refFiles(List<FilesVo> files, String refId) {
         if (org.apache.commons.lang.StringUtils.isEmpty(refId)) {
             return;
         }
+        
+//        SubpageParam param = new SubpageParam();
+//        param.setRefId(id);
+//		List<FilesVo> filesList = filesApi.find(param);
+        SubpageParam param = new SubpageParam();
+        param.setRefId(refId);
+        filesApi.remove(param);
+        
         filesService.remove(new QueryWrapper<Files>().lambda().eq(Files::getRefId, refId));
         if (files != null && !files.isEmpty()) {
             for (Files f : files) {

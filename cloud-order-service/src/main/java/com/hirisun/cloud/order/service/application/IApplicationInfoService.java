@@ -44,10 +44,10 @@ public interface IApplicationInfoService extends IService<ApplicationInfo> {
      */
     <S> void draft(UserVO user, ApplicationInfo<S, Object> info, IApplicationHandler<S> handler);
 
-    <S, I> ApplicationInfo<S, I> getDetail(UserVO user, String id, IApplicationHandler<S> handler,
+    <S, I> ApplicationInfoVo<S, I> getDetail(UserVO user, String id, IApplicationHandler<S> handler,
                                            IImplHandler<I> implHandler);
 
-    public <S, I> ApplicationInfo<S, I> getNewFlowDetail(UserVO user, String id, IApplicationHandler<S> handler, IImplHandler<I> implHandler);
+    public <S, I> ApplicationInfoVo<S, I> getNewFlowDetail(UserVO user, String id, IApplicationHandler<S> handler, IImplHandler<I> implHandler);
     /**
      * 实施
      */

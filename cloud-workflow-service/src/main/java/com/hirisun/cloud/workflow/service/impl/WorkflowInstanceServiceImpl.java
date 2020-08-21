@@ -63,7 +63,7 @@ public class WorkflowInstanceServiceImpl extends ServiceImpl<WorkflowInstanceMap
      * @param businessId    应用id
      */
     @Override
-    public void launchInstanceOfWorkflow(String createPersonId, String flowId, String businessId) {
+    public String launchInstanceOfWorkflow(String createPersonId, String flowId, String businessId) {
 
         Workflow workFlow = workflowService.getById(flowId);
         logger.info("launch version :{}",workFlow.getVersion());
@@ -125,11 +125,12 @@ public class WorkflowInstanceServiceImpl extends ServiceImpl<WorkflowInstanceMap
         // 发起流程的第一个环节,申请环节
         boolean createActiviteResult = workflowActivityService.save(firstActivity);
         if (createActiviteResult && createInstanceResult) {
-            return ;
+            return firstActivity.getId();
         } else {
             logger.info("发起流程失败");
             new CustomException(WorkflowCode.WORKFLOW_CREATE_FAIL);
         }
+		return actId;
     }
 
     /**

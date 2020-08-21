@@ -52,7 +52,7 @@ public class WorkflowInstanceManageController {
     @PostMapping("/feign/launchInstanceOfWorkflow")
     public void  launchInstanceOfWorkflow(@RequestParam String createPersonId,@RequestParam  String flowId,@RequestParam String businessId) {
         logger.info("/feign/launchInstanceOfWorkflow：{},{},{}",createPersonId,flowId,businessId);
-        workflowInstanceService.launchInstanceOfWorkflow(createPersonId, flowId, businessId);
+        String activityId = workflowInstanceService.launchInstanceOfWorkflow(createPersonId, flowId, businessId);
         return ;
     }
 

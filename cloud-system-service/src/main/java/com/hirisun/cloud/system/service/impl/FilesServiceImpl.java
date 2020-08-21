@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -36,9 +37,8 @@ import com.hirisun.cloud.common.exception.CustomException;
 import com.hirisun.cloud.common.util.JsonUtils;
 import com.hirisun.cloud.common.vo.CommonCode;
 import com.hirisun.cloud.model.app.param.SubpageParam;
-import com.hirisun.cloud.model.app.vo.AppSceneVo;
 import com.hirisun.cloud.model.file.FilesVo;
-import com.hirisun.cloud.system.bean.AppSupre;
+import com.hirisun.cloud.model.param.FilesParam;
 import com.hirisun.cloud.system.bean.Files;
 import com.hirisun.cloud.system.mapper.FilesMapper;
 import com.hirisun.cloud.system.service.FilesService;
@@ -403,5 +403,37 @@ public class FilesServiceImpl extends ServiceImpl<FilesMapper, Files> implements
 		}
 		
 		return null;
+	}
+
+	@Transactional(rollbackFor = Exception.class)
+	public void saveBatch(FilesParam filesParam) {
+		
+		List<FilesVo> filesVoList = filesParam.getFiles();
+		
+		if(CollectionUtils.isNotEmpty(filesVoList)) {
+			
+			List<Files> filesList = new ArrayList<Files>(); 
+			
+			for(FilesVo vo : filesVoList) {
+				Files files = new Files();
+				BeanUtils.copyProperties(vo, files);
+				filesList.add(files);
+			}
+			this.saveBatch(filesList);
+		}
+		
+		
+		
+	}
+
+	@Transactional(rollbackFor = Exception.class)
+	public void deleteBatch(FilesParam param) {
+		
+		List<String> filesIdList = param.getFilesIdList();
+		if(CollectionUtils.isNotEmpty(filesIdList)) {
+			filesMapper.deleteBatchIds(filesIdList);
+		}
+		
+		
 	}
 }
