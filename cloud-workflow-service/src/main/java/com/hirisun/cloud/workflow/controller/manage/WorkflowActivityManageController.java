@@ -42,7 +42,7 @@ public class WorkflowActivityManageController {
     /**
      * 根据参数获取流程活动
      * @param status  流程活动状态
-     * @param instanceId    流程实例id
+     * @param instanceId 流程实例id
      */
     @ApiIgnore
     @ApiOperation("根据参数获取一个流程流转信息")
@@ -64,7 +64,6 @@ public class WorkflowActivityManageController {
     @ApiOperation("根据参数获取流程流转列表")
     @PostMapping("/feign/getWorkflowActivityListByParams")
     public String getWorkflowActivityListByParams(@RequestParam Integer status,@RequestParam String instanceId) {
-        logger.info("/feign/getWorkflowActivityListByParams：{},{}",status,instanceId);
         List<WorkflowActivity> activityList = workflowActivityService.list(new QueryWrapper<WorkflowActivity>().lambda()
                 .eq(WorkflowActivity::getActivityStatus,status)
                 .eq(WorkflowActivity::getInstanceId,instanceId));
@@ -77,14 +76,13 @@ public class WorkflowActivityManageController {
      * @param map 短信消息map
      * @param workflowNodeStr 下个环节json串
      */
-    @ApiIgnore
-    @ApiOperation("环节初次流转")
-    @PutMapping("/feign/advanceCurrentActivity")
-    public void advanceCurrentActivity(@RequestBody AdvanceBeanVO advanceBeanVO,@RequestParam Map<String, String> map,@RequestParam String workflowNodeStr) {
-
-        WorkflowNode nextNode = JSON.parseObject(workflowNodeStr, WorkflowNode.class);
-        workflowActivityService.advanceCurrentActivity(advanceBeanVO,map,nextNode);
-    }
+//    @ApiIgnore
+//    @ApiOperation("环节初次流转")
+//    @PutMapping("/feign/advanceCurrentActivity")
+//    public Map<String,String> advanceCurrentActivity(@RequestBody AdvanceBeanVO advanceBeanVO,@RequestParam Map<String, String> map,@RequestParam String workflowNodeStr) {
+//        WorkflowNode nextNode = JSON.parseObject(workflowNodeStr, WorkflowNode.class);
+//        return workflowActivityService.advanceCurrentActivity(advanceBeanVO,map,nextNode);
+//    }
     /**
      * 环节正常流转
      * @param currentActivityId 环节id
@@ -103,7 +101,6 @@ public class WorkflowActivityManageController {
     @ApiOperation("通过实例id获取处理人id")
     @PostMapping("/feign/instanceToHandleIdCards")
     public Map<String, String> instanceToHandleIdCards(@RequestParam List<String> instanceIdList) {
-
         return workflowActivityService.instanceToHandleIdCards(instanceIdList);
     }
 
@@ -141,6 +138,19 @@ public class WorkflowActivityManageController {
     @PostMapping("/feign/adviseActivity")
     public Map<String,String> adviseActivity(@RequestParam String activityId) {
         Map resultMap = workflowActivityService.adviseActivity(activityId);
+        return resultMap;
+    }
+
+    /**
+     * 加办
+     */
+    @ApiIgnore
+    @ApiOperation("加办")
+    @PostMapping("/feign/add")
+    public Map<String,String> add(@RequestParam String handlerPersonIds,
+                                  @RequestParam String currentActivityId,
+                                  @RequestParam String creatorId) {
+        Map resultMap = workflowActivityService.add(handlerPersonIds,currentActivityId,creatorId);
         return resultMap;
     }
 

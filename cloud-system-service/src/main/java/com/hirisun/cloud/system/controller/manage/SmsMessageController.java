@@ -68,7 +68,7 @@ public class SmsMessageController {
      */
     @ApiOperation("发送业务拒绝回退短信")
     @GetMapping("/buildRejectMessage")
-    public void buildProcessingMessage(@RequestParam String creatorId,@RequestParam String bizName) {
+    public void buildRejectMessage(@RequestParam String creatorId,@RequestParam String bizName) {
         messageProvider.sendMessageAsync(messageProvider.buildRejectMessage(creatorId,bizName));
         return ;
     }

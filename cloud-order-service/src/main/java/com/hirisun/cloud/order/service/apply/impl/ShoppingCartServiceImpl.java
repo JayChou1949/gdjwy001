@@ -44,6 +44,7 @@ import com.hirisun.cloud.order.service.apply.ShoppingCartService;
 import com.hirisun.cloud.order.util.SubmitRequest;
 import com.hirisun.cloud.order.vo.OrderCode;
 import com.hirisun.cloud.redis.service.RedisService;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * <p>
@@ -90,6 +91,7 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
      * @param user
      * @param submitRequest
      */
+    @Transactional
     @Override
     public void submit(UserVO user, SubmitRequest submitRequest) {
         /**
@@ -160,7 +162,6 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
             }else{
                 throw new CustomException(OrderCode.WORKFLOW_MISSING);
             }
-
             //环节处理人map key:环节ID value:审核人id ，分割
             modelMapToPerson.put(nextNode.getId(),
                     submitRequest.getUserIds());
@@ -172,11 +173,12 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
             Map<String,String> map = new HashMap<>();
             map.put("name",info.getServiceTypeName());
             map.put("order",info.getOrderNumber());
-            workflowApi.advanceCurrentActivity(advanceBeanVO,map, nodeStr);
-
-
+            Map resultMap = workflowApi.advanceActivity(firstActivity.getId(),map);
+            if (!"200".equals(resultMap.get("code"))) {
+                logger.error("advanceCurrentActivity调用失败:{}",resultMap.get("msg"));
+                throw new CustomException(OrderCode.FEIGN_METHOD_ERROR);
+            }
         }
-
 //        this.removeByIds(idList);
 
     }

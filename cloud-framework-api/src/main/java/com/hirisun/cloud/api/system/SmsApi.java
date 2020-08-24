@@ -48,7 +48,7 @@ public interface SmsApi {
      */
     @ApiOperation("发送业务拒绝回退短信")
     @GetMapping("/system/sms/buildRejectMessage")
-    public void buildProcessingMessage(@RequestParam String creatorId,@RequestParam String bizName);
+    public void buildRejectMessage(@RequestParam String creatorId,@RequestParam String bizName);
     /**
      * 发送资源缩配短信
      * @param creatorId 业务名

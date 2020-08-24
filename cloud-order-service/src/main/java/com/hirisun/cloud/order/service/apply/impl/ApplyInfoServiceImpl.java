@@ -9,6 +9,7 @@ import com.battcn.boot.swagger.model.Order;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
+import com.hirisun.cloud.api.system.SmsApi;
 import com.hirisun.cloud.api.user.UserApi;
 import com.hirisun.cloud.api.workflow.WorkflowApi;
 import com.hirisun.cloud.common.constant.BusinessName;
@@ -23,6 +24,7 @@ import com.hirisun.cloud.model.apply.FallBackVO;
 import com.hirisun.cloud.model.service.AppReviewInfoVo;
 import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.model.workflow.WorkflowActivityVO;
+import com.hirisun.cloud.model.workflow.WorkflowInstanceVO;
 import com.hirisun.cloud.model.workflow.WorkflowNodeVO;
 import com.hirisun.cloud.order.bean.apply.ApplyFeedback;
 import com.hirisun.cloud.order.bean.apply.ApplyInfo;
@@ -32,6 +34,7 @@ import com.hirisun.cloud.order.mapper.apply.ApplyInfoMapper;
 import com.hirisun.cloud.order.service.apply.ApplyFeedbackService;
 import com.hirisun.cloud.order.service.apply.ApplyInfoService;
 import com.hirisun.cloud.order.service.apply.ApplyReviewRecordService;
+import com.hirisun.cloud.order.vo.ApproveVO;
 import com.hirisun.cloud.order.vo.OrderCode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -78,6 +81,9 @@ public class ApplyInfoServiceImpl extends ServiceImpl<ApplyInfoMapper, ApplyInfo
     @Autowired
     private UserApi userApi;
 
+    @Autowired
+    private SmsApi smsApi;
+
     /**
      * 分页查询工单审批记录
      * 拼装工单当前处理人
@@ -90,6 +96,50 @@ public class ApplyInfoServiceImpl extends ServiceImpl<ApplyInfoMapper, ApplyInfo
             curHandlerPerson(applyInfoList,user);
         }
         return page;
+    }
+
+    @Override
+    public QueryResponseResult<ApplyInfo> detail(String id) {
+        /**
+         * 1.查询申请工单
+         * 2.查询对应的流程实例
+         * 3.查询流程实例对应的流转信息
+         * 4.查询审批记录
+         * 5.查询反馈记录
+         */
+        ApplyInfo applyInfo = applyInfoService.getById(id);
+        if (applyInfo == null) {
+            log.error("申请单不存在");
+            return QueryResponseResult.fail("申请单不存在");
+        }
+        String instanceStr = workflowApi.getWorkflowInstanceByBusinessId(applyInfo.getId());
+        if (org.apache.commons.lang3.StringUtils.isEmpty(instanceStr)) {
+            log.error("流程实例未找到");
+            return QueryResponseResult.fail("流程实例未找到");
+        }
+        WorkflowInstanceVO instance = JSON.parseObject(instanceStr, WorkflowInstanceVO.class);
+
+        String nodeStr = workflowApi.getWorkflowNodeAndActivitys(instance.getVersion(), instance.getWorkflowId(), instance.getId());
+        if (org.apache.commons.lang3.StringUtils.isEmpty(nodeStr)) {
+            log.error("未找到对应的流程环节信息！");
+            throw new CustomException(OrderCode.WORKFLOW_MISSING);
+        }
+        //TODO nodeList modelName modelStatus  流程实例和环节结合
+        List<WorkflowNodeVO> nodeList=JSON.parseArray(nodeStr, WorkflowNodeVO.class);
+
+        List<ApplyReviewRecord> reviewList= applyReviewRecordService.list(new QueryWrapper<ApplyReviewRecord>().lambda()
+                .eq(ApplyReviewRecord::getApplyId, applyInfo.getId()).orderByDesc(ApplyReviewRecord::getCreateTime));
+
+        List<ApplyFeedback> feedbackList= applyFeedbackService.list(new QueryWrapper<ApplyFeedback>().lambda()
+                .eq(ApplyFeedback::getAppInfoId, applyInfo.getId()).orderByDesc(ApplyFeedback::getCreateTime));
+
+        Map map = new HashMap();
+        map.put("applyInfo", applyInfo);
+        map.put("instance", instance);
+        map.put("nodeList", nodeList);
+        map.put("reviewList", reviewList);
+        map.put("feedbackList", feedbackList);
+        return QueryResponseResult.success(map);
     }
 
     /**
@@ -197,6 +247,7 @@ public class ApplyInfoServiceImpl extends ServiceImpl<ApplyInfoMapper, ApplyInfo
         this.update(new ApplyInfo(), new UpdateWrapper<ApplyInfo>().lambda()
                 .eq(ApplyInfo::getId, id)
                 .set(ApplyInfo::getStatus, ApplyInfoStatus.DELETE.getCode()));
+//        workflowApi.terminationInstanceOfWorkFlow(id);
         // 如果有部门内审核人,删除之
 //        innerReviewUserService.removeByAppInfoId(info.getId());
     }
@@ -407,6 +458,37 @@ public class ApplyInfoServiceImpl extends ServiceImpl<ApplyInfoMapper, ApplyInfo
 //        }
     }
 
+    /**
+     * 加办
+     * @param user 用户
+     * @param approveVO 审核信息
+     * @return
+     */
+    @Override
+    public QueryResponseResult add(UserVO user, ApproveVO approveVO) {
+        ApplyInfo info = applyInfoService.getById(approveVO.getApplyReviewRecord().getApplyId());
+        Map<String, String> resultMap = workflowApi.add(approveVO.getUserIds(), approveVO.getCurrentActivityId(), user.getIdCard());
+        if ("200".equals(resultMap.get("code"))) {
+            ApplyReviewRecord applyReviewRecord= approveVO.getApplyReviewRecord();
+            applyReviewRecord.setType(resultMap.get("type"));
+            applyReviewRecord.setStepName(resultMap.get("stepName"));
+            applyReviewRecord.setCreator(user.getIdCard());
+            if (StringUtils.isEmpty(applyReviewRecord.getId())) {
+                applyReviewRecordService.save(applyReviewRecord);
+            }else{
+                applyReviewRecordService.updateById(applyReviewRecord);
+            }
+        }else{
+            return QueryResponseResult.fail(resultMap.get("msg"));
+        }
+        smsApi.buildProcessingMessage(info.getServiceTypeName(),info.getOrderNumber(),approveVO.getUserIds());
+        return QueryResponseResult.success(null);
+    }
+
+    /**
+     * VO转换成实体
+     * @return
+     */
     public ApplyReviewRecord reviewViewObjectConvert(ApplyReviewRecordVO applyReviewRecordVO) {
         ApplyReviewRecord applyReviewRecord = new ApplyReviewRecord();
         if (StringUtils.isNotEmpty(applyReviewRecordVO.getId())) {

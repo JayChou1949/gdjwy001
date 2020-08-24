@@ -7,6 +7,7 @@ import com.hirisun.cloud.model.apply.FallBackVO;
 import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.order.bean.apply.ApplyInfo;
 import com.hirisun.cloud.order.continer.IImplHandler;
+import com.hirisun.cloud.order.vo.ApproveVO;
 
 import java.util.Map;
 
@@ -24,6 +25,13 @@ public interface ApplyInfoService extends IService<ApplyInfo> {
      * 获取申请工单记录
      */
     Page<ApplyInfo> getPage(Page<ApplyInfo> page, UserVO user, Map map);
+
+    /**
+     * 工单详情
+     * @param id
+     * @return
+     */
+    public QueryResponseResult<ApplyInfo> detail(String id);
 
     /**
      * 逻辑删除申请审批工单
@@ -50,5 +58,10 @@ public interface ApplyInfoService extends IService<ApplyInfo> {
      * @throws Exception
      */
     public <I> void saveImpl(UserVO user, Map<String, Object> param, IImplHandler<I> implHandler, String modelId) throws Exception;
+
+    public QueryResponseResult add(UserVO userVO, ApproveVO approveVO);
+
+//    public QueryResponseResult deleteById(UserVO user,String id);
+
 
 }

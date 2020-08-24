@@ -2,6 +2,8 @@ package com.hirisun.cloud.workflow.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.hirisun.cloud.api.system.SmsApi;
+import com.hirisun.cloud.common.contains.WorkflowActivityStatus;
 import com.hirisun.cloud.common.contains.WorkflowNodeAbilityType;
 import com.hirisun.cloud.common.exception.CustomException;
 import com.hirisun.cloud.common.util.UUIDUtil;
@@ -13,6 +15,7 @@ import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.model.workflow.AdvanceBeanVO;
 import com.hirisun.cloud.model.workflow.WorkflowActivityVO;
 import com.hirisun.cloud.model.workflow.WorkflowNodeVO;
+import com.hirisun.cloud.workflow.bean.Workflow;
 import com.hirisun.cloud.workflow.bean.WorkflowActivity;
 import com.hirisun.cloud.workflow.bean.WorkflowInstance;
 import com.hirisun.cloud.workflow.bean.WorkflowNode;
@@ -23,6 +26,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hirisun.cloud.workflow.service.WorkflowInstanceService;
 import com.hirisun.cloud.workflow.service.WorkflowNodeService;
 import com.hirisun.cloud.workflow.vo.WorkflowCode;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,127 +62,137 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
     @Autowired
     private WorkflowActivityService workflowActivityService;
 
+    @Autowired
+    private SmsApi smsApi;
+
     /**
      * 初次流转  ,提交当前环节流转信息，生成下个待办环节流转信息
      * @param advanceBeanVO 流转VO
      * @param map 短信消息map
      * @return
      */
-    @Override
-    public void advanceCurrentActivity(AdvanceBeanVO advanceBeanVO, Map<String, String> map,WorkflowNode nextModel) {
-        if (advanceBeanVO==null) {
-            logger.info("流转信息不能为空");
-            throw new CustomException(WorkflowCode.ADVANCE_CAN_NOT_NULL);
-        }
-        String currentActivityId=advanceBeanVO.getCurrentActivityId();
-        if (StringUtils.isEmpty(currentActivityId)) {
-            logger.info("当前环节ID不能为空");
-            throw new CustomException(WorkflowCode.NODE_ID_CAN_NOT_NULL);
-        }
-        WorkflowActivity currentActivity=this.getById(currentActivityId);
-        if (currentActivity == null) {
-            logger.info("当前流程活动信息为空,流转失败!");
-            throw new CustomException(WorkflowCode.WORKFLOW_ACTIVITY_MISSING);
-        }
-        //下一流转环节的处理人Map
-        Map<String, String> modelMapToPerson=advanceBeanVO.getModelMapToPerson();
-        //下级环节集合
-//        List<WorkflowNode> nextModels= null;
-        String currentModelId=currentActivity.getNodeId();
-        if (currentModelId==null||"".equals(currentModelId)) {
-            logger.info("当前环节对应的流程环节为空，请传入流程定义环节信息!");
-            throw new CustomException(WorkflowCode.WORKFLOW_ACTIVITY_ERROR);
-        }
-
-        if (!currentActivity.getActivityStatus().equals(WorkflowActivity.STATUS_WAITING)) {
-            logger.info("该任务已经处理，不能重复处理!");
-            throw new CustomException(WorkflowCode.WORKFLOW_ACTIVITY_HANDLING);
-        }
-        //如果没有下级环节，则直接完成当前环节，完成流程实例
-        if (nextModel==null) {
-            currentActivity.setActivityStatus(WorkflowActivity.STATUS_SUBMIT);
-            currentActivity.setHandleTime(new Date());
-            this.updateById(currentActivity);
-
-            WorkflowInstance instance=workflowInstanceService.getById(currentActivity.getInstanceId());
-            instance.setCompleteTime(new Date());
-            instance.setInstanceStatus(WorkflowInstance.INSTANCE_STATUS_COMPLETE);
-            workflowInstanceService.updateById(instance);
-            return;
-        }
-
-        //取得对应环节的处理人
-        String personids=modelMapToPerson.get(nextModel.getId());
-        //如果处理人为空则取出默认处理人
-        if (personids==null||personids.trim().equals("")) {
-            personids=nextModel.getDefaultHandler();
-            //如果默认处理人也为空则直接返回提示信息给前台
-            if (personids==null||personids.trim().equals("")) {
-                logger.info("流程未配置处理人!");
-                throw new CustomException(WorkflowCode.WORKFLOW_NODE_HANDLER_MISSING);
-            }
-        }
-        //把办理人分割成数组
-        String personArr[]=personids.split(",");
-        if (personArr.length==0) {
-            throw new CustomException(WorkflowCode.WORKFLOW_NODE_HANDLER_MISSING);
-        }
-        //获取需要的参与人对应关系
-        Map<String, String> adviserMap=advanceBeanVO.getModelMapToAdviser();
-        String adviserIds=null;
-        if (adviserMap!=null) {
-            adviserIds=adviserMap.get(nextModel.getId());
-        }
-        //把参与人分割成数组
-        String adviserArr[]=null;
-        if (adviserIds!=null) {
-            adviserArr=adviserIds.split(",");
-        }
-        if (map!=null) {
-            handleFlow(nextModel, currentActivity, personArr,adviserArr,advanceBeanVO,map);
-        } else {
-            handleFlow(nextModel, currentActivity, personArr, adviserArr, advanceBeanVO,null);
-        }
-
-        //当前流转信息更新为已提交,同级(其它处理人)在handleFlow已处理为已抢占
-        currentActivity.setHandleTime(new Date());
-        currentActivity.setActivityStatus(WorkflowActivity.STATUS_SUBMIT);
-        this.updateById(currentActivity);
-//        return QueryResponseResult.success(null);
-    }
+//    @Override
+//    public Map<String,String> advanceCurrentActivity(AdvanceBeanVO advanceBeanVO, Map<String, String> map,WorkflowNode nextModel) {
+//        Map<String, String> resultMap = new HashMap<>();
+//        resultMap.put("code", "201");
+//        if (advanceBeanVO==null) {
+//            logger.info("流转信息不能为空");
+//            resultMap.put("msg", "流转信息不能为空");
+//            return resultMap;
+//        }
+//        String currentActivityId=advanceBeanVO.getCurrentActivityId();
+//        if (StringUtils.isEmpty(currentActivityId)) {
+//            logger.info("当前环节ID不能为空");
+//            resultMap.put("msg", "当前环节ID不能为空");
+//            return resultMap;
+//        }
+//        WorkflowActivity currentActivity=this.getById(currentActivityId);
+//        if (currentActivity == null) {
+//            logger.info("当前流程活动信息为空,流转失败!");
+//            resultMap.put("msg", "当前流程活动信息为空,流转失败");
+//            return resultMap;
+//        }
+//        //下一流转环节的处理人Map
+//        Map<String, String> modelMapToPerson=advanceBeanVO.getModelMapToPerson();
+//        //下级环节集合
+////        List<WorkflowNode> nextModels= null;
+//        String currentModelId=currentActivity.getNodeId();
+//        if (currentModelId==null||"".equals(currentModelId)) {
+//            logger.info("当前环节对应的流程环节为空，请传入流程定义环节信息!");
+//            resultMap.put("msg", "当前环节对应的流程环节为空，请传入流程定义环节信息");
+//            return resultMap;
+//        }
+//
+//        if (!currentActivity.getActivityStatus().equals(WorkflowActivity.STATUS_WAITING)) {
+//            logger.info("该任务已经处理，不能重复处理!");
+//            resultMap.put("msg", "该任务已经处理，不能重复处理");
+//            return resultMap;
+//        }
+//        //如果没有下级环节，则直接完成当前环节，完成流程实例
+//        if (nextModel==null) {
+//            currentActivity.setActivityStatus(WorkflowActivity.STATUS_SUBMIT);
+//            currentActivity.setHandleTime(new Date());
+//            this.updateById(currentActivity);
+//
+//            WorkflowInstance instance=workflowInstanceService.getById(currentActivity.getInstanceId());
+//            instance.setCompleteTime(new Date());
+//            instance.setInstanceStatus(WorkflowInstance.INSTANCE_STATUS_COMPLETE);
+//            workflowInstanceService.updateById(instance);
+//            resultMap.put("code", "200");
+//            resultMap.put("msg", "成功");
+//            return resultMap;
+//        }
+//
+//        //取得对应环节的处理人
+//        String personids=modelMapToPerson.get(nextModel.getId());
+//        //如果处理人为空则取出默认处理人
+//        if (personids==null||personids.trim().equals("")) {
+//            personids=nextModel.getDefaultHandler();
+//            //如果默认处理人也为空则直接返回提示信息给前台
+//            if (personids==null||personids.trim().equals("")) {
+//                logger.info("流程未配置处理人!");
+//                resultMap.put("msg", "流程未配置处理人");
+//                return resultMap;
+//            }
+//        }
+//        //把办理人分割成数组
+//        String personArr[]=personids.split(",");
+//        if (personArr.length==0) {
+//            throw new CustomException(WorkflowCode.WORKFLOW_NODE_HANDLER_MISSING);
+//        }
+//        //获取需要的参与人对应关系
+//        Map<String, String> adviserMap=advanceBeanVO.getModelMapToAdviser();
+//        String adviserIds=null;
+//        if (adviserMap!=null) {
+//            adviserIds=adviserMap.get(nextModel.getId());
+//        }
+//        //把参与人分割成数组
+//        String adviserArr[]=null;
+//        if (adviserIds!=null) {
+//            adviserArr=adviserIds.split(",");
+//        }
+//    handleFlow(nextModel, currentActivity, personArr,adviserArr,map);
+//
+//        //当前流转信息更新为已提交,同级(其它处理人)在handleFlow已处理为已抢占
+//        currentActivity.setHandleTime(new Date());
+//        currentActivity.setActivityStatus(WorkflowActivity.STATUS_SUBMIT);
+//        this.updateById(currentActivity);
+//        resultMap.put("code", "200");
+//        resultMap.put("msg", "成功");
+//        return resultMap;
+//    }
 
     /**
-     * 处理新增流转信息
+     * 保存流转信息
      * @param nextModel 下一环节
      * @param currentActivity 当前流转ID
      * @param personArr 处理人数组
      * @param adviserArr 参与人数组
-     * @param advanceBeanVO
-     * @param map
+     * @param messageMap    短信信息map
      */
-    private void handleFlow(WorkflowNode nextModel, WorkflowActivity currentActivity, String[] personArr,String[] adviserArr, AdvanceBeanVO advanceBeanVO, Map<String, String> map) {
-
+    private void handleFlow(WorkflowNode nextModel, WorkflowActivity currentActivity, String[] personArr,String[] adviserArr, Map<String, String> messageMap) {
+        List<WorkflowActivity> activityList = new ArrayList<>();
         //如果为抢占模式，则直接生成下级的待办任务
         for (int i = 0; i < personArr.length; i++) {
-            WorkflowActivity nextActivity=getTaskActivity(personArr[i],currentActivity,nextModel,WorkflowActivity.STATUS_WAITING);
-            this.save(nextActivity);
-            if (null!=map) {
-//                messageProvider.sendMessageAsync(messageProvider.buildProcessingMessage(map.get("name"), map.get("order"), personArr[i]));
-            }
+            WorkflowActivity defaultActivity=getTaskActivity(personArr[i],currentActivity,nextModel,WorkflowActivity.STATUS_WAITING);
+            activityList.add(defaultActivity);
         }
         //生成参与人待办
         if (adviserArr!=null) {
             for (int j = 0; j < adviserArr.length; j++) {
                 WorkflowActivity adviserActivity=getTaskActivity(adviserArr[j],currentActivity,nextModel,WorkflowActivity.STATUS_WAITING);
                 adviserActivity.setActivityType("adviser");
-                this.save(adviserActivity);
-                //发送待办通知消息到mq
-                if (null!=map) {
-//                    messageProvider.sendMessageAsync(messageProvider.buildProcessingMessage(map.get("name"), map.get("order"), personArr[j]));
-                }
+                activityList.add(adviserActivity);
             }
         }
-
+        if (CollectionUtils.isNotEmpty(activityList)) {
+            this.saveBatch(activityList);
+            if (messageMap != null) {
+                activityList.forEach(item->{
+                    smsApi.buildProcessingMessage(messageMap.get("name"), messageMap.get("order"), item.getHandlePersons());
+                });
+            }
+        }
         //修改当前环节状态为已提交 ，如果当前环节选择了多个办理人，则activity有多个,把每个都更新为已提交
         WorkflowActivity activity = new WorkflowActivity();
         activity.setHandleTime(new Date());
@@ -187,7 +201,6 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
                 .eq(WorkflowActivity::getNodeId, currentActivity.getNodeId())
                 .eq(WorkflowActivity::getInstanceId, currentActivity.getInstanceId())
                 .ne(WorkflowActivity::getId, currentActivity.getId()));
-
     }
 
     /**
@@ -202,7 +215,6 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
         WorkflowActivity activity=new WorkflowActivity();
         String actId= UUIDUtil.getUUID();
         activity.setId(actId);
-        activity.setCreateTime(new Date());
         activity.setHandlePersons(userId);
         activity.setCreator(currentActivity.getCreator());
         activity.setInstanceId(currentActivity.getInstanceId());
@@ -246,33 +258,12 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
     public Map<String,String> advanceActivity(String currentActivityId, Map<String, String> map) {
 
         Map<String, String> resultMap = new ConcurrentHashMap<>();
-//        logger.info("advanceCurrentActivity: currentActivityId -> {} ,approve ->{}",
-//                currentActivityId,approve);
-
         WorkflowActivity currentActivity = null;
-        Map<String, String> modelMapToPerson=new HashMap<String, String>();
         if (currentActivityId!=null&&!currentActivityId.equals("")) {
             currentActivity=this.getById(currentActivityId);
         }else {
             throw new CustomException(WorkflowCode.WORKFLOW_NODE_NOT_NULL);
         }
-
-//        WorkflowNode curmodel = workflowNodeService.getById(currentActivity.getNodeId());
-//        approve.setStepName(curmodel.getModelname());
-//        approve.setFlowStepId(currentActivity.getModelid());
-//        logger.debug("advanceCurrentActivity approve -> {}",approve);
-//        if (approve.getId()==null||approve.getId().trim().equals("")) {
-//            logger.debug("advanceCurrentActivity approve insert -> {}",approve);
-//            approve.insert();
-//        }else {
-//            logger.debug("advanceCurrentActivity approve update -> {}",approve);
-//            approve.updateById();
-//        }
-        //审批意见关联文件
-//        List<Files> filesList = approve.getFileList();
-//        if(CollectionUtils.isNotEmpty(filesList)){
-//            filesService.refFiles(filesList,approve.getId());
-//        }
         //下级环节集合
         WorkflowNode nextNode = null;
         if (currentActivity!=null) {
@@ -284,8 +275,6 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
             if (!WorkflowActivity.STATUS_WAITING.equals(currentActivity.getActivityStatus())) {
                 throw new CustomException(WorkflowCode.WORKFLOW_ACTIVITY_STATUS_ERROR);
             }
-
-            logger.info("advanceCurrentActivity: currentModelId -> {}",currentModelId);
 
 //            if(approve.getRdbAddAccount() == 1 || approve.getResourceRecoveredAgree() == 1){ //如果是关系型数据库新增账号类型或者资源回收被回收人同意回收,下级环节为业务办理
             if(map.get("gotoImpl")!=null){
@@ -299,7 +288,6 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
             }else {
                 nextNode=workflowNodeMapper.getNextNodeById(currentModelId);
             }
-            logger.info("advanceCurrentActivity: nextModels -> {}",nextNode);
             //如果没有下级环节，则直接完成当前环节，完成流程实例
             if (nextNode==null) {
                 currentActivity.setActivityStatus(WorkflowActivity.STATUS_SUBMIT);
@@ -321,44 +309,33 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
         }else {
             throw new CustomException(WorkflowCode.WORKFLOW_ACTIVITY_MISSING);
         }
-        String next = "";//next记录环节名
-        WorkflowNode returnModel=null;
-//        for (WorkflowNode model:nextModels) {
-            //取得对应环节的处理人
-            String personids=nextNode.getDefaultHandler();
-            //如果默认处理人也为空则直接返回提示信息给前台
-            if (personids==null||personids.trim().equals("")) {
-                logger.error("流程未配置处理人");
-                throw new CustomException(WorkflowCode.WORKFLOW_NODE_NO_HANDLER);
+        //取得对应环节的处理人
+        String personids = nextNode.getDefaultHandler();
+        //如果默认处理人也为空则直接返回提示信息给前台
+        if (personids == null || personids.trim().equals("")) {
+            logger.error("流程未配置处理人");
+            throw new CustomException(WorkflowCode.WORKFLOW_NODE_NO_HANDLER);
 
-            }
-            //把办理人分割成数组
-            String personArr[]=personids.split(",");
-            if (personArr.length==0) {
-                throw new CustomException(WorkflowCode.WORKFLOW_NODE_NO_HANDLER);
-            }
-            //获取需要的参与人对应关系
-            String adviserIds=nextNode.getAdviserPerson();
-            //把参与人分割成数组
-            String adviserArr[]=null;
-            if (adviserIds!=null) {
-                adviserArr=adviserIds.split(",");
-            }
-            next = nextNode.getNodeName();
-            returnModel=nextNode;
-            if (map==null){
-                //model:下一环节 ，currentActivity:当前流转ID，personArr：处理人数组，adviserArr:参与人数组
-                handleFlow(nextNode, currentActivity, personArr,adviserArr,null,null);
-            }else{
-                handleFlow(nextNode, currentActivity, personArr,adviserArr,null,map);
-            }
-//        }
+        }
+        //把办理人分割成数组
+        String personArr[] = personids.split(",");
+        if (personArr.length == 0) {
+            throw new CustomException(WorkflowCode.WORKFLOW_NODE_NO_HANDLER);
+        }
+        //获取需要的参与人对应关系
+        String adviserIds = nextNode.getAdviserPerson();
+        //把参与人分割成数组
+        String adviserArr[] = null;
+        if (adviserIds != null) {
+            adviserArr = adviserIds.split(",");
+        }
+        handleFlow(nextNode, currentActivity, personArr, adviserArr, null);
         currentActivity.setHandleTime(new Date());
         currentActivity.setActivityStatus(WorkflowActivity.STATUS_SUBMIT);
         workflowActivityService.updateById(currentActivity);
         //返回下一环节的名字
         resultMap.put("code", "200");
-        resultMap.put("data", JSON.toJSONString(returnModel));
+        resultMap.put("data", JSON.toJSONString(nextNode));
         return resultMap;
     }
 
@@ -480,11 +457,7 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
             if (adviserIds!=null) {
                 adviserArr=adviserIds.split(",");
             }
-            if (map==null){
-                handleFlow(fallbackModel, currentActivity, personArr,adviserArr,null,null);
-            }else{
-                handleFlow(fallbackModel, currentActivity, personArr,adviserArr,null,map);
-            }
+            handleFlow(fallbackModel, currentActivity, personArr,adviserArr,map);
         }
         //同时流转给多个人时当前环节有多个待办
         List<WorkflowActivity> currentactivities=workflowActivityService.list(new QueryWrapper<WorkflowActivity>().lambda().eq(WorkflowActivity::getNodeId,currentActivity.getNodeId())
@@ -559,5 +532,46 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
         resultMap.put("code", "200");
         resultMap.put("msg", "成功");
         return resultMap;
+    }
+
+    @Override
+    public Map<String, String> add(String handlerPersonIds, String currentActivityId,String creatorId) {
+        Map<String, String> resultMap = new HashMap<>();
+        resultMap.put("code", "201");
+        WorkflowActivity currentActivity = null;
+
+        if (currentActivityId!=null&&!currentActivityId.equals("")) {
+            currentActivity=this.getById(currentActivityId);
+        }else {
+            resultMap.put("msg", "当前环节ID不能为空");
+            return resultMap;
+        }
+
+        currentActivity.setActivityStatus(WorkflowActivityStatus.AUDIT.getCode());
+        workflowActivityService.updateById(currentActivity);
+        WorkflowActivity activity = new WorkflowActivity();
+        activity.setHandleTime(new Date());
+        activity.setActivityStatus(WorkflowActivityStatus.PREEMPT.getCode());
+        // 其它参与人改为抢占
+        this.update(activity, new QueryWrapper<WorkflowActivity>().lambda()
+                .eq(WorkflowActivity::getNodeId, currentActivity.getNodeId())
+                .eq(WorkflowActivity::getInstanceId, currentActivity.getInstanceId()).ne(WorkflowActivity::getId, currentActivity.getId()));
+        // 插入指定加办人
+        WorkflowActivity advanceActivity=new WorkflowActivity();
+        advanceActivity.setId(UUIDUtil.getUUID());
+        advanceActivity.setActivityStatus(WorkflowActivityStatus.WAITING.getCode());
+        advanceActivity.setCreateTime(new Date());
+        advanceActivity.setCreator(creatorId);
+        advanceActivity.setInstanceId(currentActivity.getInstanceId());
+        advanceActivity.setNodeId(currentActivity.getNodeId());
+        advanceActivity.setPreActivityId(currentActivity.getPreActivityId());
+        advanceActivity.setHandlePersons(handlerPersonIds);
+        this.save(advanceActivity);
+        WorkflowNode curmodel = workflowNodeService.getById(currentActivity.getNodeId());
+        resultMap.put("stepName", curmodel.getNodeName());
+        resultMap.put("type","6");
+        resultMap.put("code", "200");
+        resultMap.put("msg","成功");
+        return null;
     }
 }

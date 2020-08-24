@@ -1,29 +1,27 @@
 package com.hirisun.cloud.common.contains;
 
-/**
- * 审核状态
- */
-public enum WorkflowNodeAbilityType {
+import com.hirisun.cloud.common.exception.ExceptionCast;
+import com.hirisun.cloud.common.vo.CommonCode;
+import org.apache.commons.lang.StringUtils;
 
-    REVIEW("1", "审核"),
-    ADD("2", "加办"),
-    IMPL("3", "上线"),
-    REJECT("4", "驳回"),
-    DELETE("5", "删除"),
-    FALLBACK("6", "反馈"),
-    FORWARD("7", "转发"),
-    FALL("8", "回退"),
-    APPLY("9", "申请");
+public enum WorkflowActivityStatus {
+    WAITING(0, "待办"),
+    SUBMIT(1, "已提交"),
+    REJECT(2, "已回退"),
+    AUDIT(3, "已呈批"),
+    PREEMPT(4, "已抢占"),
+    TERMINAT(5, "已终止"),
+    FORWARD(6, "已转发");
 
-    private final String code;
+    private final Integer code;
     private final String name;
 
-    WorkflowNodeAbilityType(String code, String name) {
+    WorkflowActivityStatus(Integer code, String name) {
         this.code = code;
         this.name  = name;
     }
 
-    public String getCode() {
+    public Integer getCode() {
         return code;
     }
 
