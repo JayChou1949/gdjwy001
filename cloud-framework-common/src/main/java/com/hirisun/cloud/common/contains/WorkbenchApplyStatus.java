@@ -1,8 +1,6 @@
 package com.hirisun.cloud.common.contains;
 
-import com.upd.hwcloud.common.exception.BaseException;
 
-import org.apache.commons.lang.StringUtils;
 
 /**
  * @author wuc
@@ -35,7 +33,7 @@ public enum WorkbenchApplyStatus {
 
     public static WorkbenchApplyStatus codeOf(String code) {
         if (code==null) {
-            throw new BaseException("工作台订单状态码错误");
+//            throw new BaseException("工作台订单状态码错误");
         }
         WorkbenchApplyStatus[] values = WorkbenchApplyStatus.values();
         for (WorkbenchApplyStatus value : values) {
@@ -43,6 +41,7 @@ public enum WorkbenchApplyStatus {
                 return value;
             }
         }
-        throw new BaseException("工作台订单状态码错误");
+//        throw new BaseException("工作台订单状态码错误");
+        return null;
     }
 }

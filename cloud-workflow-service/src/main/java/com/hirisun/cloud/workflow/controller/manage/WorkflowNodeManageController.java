@@ -4,6 +4,7 @@ package com.hirisun.cloud.workflow.controller.manage;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.hirisun.cloud.common.contains.WorkflowActivityStatus;
 import com.hirisun.cloud.workflow.bean.WorkflowActivity;
 import com.hirisun.cloud.workflow.bean.WorkflowNode;
 import com.hirisun.cloud.workflow.service.WorkflowActivityService;
@@ -14,6 +15,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -101,33 +103,34 @@ public class WorkflowNodeManageController {
     @ApiIgnore
     @ApiOperation("根据参数获取流程环节")
     @PostMapping("/feign/getWorkflowNodeAndActivitys")
-    public String getWorkflowNodeAndActivitys(@RequestParam Integer version,@RequestParam String workflowId,@RequestParam String instanceId) {
-        logger.info("/feign/getWorkflowNodeAndActivitys：{},{},{}",version,workflowId,instanceId);
+    public String getWorkflowNodeAndActivitys(@RequestParam Integer version,
+                                              @RequestParam String workflowId,
+                                              @RequestParam String instanceId) {
         LambdaQueryWrapper<WorkflowNode> lambdaQueryWrapper = new QueryWrapper<WorkflowNode>().lambda()
                 .eq(WorkflowNode::getVersion, version)
                 .eq(WorkflowNode::getWorkflowId, workflowId).orderByAsc(WorkflowNode::getNodeSort);
 
         List<WorkflowNode> nodeList = workflowNodeService.list(lambdaQueryWrapper);
 
-        List<Integer> notInStatus = Arrays.asList(WorkflowActivity.STATUS_REJECT,
-                WorkflowActivity.STATUS_FORWARD,
-                WorkflowActivity.STATUS_AUDIT,
-                WorkflowActivity.STATUS_PREEMPT);
+        List<Integer> notInStatus = Arrays.asList(WorkflowActivityStatus.REJECT.getCode(),
+                WorkflowActivityStatus.FORWARD.getCode(),
+                WorkflowActivityStatus.AUDIT.getCode(),
+                WorkflowActivityStatus.PREEMPT.getCode());
         List<WorkflowActivity> workflowActivityList = workflowActivityService.list(new QueryWrapper<WorkflowActivity>().lambda()
                 .notIn(WorkflowActivity::getActivityStatus, notInStatus).eq(WorkflowActivity::getInstanceId,instanceId));
         logger.info("workflowActivityList:{}",workflowActivityList);
         if (CollectionUtils.isNotEmpty(nodeList) && CollectionUtils.isNotEmpty(workflowActivityList)) {
             nodeList.forEach(node->{
                 workflowActivityList.forEach(activity->{
-                    node.setNodeStatus(WorkflowActivity.STATUS_SUBMIT);
+                    node.setNodeStatus(WorkflowActivityStatus.SUBMIT.getCode());
                     if (node.getId().equals(activity.getNodeId())) {
-                        if (WorkflowActivity.STATUS_SUBMIT.equals(activity.getActivityStatus())) {
+                        if (WorkflowActivityStatus.SUBMIT.getCode().equals(activity.getActivityStatus())) {
                             node.setNodeStatusCode("finished");
-                        }else if (WorkflowActivity.STATUS_WAITING.equals(activity.getActivityStatus())) {
+                        }else if (WorkflowActivityStatus.WAITING.getCode().equals(activity.getActivityStatus())) {
                             //查找到待办直接返回
                             node.setNodeStatusCode("underway");
                             return;
-                        }else if (WorkflowActivity.STATUS_TERMINATE.equals(activity.getActivityStatus())) {
+                        }else if (WorkflowActivityStatus.TERMINAT.getCode().equals(activity.getActivityStatus())) {
                             node.setNodeStatusCode("termination");
                         }else{
                             node.setNodeStatusCode("unfinished");

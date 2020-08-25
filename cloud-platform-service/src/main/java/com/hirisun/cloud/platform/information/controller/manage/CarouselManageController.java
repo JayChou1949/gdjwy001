@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hirisun.cloud.common.annotation.LoginUser;
+import com.hirisun.cloud.common.contains.ReviewStatus;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.platform.information.bean.Carousel;
@@ -90,7 +91,7 @@ public class CarouselManageController {
         }
         carousel.setCreator(user.getIdCard());
         carousel.setUpdateTime(new Date());
-        carousel.setStatus(Carousel.STATUS_WAIT_ONLINE);
+        carousel.setStatus(ReviewStatus.PRO_ONLINE.getCode());
         carouselService.save(carousel);
         return QueryResponseResult.success(carousel);
     }
@@ -111,7 +112,7 @@ public class CarouselManageController {
         if(NewsParamUtil.checkUserInfomationPermission(user,carousel.getProvincial(),newsBelong)){
             return QueryResponseResult.fail("无权操作该区域数据");
         }
-        carousel.setStatus(Carousel.STATUS_DELETE);
+        carousel.setStatus(ReviewStatus.DELETE.getCode());
         carouselService.updateById(carousel);
         //TODO 远程调用日志模块，记录操作人日志 sys_log
         return QueryResponseResult.success("删除成功");
@@ -135,7 +136,7 @@ public class CarouselManageController {
         if(NewsParamUtil.checkUserInfomationPermission(user,carousel.getProvincial(),newsBelong)){
             return QueryResponseResult.fail("无权操作该区域数据");
         }
-        carousel.setStatus(Carousel.STATUS_WAIT_ONLINE);
+        carousel.setStatus(ReviewStatus.PRO_ONLINE.getCode());
         carouselService.updateById(carousel);
         return QueryResponseResult.success(carousel);
     }
@@ -151,9 +152,9 @@ public class CarouselManageController {
         Carousel Carousel = new Carousel();
         Carousel.setId(id);
         if(type.equals(1)){
-            Carousel.setStatus(Carousel.STATUS_ONLINE);
+            Carousel.setStatus(ReviewStatus.ONLINE.getCode());
         }else{
-            Carousel.setStatus(Carousel.STATUS_WAIT_ONLINE);
+            Carousel.setStatus(ReviewStatus.PRO_ONLINE.getCode());
         }
         carouselService.updateById(Carousel);
         return QueryResponseResult.success(Carousel);

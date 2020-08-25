@@ -3,6 +3,8 @@ package com.hirisun.cloud.workflow.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hirisun.cloud.api.user.UserApi;
+import com.hirisun.cloud.common.contains.WorkflowActivityStatus;
+import com.hirisun.cloud.common.contains.WorkflowInstanceStatus;
 import com.hirisun.cloud.common.exception.CustomException;
 import com.hirisun.cloud.common.util.UUIDUtil;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
@@ -94,7 +96,7 @@ public class WorkflowInstanceServiceImpl extends ServiceImpl<WorkflowInstanceMap
         instance.setCreator(createPersonId);
         instance.setCreateTime(new Date());
         instance.setCreatorOrgId(user==null?null:user.getOrgId());
-        instance.setInstanceStatus(WorkflowInstance.INSTANCE_STATUS_WORKING);
+        instance.setInstanceStatus(WorkflowInstanceStatus.WORKING.getCode());
         instance.setWorkflowId(flowId);
         instance.setBusinessId(businessId);
         instance.setVersion(workFlowModel.getVersion());
@@ -106,11 +108,11 @@ public class WorkflowInstanceServiceImpl extends ServiceImpl<WorkflowInstanceMap
         if (user==null) {
             firstActivity.setCreator(createPersonId);
             firstActivity.setHandlePersons(null);
-            firstActivity.setActivityStatus(WorkflowActivity.STATUS_SUBMIT);
+            firstActivity.setActivityStatus(WorkflowActivityStatus.SUBMIT.getCode());
         }else {
             firstActivity.setCreator(user.getIdCard());
             firstActivity.setHandlePersons(createPersonId);
-            firstActivity.setActivityStatus(WorkflowActivity.STATUS_WAITING);
+            firstActivity.setActivityStatus(WorkflowActivityStatus.WAITING.getCode());
         }
         firstActivity.setCreateTime(new Date());
         firstActivity.setInstanceId(insId);
@@ -173,7 +175,7 @@ public class WorkflowInstanceServiceImpl extends ServiceImpl<WorkflowInstanceMap
         instance.setCreator(creatorName);
         instance.setCreateTime(new Date());
         instance.setCreatorOrgId(user==null?null:user.getOrgId());
-        instance.setInstanceStatus(WorkflowInstance.INSTANCE_STATUS_WORKING);
+        instance.setInstanceStatus(WorkflowInstanceStatus.WORKING.getCode());
         instance.setWorkflowId(workflow.getId());
         instance.setBusinessId(businessId);
         instance.setVersion(workflow.getVersion());
@@ -184,7 +186,7 @@ public class WorkflowInstanceServiceImpl extends ServiceImpl<WorkflowInstanceMap
         //如果是外部提交则user为空，直接存传递过来的申请人身份证,否则存登陆人身份证
         firstActivity.setCreator(creatorName);
         firstActivity.setHandlePersons(null);
-        firstActivity.setActivityStatus(WorkflowActivity.STATUS_WAITING);
+        firstActivity.setActivityStatus(WorkflowActivityStatus.WAITING.getCode());
 
         firstActivity.setCreateTime(new Date());
         firstActivity.setInstanceId(insId);

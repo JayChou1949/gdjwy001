@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hirisun.cloud.api.system.SmsApi;
 import com.hirisun.cloud.common.contains.WorkflowActivityStatus;
+import com.hirisun.cloud.common.contains.WorkflowInstanceStatus;
 import com.hirisun.cloud.common.contains.WorkflowNodeAbilityType;
 import com.hirisun.cloud.common.exception.CustomException;
 import com.hirisun.cloud.common.util.UUIDUtil;
@@ -174,13 +175,13 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
         List<WorkflowActivity> activityList = new ArrayList<>();
         //如果为抢占模式，则直接生成下级的待办任务
         for (int i = 0; i < personArr.length; i++) {
-            WorkflowActivity defaultActivity=getTaskActivity(personArr[i],currentActivity,nextModel,WorkflowActivity.STATUS_WAITING);
+            WorkflowActivity defaultActivity=getTaskActivity(personArr[i],currentActivity,nextModel,WorkflowActivityStatus.WAITING.getCode());
             activityList.add(defaultActivity);
         }
         //生成参与人待办
         if (adviserArr!=null) {
             for (int j = 0; j < adviserArr.length; j++) {
-                WorkflowActivity adviserActivity=getTaskActivity(adviserArr[j],currentActivity,nextModel,WorkflowActivity.STATUS_WAITING);
+                WorkflowActivity adviserActivity=getTaskActivity(adviserArr[j],currentActivity,nextModel,WorkflowActivityStatus.WAITING.getCode());
                 adviserActivity.setActivityType("adviser");
                 activityList.add(adviserActivity);
             }
@@ -196,7 +197,7 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
         //修改当前环节状态为已提交 ，如果当前环节选择了多个办理人，则activity有多个,把每个都更新为已提交
         WorkflowActivity activity = new WorkflowActivity();
         activity.setHandleTime(new Date());
-        activity.setActivityStatus(WorkflowActivity.STATUS_PREEMPT);
+        activity.setActivityStatus(WorkflowActivityStatus.PREEMPT.getCode());
         this.update(activity, new QueryWrapper<WorkflowActivity>().lambda()
                 .eq(WorkflowActivity::getNodeId, currentActivity.getNodeId())
                 .eq(WorkflowActivity::getInstanceId, currentActivity.getInstanceId())
@@ -238,7 +239,7 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
 
         //获取待办流转信息
         List<WorkflowActivity> toDoActivities = activities.parallelStream().filter(activity ->
-                WorkflowActivity.STATUS_WAITING.equals(activity.getActivityStatus())
+                WorkflowActivityStatus.WAITING.getCode().equals(activity.getActivityStatus())
                         && activity.getActivityType()==null).collect(Collectors.toList());
 
         // instanceId-IdCards
@@ -272,7 +273,7 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
                 throw new CustomException(WorkflowCode.WORKFLOW_ACTIVITY_NODE_ID_NOT_NULL);
             }
 
-            if (!WorkflowActivity.STATUS_WAITING.equals(currentActivity.getActivityStatus())) {
+            if (!WorkflowActivityStatus.WAITING.getCode().equals(currentActivity.getActivityStatus())) {
                 throw new CustomException(WorkflowCode.WORKFLOW_ACTIVITY_STATUS_ERROR);
             }
 
@@ -290,18 +291,18 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
             }
             //如果没有下级环节，则直接完成当前环节，完成流程实例
             if (nextNode==null) {
-                currentActivity.setActivityStatus(WorkflowActivity.STATUS_SUBMIT);
+                currentActivity.setActivityStatus(WorkflowActivityStatus.SUBMIT.getCode());
                 currentActivity.setHandleTime(new Date());
                 this.updateById(currentActivity);
                 WorkflowActivity activity = new WorkflowActivity();
                 activity.setHandleTime(new Date());
-                activity.setActivityStatus(WorkflowActivity.STATUS_PREEMPT);
+                activity.setActivityStatus(WorkflowActivityStatus.PREEMPT.getCode());
                 boolean updateR=this.update(activity,new QueryWrapper<WorkflowActivity>().eq("modelid",currentActivity.getNodeId())
                         .eq("instanceid",currentActivity.getInstanceId()).ne("id",currentActivity.getId()));
 
                 WorkflowInstance instance=workflowInstanceService.getById(currentActivity.getInstanceId());
                 instance.setCompleteTime(new Date());
-                instance.setInstanceStatus(WorkflowInstance.INSTANCE_STATUS_COMPLETE);
+                instance.setInstanceStatus(WorkflowInstanceStatus.COMPLETE.getCode());
                 workflowInstanceService.updateById(instance);
                 resultMap.put("code", "201");//成功，无下个环节
                 return resultMap;
@@ -331,7 +332,7 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
         }
         handleFlow(nextNode, currentActivity, personArr, adviserArr, null);
         currentActivity.setHandleTime(new Date());
-        currentActivity.setActivityStatus(WorkflowActivity.STATUS_SUBMIT);
+        currentActivity.setActivityStatus(WorkflowActivityStatus.SUBMIT.getCode());
         workflowActivityService.updateById(currentActivity);
         //返回下一环节的名字
         resultMap.put("code", "200");
@@ -431,7 +432,7 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
                 WorkflowActivity activity=activities.get(0);
                 String id=UUIDUtil.getUUID();
                 activity.setId(id);
-                activity.setActivityStatus(WorkflowActivity.STATUS_WAITING);
+                activity.setActivityStatus(WorkflowActivityStatus.WAITING.getCode());
                 activity.setCreateTime(new Date());
                 activity.setCreator(currentActivity.getHandlePersons());
                 workflowActivityService.save(activity);
@@ -464,7 +465,7 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
                 .eq(WorkflowActivity::getInstanceId,currentActivity.getInstanceId()));
         for (WorkflowActivity activity:currentactivities) {
             activity.setHandleTime(new Date());
-            activity.setActivityStatus(WorkflowActivity.STATUS_REJECT);
+            activity.setActivityStatus(WorkflowActivityStatus.REJECT.getCode());
             workflowActivityService.updateById(activity);
         }
         //获取复核环节的下级环节,把之后的环节置为已回退
@@ -481,7 +482,7 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
             if (activities2 != null) {
                 for (WorkflowActivity nextActivity : activities2) {
                     nextActivity.setHandleTime(new Date());
-                    nextActivity.setActivityStatus(WorkflowActivity.STATUS_REJECT);
+                    nextActivity.setActivityStatus(WorkflowActivityStatus.REJECT.getCode());
                     workflowActivityService.updateById(nextActivity);
                     if (nextActivity.getId().equals(currentActivity.getId())) {
                         break;
@@ -504,9 +505,9 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
                 .eq(WorkflowActivity::getInstanceId, workflowActivity.getInstanceId())
                 .eq(WorkflowActivity::getNodeId, nodeId)
                 .and(i->i
-                        .eq(WorkflowActivity::getActivityStatus,WorkflowActivity.STATUS_SUBMIT)
+                        .eq(WorkflowActivity::getActivityStatus,WorkflowActivityStatus.SUBMIT.getCode())
                         .or()
-                        .eq(WorkflowActivity::getActivityStatus,WorkflowActivity.STATUS_PREEMPT)
+                        .eq(WorkflowActivity::getActivityStatus,WorkflowActivityStatus.PREEMPT.getCode())
                 ));
         return activities;
     }
@@ -527,7 +528,7 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
         resultMap.put("nodeId", currentActivity.getNodeId());
         resultMap.put("type", "5");
         currentActivity.setHandleTime(new Date());
-        currentActivity.setActivityStatus(WorkflowActivity.STATUS_SUBMIT);
+        currentActivity.setActivityStatus(WorkflowActivityStatus.SUBMIT.getCode());
         this.updateById(currentActivity);
         resultMap.put("code", "200");
         resultMap.put("msg", "成功");

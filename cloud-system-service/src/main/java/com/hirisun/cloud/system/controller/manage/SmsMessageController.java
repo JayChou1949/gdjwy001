@@ -26,14 +26,14 @@ public class SmsMessageController {
 
     /**
      * 发送业务受理短信
-     * @param submitor 申请人
+     * @param creatorId 申请人身份证
      * @param bizName 业务名称
      * @param orderNum 工单号
      */
     @ApiOperation("发送业务受理短信")
     @GetMapping("/buildSuccessMessage")
-    public void buildSuccessMessage(@RequestParam UserVO submitor, @RequestParam String bizName, @RequestParam String orderNum) {
-        messageProvider.sendMessageAsync(messageProvider.buildSuccessMessage(submitor,bizName,orderNum));
+    public void buildSuccessMessage(@RequestParam String creatorId, @RequestParam String bizName, @RequestParam String orderNum) {
+        messageProvider.sendMessageAsync(messageProvider.buildSuccessMessage(creatorId,bizName,orderNum));
         return ;
     }
 

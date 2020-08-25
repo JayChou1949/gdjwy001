@@ -57,18 +57,33 @@ public class WorkflowNodeVO implements Serializable {
     @ApiModelProperty(value = "环节状态")
     private String nodeStatusCode;
 
+    @ApiModelProperty(value = "默认处理人名称")
+    private String defaultHandlerName;
 
+    @ApiModelProperty(value = "通知人名称")
+    private String noticePersionName;
+
+    @ApiModelProperty(value = "参与人名称")
+    private String adviserPersonName;
 
     @Override
     public String toString() {
-        return "WorkflowNode{" +
-        "id=" + id +
-        ", workflowId=" + workflowId +
-        ", nodeName=" + nodeName +
-        ", version=" + version +
-        ", defaultHandler=" + defaultHandler +
-        ", noticePersion=" + noticePersion +
-        ", adviserPerson=" + adviserPerson +
-        "}";
+        return "WorkflowNodeVO{" +
+                "id='" + id + '\'' +
+                ", workflowId='" + workflowId + '\'' +
+                ", nodeName='" + nodeName + '\'' +
+                ", version=" + version +
+                ", defaultHandler='" + defaultHandler + '\'' +
+                ", noticePersion='" + noticePersion + '\'' +
+                ", adviserPerson='" + adviserPerson + '\'' +
+                ", nodeFeature='" + nodeFeature + '\'' +
+                ", nodeSort=" + nodeSort +
+                ", rejectNum=" + rejectNum +
+                ", nodeStatus=" + nodeStatus +
+                ", nodeStatusCode='" + nodeStatusCode + '\'' +
+                ", defaultHandlerName='" + defaultHandlerName + '\'' +
+                ", noticePersionName='" + noticePersionName + '\'' +
+                ", adviserPersonName='" + adviserPersonName + '\'' +
+                '}';
     }
 }

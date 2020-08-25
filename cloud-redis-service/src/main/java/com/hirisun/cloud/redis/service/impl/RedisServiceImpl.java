@@ -1,10 +1,15 @@
 package com.hirisun.cloud.redis.service.impl;
 
+import com.hirisun.cloud.common.constant.RedisKey;
+import com.hirisun.cloud.common.exception.CustomException;
+import com.hirisun.cloud.common.vo.CommonCode;
 import com.hirisun.cloud.redis.service.RedisService;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -93,6 +98,18 @@ public class RedisServiceImpl implements RedisService {
     @Override
     public Long increment(String redisKey){
         return redisTemplate.opsForValue().increment(redisKey, 1L);
+    }
+
+    @Override
+    public String genOrderNum(String prefix) {
+        String yyyyMMdd = DateFormatUtils.format(new Date(), "yyyyMMdd");
+        String redisKey = prefix + yyyyMMdd;
+        Long increment = this.increment(redisKey);
+        if (increment == null) {
+            throw new CustomException(CommonCode.SERVER_ERROR);
+        }
+        this.expire(redisKey, 1L, TimeUnit.DAYS);
+        return String.format("%s%04d", yyyyMMdd, increment);
     }
 
 }

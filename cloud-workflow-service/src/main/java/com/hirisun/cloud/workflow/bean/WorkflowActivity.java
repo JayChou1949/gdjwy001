@@ -27,41 +27,6 @@ public class WorkflowActivity implements Serializable {
 
     private static final long serialVersionUID=1L;
 
-    /**
-     * 环节状态 0待办
-     */
-    public static final Integer STATUS_WAITING=0;
-    /**
-     * 环节状态 1已提交
-     */
-    public static final Integer STATUS_SUBMIT=1;
-
-    /**
-     * 环节状态  2已回退
-     */
-    public static final Integer STATUS_REJECT=2;
-
-    /**
-     * 环节状态 3已呈批
-     */
-    public static final Integer STATUS_AUDIT=3;
-
-    /**
-     * 环节状态 4已抢占
-     */
-    public static final Integer STATUS_PREEMPT=4;
-
-    /**
-     * 环节状态 5已终止
-     */
-    public static final Integer STATUS_TERMINATE=5;
-
-    /**
-     * 环节状态 6已转发
-     */
-    public static final Integer STATUS_FORWARD=6;
-
-
     @TableId(value = "ID", type = IdType.ASSIGN_ID)
     private String id;
 

@@ -161,14 +161,15 @@ public class MessageProvider {
     /**
      * 构造提交成功短信通知消息
      */
-    public Message buildSuccessMessage(UserVO submitor, String bizName, String orderNum) {
-        if (submitor == null) {
+    public Message buildSuccessMessage(String creatorId, String bizName, String orderNum) {
+        UserVO user = getUserByIdCard(creatorId);
+        if (user == null) {
             logger.error("to send user is null");
             return null;
         }
         Message toUser = new Message();
-        toUser.setContent(String.format(msgSubmitSuccess, submitor.getName(), bizName, orderNum, "%s"));
-        toUser.setUser(submitor);
+        toUser.setContent(String.format(msgSubmitSuccess, user.getName(), bizName, orderNum, "%s"));
+        toUser.setUser(user);
         return toUser;
     }
 
