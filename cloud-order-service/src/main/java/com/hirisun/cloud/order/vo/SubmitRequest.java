@@ -11,7 +11,7 @@ import com.google.common.base.Converter;
 import com.hirisun.cloud.common.exception.CustomException;
 import com.hirisun.cloud.common.vo.CommonCode;
 import com.hirisun.cloud.model.file.FilesVo;
-import com.hirisun.cloud.order.bean.application.ApplicationInfo;
+import com.hirisun.cloud.order.bean.apply.ApplyInfo;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -21,8 +21,6 @@ import lombok.NoArgsConstructor;
 
 /**
  * 购物车提交请求VO
- * @author yyc
- * @date 2020/4/28
  */
 @Data
 @AllArgsConstructor
@@ -160,17 +158,17 @@ public class SubmitRequest {
     @ApiModelProperty(value = "使用资源的虚拟机IP")
     private String vmIp;
 
-    public ApplicationInfo convertToApplicationInfo(){
+    public ApplyInfo convertToApplicationInfo(){
         SubmitRequestConvert submitRequestConvert = new SubmitRequestConvert();
-        ApplicationInfo info = submitRequestConvert.convert(this);
+        ApplyInfo info = submitRequestConvert.convert(this);
         return info;
     }
 
-    private static class SubmitRequestConvert extends Converter<SubmitRequest,ApplicationInfo>{
+    private static class SubmitRequestConvert extends Converter<SubmitRequest,ApplyInfo>{
         @Override
-        protected ApplicationInfo doForward(SubmitRequest submitRequest) {
+        protected ApplyInfo doForward(SubmitRequest submitRequest) {
             logger.info("SubmitRequest: {}",submitRequest);
-           ApplicationInfo info = new ApplicationInfo();
+            ApplyInfo info = new ApplyInfo();
             try {
                 BeanUtils.copyProperties(submitRequest,info);
                 logger.info("info: {}",info);
@@ -183,7 +181,7 @@ public class SubmitRequest {
         }
 
         @Override
-        protected SubmitRequest doBackward(ApplicationInfo info) {
+        protected SubmitRequest doBackward(ApplyInfo info) {
         	throw new CustomException(CommonCode.CONVERT_ERROR);
         }
     }

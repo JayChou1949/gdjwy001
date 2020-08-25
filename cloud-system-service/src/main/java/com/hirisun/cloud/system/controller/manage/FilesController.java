@@ -1,5 +1,7 @@
 package com.hirisun.cloud.system.controller.manage;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -8,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hirisun.cloud.model.app.param.SubpageParam;
+import com.hirisun.cloud.model.file.FilesVo;
 import com.hirisun.cloud.model.param.FilesParam;
 import com.hirisun.cloud.system.service.FilesService;
 
@@ -31,17 +34,18 @@ public class FilesController {
 	}
 	
 	@ApiIgnore
-    @ApiOperation("根据 SaasSubpageId 删除文件信息")
+    @ApiOperation("根据 refId 删除文件信息")
     @GetMapping("/remove")
     public void remove(@RequestBody SubpageParam param) {
 		filesService.remove(param.getSubpageId());
 	}
 	
 	@ApiIgnore
-    @ApiOperation("根据 SaasSubpageId 获取文件信息")
+    @ApiOperation("根据 refid 获取文件信息")
     @GetMapping("/find")
-    public void find(@RequestBody SubpageParam param) {
-		filesService.findBySubpageId(param.getSubpageId());
+    public List<FilesVo> find(@RequestBody SubpageParam param) {
+		List<FilesVo> list = filesService.findByRefId(param.getRefId());
+		return list;
 	}
 	
 	@ApiIgnore
@@ -56,5 +60,12 @@ public class FilesController {
     @PostMapping("/save/delete")
     public void deleteBatch(@RequestBody FilesParam param) {
 		filesService.deleteBatch(param);
+	}
+	
+	@ApiIgnore
+    @ApiOperation("更新file的关联关系")
+    @PostMapping("/update/ref")
+    public void updateFileRef(@RequestBody FilesParam param) {
+		
 	}
 }

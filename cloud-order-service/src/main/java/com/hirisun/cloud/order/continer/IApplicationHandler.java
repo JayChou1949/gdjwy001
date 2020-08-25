@@ -3,14 +3,14 @@ package com.hirisun.cloud.order.continer;
 
 import java.util.List;
 
-import com.hirisun.cloud.order.bean.application.ApplicationInfo;
-import com.hirisun.cloud.order.bean.shopping.ShoppingCart;
+import com.hirisun.cloud.model.shopping.vo.ApplicationInfoVo;
+import com.hirisun.cloud.model.shopping.vo.ShoppingCartVo;
 
 public interface IApplicationHandler<S> {
 
-    void saveShoppingCart(ShoppingCart<S> shoppingCart);
+    void saveShoppingCart(ShoppingCartVo shoppingCart);
 
-    void save(ApplicationInfo<S, Object> info);
+    void save(ApplicationInfoVo info);
 
     /**
      * 获取申请信息
@@ -19,9 +19,9 @@ public interface IApplicationHandler<S> {
 
     List<S> getByShoppingCartId(String shoppingCartId);
 
-    void update(ApplicationInfo<S, Object> info);
+    void update(ApplicationInfoVo info);
 
-    void updateShoppingCart(ShoppingCart<S> shoppingCart);
+    void updateShoppingCart(ShoppingCartVo shoppingCart);
 
     /**
      * 获取申请总数(购物车显示字段)

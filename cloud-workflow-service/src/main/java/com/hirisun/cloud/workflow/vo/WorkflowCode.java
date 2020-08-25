@@ -17,7 +17,10 @@ public enum WorkflowCode implements ResultCode {
     WORKFLOW_NODE_NOT_NULL(2412,"环节ID不能为空"),
     WORKFLOW_ACTIVITY_NODE_ID_NOT_NULL(2413,"当前环节对应的流程环节为空，请传入流程定义环节信息"),
     WORKFLOW_ACTIVITY_STATUS_ERROR(2414,"该任务已经处理，不能重复处理"),
-    WORKFLOW_NODE_NO_HANDLER(2415,"流程未配置处理人")
+    WORKFLOW_NODE_NO_HANDLER(2415,"流程未配置处理人"),
+    WORKFLOW_NODE_INFO_NULL(2416,"当前环节信息为空,流转失败"),
+    HANDLER_NULL(2417,"办理人不能为空."),
+    END_ACTIVITY_NULL(2418,"未找到结束环节!")
 
     ;
     /**

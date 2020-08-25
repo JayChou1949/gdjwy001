@@ -1,19 +1,13 @@
 package com.hirisun.cloud.order.handler;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.google.common.collect.Maps;
-import com.hirisun.cloud.common.contains.ApplicationInfoStatus;
-import com.hirisun.cloud.common.contains.WorkbenchApplyStatus;
-import com.hirisun.cloud.model.user.UserVO;
-import com.hirisun.cloud.model.workbench.vo.QueryVO;
-import com.hirisun.cloud.order.bean.application.ApplicationInfo;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import com.google.common.collect.Maps;
+import com.hirisun.cloud.common.contains.WorkbenchApplyStatus;
+import com.hirisun.cloud.model.user.UserVO;
+import com.hirisun.cloud.model.workbench.vo.QueryVO;
 
 
 public class CommonHandler {
@@ -243,21 +237,4 @@ public class CommonHandler {
     }
 
 
-    /**
-     * 检查是否有删除权限
-     * @param records
-     * @param user
-     */
-    public static void checkDeleteEnable(List<ApplicationInfo> records,UserVO user){
-        if (records != null && !records.isEmpty()) {
-            for (ApplicationInfo record : records) {
-                ApplicationInfoStatus ais = ApplicationInfoStatus.codeOf(record.getStatus());
-                // 判断是否能删除
-                if (ais != ApplicationInfoStatus.DELETE
-                        && Objects.equals(user.getIdCard(), record.getCreator())) {
-                    record.setCanDelete(true);
-                }
-            }
-        }
-    }
 }

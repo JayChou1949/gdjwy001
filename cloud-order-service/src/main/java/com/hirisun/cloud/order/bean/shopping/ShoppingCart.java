@@ -3,30 +3,24 @@ package com.hirisun.cloud.order.bean.shopping;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.hirisun.cloud.model.file.FilesVo;
 
 /**
  * 购物车
- * <p>
- * 
- * </p>
- *
- * @author yyc
- * @since 2020-04-16
  */
 @TableName("TB_SHOPPING_CART")
-public class ShoppingCart<S> extends Model<ShoppingCart> {
+public class ShoppingCart implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-        /**
+		/**
      * UUID
      */
          @TableId(value = "ID",type = IdType.UUID)
@@ -78,7 +72,7 @@ public class ShoppingCart<S> extends Model<ShoppingCart> {
     private String formNum;
 
     @TableField(exist = false)
-    private List<S> serverList;
+    private List<Map<String,Object>> serverList;
 
 
     @TableField(exist = false)
@@ -197,11 +191,11 @@ public class ShoppingCart<S> extends Model<ShoppingCart> {
     }
 
 
-    public List<S> getServerList() {
+    public List<Map<String,Object>> getServerList() {
         return serverList;
     }
 
-    public void setServerList(List<S> serverList) {
+    public void setServerList(List<Map<String,Object>> serverList) {
         this.serverList = serverList;
     }
 
@@ -245,25 +239,4 @@ public class ShoppingCart<S> extends Model<ShoppingCart> {
         this.dsName = dsName;
     }
 
-    @Override
-    protected Serializable pkVal() {
-        return this.id;
-    }
-
-    @Override
-    public String toString() {
-        return "ShoppingCart{" +
-                "id='" + id + '\'' +
-                ", serviceTypeId='" + serviceTypeId + '\'' +
-                ", serviceTypeName='" + serviceTypeName + '\'' +
-                ", resourceType=" + resourceType +
-                ", status=" + status +
-                ", createTime=" + createTime +
-                ", modifiedTime=" + modifiedTime +
-                ", creatorIdCard='" + creatorIdCard + '\'' +
-                ", creatorName='" + creatorName + '\'' +
-                ", formNum='" + formNum + '\'' +
-                ", serverList=" + serverList +
-                '}';
-    }
 }

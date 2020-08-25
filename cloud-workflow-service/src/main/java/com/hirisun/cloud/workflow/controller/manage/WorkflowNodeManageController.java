@@ -4,6 +4,8 @@ package com.hirisun.cloud.workflow.controller.manage;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.hirisun.cloud.model.param.WorkflowNodeParam;
+import com.hirisun.cloud.model.workflow.WorkflowNodeVO;
 import com.hirisun.cloud.workflow.bean.WorkflowActivity;
 import com.hirisun.cloud.workflow.bean.WorkflowNode;
 import com.hirisun.cloud.workflow.service.WorkflowActivityService;
@@ -16,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -138,6 +141,17 @@ public class WorkflowNodeManageController {
             });
         }
         return JSON.toJSONString(nodeList);
+    }
+    
+    /**
+     * 根据环节param获取环节信息
+     */
+    @ApiIgnore
+    @ApiOperation("根据环节id获取环节信息")
+    @PostMapping("/feign/node/get")
+    public WorkflowNodeVO getNodeByParam(@RequestBody WorkflowNodeParam param) {
+        WorkflowNodeVO workflowNode = workflowNodeService.getNodeByParam(param);
+        return workflowNode;
     }
 }
 

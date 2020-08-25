@@ -1,15 +1,23 @@
 package com.hirisun.cloud.api.workflow;
 
-import com.hirisun.cloud.model.apply.FallBackVO;
-import com.hirisun.cloud.model.workflow.AdvanceBeanVO;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
-
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import com.hirisun.cloud.model.apply.FallBackVO;
+import com.hirisun.cloud.model.param.ActivityParam;
+import com.hirisun.cloud.model.param.WorkflowNodeParam;
+import com.hirisun.cloud.model.workflow.AdvanceBeanVO;
+import com.hirisun.cloud.model.workflow.WorkflowActivityVO;
+import com.hirisun.cloud.model.workflow.WorkflowNodeVO;
+
+import io.swagger.annotations.ApiOperation;
+import springfox.documentation.annotations.ApiIgnore;
 
 
 /**
@@ -208,4 +216,38 @@ public interface WorkflowApi {
     @ApiOperation("通知人流转信息")
     @PostMapping("/feign/adviseActivity")
     public Map<String, String> adviseActivity(@RequestParam String activityId);
+    
+    /**
+     * 根据参数获取流程环节
+     *
+     */
+    @ApiIgnore
+    @ApiOperation("通知人流转信息")
+    @PostMapping(workflowActivityBaseUrl+"/feign/activity/get")
+    public WorkflowActivityVO getActivityByParam(@RequestBody ActivityParam param);
+    
+    @ApiIgnore
+    @ApiOperation("根据参数获取 WorkflowActivity 集合")
+    @PostMapping(workflowActivityBaseUrl+"/feign/activity/find")
+    public List<WorkflowActivityVO> findActivityByParam(@RequestBody ActivityParam param);
+    
+    /**
+     * 根据环节param获取环节信息
+     */
+    @ApiIgnore
+    @ApiOperation("根据环节id获取环节信息")
+    @PostMapping(workflowActivityBaseUrl+"/feign/node/get")
+    public WorkflowNodeVO getNodeByParam(@RequestBody WorkflowNodeParam param);
+    
+    /**
+     * 环节流转
+     *
+     * @param advanceBeanVO   流转VO
+     * @param map             短信消息map
+     */
+    @ApiIgnore
+    @ApiOperation("环节流转")
+    @PutMapping(value = workflowActivityBaseUrl + "/feign/activity/advance",consumes = "application/json")
+    public void activityAdvance(@RequestBody AdvanceBeanVO advanceBeanVO, @RequestParam Map<String, String> map);
+
 }

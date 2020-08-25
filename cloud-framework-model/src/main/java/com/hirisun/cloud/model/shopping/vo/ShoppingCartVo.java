@@ -13,7 +13,7 @@ import lombok.Data;
 
 @ApiModel("购物车VO")
 @Data
-public class ShoppingCartVo<T> implements Serializable {
+public class ShoppingCartVo implements Serializable {
 
 	private static final long serialVersionUID = 8043816034270271770L;
 
@@ -62,7 +62,23 @@ public class ShoppingCartVo<T> implements Serializable {
 	@ApiModelProperty("DaaS、SaaS服务名")
     private String dsName;
 	
+	@ApiModelProperty("appInfoId")
+    private String appInfoId;
+	
 	@ApiModelProperty("业务表单信息")
 	private List<Map<String,Object>> serverList;
 
+	public ShoppingCartVo(String id, String formNum) {
+		this.id = id;
+		this.formNum = formNum;
+	}
+	
+	public ShoppingCartVo() {}
+
+	public ShoppingCartVo(String id, String formNum, String appInfoId) {
+		this.id = id;
+		this.formNum = formNum;
+		this.appInfoId = appInfoId;
+	}
+	
 }

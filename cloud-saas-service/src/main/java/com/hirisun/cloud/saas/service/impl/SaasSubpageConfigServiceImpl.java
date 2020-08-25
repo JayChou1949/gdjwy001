@@ -105,7 +105,7 @@ public class SaasSubpageConfigServiceImpl implements SaasSubpageConfigService {
 				.lambda().eq(SaasSubpageConfig::getMasterId,masterId));
 		
         if (subpage != null) {
-        	param.setSubpageId(subpage.getId());
+        	param.setRefId(subpage.getId());
         	List<FilesVo> filesList = filesApi.find(param);
             subpage.setFilesList(filesList);
             

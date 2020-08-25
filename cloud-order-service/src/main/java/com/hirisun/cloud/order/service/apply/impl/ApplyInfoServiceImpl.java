@@ -317,7 +317,8 @@ public class ApplyInfoServiceImpl extends ServiceImpl<ApplyInfoMapper, ApplyInfo
      */
     @Transactional(rollbackFor = Throwable.class)
     @Override
-    public <I> void saveImpl(UserVO user, Map<String, Object> param, IImplHandler<I> implHandler, String modelId) throws Exception {
+    public void saveImpl(UserVO user, Map<String, Object> param, 
+    		IImplHandler implHandler, String modelId) throws Exception {
         ApplyInfo info = (ApplyInfo) param.get("info");
         // 添加实施信息
 //        ImplRequest<I> implRequest = (ImplRequest<I>) param.get("implRequest");

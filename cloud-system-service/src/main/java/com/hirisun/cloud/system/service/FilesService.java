@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -52,9 +53,11 @@ public interface FilesService extends IService<Files> {
     
     void remove(String masterId);
     
-    List<FilesVo> findBySubpageId(String subpageId);
+    List<FilesVo> findByRefId(String refId);
     
     void saveBatch(FilesParam filesParam);
 
 	void deleteBatch(FilesParam param);
+	
+	public void updateFileRef(@RequestBody FilesParam param);
 }

@@ -20,7 +20,7 @@
         <module>cloud-workflow-service</module>
         <module>cloud-saas-service</module>
         <module>cloud-daas-service</module>
-        <module>cloud-paas-service</module>
+        <!-- <module>cloud-paas-service</module> -->
         <module>cloud-order-service</module>
     </modules>
     <parent>

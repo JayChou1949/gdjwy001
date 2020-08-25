@@ -38,7 +38,7 @@ public interface ShoppingCartService {
      * 更新购物车信息
      * @param json 前端请求json
      */
-    <S> void update(String json);
+    void update(String json);
 
     /**
      * 删除购物车
@@ -49,32 +49,17 @@ public interface ShoppingCartService {
     /**
      * 购物车提交
      * @param submitRequest 提交VO
+     * @throws Exception 
      */
-    void submit(UserVO user,SubmitRequest submitRequest);
-
-    /**
-     * 初次老数据对接
-     */
-   // void oldDataMove(Long resourceType);
-
-    /**
-     * 删除旧购物车
-     * @param resourceType
-     */
-    void deleteOldShoppingCart(Long resourceType);
-
+    void submit(UserVO user,SubmitRequest submitRequest) throws Exception;
 
     /**
      * 各类资源购物车数目
      * @return map
      */
     Map<String,Integer> getNumGroupByType(String idCard);
-
-
-    /**
-     * daas、saas购物车去重
-     */
-    void distinct();
+    
+    Integer count(String idCard);
 
 
 }

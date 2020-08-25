@@ -18,8 +18,6 @@ import com.hirisun.cloud.iaas.service.IIaasTxyfzjhExtService;
 import com.hirisun.cloud.iaas.service.IIaasTxyfzjhService;
 import com.hirisun.cloud.model.shopping.vo.ApplicationInfoVo;
 import com.hirisun.cloud.model.shopping.vo.ShoppingCartVo;
-import com.hirisun.cloud.order.bean.application.ApplicationInfo;
-import com.hirisun.cloud.order.bean.shopping.ShoppingCart;
 
 /**
  * <p>

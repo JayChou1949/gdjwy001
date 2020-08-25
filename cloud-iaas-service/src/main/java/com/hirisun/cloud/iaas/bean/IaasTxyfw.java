@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
-import com.hirisun.cloud.order.annotation.ExcelExplain;
+import com.hirisun.cloud.common.annotation.ExcelExplain;
 
 /**
  * <p>

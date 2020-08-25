@@ -2,12 +2,9 @@ package com.hirisun.cloud.order.continer;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.springframework.context.ApplicationContext;
-
 import com.hirisun.cloud.common.contains.ResourceType;
 import com.hirisun.cloud.common.exception.CustomException;
 import com.hirisun.cloud.common.vo.CommonCode;
-import com.hirisun.cloud.order.bean.application.ApplicationInfo;
 
 
 public enum FormNum {
@@ -134,8 +131,8 @@ public enum FormNum {
      * @param info 订单
      * @return 表单枚举
      */
-    public static FormNum getFormNumByInfo(ApplicationInfo info) {
-        return getFormNumByName(info.getFormNum());
+    public static FormNum getFormNumByInfo(String formNum) {
+        return getFormNumByName(formNum);
     }
 
     /**

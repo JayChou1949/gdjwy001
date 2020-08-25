@@ -28,6 +28,14 @@ public enum CommonCode implements ResultCode{
     PROJECT_NULL(1020,"请选择需提交的项!"),
     SUBMITREQUEST_CONVERT_FAIL(1021,"SubmitRequest Convert Fail"),
     CONVERT_ERROR(1022,"不支持逆向转化"),
+    ITEM_NULL(1023,"请选择需提交的项"),
+    SERVICE_ID_NULL(1024,"参数服务id必填"),
+    SHOPPINGCAR_ID_NULL(1025,"请选择需提交购物车"),
+    ORDER_NUMBER_ERROR(1026,"申请单号生成错误,请重试!"),
+    ORDER_SPLIT_ERROR(1027,"分单处理异常."),
+    DRAFT_ERROR(1028,"草稿不能提交."),
+    FLOW_INSTANCE_NULL_ERROR(1029,"流程实例未找到."),
+    WORK_ORDERSTATUS_ERROR(1030,"工作台订单状态码错误."),
     SERVER_ERROR(9999,"系统繁忙，稍后重试");
     /**
      * 状态码

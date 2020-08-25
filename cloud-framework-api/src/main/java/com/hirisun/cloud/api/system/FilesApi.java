@@ -28,7 +28,7 @@ public interface FilesApi {
     public void remove(@RequestBody SubpageParam param);
 	
 	@ApiIgnore
-    @ApiOperation("根据 SaasSubpageId 获取文件信息")
+    @ApiOperation("根据 refId 获取文件信息")
     @GetMapping("/system/files/find")
     public List<FilesVo> find(@RequestBody SubpageParam param);
 	
@@ -41,4 +41,9 @@ public interface FilesApi {
     @ApiOperation("根据文件id集合批量删除文件信息")
     @PostMapping("/system/files/save/delete")
     public void deleteBatch(@RequestBody FilesParam param);
+	
+	@ApiIgnore
+    @ApiOperation("更新file的关联关系")
+    @PostMapping("/system/files/update/ref")
+    public void updateFileRef(@RequestBody FilesParam param);
 }

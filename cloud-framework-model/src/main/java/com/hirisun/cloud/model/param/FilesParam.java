@@ -14,6 +14,8 @@ public class FilesParam implements Serializable{
 	
 	private List<FilesVo> files;
 	private String refId;
+	//更新关联关系用到
+	private String newRefId;
 	private List<String> filesIdList;
 	
 	

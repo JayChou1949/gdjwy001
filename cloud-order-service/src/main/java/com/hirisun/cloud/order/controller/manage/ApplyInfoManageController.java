@@ -242,8 +242,9 @@ public class ApplyInfoManageController {
         String uuid = UUIDUtil.getUUID();
         try {
             if (lock.lock(lockKey, uuid)) {
+            	//TODO
                 //服务审核信息表 自动订购 实施表
-                applyInfoService.saveImpl(user, param, hw.getImplHandler(),activity.getNodeId());
+//                applyInfoService.saveImpl(user, param, hw.getImplHandler(),activity.getNodeId());
 //                if ("1".equals(implRequest.getResult())&& hw.getImplHandler() instanceof IIaasYzmyzyUserService) {
 //                    ImplRequest<IaasYzmyzyUser> implreq = implRequest;
 //                    List<IaasYzmyzyUser> impls = implreq.getImplServerList();

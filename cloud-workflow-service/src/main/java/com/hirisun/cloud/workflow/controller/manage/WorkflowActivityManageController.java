@@ -4,7 +4,10 @@ package com.hirisun.cloud.workflow.controller.manage;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hirisun.cloud.model.apply.FallBackVO;
+import com.hirisun.cloud.model.param.ActivityParam;
+import com.hirisun.cloud.model.workflow.ActivityVo;
 import com.hirisun.cloud.model.workflow.AdvanceBeanVO;
+import com.hirisun.cloud.model.workflow.WorkflowActivityVO;
 import com.hirisun.cloud.workflow.bean.WorkflowActivity;
 import com.hirisun.cloud.workflow.bean.WorkflowInstance;
 import com.hirisun.cloud.workflow.bean.WorkflowNode;
@@ -144,5 +147,33 @@ public class WorkflowActivityManageController {
         return resultMap;
     }
 
+    @ApiIgnore
+    @ApiOperation("根据参数获取单个 WorkflowActivity ")
+    @PostMapping("/feign/activity/get")
+    public WorkflowActivityVO getActivityByParam(@RequestBody ActivityParam param) {
+    	WorkflowActivityVO activity = workflowActivityService.getActivityByParam(param);
+    	return activity;
+    }
+    
+    @ApiIgnore
+    @ApiOperation("根据参数获取 WorkflowActivity 集合")
+    @PostMapping("/feign/activity/find")
+    public List<WorkflowActivityVO> findActivityByParam(@RequestBody ActivityParam param) {
+    	List<WorkflowActivityVO> list = workflowActivityService.findActivityByParam(param);
+    	return list;
+    }
+    
+    /**
+     * 环节流转
+     *
+     * @param advanceBeanVO   流转VO
+     * @param map             短信消息map
+     */
+    @ApiIgnore
+    @ApiOperation("环节流转")
+    @PutMapping(value = "/feign/activity/advance",consumes = "application/json")
+    public void activityAdvance(@RequestBody AdvanceBeanVO advanceBeanVO, @RequestParam Map<String, String> map) {
+    	workflowActivityService.advanceCurrentActivity(advanceBeanVO, map);
+    }
 }
 

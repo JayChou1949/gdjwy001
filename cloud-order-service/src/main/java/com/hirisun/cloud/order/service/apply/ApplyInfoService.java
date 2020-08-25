@@ -49,6 +49,6 @@ public interface ApplyInfoService extends IService<ApplyInfo> {
      * @param <I>
      * @throws Exception
      */
-    public <I> void saveImpl(UserVO user, Map<String, Object> param, IImplHandler<I> implHandler, String modelId) throws Exception;
+    public void saveImpl(UserVO user, Map<String, Object> param, IImplHandler implHandler, String modelId) throws Exception;
 
 }

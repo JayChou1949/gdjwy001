@@ -29,6 +29,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
@@ -392,7 +393,7 @@ public class FilesServiceImpl extends ServiceImpl<FilesMapper, Files> implements
 	}
 
 	@Override
-	public List<FilesVo> findBySubpageId(String subpageId) {
+	public List<FilesVo> findByRefId(String subpageId) {
 		
 		List<Files> list = this.list(new QueryWrapper<Files>()
 				.lambda().eq(Files::getRefId, subpageId));
@@ -435,5 +436,11 @@ public class FilesServiceImpl extends ServiceImpl<FilesMapper, Files> implements
 		}
 		
 		
+	}
+
+	@Transactional(rollbackFor = Exception.class)
+	public void updateFileRef(FilesParam param) {
+		filesMapper.update(new Files(),new UpdateWrapper<Files>().lambda()
+				.eq(Files::getRefId,param.getRefId()).set(Files::getRefId,param.getNewRefId()));
 	}
 }

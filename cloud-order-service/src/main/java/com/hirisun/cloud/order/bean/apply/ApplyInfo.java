@@ -1,15 +1,22 @@
 package com.hirisun.cloud.order.bean.apply;
 
-import com.baomidou.mybatisplus.annotation.*;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.hirisun.cloud.model.user.UserVO;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.hirisun.cloud.model.file.FilesVo;
+import com.hirisun.cloud.model.user.UserVO;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 /**
  * <p>
@@ -22,7 +29,7 @@ import java.util.List;
 @Data
 @TableName("T_APPLY_INFO")
 @ApiModel(value="ApplyInfo对象", description="申请信息表")
-public class ApplyInfo<S, I> implements Serializable {
+public class ApplyInfo implements Serializable {
 
     private static final long serialVersionUID=1L;
 
@@ -233,15 +240,34 @@ public class ApplyInfo<S, I> implements Serializable {
     @TableField("SERVICE_SOURCE")
     private String serviceSource;
 
+    @ApiModelProperty(value = "大数据集群账号")
+    @TableField("CLUSTER_ACCOUNT")
+    private String clusterAccount;
 
+    @ApiModelProperty(value = "使用资源的虚拟机IP")
+    @TableField("VM_IP")
+    private String vmIp;
+    
+    @ApiModelProperty(value = "流程 id")
+    @TableField("FLOW_STEP_ID")
+    private String flowStepId;
+
+    @ApiModelProperty(value = "流程 id备份,用于加办,转发")
+    @TableField("FLOW_STEP_ID_BAK")
+    private String flowStepIdBak;
+    
+    @ApiModelProperty(value = "是否新流程")
+    @TableField("FLOW_NEW")
+    private String flowNew;
+    
     /**
      * 组件信息(申请)
      */
     @TableField(exist = false)
-    private List<S> serverList;
+    private List<Map<String,Object>> serverList;
 
     @TableField(exist = false)
-    private String fileList;
+    private List<FilesVo> fileList;
     /**
      * 服务模板文件
      */
@@ -332,7 +358,7 @@ public class ApplyInfo<S, I> implements Serializable {
      * 实施服务器信息(详情)
      */
     @TableField(exist = false)
-    private List<I> implServerList;
+    private List<Map<String,Object>> implServerList;
 
     /**
      * 实施结果(最后一条)

@@ -10,7 +10,6 @@ import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.hirisun.cloud.iaas.bean.IaasDxccExt;
 import com.hirisun.cloud.iaas.bean.IaasSfswjfw;
 import com.hirisun.cloud.iaas.mapper.IaasSfswjfwMapper;
 import com.hirisun.cloud.iaas.service.IIaasSfswjfwService;
@@ -28,7 +27,10 @@ public class IaasSfswjfwServiceImpl extends ServiceImpl<IaasSfswjfwMapper,
     @Transactional(rollbackFor = Throwable.class)
     @Override
     public void saveShoppingCart(ShoppingCartVo shoppingCart) {
-        List<IaasSfswjfw> serverList = shoppingCart.getServerList();
+    	
+    	List<IaasSfswjfw> serverList = JSON.parseObject(JSON.toJSON(shoppingCart.getServerList()).toString(), 
+    			new TypeReference<List<IaasSfswjfw>>(){});
+    	
         if (serverList != null && !serverList.isEmpty()) {
             for (IaasSfswjfw txyfw : serverList) {
                 txyfw.setId(null);

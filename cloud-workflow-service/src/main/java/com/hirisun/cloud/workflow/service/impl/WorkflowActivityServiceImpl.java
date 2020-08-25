@@ -1,37 +1,44 @@
 package com.hirisun.cloud.workflow.service.impl;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hirisun.cloud.common.contains.WorkflowNodeAbilityType;
 import com.hirisun.cloud.common.exception.CustomException;
 import com.hirisun.cloud.common.util.UUIDUtil;
 import com.hirisun.cloud.common.util.WorkflowUtil;
-import com.hirisun.cloud.model.apply.ApplyReviewRecordVO;
 import com.hirisun.cloud.model.apply.FallBackVO;
+import com.hirisun.cloud.model.param.ActivityParam;
 import com.hirisun.cloud.model.service.AppReviewInfoVo;
 import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.model.workflow.AdvanceBeanVO;
 import com.hirisun.cloud.model.workflow.WorkflowActivityVO;
-import com.hirisun.cloud.model.workflow.WorkflowNodeVO;
 import com.hirisun.cloud.workflow.bean.WorkflowActivity;
 import com.hirisun.cloud.workflow.bean.WorkflowInstance;
 import com.hirisun.cloud.workflow.bean.WorkflowNode;
 import com.hirisun.cloud.workflow.mapper.WorkflowActivityMapper;
 import com.hirisun.cloud.workflow.mapper.WorkflowNodeMapper;
 import com.hirisun.cloud.workflow.service.WorkflowActivityService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hirisun.cloud.workflow.service.WorkflowInstanceService;
 import com.hirisun.cloud.workflow.service.WorkflowNodeService;
 import com.hirisun.cloud.workflow.vo.WorkflowCode;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -560,4 +567,161 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
         resultMap.put("msg", "成功");
         return resultMap;
     }
+
+	@Override
+	public WorkflowActivityVO getActivityByParam(ActivityParam param) {
+		
+		WorkflowActivity workflowActivity = workflowActivityService.getOne(new QueryWrapper<WorkflowActivity>().eq("ACTIVITY_STATUS",0)
+                .eq("IS_START",0).eq("INSTANCE_ID",param.getInstanceId()));
+		
+		if(workflowActivity != null) {
+			WorkflowActivityVO workflowActivityVO = new WorkflowActivityVO();
+			BeanUtils.copyProperties(workflowActivity, workflowActivityVO);
+			return workflowActivityVO;
+		}
+		
+		return null;
+	}
+
+	@Override
+	public void advanceCurrentActivity(AdvanceBeanVO advanceBeanVO, Map<String, String> map) {
+		
+		WorkflowActivity currentActivity = null;
+        Map<String, String> modelMapToPerson= null;
+        if (advanceBeanVO!=null) {
+            String currentActivityId=advanceBeanVO.getCurrentActivityId();
+            if (currentActivityId!=null&&!currentActivityId.equals("")) {
+                currentActivity=getById(currentActivityId);
+            }else {
+                throw new CustomException(WorkflowCode.NODE_ID_CAN_NOT_NULL);
+            }
+            //下一流转环节的处理人Map
+            modelMapToPerson=advanceBeanVO.getModelMapToPerson();
+        }else {
+            throw new CustomException(WorkflowCode.ADVANCE_CAN_NOT_NULL);
+        }
+        //下级环节集合
+        List<WorkflowNode> nextModels= null;
+        if (currentActivity!=null) {
+            String currentModelId=currentActivity.getNodeId();
+            if (currentModelId==null||"".equals(currentModelId)) {
+                throw new CustomException(WorkflowCode.WORKFLOW_ACTIVITY_NODE_ID_NOT_NULL);
+            }
+
+            if (currentActivity.getActivityStatus() != 0) {
+                throw new CustomException(WorkflowCode.WORKFLOW_ACTIVITY_STATUS_ERROR);
+            }
+
+            WorkflowNode nextNodeById = workflowNodeMapper.getNextNodeById(currentModelId);
+//            nextModels=workFlowModelDao.getSubordinateModel(currentModelId);
+            //如果没有下级环节，则直接完成当前环节，完成流程实例
+            if (nextModels==null||nextModels.size()==0) {
+                currentActivity.setActivityStatus(WorkflowActivity.STATUS_SUBMIT);
+                currentActivity.setHandleTime(new Date());
+                this.updateById(currentActivity);
+                WorkflowInstance instance = workflowInstanceService.getById(currentActivity.getInstanceId());
+//                Instance instance=instanceDao.selectById(currentActivity.getInstanceid());
+                instance.setCompleteTime(new Date());
+                instance.setInstanceStatus(WorkflowInstance.INSTANCE_STATUS_COMPLETE);
+                workflowInstanceService.updateById(instance);
+            }
+        }else {
+            throw new CustomException(WorkflowCode.WORKFLOW_NODE_INFO_NULL);
+        }
+
+       /* if (modelMapToPerson.size()<1) {
+            throw new BaseException( "办理人不能为空", 201);
+        }*/
+        //用来判断是否审批不通过跳级流转到最后一个环节
+        Integer jujeAdvaceToLastModel=0;
+        for (WorkflowNode workflowNode:nextModels) {
+            //获取当前环节指定的办理人
+            //判断定义的下级环节是否存在于前台传入需要流传的下级环节中,如果不存在,直接进入下一个循环
+            if (!modelMapToPerson.containsKey(workflowNode.getId())) {
+                jujeAdvaceToLastModel++;
+                continue;
+            }
+            //取得对应环节的处理人
+            String personids=modelMapToPerson.get(workflowNode.getId());
+            //如果处理人为空则取出默认处理人
+            if (personids==null||personids.trim().equals("")) {
+                personids=workflowNode.getDefaultHandler();
+                //如果默认处理人也为空则直接返回提示信息给前台
+                if (personids==null||personids.trim().equals("")) {
+                    throw new CustomException(WorkflowCode.WORKFLOW_NODE_NO_HANDLER);
+                }
+            }
+            //把办理人分割成数组
+            String personArr[]=personids.split(",");
+            if (personArr.length==0) {
+                throw new CustomException(WorkflowCode.HANDLER_NULL);
+            }
+            //获取需要的参与人对应关系
+            Map<String, String> adviserMap=advanceBeanVO.getModelMapToAdviser();
+            String adviserIds=null;
+            if (adviserMap!=null) {
+                adviserIds=adviserMap.get(workflowNode.getId());
+            }
+            //把参与人分割成数组
+            String adviserArr[]=null;
+            if (adviserIds!=null) {
+                adviserArr=adviserIds.split(",");
+            }
+            
+            handleFlow(workflowNode, currentActivity, personArr,adviserArr,advanceBeanVO,map);
+            
+        }
+        if (jujeAdvaceToLastModel>0&&modelMapToPerson.size()==1) {
+            Set<String> set=modelMapToPerson.keySet();
+            String id="";
+            for (String key:set) {
+                id=key;
+            }
+            WorkflowNode model=workflowNodeService.getById(id);
+            if (model!=null) {
+                String [] personArr=modelMapToPerson.get(id).split(",");
+                if (personArr.length==0) {
+                    throw new CustomException(WorkflowCode.HANDLER_NULL);
+                }
+                
+                handleFlow(model, currentActivity, personArr,null,advanceBeanVO,map);
+                
+            }else {
+                throw new CustomException(WorkflowCode.END_ACTIVITY_NULL);
+            }
+        }
+        //当前流转信息更新为已提交,同级(其它处理人)在handleFlow已处理为已抢占
+        currentActivity.setHandleTime(new Date());
+        currentActivity.setActivityStatus(WorkflowActivity.STATUS_SUBMIT);
+        this.updateById(currentActivity);
+		
+	}
+
+	@Override
+	public List<WorkflowActivityVO> findActivityByParam(ActivityParam param) {
+		
+		String activityType = param.getActivityType();
+		List<WorkflowActivity> list = null;
+		if(StringUtils.isNotBlank(activityType)) {
+			list = this.list(new QueryWrapper<WorkflowActivity>().lambda()
+	                .eq(WorkflowActivity::getInstanceId,param.getInstanceId())
+	                .eq(WorkflowActivity::getHandlePersons,param.getHandlePersons())
+	                .eq(WorkflowActivity::getActivityStatus,param.getActivitystatus())
+	                .eq(WorkflowActivity::getActivityType,activityType));
+		}else {
+			list = this.list(new QueryWrapper<WorkflowActivity>().lambda()
+	                .eq(WorkflowActivity::getInstanceId,param.getInstanceId())
+	                .eq(WorkflowActivity::getHandlePersons,param.getHandlePersons())
+	                .eq(WorkflowActivity::getActivityStatus,param.getActivitystatus())
+	                .isNull(WorkflowActivity::getActivityType));
+		}
+		
+		if(CollectionUtils.isNotEmpty(list)) {
+			List<WorkflowActivityVO> serverList = JSON.parseObject(JSON.toJSON(list).toString(), 
+	    			new TypeReference<List<WorkflowActivityVO>>(){});
+			return serverList;
+		}
+		
+		return null;
+	}
 }

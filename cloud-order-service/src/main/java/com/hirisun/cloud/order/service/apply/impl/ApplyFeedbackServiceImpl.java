@@ -1,10 +1,11 @@
 package com.hirisun.cloud.order.service.apply.impl;
 
-import com.baomidou.mybatisplus.extension.service.IService;
+import org.springframework.stereotype.Service;
+
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hirisun.cloud.order.bean.apply.ApplyFeedback;
 import com.hirisun.cloud.order.mapper.apply.ApplyFeedbackMapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.springframework.stereotype.Service;
+import com.hirisun.cloud.order.service.apply.ApplyFeedbackService;
 
 /**
  * <p>
@@ -15,6 +16,6 @@ import org.springframework.stereotype.Service;
  * @since 2020-08-12
  */
 @Service
-public class ApplyFeedbackServiceImpl extends ServiceImpl<ApplyFeedbackMapper, ApplyFeedback> implements IService<ApplyFeedback> {
+public class ApplyFeedbackServiceImpl extends ServiceImpl<ApplyFeedbackMapper, ApplyFeedback> implements ApplyFeedbackService {
 
 }
