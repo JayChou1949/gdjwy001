@@ -2,6 +2,7 @@ package com.hirisun.cloud.platform.document.controller;
 
 
 import com.hirisun.cloud.common.vo.QueryResponseResult;
+import com.hirisun.cloud.model.platform.vo.UserDocVo;
 import com.hirisun.cloud.platform.document.bean.UserDoc;
 import com.hirisun.cloud.platform.document.service.UserDocService;
 import io.swagger.annotations.Api;
@@ -37,6 +38,17 @@ public class UserDocController {
     public QueryResponseResult<UserDoc> listUserDoc(@ApiParam(value = "文档类型：用户指南",required = true) @RequestParam String domainValue) {
         LinkedList<UserDoc> list = userDocService.listByDomain(domainValue);
         return QueryResponseResult.success(list);
+    }
+    
+    
+    /**
+     * 根据适用业务获取用户文档
+     */
+    @ApiOperation("根据适用业务获取用户文档Vo")
+    @GetMapping("/find")
+    public List<UserDocVo> find(@ApiParam(value = "文档类型：用户指南",required = true) @RequestParam String domainValue) {
+    	List<UserDocVo> list = userDocService.findByDomain(domainValue);
+        return list;
     }
 
 }

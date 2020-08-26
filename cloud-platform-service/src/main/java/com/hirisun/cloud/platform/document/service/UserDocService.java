@@ -1,12 +1,14 @@
 package com.hirisun.cloud.platform.document.service;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.hirisun.cloud.model.platform.vo.UserDocVo;
 import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.platform.document.bean.UserDoc;
-import com.baomidou.mybatisplus.extension.service.IService;
-
-import java.util.LinkedList;
-import java.util.Map;
 
 /**
  * <p>
@@ -19,6 +21,8 @@ import java.util.Map;
 public interface UserDocService extends IService<UserDoc> {
 
     LinkedList<UserDoc> listByDomain(String domain);
+    
+    List<UserDocVo> findByDomain(String domain);
 
     Page getPage(Page page, UserVO user, Map map);
 

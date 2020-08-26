@@ -2,16 +2,22 @@ package com.hirisun.cloud.platform.document.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hirisun.cloud.common.contains.ReviewStatus;
+import com.hirisun.cloud.model.platform.vo.UserDocVo;
 import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.platform.document.bean.UserDoc;
 import com.hirisun.cloud.platform.document.mapper.UserDocMapper;
 import com.hirisun.cloud.platform.document.service.UserDocService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -49,4 +55,21 @@ public class UserDocServiceImpl extends ServiceImpl<UserDocMapper, UserDoc> impl
             this.updateById(userDoc);
         }
     }
+
+	@Override
+	public List<UserDocVo> findByDomain(String domain) {
+		
+		List<UserDocVo> voList = new ArrayList<UserDocVo>();
+		
+		LinkedList<UserDoc> list = userDocMapper.listByDomain(domain);
+		if(CollectionUtils.isNotEmpty(list)) {
+			list.forEach(userDoc->{
+				UserDocVo vo = new UserDocVo();
+				BeanUtils.copyProperties(userDoc, vo);
+				voList.add(vo);
+			});
+		}
+		
+		return voList;
+	}
 }

@@ -32,7 +32,7 @@ public class IaasYzmyzyUserImpl extends Model<IaasYzmyzyUserImpl> {
         /**
      * 身份证号
      */
-         @TableId("IDCARD")
+         @TableField("IDCARD")
     private String idcard;
 
         /**

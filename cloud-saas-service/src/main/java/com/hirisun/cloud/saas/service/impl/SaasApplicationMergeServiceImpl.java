@@ -1,7 +1,9 @@
 package com.hirisun.cloud.saas.service.impl;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
@@ -10,10 +12,11 @@ import java.util.Objects;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +25,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.hirisun.cloud.api.file.FileApi;
+import com.hirisun.cloud.api.platform.UserDocApi;
 import com.hirisun.cloud.api.system.FilesApi;
 import com.hirisun.cloud.api.user.UserApi;
 import com.hirisun.cloud.common.contains.ApplicationInfoStatus;
@@ -30,6 +35,8 @@ import com.hirisun.cloud.common.util.AreaPoliceCategoryUtils;
 import com.hirisun.cloud.model.app.param.SubpageParam;
 import com.hirisun.cloud.model.file.FilesVo;
 import com.hirisun.cloud.model.impl.vo.ImplRequestVo;
+import com.hirisun.cloud.model.platform.vo.UserDocVo;
+import com.hirisun.cloud.model.saas.contains.SaasFileupload;
 import com.hirisun.cloud.model.saas.vo.SaasOrderTotalVo;
 import com.hirisun.cloud.model.saas.vo.SaasTotalVo;
 import com.hirisun.cloud.model.saas.vo.SaasUseTotalVo;
@@ -79,14 +86,11 @@ public class SaasApplicationMergeServiceImpl extends ServiceImpl<SaasApplication
 //    private MessageProvider messageProvider;
 //    @Autowired
 //    private ISpeedUpService speedUpService;
-
-    private static String rootPath;
-
-    @Value("${file.path}")
-    public void setRootPath(String rootPath) {
-        SaasApplicationMergeServiceImpl.rootPath = rootPath;
-    }
-
+    @Autowired
+    private FileApi fileApi;
+    @Autowired
+    private UserDocApi userDocApi;
+    
     @Transactional(rollbackFor = Exception.class)
     @Override
     public SaasApplicationMerge merge(UserVO user, String ids) {
@@ -365,20 +369,24 @@ public class SaasApplicationMergeServiceImpl extends ServiceImpl<SaasApplication
     }
 
     private void downFile(HttpServletResponse response, String name) throws IOException {
-        File file = new File(rootPath+"/" + name);
-        if (file.exists()) {
-            // 设置强制下载不打开
-            response.setContentType("application/force-download");
+    	
+    	List<UserDocVo> docVoList = userDocApi.find("建模平台用户开通申请总表");
+    	if(CollectionUtils.isNotEmpty(docVoList)) {
+    		UserDocVo userDocVo = docVoList.get(0);
+    		String fileId = userDocVo.getFileId();
+    		byte[] download = fileApi.download(fileId);
+    		// 设置文件名
+    		response.setContentType("application/force-download");
             String originaName;
             try {
                 originaName = URLEncoder.encode(name, "UTF-8");
             } catch (UnsupportedEncodingException e) {
                 originaName = "建模平台用户开通申请总表.doc";
             }
-            // 设置文件名
             response.addHeader("Content-Disposition", "attachment;fileName=" + originaName);
-            FileUtils.copyFile(file, response.getOutputStream());
-        }
+            InputStream inputStream = new ByteArrayInputStream(download);
+            IOUtils.copy(inputStream, response.getOutputStream());
+    	}
     }
 
 }

@@ -42,6 +42,45 @@
         <!-- <association property="user" column="CREATOR" select="com.upd.hwcloud.dao.UserMapper.findUserByIdcard" /> -->
     </resultMap>
 
+	<resultMap id="SubpageResultMap" type="com.hirisun.cloud.iaas.bean.Subpage">
+        <id column="ID" property="id" />
+        <result column="VENDOR" property="vendor" />
+        <result column="URL" property="url" />
+        <result column="DESCRIPTION_ONE" property="descriptionOne" />
+        <result column="DESCRIPTION_TWO" property="descriptionTwo" />
+        <result column="DESCRIPTION_THREE" property="descriptionThree" />
+        <result column="APPLICATION_ONE" property="applicationOne" />
+        <result column="APPLICATION_TWO" property="applicationTwo" />
+        <result column="APPLICATION_THREE" property="applicationThree" />
+        <result column="USE_ONE" property="useOne" />
+        <result column="USE_TWO" property="useTwo" />
+        <result column="USE_THREE" property="useThree" />
+        <result column="USE_FOUR" property="useFour" />
+        <result column="USE_FIVE" property="useFive" />
+        <result column="FLOW_ONE" property="flowOne" />
+        <result column="FLOW_TWO" property="flowTwo" />
+        <result column="FLOW_THREE" property="flowThree" />
+        <result column="FLOW_FOUR" property="flowFour" />
+        <result column="FEEDBACK_ONE" property="feedbackOne" />
+        <result column="FEEDBACK_MAN_ONE" property="feedbackManOne" />
+        <result column="FEEDBACK_TWO" property="feedbackTwo" />
+        <result column="FEEDBACK_MAN_TWO" property="feedbackManTwo" />
+        <result column="FEEDBACK_THREE" property="feedbackThree" />
+        <result column="FEEDBACK_MAN_THREE" property="feedbackManThree" />
+        <result column="FEEDBACK_FOUR" property="feedbackFour" />
+        <result column="FEEDBACK_MAN_FOUR" property="feedbackManFour" />
+        <result column="SERVICE_ID" property="serviceId" />
+        <result column="SORT" property="sort" />
+        <result column="USE" property="use" />
+        <result column="BUILD" property="build" />
+        <result column="BUILD_ORG" property="buildOrg" />
+        <result column="BUILD_CONTACT" property="buildContact" />
+        <result column="BUILD_PHONE" property="buildPhone" />
+        <result column="DEVELOP_ORG" property="developOrg" />
+        <result column="DEVELOP_CONTACT" property="developContact" />
+        <result column="DEVELOP_PHONE" property="developPhone" />
+    </resultMap>
+
     <select id="getPage" resultMap="BaseResultMap">
         SELECT S.*
         FROM T_IAAS_CONFIG S
@@ -66,7 +105,7 @@
         ORDER BY SORT ASC, MODIFIED_TIME DESC
     </select>
 
-    <select id="getLabel" resultMap="com.hirisun.cloud.iaas.mapper.SubpageMapper.BaseResultMap">
+    <select id="getLabel" resultMap="SubpageResultMap">
         select ss.SERVICE_ID,ss.USE
         from TB_SUBPAGE ss
         left join T_IAAS_CONFIG s on ss.SERVICE_ID = s.ID
@@ -79,7 +118,7 @@
         </if>
     </select>
 
-    <select id="getPageByCondition" resultType="BaseResultMap">
+    <select id="getPageByCondition" resultMap="BaseResultMap">
         select DISTINCT s.*
         from T_IAAS_CONFIG s
         left join TB_SUBPAGE ss on ss.SERVICE_ID = s.ID
@@ -99,7 +138,7 @@
         order by s.SORT asc,s.MODIFIED_TIME desc,s.BUILD_STATUS asc
     </select>
 
-    <select id="getCloudDesktopByName" resultType="BaseResultMap">
+    <select id="getCloudDesktopByName" resultMap="BaseResultMap">
         SELECT ID,NAME,FORM_NUM,INSTRUCTIONS FROM T_IAAS_CONFIG WHERE NAME=#{name}
     </select>
 

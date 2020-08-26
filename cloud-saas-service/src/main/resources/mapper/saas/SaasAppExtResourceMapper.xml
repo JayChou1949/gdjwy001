@@ -3,7 +3,7 @@
 <mapper namespace="com.hirisun.cloud.saas.mapper.SaasAppExtResourceMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.hirisun.cloud.order.bean.saas.SaasAppExtResource">
+    <resultMap id="BaseResultMap" type="com.hirisun.cloud.saas.bean.SaasAppExtResource">
         <id column="ID" property="id" />
         <result column="MASTER_ID" property="masterId" />
         <result column="FOLDER_NAME" property="folderName" />

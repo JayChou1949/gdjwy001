@@ -1,11 +1,11 @@
 package com.hirisun.cloud.saas.service.impl;
 
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,14 +13,12 @@ import java.util.Objects;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,15 +31,15 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Maps;
+import com.hirisun.cloud.api.file.FileApi;
 import com.hirisun.cloud.api.system.FilesApi;
-import com.hirisun.cloud.api.workflow.WorkflowApi;
 import com.hirisun.cloud.common.constant.RedisKey;
 import com.hirisun.cloud.common.contains.ApplicationInfoStatus;
 import com.hirisun.cloud.common.contains.UserType;
 import com.hirisun.cloud.common.exception.CustomException;
-import com.hirisun.cloud.common.util.OrderNumUtil;
 import com.hirisun.cloud.model.app.param.SubpageParam;
 import com.hirisun.cloud.model.file.FilesVo;
+import com.hirisun.cloud.model.saas.contains.SaasFileupload;
 import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.model.workbench.vo.QueryVO;
 import com.hirisun.cloud.model.workbench.vo.ResourceOverviewVO;
@@ -82,6 +80,8 @@ public class SaasApplicationServiceImpl extends ServiceImpl<SaasApplicationMappe
     @Autowired
     private FilesApi filesApi;
     @Autowired
+    private FileApi fileApi;
+    @Autowired
     private ISaasApplicationMergeService saasApplicationMergeService;
     
     //TODO
@@ -98,13 +98,6 @@ public class SaasApplicationServiceImpl extends ServiceImpl<SaasApplicationMappe
     private SaasApplicationMapper saasApplicationMapper;
     @Autowired
     private ISaasAppExtResourceService saasAppExtResourceService;
-
-    private static String rootPath;
-
-    @Value("${file.path}")
-    public void setRootPath(String rootPath) {
-        SaasApplicationServiceImpl.rootPath = rootPath;
-    }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -505,33 +498,43 @@ public class SaasApplicationServiceImpl extends ServiceImpl<SaasApplicationMappe
 
     @Override
     public void uploadFile(MultipartFile file) throws IOException {
-        upFile(file, "应用权限回收申请.xls");
+    	
+    	String fileId = fileApi.upload(file, SaasFileupload.SAAS_FILE_TYPE, "应用权限回收申请");
+    	
+    	FilesVo vo = new FilesVo();
+    	vo.setOriginaName("应用权限回收申请.xls");
+    	vo.setPath(fileId);
+    	vo.setSuffix(".xml");
+		SubpageParam param = new SubpageParam();
+		List<FilesVo> files = new ArrayList<FilesVo>();
+		files.add(vo);
+		param.setFiles(files);
+		
+		param.setRefId(SaasFileupload.AppPermissionRecyclingApply);
+		filesApi.refFiles(param);
+    	
     }
 
-    private void upFile(MultipartFile file, String name) throws IOException {
-        File targetFile = new File(rootPath+"/" + name);
-        targetFile.exists();
-        FileOutputStream fileOutputStream = new FileOutputStream(targetFile);
-        InputStream inputStream = file.getInputStream();
-        IOUtils.copy(inputStream, fileOutputStream);
-        IOUtils.closeQuietly(inputStream);
-        IOUtils.closeQuietly(fileOutputStream);
-    }
 
     private void downFile(HttpServletResponse response, String name) throws IOException {
-        File file = new File(rootPath+"/" + name);
-        if (file.exists()) {
-            // 设置强制下载不打开
-            response.setContentType("application/force-download");
+    	
+    	SubpageParam param = new SubpageParam();
+    	param.setRefId(SaasFileupload.AppPermissionRecyclingApply);
+    	List<FilesVo> voList = filesApi.find(param);
+    	if(CollectionUtils.isNotEmpty(voList)) {
+    		FilesVo filesVo = voList.get(0);
+    		byte[] download = fileApi.download(filesVo.getPath());
+    		// 设置文件名
+    		response.setContentType("application/force-download");
             String originaName;
             try {
                 originaName = URLEncoder.encode(name, "UTF-8");
             } catch (UnsupportedEncodingException e) {
                 originaName = "应用权限回收申请.xls";
             }
-            // 设置文件名
             response.addHeader("Content-Disposition", "attachment;fileName=" + originaName);
-            FileUtils.copyFile(file, response.getOutputStream());
-        }
+            InputStream inputStream = new ByteArrayInputStream(download);
+            IOUtils.copy(inputStream, response.getOutputStream());
+    	}
     }
 }
