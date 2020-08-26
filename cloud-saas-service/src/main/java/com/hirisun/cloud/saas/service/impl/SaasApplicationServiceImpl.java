@@ -45,6 +45,7 @@ import com.hirisun.cloud.model.file.FilesVo;
 import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.model.workbench.vo.QueryVO;
 import com.hirisun.cloud.model.workbench.vo.ResourceOverviewVO;
+import com.hirisun.cloud.redis.service.RedisService;
 import com.hirisun.cloud.saas.bean.SaasAppExtResource;
 import com.hirisun.cloud.saas.bean.SaasApplication;
 import com.hirisun.cloud.saas.bean.SaasApplicationExt;
@@ -75,11 +76,9 @@ public class SaasApplicationServiceImpl extends ServiceImpl<SaasApplicationMappe
     private static final Logger logger = LoggerFactory.getLogger(SaasApplicationServiceImpl.class);
 
     @Autowired
-    private StringRedisTemplate stringRedisTemplate;
+    private RedisService redisService;
     @Autowired
     private ISaasApplicationExtService saasApplicationExtService;
-//    @Autowired
-//    private IFilesService filesService;
     @Autowired
     private FilesApi filesApi;
     @Autowired
@@ -118,7 +117,7 @@ public class SaasApplicationServiceImpl extends ServiceImpl<SaasApplicationMappe
         info.setPostType(user.getPostType());
         info.setMobileWork(user.getMobileWork());
         info.setStatus(ApplicationInfoStatus.INNER_REVIEW.getCode());
-        String orderNum = OrderNumUtil.gen(RedisKey.KEY_ORDER_NUM_PREFIX);
+        String orderNum = redisService.genOrderNum(RedisKey.KEY_ORDER_NUM_PREFIX);
         info.setOrderNumber(orderNum);
         //设置申请单的用户id，同同一用户id  modfiy  by    qm 2020-7-30
         if(null!=user.getId()){
@@ -138,7 +137,6 @@ public class SaasApplicationServiceImpl extends ServiceImpl<SaasApplicationMappe
         param.setRefId(info.getId());
 		filesApi.refFiles(param );
         
-//        filesService.refFiles(info.getFileList(), info.getId());
 //        messageProvider.sendMessageAsync(messageProvider.buildSuccessMessage(user, BusinessName.SAAS_RESOURCE, info.getOrderNumber()));
     
 		//TODO: 消息队列改造
@@ -171,7 +169,6 @@ public class SaasApplicationServiceImpl extends ServiceImpl<SaasApplicationMappe
         this.saveExt(info);
         saasAppExtResourceService.remove(new QueryWrapper<SaasAppExtResource>().lambda().eq(SaasAppExtResource::getMasterId,info.getId()));
         this.saveExtResource(info);
-//        filesService.refFiles(info.getFileList(), info.getId());
         
         SubpageParam param = new SubpageParam();
         param.setFiles(info.getFileList());
