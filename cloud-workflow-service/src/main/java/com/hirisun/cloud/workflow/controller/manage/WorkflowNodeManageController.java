@@ -4,6 +4,7 @@ package com.hirisun.cloud.workflow.controller.manage;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.hirisun.cloud.common.contains.WorkflowActivityStatus;
 import com.hirisun.cloud.model.param.WorkflowNodeParam;
 import com.hirisun.cloud.model.workflow.WorkflowNodeVO;
 import com.hirisun.cloud.workflow.bean.WorkflowActivity;
