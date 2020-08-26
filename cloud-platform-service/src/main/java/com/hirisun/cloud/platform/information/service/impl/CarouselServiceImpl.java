@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hirisun.cloud.api.file.FileApi;
+import com.hirisun.cloud.common.contains.ReviewStatus;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.model.file.FileSystemVO;
 import com.hirisun.cloud.platform.document.bean.DevDoc;
@@ -100,7 +101,7 @@ public class CarouselServiceImpl extends ServiceImpl<CarouselMapper, Carousel> i
             default:
                 break;
         }
-        wrapper.eq(Carousel::getStatus,Carousel.STATUS_ONLINE);
+        wrapper.eq(Carousel::getStatus, ReviewStatus.ONLINE.getCode());
         wrapper.eq(Carousel::getProvincial, type);
         wrapper.orderByAsc(Carousel::getSortNum);
         wrapper.orderByDesc(Carousel::getUpdateTime);
@@ -145,7 +146,7 @@ public class CarouselServiceImpl extends ServiceImpl<CarouselMapper, Carousel> i
         }
         //查询未上线
         if(status==null||status.equals(0)){
-            wrapper.in(Carousel::getStatus,Carousel.STATUS_AUDIT,Carousel.STATUS_REJECT);
+            wrapper.in(Carousel::getStatus,ReviewStatus.REVIEWING,ReviewStatus.REJECT.getCode());
         }else{//已上线
             wrapper.eq(Carousel::getStatus,status);
         }
@@ -211,7 +212,7 @@ public class CarouselServiceImpl extends ServiceImpl<CarouselMapper, Carousel> i
             default:
                 break;
         }
-        wrapper.eq(Carousel::getStatus,Carousel.STATUS_ONLINE);
+        wrapper.eq(Carousel::getStatus,ReviewStatus.ONLINE.getCode());
         wrapper.orderByAsc(Carousel::getSortNum);
         wrapper.orderByDesc(Carousel::getUpdateTime);
         return this.list(wrapper);

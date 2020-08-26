@@ -4,6 +4,7 @@ package com.hirisun.cloud.platform.information.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.hirisun.cloud.common.contains.ReviewStatus;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.platform.information.bean.News;
 import com.hirisun.cloud.platform.information.service.NewsService;
@@ -62,7 +63,7 @@ public class NewsController {
             default:
                 break;
         }
-        wrapper.eq(News::getStatus,News.STATUS_ONLINE);
+        wrapper.eq(News::getStatus, ReviewStatus.ONLINE.getCode());
         wrapper.eq(News::getProvincial, type);
         wrapper.orderByDesc(News::getIsTop,News::getTime);
         wrapper.orderByAsc(News::getSortNum);

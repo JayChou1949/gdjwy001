@@ -27,15 +27,6 @@ public class Workflow implements Serializable {
 
     private static final long serialVersionUID=1L;
 
-    /**
-     * 流程状态 0 正常
-     */
-    public static Integer STATUS_NORMAL=0;
-    /**
-     * 流程状态 1 删除
-     */
-    public static Integer STATUS_DELETE=1;
-
     @TableId(value = "ID", type = IdType.ASSIGN_ID)
     private String id;
 

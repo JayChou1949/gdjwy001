@@ -1,7 +1,6 @@
 package com.hirisun.cloud.common.contains;
 
-import com.hirisun.cloud.common.exception.CustomException;
-import com.hirisun.cloud.common.vo.CommonCode;
+
 
 /**
  * @author wuc
@@ -33,15 +32,13 @@ public enum WorkbenchApplyStatus {
     }
 
     public static WorkbenchApplyStatus codeOf(String code) {
-        if (code==null) {
-            throw new CustomException(CommonCode.WORK_ORDERSTATUS_ERROR);
-        }
+        if (code==null)return null;
         WorkbenchApplyStatus[] values = WorkbenchApplyStatus.values();
         for (WorkbenchApplyStatus value : values) {
             if (value.getCode().equals(code)) {
                 return value;
             }
         }
-        throw new CustomException(CommonCode.WORK_ORDERSTATUS_ERROR);
+        return null;
     }
 }

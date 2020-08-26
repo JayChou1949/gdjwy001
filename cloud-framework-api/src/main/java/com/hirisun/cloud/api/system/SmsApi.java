@@ -15,13 +15,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface SmsApi {
     /**
      * 发送业务受理短信
-     * @param submitor 申请人
+     * @param creatorId 申请人身份证
      * @param bizName 业务名称
      * @param orderNum 工单号
      */
     @ApiOperation("发送业务受理短信")
     @GetMapping("/system/sms/buildSuccessMessage")
-    public void buildSuccessMessage(@RequestParam UserVO submitor, @RequestParam String bizName, @RequestParam String orderNum);
+    public void buildSuccessMessage(@RequestParam String creatorId, @RequestParam String bizName, @RequestParam String orderNum);
 
     /**
      * 发送处理人短信
@@ -48,7 +48,7 @@ public interface SmsApi {
      */
     @ApiOperation("发送业务拒绝回退短信")
     @GetMapping("/system/sms/buildRejectMessage")
-    public void buildProcessingMessage(@RequestParam String creatorId,@RequestParam String bizName);
+    public void buildRejectMessage(@RequestParam String creatorId,@RequestParam String bizName);
     /**
      * 发送资源缩配短信
      * @param creatorId 业务名

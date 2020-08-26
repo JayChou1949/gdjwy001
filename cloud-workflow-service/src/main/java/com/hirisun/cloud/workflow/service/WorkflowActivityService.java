@@ -6,11 +6,10 @@ import java.util.Map;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hirisun.cloud.model.apply.FallBackVO;
 import com.hirisun.cloud.model.param.ActivityParam;
-import com.hirisun.cloud.model.workflow.ActivityVo;
 import com.hirisun.cloud.model.workflow.AdvanceBeanVO;
 import com.hirisun.cloud.model.workflow.WorkflowActivityVO;
 import com.hirisun.cloud.workflow.bean.WorkflowActivity;
-import com.hirisun.cloud.workflow.bean.WorkflowNode;
+
 
 /**
  * <p>
@@ -22,7 +21,7 @@ import com.hirisun.cloud.workflow.bean.WorkflowNode;
  */
 public interface WorkflowActivityService extends IService<WorkflowActivity> {
 
-    public void advanceCurrentActivity(AdvanceBeanVO advanceBeanVO, Map<String, String> map, WorkflowNode nextModel);
+//    public Map<String, String> advanceCurrentActivity(AdvanceBeanVO advanceBeanVO, Map<String, String> map, WorkflowNode nextModel);
 
     public Map<String, String> advanceActivity(String currentActivityId, Map<String, String> map);
 
@@ -37,4 +36,6 @@ public interface WorkflowActivityService extends IService<WorkflowActivity> {
     public List<WorkflowActivityVO> findActivityByParam(ActivityParam param);
 
     public void advanceCurrentActivity(AdvanceBeanVO advanceBeanVO, Map<String, String> map);
+    public Map<String,String> add(String handlerPersonIds, String currentActivityId,String creatorId);
+
 }

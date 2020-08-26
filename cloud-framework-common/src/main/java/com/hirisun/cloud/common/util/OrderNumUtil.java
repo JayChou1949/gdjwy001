@@ -6,11 +6,13 @@ public class OrderNumUtil {
 	
 	
     /**
+     *
+     * 弃用，改用redisService方法
      * 生成单号,格式 yyyyMMdd0001,利用redis递增
      * @param prefix redis保存递增值key前缀
      * @return
      */
-    public static String gen(String prefix) {
+    private static String gen(String prefix) {
 //        // 生成单号
 //        String yyyyMMdd = DateFormatUtils.format(new Date(), "yyyyMMdd");
 //        String redisKey = prefix + yyyyMMdd;

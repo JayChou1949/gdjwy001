@@ -3,6 +3,7 @@ package com.hirisun.cloud.user.controller.manager;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hirisun.cloud.common.annotation.LoginUser;
+import com.hirisun.cloud.common.constant.PermissionType;
 import com.hirisun.cloud.common.util.TreeUtils;
 import com.hirisun.cloud.common.util.UUIDUtil;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
@@ -87,7 +88,7 @@ public class PermissionManageController {
     public QueryResponseResult<Permission> menu(@LoginUser UserVO user) {
         Map map = new HashMap<>();
         map.put("uid", user.getIdCard());
-        map.put("type", Permission.PERMISSION_TYPE_MENU);
+        map.put("type", PermissionType.PERMISSION_TYPE_MENU);
         List<Permission> menu = permissionService.listUserMenu(map);
         menu = (List<Permission>) TreeUtils.listWithTree(menu);
         return QueryResponseResult.success(menu);
@@ -97,8 +98,8 @@ public class PermissionManageController {
     @PutMapping("/create")
     public QueryResponseResult<Permission> create(
             @RequestBody Permission permission) {
-        permission.setStatus(Permission.PERMISSION_STATUS_ENABLED);
-        permission.setType(Permission.PERMISSION_TYPE_MENU);
+        permission.setStatus(PermissionType.PERMISSION_STATUS_ENABLED);
+        permission.setType(PermissionType.PERMISSION_TYPE_MENU);
         permissionService.save(permission);
         return QueryResponseResult.success(null);
     }

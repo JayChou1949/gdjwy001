@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hirisun.cloud.common.annotation.LoginUser;
+import com.hirisun.cloud.common.contains.ReviewStatus;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.platform.information.bean.News;
@@ -76,7 +77,7 @@ public class NewsManageController {
         }
         //查询未上线
         if(status==null||status.equals(0)){
-            wrapper.in(News::getStatus,News.STATUS_AUDIT,News.STATUS_REJECT);
+            wrapper.in(News::getStatus, ReviewStatus.REVIEWING.getCode(),ReviewStatus.REJECT.getCode());
         }else{//已上线
             wrapper.eq(News::getStatus,status);
         }
@@ -122,7 +123,7 @@ public class NewsManageController {
         news.setCreator(user.getIdCard());
         news.setUpdateTime(new Date());
         news.setViewCount(0L);
-        news.setStatus(News.STATUS_WAIT_ONLINE);
+        news.setStatus(ReviewStatus.PRO_ONLINE.getCode());
         newsService.save(news);
         return QueryResponseResult.success(news);
     }
@@ -143,7 +144,7 @@ public class NewsManageController {
         if(NewsParamUtil.checkUserInfomationPermission(user,news.getProvincial(),newsBelong)){
             return QueryResponseResult.fail("无权操作该区域数据");
         }
-        news.setStatus(News.STATUS_DELETE);
+        news.setStatus(ReviewStatus.DELETE.getCode());
         newsService.deleteNews(news,user);
         return QueryResponseResult.success("删除成功");
     }
@@ -166,7 +167,7 @@ public class NewsManageController {
         if(NewsParamUtil.checkUserInfomationPermission(user,news.getProvincial(),newsBelong)){
             return QueryResponseResult.fail("无权操作该区域数据");
         }
-        news.setStatus(News.STATUS_WAIT_ONLINE);
+        news.setStatus(ReviewStatus.PRO_ONLINE.getCode());
         newsService.updateById(news);
         return QueryResponseResult.success(news);
     }
@@ -182,9 +183,9 @@ public class NewsManageController {
         News news = new News();
         news.setId(id);
         if(type.equals(1)){
-            news.setStatus(News.STATUS_ONLINE);
+            news.setStatus(ReviewStatus.ONLINE.getCode());
         }else{
-            news.setStatus(News.STATUS_WAIT_ONLINE);
+            news.setStatus(ReviewStatus.PRO_ONLINE.getCode());
         }
         newsService.updateById(news);
         return QueryResponseResult.success(news);

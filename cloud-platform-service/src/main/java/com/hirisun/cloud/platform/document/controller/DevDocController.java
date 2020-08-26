@@ -3,6 +3,7 @@ package com.hirisun.cloud.platform.document.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hirisun.cloud.common.annotation.LoginUser;
+import com.hirisun.cloud.common.contains.ReviewStatus;
 import com.hirisun.cloud.common.util.TreeUtils;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.model.user.UserVO;
@@ -55,7 +56,7 @@ public class DevDocController {
         page.setSize(pageSize);
         Map param=new HashMap();
         param.put("isFront",true);
-        param.put("status",DevDocClass.STATUS_ONLINE);
+        param.put("status", ReviewStatus.ONLINE.getCode());
         param.put("name", name);
         param.put("firstClass", firstClass);
         param.put("secondClass", secondClass);

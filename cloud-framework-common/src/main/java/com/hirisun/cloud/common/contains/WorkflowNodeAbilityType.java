@@ -6,7 +6,7 @@ package com.hirisun.cloud.common.contains;
 public enum WorkflowNodeAbilityType {
 
     REVIEW("1", "审核"),
-    ADD("2", "加班"),
+    ADD("2", "加办"),
     IMPL("3", "上线"),
     REJECT("4", "驳回"),
     DELETE("5", "删除"),

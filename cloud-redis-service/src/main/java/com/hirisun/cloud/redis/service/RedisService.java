@@ -134,4 +134,10 @@ public interface RedisService {
      * @param redisKey   键
      */
     public Long increment(String redisKey);
+
+    /**
+     * 生成订单号
+     * @return
+     */
+    public String genOrderNum(String prefix);
 }

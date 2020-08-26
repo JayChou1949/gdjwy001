@@ -44,7 +44,9 @@ public interface WorkflowApi {
     @ApiIgnore
     @ApiOperation("执行保存应用申请实例")
     @PostMapping(workflowInstanceUrl+"/feign/launchInstanceOfWorkflow")
-    public void launchInstanceOfWorkflow(@RequestParam String createPersonId, @RequestParam String flowId, @RequestParam String businessId);
+    public void launchInstanceOfWorkflow(@RequestParam String createPersonId,
+                                         @RequestParam String flowId,
+                                         @RequestParam String businessId);
 
     /**
      * 执行保存应用申请实例
@@ -56,7 +58,9 @@ public interface WorkflowApi {
     @ApiIgnore
     @ApiOperation("执行保存应用申请实例")
     @PostMapping(workflowInstanceUrl+"/feign/launchInstanceByArea")
-    public String launchInstanceByArea(@RequestParam String creatorName, @RequestParam String flowId, @RequestParam String businessId);
+    public String launchInstanceByArea(@RequestParam String creatorName,
+                                       @RequestParam String flowId,
+                                       @RequestParam String businessId);
 
     /**
      * 根据服务id获取流程实例
@@ -77,7 +81,8 @@ public interface WorkflowApi {
     @ApiIgnore
     @ApiOperation("根据参数获取一个流程流转信息")
     @PostMapping(workflowActivityBaseUrl+"/feign/getOneWorkflowActivityByParams")
-    public String getOneWorkflowActivityByParams(@RequestParam Integer status, @RequestParam String instanceId);
+    public String getOneWorkflowActivityByParams(@RequestParam Integer status,
+                                                 @RequestParam String instanceId);
 
     /**
      * 根据参数获取流程活动
@@ -88,7 +93,8 @@ public interface WorkflowApi {
     @ApiIgnore
     @ApiOperation("根据参数获取流程流转列表")
     @PostMapping(workflowActivityBaseUrl+"/feign/getWorkflowActivityListByParams")
-    public String getWorkflowActivityListByParams(@RequestParam Integer status, @RequestParam String instanceId);
+    public String getWorkflowActivityListByParams(@RequestParam Integer status,
+                                                  @RequestParam String instanceId);
 
     /**
      * 根据参数获取流程环节
@@ -100,7 +106,9 @@ public interface WorkflowApi {
     @ApiIgnore
     @ApiOperation("根据参数获取流程环节")
     @PostMapping(workflowNodeBaseUrl+"/feign/getWorkflowNodeByParams")
-    public String getWorkflowNodeByParams(@RequestParam Integer version, @RequestParam String workflowId, @RequestParam(required = false) Integer nodeSort);
+    public String getWorkflowNodeByParams(@RequestParam Integer version,
+                                          @RequestParam String workflowId,
+                                          @RequestParam(required = false) Integer nodeSort);
 
     /**
      * 根据参数获取流程环节
@@ -112,7 +120,9 @@ public interface WorkflowApi {
     @ApiIgnore
     @ApiOperation("根据参数获取流程环节")
     @PostMapping(workflowNodeBaseUrl + "/feign/getWorkflowNodeAndActivitys")
-    public String getWorkflowNodeAndActivitys(@RequestParam Integer version, @RequestParam String workflowId, @RequestParam String instanceId);
+    public String getWorkflowNodeAndActivitys(@RequestParam Integer version,
+                                              @RequestParam String workflowId,
+                                              @RequestParam String instanceId);
 
 
     /**
@@ -122,10 +132,12 @@ public interface WorkflowApi {
      * @param map             短信消息map
      * @param workflowNodeStr 下个环节json串
      */
-    @ApiIgnore
-    @ApiOperation("环节流转")
-    @PutMapping(value = workflowActivityBaseUrl + "/feign/advanceCurrentActivity",consumes = "application/json")
-    public void advanceCurrentActivity(@RequestBody AdvanceBeanVO advanceBeanVO, @RequestParam Map<String, String> map, @RequestParam String workflowNodeStr);
+//    @ApiIgnore
+//    @ApiOperation("环节流转")
+//    @PutMapping(value = workflowActivityBaseUrl + "/feign/advanceCurrentActivity",consumes = "application/json")
+//    public Map<String,String> advanceCurrentActivity(@RequestBody AdvanceBeanVO advanceBeanVO,
+//                                                     @RequestParam Map<String, String> map,
+//                                                     @RequestParam String workflowNodeStr);
 
     /**
      * 环节正常流转
@@ -135,7 +147,8 @@ public interface WorkflowApi {
     @ApiIgnore
     @ApiOperation("环节正常流转")
     @PutMapping(workflowActivityBaseUrl + "/feign/advanceActivity")
-    public Map<String, String> advanceActivity(@RequestBody String currentActivityId, @RequestParam Map<String, String> map);
+    public Map<String, String> advanceActivity(@RequestBody String currentActivityId,
+                                               @RequestParam Map<String, String> map);
 
     /**
      * IPDS订单选择流程（s->saasService）
@@ -205,7 +218,8 @@ public interface WorkflowApi {
     @ApiIgnore
     @ApiOperation("记录申请流程驳回信息")
     @PostMapping(workflowActivityBaseUrl+"/feign/fallbackOnApproveNotPass")
-    public Map<String, String> fallbackOnApproveNotPass(@RequestBody FallBackVO fallBackVO, @RequestParam Map map);
+    public Map<String, String> fallbackOnApproveNotPass(@RequestBody FallBackVO fallBackVO,
+                                                        @RequestParam Map map);
 
     /**
      * 通知人流转信息
@@ -250,4 +264,14 @@ public interface WorkflowApi {
     @PutMapping(value = workflowActivityBaseUrl + "/feign/activity/advance",consumes = "application/json")
     public void activityAdvance(@RequestBody AdvanceBeanVO advanceBeanVO, @RequestParam Map<String, String> map);
 
+
+    /**
+     * 加办
+     */
+    @ApiIgnore
+    @ApiOperation("加办")
+    @PostMapping("/feign/add")
+    public Map<String, String> add(@RequestParam String handlerPersonIds,
+                                   @RequestParam String currentActivityId,
+                                   @RequestParam String creatorId);
 }

@@ -23,13 +23,6 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel(value="DevDocClass对象", description="文档分类表")
 public class DevDocClass extends Tree<DevDocClass> implements Serializable {
 
-    //文档分类状态 0审核 1待上线 2上线 3驳回 4删除
-    public static final Long STATUS_AUDIT=0L;
-    public static final Long STATUS_WAIT_ONLINE=1L;
-    public static final Long STATUS_ONLINE=2L;
-    public static final Long STATUS_REJECT=3L;
-    public static final Long STATUS_DELETE=4L;
-
     private static final long serialVersionUID=1L;
 
     @TableId(value = "ID", type = IdType.ASSIGN_UUID)

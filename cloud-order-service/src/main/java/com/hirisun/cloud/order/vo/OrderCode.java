@@ -12,7 +12,8 @@ public enum OrderCode implements ResultCode {
     USER_SELECT_ERROR(2506, "用户查询失败！"),
     APPLY_MISSING(2507,"审批信息未找到!"),
     USER_CANT_EDIT_OTHER_USER_APPLY(2508,"只能删除自己的申请!"),
-    FALLBACK_ID_NOT_NULL(2508,"回退环节ID不能为空,回退失败!")
+    FALLBACK_ID_NOT_NULL(2508,"回退环节ID不能为空,回退失败!"),
+    FEIGN_METHOD_ERROR(2509,"远程方法调用失败")
     ;
     /**
      * 状态码

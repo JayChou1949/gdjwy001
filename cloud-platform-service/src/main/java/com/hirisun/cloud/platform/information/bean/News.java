@@ -25,27 +25,6 @@ public class News implements Serializable {
     private static final long serialVersionUID=1L;
 
     /**
-     * show 状态 0审核
-     */
-    public static final Long STATUS_AUDIT=0L;
-    /**
-     * 状态 1待上线
-     */
-    public static final Long STATUS_WAIT_ONLINE=1L;
-    /**
-     * 状态 2上线
-     */
-    public static final Long STATUS_ONLINE=2L;
-    /**
-     * 状态 3驳回
-     */
-    public static final Long STATUS_REJECT=3L;
-    /**
-     * 状态 4删除
-     */
-    public static final Long STATUS_DELETE=4L;
-
-    /**
      * 置顶状态 0无置顶
      */
     public static final Integer TOP_NO=0;

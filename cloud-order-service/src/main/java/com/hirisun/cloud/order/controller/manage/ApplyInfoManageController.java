@@ -9,6 +9,7 @@ import com.hirisun.cloud.common.annotation.LoginUser;
 import com.hirisun.cloud.common.contains.ApplyInfoStatus;
 import com.hirisun.cloud.common.contains.WorkflowNodeAbilityType;
 import com.hirisun.cloud.common.exception.CustomException;
+import com.hirisun.cloud.common.util.ExceptionPrintUtil;
 import com.hirisun.cloud.common.util.UUIDUtil;
 import com.hirisun.cloud.common.util.WorkflowUtil;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
@@ -118,49 +119,8 @@ public class ApplyInfoManageController {
     public QueryResponseResult<ApplyInfo> detail(
             @LoginUser UserVO user,
             @ApiParam(value = "详情id",required = true) @RequestParam(required = true,defaultValue = "1") String id){
-        /**
-         * 1.查询申请工单
-         * 2.查询对应的流程实例
-         * 3.查询流程实例对应的流转信息
-         * 4.查询审批记录
-         * 5.查询反馈记录
-         */
-        ApplyInfo applyInfo = applyInfoService.getById(id);
-        if (applyInfo == null) {
-            logger.error("申请单不存在");
-            return QueryResponseResult.fail("申请单不存在");
-        }
-        String instanceStr = workflowApi.getWorkflowInstanceByBusinessId(applyInfo.getId());
-        if (StringUtils.isEmpty(instanceStr)) {
-            logger.error("流程实例未找到");
-            return QueryResponseResult.fail("流程实例未找到");
-        }
-        WorkflowInstanceVO instance = JSON.parseObject(instanceStr, WorkflowInstanceVO.class);
-
-        String nodeStr = workflowApi.getWorkflowNodeAndActivitys(instance.getVersion(), instance.getWorkflowId(), instance.getId());
-        if (StringUtils.isEmpty(nodeStr)) {
-            logger.error("未找到对应的流程环节信息！");
-            throw new CustomException(OrderCode.WORKFLOW_MISSING);
-        }
-        //TODO nodeList modelName modelStatus  流程实例和环节结合
-        List<WorkflowNodeVO> nodeList=JSON.parseArray(nodeStr, WorkflowNodeVO.class);
-
-        List<ApplyReviewRecord> reviewList= applyReviewRecordService.list(new QueryWrapper<ApplyReviewRecord>().lambda()
-                .eq(ApplyReviewRecord::getApplyId, applyInfo.getId()).orderByDesc(ApplyReviewRecord::getCreateTime));
-
-        List<ApplyFeedback> feedbackList= applyFeedbackService.list(new QueryWrapper<ApplyFeedback>().lambda()
-                .eq(ApplyFeedback::getAppInfoId, applyInfo.getId()).orderByDesc(ApplyFeedback::getCreateTime));
-
-        Map map = new HashMap();
-        map.put("applyInfo", applyInfo);
-        map.put("instance", instance);
-        map.put("nodeList", nodeList);
-        map.put("reviewList", reviewList);
-        map.put("feedbackList", feedbackList);
-        return QueryResponseResult.success(map);
+        return applyInfoService.detail(id);
     }
-
-
 
     public static String dealNameforQuery(String name){
         if(StringUtils.isNotBlank(name)){
@@ -177,8 +137,18 @@ public class ApplyInfoManageController {
                                           @ApiParam(value = "审批工单id",required = true)@RequestParam String id) {
         String uuid = UUIDUtil.getUUID();
         String lockKey = id.intern();
-        applyInfoService.deleteById(user, id);
-//        workflowApi.terminationInstanceOfWorkFlow(id);
+        try {
+            if (lock.lock(lockKey, uuid)) {
+                applyInfoService.deleteById(user, id);
+            } else {
+                return QueryResponseResult.fail("系统繁忙，请稍后重试！");
+            }
+        } catch (Exception e) {
+            logger.error(ExceptionPrintUtil.getStackTraceInfo(e));
+            return QueryResponseResult.fail("删除失败！");
+        } finally {
+            lock.unlock(lockKey, uuid);
+        }
         return QueryResponseResult.success(null);
     }
 
@@ -189,28 +159,11 @@ public class ApplyInfoManageController {
 
         return applyInfoService.approve(user,vo);
     }
-    @ApiOperation(value = "审批")
-    @RequestMapping(value = "/approveByApplicationApply", method = RequestMethod.POST)
-    public QueryResponseResult approveByApplicationApply(@LoginUser UserVO user,
-                                       @RequestBody FallBackVO vo) {
-
-        return applyInfoService.approve(user,vo);
-    }
 
     @ApiOperation(value = "加办")
     @PostMapping("/add")
     public QueryResponseResult add(@LoginUser UserVO user, @RequestBody ApproveVO approveVO) {
-
-        ApplyInfo info = applyInfoService.getById(approveVO.getApplyReviewRecord().getApplyId());
-//        activityService.add(approveVO.getApprove(),approveVO.getUserIds(),approveVO.getCurrentActivityId(), user);
-//        messageProvider.sendMessageAsync(messageProvider.buildProcessingMessage(info.getServiceTypeName(),info.getOrderNumber(),appVo.getUserIds()));
-        return QueryResponseResult.success(null);
-    }
-    @ApiOperation(value = "修改应用申请的审批信息")
-    @RequestMapping(value = "/update", method = RequestMethod.POST)
-    public QueryResponseResult update(@LoginUser UserVO user, @RequestBody ApplyInfo info) throws IOException {//SaasApplicationMerge
-//        saasApplicationMergeService.update(user,info);
-        return QueryResponseResult.success(null);
+        return applyInfoService.add(user,approveVO);
     }
 
     @ApiOperation(value = "业务办理")

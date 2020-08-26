@@ -23,15 +23,6 @@ public class WorkflowVO implements Serializable {
 
     private static final long serialVersionUID=1L;
 
-    /**
-     * 流程状态 0 正常
-     */
-    public static Integer STATUS_NORMAL=0;
-    /**
-     * 流程状态 1 删除
-     */
-    public static Integer STATUS_DELETE=1;
-
     private String id;
 
     @ApiModelProperty(value = "流程业务名称")

@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hirisun.cloud.api.system.SmsApi;
 import com.hirisun.cloud.api.system.SystemApi;
 import com.hirisun.cloud.common.annotation.LoginUser;
+import com.hirisun.cloud.common.contains.WorkflowStatus;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.model.system.SysDictVO;
 import com.hirisun.cloud.model.user.UserVO;
@@ -79,7 +80,7 @@ public class WorkflowManageController {
         if (!StringUtils.isEmpty(name)) {
             wrapper.like(Workflow::getFlowName, name);
         }
-        wrapper.eq(Workflow::getFlowStatus, Workflow.STATUS_NORMAL);
+        wrapper.eq(Workflow::getFlowStatus, WorkflowStatus.NORMAL.getCode());
         wrapper.orderByDesc(Workflow::getCreateTime);
         Page<Workflow> page = new Page<>();
         page.setCurrent(pageNum);
@@ -112,7 +113,7 @@ public class WorkflowManageController {
     public QueryResponseResult<Workflow> delete(@ApiParam(value = "流程配置id",required = true) @RequestParam String id) {
 
         Workflow workflow = workflowService.getById(id);
-        workflow.setFlowStatus(Workflow.STATUS_DELETE);
+        workflow.setFlowStatus(WorkflowStatus.DELETE.getCode());
         workflowService.updateById(workflow);
         return QueryResponseResult.success(null);
     }
