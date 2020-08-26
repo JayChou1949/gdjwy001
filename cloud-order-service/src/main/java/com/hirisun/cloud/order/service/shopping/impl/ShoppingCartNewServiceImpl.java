@@ -29,6 +29,7 @@ import com.google.common.collect.Maps;
 import com.hirisun.cloud.api.daas.DaasApplicationApi;
 import com.hirisun.cloud.api.daas.DaasShoppingCartApi;
 import com.hirisun.cloud.api.iaas.IaasShoppingCartApi;
+import com.hirisun.cloud.api.paas.PaasShoppingCartApi;
 import com.hirisun.cloud.api.saas.SaasApplicationApi;
 import com.hirisun.cloud.api.saas.SaasShoppingCartApi;
 import com.hirisun.cloud.api.system.FilesApi;
@@ -92,6 +93,8 @@ public class ShoppingCartNewServiceImpl extends ServiceImpl<ShoppingCartMapper, 
 	@Autowired
 	private DaasApplicationApi daasApplicationApi;
 	@Autowired
+	private PaasShoppingCartApi paasShoppingCartApi;
+	@Autowired
 	private WorkflowApi workflowApi;
 	@Autowired
     private StringRedisTemplate stringRedisTemplate;
@@ -143,7 +146,7 @@ public class ShoppingCartNewServiceImpl extends ServiceImpl<ShoppingCartMapper, 
 		}else if(formNum.startsWith("SAAS")) {
 			saasShoppingCartApi.itemSave(shoppingCartVo);
 		}else if(formNum.startsWith("PAAS")) {
-			
+			paasShoppingCartApi.itemSave(shoppingCartVo);
 		}
 	}
 	
@@ -157,7 +160,7 @@ public class ShoppingCartNewServiceImpl extends ServiceImpl<ShoppingCartMapper, 
 		}else if(formNum.startsWith("SAAS")) {
 			return saasShoppingCartApi.getShoppingCartItemList(shoppingCartVo);
 		}else if(formNum.startsWith("PAAS")) {
-			
+			return paasShoppingCartApi.getShoppingCartItemList(shoppingCartVo);
 		}
 		return null;
 	}
@@ -172,7 +175,7 @@ public class ShoppingCartNewServiceImpl extends ServiceImpl<ShoppingCartMapper, 
 		}else if(formNum.startsWith("SAAS")) {
 			return saasShoppingCartApi.getTotalNumInShoppingCart(shoppingCartVo);
 		}else if(formNum.startsWith("PAAS")) {
-			
+			return paasShoppingCartApi.getTotalNumInShoppingCart(shoppingCartVo);
 		}
 		return 0;
 	}
@@ -187,7 +190,7 @@ public class ShoppingCartNewServiceImpl extends ServiceImpl<ShoppingCartMapper, 
 		}else if(formNum.startsWith("SAAS")) {
 			saasShoppingCartApi.updateShoppingCartItem(shoppingCartVo);
 		}else if(formNum.startsWith("PAAS")) {
-			
+			paasShoppingCartApi.updateShoppingCartItem(shoppingCartVo);
 		}
 	}
 	
@@ -201,7 +204,7 @@ public class ShoppingCartNewServiceImpl extends ServiceImpl<ShoppingCartMapper, 
 		}else if(formNum.startsWith("SAAS")) {
 			saasShoppingCartApi.deleteItemByShoppingCartId(shoppingCartVo);
 		}else if(formNum.startsWith("PAAS")) {
-			
+			paasShoppingCartApi.deleteItemByShoppingCartId(shoppingCartVo);
 		}
 	}
 	
@@ -215,7 +218,7 @@ public class ShoppingCartNewServiceImpl extends ServiceImpl<ShoppingCartMapper, 
 		}else if(formNum.startsWith("SAAS")) {
 			saasShoppingCartApi.refAppInfoFromShoppingCart(shoppingCartVo);
 		}else if(formNum.startsWith("PAAS")) {
-			
+			paasShoppingCartApi.refAppInfoFromShoppingCart(shoppingCartVo);
 		}
 	}
 	
