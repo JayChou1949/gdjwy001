@@ -4,12 +4,14 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.hirisun.cloud.api.system.SystemApi;
 import com.hirisun.cloud.api.user.UserApi;
 import com.hirisun.cloud.common.constant.FormCode;
 import com.hirisun.cloud.common.contains.ResourceType;
 import com.hirisun.cloud.common.exception.CustomException;
 import com.hirisun.cloud.common.util.UUIDUtil;
 import com.hirisun.cloud.common.vo.CommonCode;
+import com.hirisun.cloud.model.system.SysDictVO;
 import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.workflow.bean.Workflow;
 import com.hirisun.cloud.workflow.bean.WorkflowNode;
@@ -51,6 +53,9 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
 
     @Autowired
     private UserApi userApi;
+
+    @Autowired
+    private SystemApi systemApi;
 
     /**
      * 流程类型-省厅 1
@@ -384,7 +389,6 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
      */
     private Workflow DaasOrSaasServiceHandle(Integer resourceType, String area, String policeCategory, String nationalSpecialProject){
 
-        //todo: 二级门户改造-新增国家专项维度
         if (StringUtils.isNotBlank(nationalSpecialProject)){
             logger.debug("DaaS SaaS服务 获取默认国家专项流程");
             return getDefaultFlow(resourceType,FLOW_TYPE_NATIONAL_PROJECT,nationalSpecialProject);
@@ -433,7 +437,8 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
      * @return
      */
     private Workflow getDefaultFlow(Integer resourceType,int flowType,String flotTypeName){
-        String type=FormCode.serviceResourceTypeKeyMap.get(resourceType);
+//        String type=FormCode.serviceResourceTypeKeyMap.get(resourceType);
+        String type = getDefaultProcess(resourceType);
         LambdaQueryWrapper<Workflow> wrapper = new QueryWrapper<Workflow>().lambda()
                 .eq(Workflow::getFlowStatus, 0)
                 .eq(Workflow::getDefaultProcess, type);
@@ -454,5 +459,26 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             wrapper.eq(Workflow::getNationalSpecialProject, flotTypeName);
         }
         return this.getOne(wrapper);
+    }
+
+    public String getDefaultProcess(Integer resourceType){
+        ResourceType.IAAS.getCode();
+//        List<SysDictVO> sysDictList = JSON.parseArray(systemApi.feignGetByValue("workflowDefaultProcess"),SysDictVO.class);
+        if (resourceType.equals(1)) {
+            return "IAAS";
+        }
+        if (resourceType.equals(2)) {
+            return "DAAS";
+        }
+        if (resourceType.equals(2)) {
+            return "PAAS";
+        }
+        if (resourceType.equals(2)) {
+            return "SAAS";
+        }
+        if (resourceType.equals(2)) {
+            return "SAAS_SERVICE";
+        }
+        return null;
     }
 }

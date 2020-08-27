@@ -5,14 +5,18 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hirisun.cloud.api.file.FileApi;
+import com.hirisun.cloud.api.system.SystemApi;
 import com.hirisun.cloud.common.contains.ReviewStatus;
+import com.hirisun.cloud.common.util.IpUtil;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.model.file.FileSystemVO;
+import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.platform.document.bean.DevDoc;
 import com.hirisun.cloud.platform.information.bean.Carousel;
 import com.hirisun.cloud.platform.information.mapper.CarouselMapper;
 import com.hirisun.cloud.platform.information.service.CarouselService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.hirisun.cloud.platform.information.util.NewsParamUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,6 +40,9 @@ public class CarouselServiceImpl extends ServiceImpl<CarouselMapper, Carousel> i
 
     @Autowired
     private FileApi fileApi;
+
+    @Autowired
+    private SystemApi systemApi;
 
     /**
      * 上/下移动轮播图位置
@@ -189,6 +196,24 @@ public class CarouselServiceImpl extends ServiceImpl<CarouselMapper, Carousel> i
             }
         }
         return carousel;
+    }
+
+    @Override
+    public QueryResponseResult<Carousel> deleteCarousel(UserVO user,String id) {
+        Carousel carousel = this.getById(id);
+        if(carousel==null){
+            return QueryResponseResult.fail("轮播图信息不存在");
+        }
+        String newsBelong = org.apache.commons.lang3.StringUtils.isEmpty(carousel.getArea())
+                ? org.apache.commons.lang3.StringUtils.isEmpty(carousel.getPoliceCategory())?carousel.getProject():carousel.getPoliceCategory() : carousel.getArea();
+        // 判断管理员权限
+        if(NewsParamUtil.checkUserInfomationPermission(user,carousel.getProvincial(),newsBelong)){
+            return QueryResponseResult.fail("无权操作该区域数据");
+        }
+        carousel.setStatus(ReviewStatus.DELETE.getCode());
+        this.updateById(carousel);
+        systemApi.saveLog(user.getIdCard(), "删除id：" + id, "删除轮播图", IpUtil.getIp());
+        return QueryResponseResult.success(carousel);
     }
 
     /**

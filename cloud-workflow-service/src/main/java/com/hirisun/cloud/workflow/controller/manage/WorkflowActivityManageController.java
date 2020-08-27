@@ -1,11 +1,16 @@
 package com.hirisun.cloud.workflow.controller.manage;
 
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import com.hirisun.cloud.model.workflow.WorkflowVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -52,12 +57,15 @@ public class WorkflowActivityManageController {
     @ApiIgnore
     @ApiOperation("根据参数获取一个流程流转信息")
     @PostMapping("/feign/getOneWorkflowActivityByParams")
-    public String getOneWorkflowActivityByParams(@RequestParam Integer status,@RequestParam String instanceId) {
-        logger.info("/feign/getOneWorkflowActivityByParams：{},{}",status,instanceId);
+    public WorkflowActivityVO getOneWorkflowActivityByParams(@RequestParam Integer status,@RequestParam String instanceId) {
         WorkflowActivity activity = workflowActivityService.getOne(new QueryWrapper<WorkflowActivity>().lambda()
                 .eq(WorkflowActivity::getActivityStatus,status)
                 .eq(WorkflowActivity::getInstanceId,instanceId));
-        return JSON.toJSONString(activity);
+        WorkflowActivityVO vo = new WorkflowActivityVO();
+        if (activity != null) {
+            BeanUtils.copyProperties(activity,vo);
+        }
+        return vo;
     }
 
     /**
@@ -68,11 +76,17 @@ public class WorkflowActivityManageController {
     @ApiIgnore
     @ApiOperation("根据参数获取流程流转列表")
     @PostMapping("/feign/getWorkflowActivityListByParams")
-    public String getWorkflowActivityListByParams(@RequestParam Integer status,@RequestParam String instanceId) {
+    public List<WorkflowActivityVO> getWorkflowActivityListByParams(@RequestParam Integer status,@RequestParam String instanceId) {
         List<WorkflowActivity> activityList = workflowActivityService.list(new QueryWrapper<WorkflowActivity>().lambda()
                 .eq(WorkflowActivity::getActivityStatus,status)
                 .eq(WorkflowActivity::getInstanceId,instanceId));
-        return JSON.toJSONString(activityList);
+        List<WorkflowActivityVO> newList = new ArrayList<>();
+        activityList.forEach(item->{
+            WorkflowActivityVO workflowActivityVO = new WorkflowActivityVO();
+            BeanUtils.copyProperties(item, workflowActivityVO);
+            newList.add(workflowActivityVO);
+        });
+        return newList;
     }
 
     /**
@@ -116,10 +130,12 @@ public class WorkflowActivityManageController {
     @ApiIgnore
     @ApiOperation("通过id获取流程流转信息")
     @PostMapping("/feign/getActivityById")
-    public String getActivityById(@RequestParam String activityId) {
+    public WorkflowActivityVO getActivityById(@RequestParam String activityId) {
 
         WorkflowActivity workflowActivity = workflowActivityService.getById(activityId);
-        return JSON.toJSONString(workflowActivity);
+        WorkflowActivityVO vo = new WorkflowActivityVO();
+        BeanUtils.copyProperties(workflowActivity,vo);
+        return vo;
     }
 
     /**

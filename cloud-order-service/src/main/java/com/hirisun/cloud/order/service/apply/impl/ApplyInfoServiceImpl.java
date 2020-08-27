@@ -112,31 +112,24 @@ public class ApplyInfoServiceImpl extends ServiceImpl<ApplyInfoMapper, ApplyInfo
             log.error("申请单不存在");
             return QueryResponseResult.fail("申请单不存在");
         }
-        String instanceStr = workflowApi.getWorkflowInstanceByBusinessId(applyInfo.getId());
-        if (org.apache.commons.lang3.StringUtils.isEmpty(instanceStr)) {
+        WorkflowInstanceVO instance = workflowApi.getWorkflowInstanceByBusinessId(applyInfo.getId());
+        if (instance==null) {
             log.error("流程实例未找到");
             return QueryResponseResult.fail("流程实例未找到");
         }
-        WorkflowInstanceVO instance = JSON.parseObject(instanceStr, WorkflowInstanceVO.class);
-
-        String nodeStr = workflowApi.getWorkflowNodeAndActivitys(instance.getVersion(), instance.getWorkflowId(), instance.getId());
-        if (org.apache.commons.lang3.StringUtils.isEmpty(nodeStr)) {
-            log.error("未找到对应的流程环节信息！");
-            throw new CustomException(OrderCode.WORKFLOW_MISSING);
-        }
-        //TODO nodeList modelName modelStatus  流程实例和环节结合
-        List<WorkflowNodeVO> nodeList=JSON.parseArray(nodeStr, WorkflowNodeVO.class);
-
+        List<WorkflowNodeVO> nodeVoList = workflowApi.getWorkflowNodeAndActivitys(instance.getVersion(), instance.getWorkflowId(), instance.getId());
         List<ApplyReviewRecord> reviewList= applyReviewRecordService.list(new QueryWrapper<ApplyReviewRecord>().lambda()
-                .eq(ApplyReviewRecord::getApplyId, applyInfo.getId()).orderByDesc(ApplyReviewRecord::getCreateTime));
+                .eq(ApplyReviewRecord::getApplyId, applyInfo.getId())
+                .orderByDesc(ApplyReviewRecord::getCreateTime));
 
         List<ApplyFeedback> feedbackList= applyFeedbackService.list(new QueryWrapper<ApplyFeedback>().lambda()
-                .eq(ApplyFeedback::getAppInfoId, applyInfo.getId()).orderByDesc(ApplyFeedback::getCreateTime));
+                .eq(ApplyFeedback::getAppInfoId, applyInfo.getId())
+                .orderByDesc(ApplyFeedback::getCreateTime));
 
         Map map = new HashMap();
         map.put("applyInfo", applyInfo);
         map.put("instance", instance);
-        map.put("nodeList", nodeList);
+        map.put("nodeList", nodeVoList);
         map.put("reviewList", reviewList);
         map.put("feedbackList", feedbackList);
         return QueryResponseResult.success(map);
@@ -248,8 +241,6 @@ public class ApplyInfoServiceImpl extends ServiceImpl<ApplyInfoMapper, ApplyInfo
                 .eq(ApplyInfo::getId, id)
                 .set(ApplyInfo::getStatus, ApplyInfoStatus.DELETE.getCode()));
 //        workflowApi.terminationInstanceOfWorkFlow(id);
-        // 如果有部门内审核人,删除之
-//        innerReviewUserService.removeByAppInfoId(info.getId());
     }
 
     /**
@@ -264,12 +255,11 @@ public class ApplyInfoServiceImpl extends ServiceImpl<ApplyInfoMapper, ApplyInfo
         ApplyReviewRecordVO approve = vo.getApplyReviewRecord();
         log.debug("Approve from request -> {}",approve);
         ApplyInfo info = applyInfoService.getById(vo.getApplyReviewRecord().getApplyId());
-        String activityStr =workflowApi.getActivityById(vo.getCurrentActivityId());
+        WorkflowActivityVO activity =workflowApi.getActivityById(vo.getCurrentActivityId());
 
-        if (StringUtils.isEmpty(activityStr)||"null".equals(activityStr)) {
+        if (activity==null) {
             throw new CustomException(OrderCode.WORKFLOW_ACTIVITY_MISSING);
         }
-        WorkflowActivityVO activity = JSON.parseObject(activityStr, WorkflowActivityVO.class);
         if ("adviser".equals(activity.getActivityType())){
             Map<String,String> resultMap=workflowApi.adviseActivity(vo.getCurrentActivityId());
             if (resultMap.get("code") != null && resultMap.get("code").equals("200")) {
@@ -285,7 +275,7 @@ public class ApplyInfoServiceImpl extends ServiceImpl<ApplyInfoMapper, ApplyInfo
             }
             return QueryResponseResult.success(null);
         }
-        WorkflowNodeVO curNode = JSON.parseObject(workflowApi.getNodeById(activity.getNodeId()), WorkflowNodeVO.class);
+        WorkflowNodeVO curNode = workflowApi.getNodeById(activity.getNodeId());
 
 
         Map<String,String> map = new HashMap<>();
@@ -309,7 +299,6 @@ public class ApplyInfoServiceImpl extends ServiceImpl<ApplyInfoMapper, ApplyInfo
             } catch (Exception e) {
                 throw new CustomException(OrderCode.WORKFLOW_MISSING);
             }
-
             //检查环节名，是否是业务办理，
             if (model.getNodeFeature().indexOf("3")>=0){
                 //下一环节名为业务办理,设置订单状态为 待实施
@@ -325,16 +314,14 @@ public class ApplyInfoServiceImpl extends ServiceImpl<ApplyInfoMapper, ApplyInfo
                 throw new CustomException(OrderCode.FALLBACK_ID_NOT_NULL);
             }
             // 流转到服务台复核或申请人
-            WorkflowNodeVO fallbackModel = JSON.parseObject(workflowApi.getNodeById(modelIds),WorkflowNodeVO.class);
+            WorkflowNodeVO fallbackModel = workflowApi.getNodeById(modelIds);
             //驳回到申请,重新申请
             boolean isApply= WorkflowUtil.compareNodeAbility(fallbackModel.getNodeFeature(), WorkflowNodeAbilityType.APPLY.getCode());
             if (isApply) {
                 workflowApi.fallbackOnApproveNotPass(vo, null);
-
                 //订单状态设置为 科信审核驳回
                 info.setStatus(ApplyInfoStatus.REVIEW_REJECT.getCode());
-                //TODO 发送短信
-//                messageProvider.sendMessageAsync(messageProvider.buildRejectMessage(info.getCreator(), info.getServiceTypeName()));
+                smsApi.buildRejectMessage(info.getCreator(), info.getServiceTypeName());
             }else{
 //                1.复制回退环节历史流程环节信息，设置为待办，处理人时间修改等插入流转表；2.复核后环节后的到当前环节间流转信息设置为已回退
                 workflowApi.fallbackOnApproveNotPass(vo, map);
@@ -363,7 +350,6 @@ public class ApplyInfoServiceImpl extends ServiceImpl<ApplyInfoMapper, ApplyInfo
      * @param param
      * @param implHandler
      * @param modelId
-     * @param <I>
      * @throws Exception
      */
     @Transactional(rollbackFor = Throwable.class)

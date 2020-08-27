@@ -43,6 +43,18 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
         });
     }
 
+    @Override
+    public boolean isBasePaaSService(String id) {
+        List<SysDict> list = this.list(new QueryWrapper<>());
+        for (SysDict item : list) {
+            //TODO feign通过paasId查询paas信息
+            if (StringUtils.isNotEmpty(item.getValue())&&item.getValue().equals("基础服务")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * 获取数据字典
      * @return

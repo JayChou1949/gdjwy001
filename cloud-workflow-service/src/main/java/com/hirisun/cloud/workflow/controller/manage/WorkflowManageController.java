@@ -23,6 +23,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -128,13 +129,15 @@ public class WorkflowManageController {
     @ApiIgnore
     @ApiOperation("根据参数选择并返回申请流程")
     @PostMapping("/feign/chooseWorkFlow")
-    public String  chooseWorkFlow(@RequestParam Integer resourceType,
-                                  @RequestParam String serviceId,
+    public WorkflowVO  chooseWorkFlow(@RequestParam Integer resourceType,
+                                  @RequestParam(required = false) String serviceId,
                                   @RequestParam(required = false) String area,
                                   @RequestParam(required = false) String policeCategory,
                                   @RequestParam(required = false) String nationalSpecialProject) {
        Workflow workflow= workflowService.chooseWorkFlow(resourceType, area, policeCategory, serviceId, nationalSpecialProject);
-        return JSON.toJSONString(workflow);
+        WorkflowVO vo = new WorkflowVO();
+        BeanUtils.copyProperties(workflow,vo);
+        return vo;
     }
 
     /**
@@ -143,11 +146,13 @@ public class WorkflowManageController {
     @ApiIgnore
     @ApiOperation("根据流程id获取流程信息")
     @PostMapping("/feign/getWorkflowById")
-    public String getWorkflowById(@RequestParam String workflowId) {
+    public WorkflowVO getWorkflowById(@RequestParam String workflowId) {
         logger.info("/feign/getWorkflowById：{},{},{}",workflowId);
 
         Workflow workflow = workflowService.getById(workflowId);
-        return JSON.toJSONString(workflow);
+        WorkflowVO vo = new WorkflowVO();
+        BeanUtils.copyProperties(workflow,vo);
+        return vo;
     }
 
     @ApiOperation("短信发送")

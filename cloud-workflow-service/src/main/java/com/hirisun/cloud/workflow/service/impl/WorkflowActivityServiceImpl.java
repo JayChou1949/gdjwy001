@@ -317,9 +317,16 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
             throw new CustomException(WorkflowCode.WORKFLOW_ACTIVITY_MISSING);
         }
         //取得对应环节的处理人
-        String personids = nextNode.getDefaultHandler();
+        String personids =null;
+        if (map.get("depApproveUserIds") != null) {
+            personids = map.get("depApproveUserIds");
+        }else{
+            personids=nextNode.getDefaultHandler();
+        }
+
         //如果默认处理人也为空则直接返回提示信息给前台
-        if (personids == null || personids.trim().equals("")) {
+        boolean isApply= WorkflowUtil.compareNodeAbility(nextNode.getNodeFeature(), WorkflowNodeAbilityType.APPLY.getCode());
+        if (!isApply&&(personids == null || personids.trim().equals(""))) {
             logger.error("流程未配置处理人");
             throw new CustomException(WorkflowCode.WORKFLOW_NODE_NO_HANDLER);
 
@@ -348,55 +355,7 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
 
 //    @Override
     public Map<String,String> add(AppReviewInfoVo approve, String handleIds, String currentActivityId, UserVO user) {
-//        WorkflowActivity currentActivity = null;
-//        Map<String, String> modelMapToPerson=new HashMap<String, String>();
-//
-//        if (currentActivityId!=null&&!currentActivityId.equals("")) {
-//            currentActivity=this.getById(currentActivityId);
-//        }else {
-//            return R.error(201, "当前环节ID不能为空");
-//        }
-//        if (approve==null) {
-//            return R.error(201, "审批信息不能为空");
-//        }
-//        if (approve.getAppInfoId()==null||approve.getAppInfoId().trim().equals("")) {
-//            return R.error(201, "申请信息ID不能为空");
-//        }
-//      /*  if (approve.getrType()==null||approve.getrType().trim().equals("")) {
-//            return R.error(201, "审批信息类型不能为空");
-//        }*/
-//        approve.setCreator(user.getIdcard());
-//        Workflowmodel curmodel = workFlowModelDao.selectById(currentActivity.getModelid());
-//        approve.setStepName(curmodel.getModelname());
-//        approve.setFlowStepId(currentActivity.getModelid());
-//        approve.setrType("6");
-//        if (approve.getId()==null||approve.getId().trim().equals("")) {
-//            approve.insert();
-//        }else {
-//            approve.updateById();
-//        }
-//        currentActivity.setActivitystatus("已呈批");
-//        activityDao.updateById(currentActivity);
-//        // 其它参与人改为抢占
-//        Activity activity = new Activity();
-//        activity.setHandletime(new Date());
-//        activity.setActivitystatus("已抢占");
-//        int updateR=activityDao.update(activity,new QueryWrapper<Activity>().eq("modelid",currentActivity.getModelid())
-//                .eq("instanceid",currentActivity.getInstanceid()).ne("id",currentActivity.getId()));
-//        // 插入指定加办人
-//        Activity advanceActivity=new Activity();
-//        advanceActivity.setId(UUIDUtil.getUUID());
-//        advanceActivity.setActivitystatus("待办");
-//        advanceActivity.setCreatetime(new Date());
-//        advanceActivity.setIsstart(1);
-//        advanceActivity.setCreatepersonid(user.getIdcard());
-//        advanceActivity.setInstanceid(currentActivity.getInstanceid());
-//        advanceActivity.setModelid(currentActivity.getModelid());
-//        advanceActivity.setPreviousactivityids(currentActivity.getPreviousactivityids());
-//        advanceActivity.setHandlepersonids(handleIds);
-//        activityDao.insert(advanceActivity);
-//
-//        return R.ok();
+
         return null;
     }
 

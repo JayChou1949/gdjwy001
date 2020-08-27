@@ -2,6 +2,7 @@ package com.hirisun.cloud.platform.information.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
+import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.platform.information.bean.Carousel;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -31,4 +32,6 @@ public interface CarouselService extends IService<Carousel> {
     Page<Carousel> getPage(Integer pageNum, Integer pageSize,Integer status,Integer type,String belong,String title);
 
     Carousel getCarouselDetail(String id);
+
+    QueryResponseResult<Carousel> deleteCarousel(UserVO user,String id);
 }

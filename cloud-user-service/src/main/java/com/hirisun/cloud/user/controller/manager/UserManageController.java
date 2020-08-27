@@ -80,7 +80,6 @@ public class UserManageController {
     @ApiOperation("根据用户身份证获取用户角色")
     @GetMapping("/getRoleByUserId")
     public QueryResponseResult<SysRole> getRoleByUserId(@ApiParam(value = "用户身份证", required = true) @RequestParam String userId) {
-        //TODO 移除allRoles，前端不需要
         List<SysRole> sysRoleList = sysRoleService.list();
         List<SysRole> roleList = new ArrayList<>();
         List<UserRole> userRoleList = userRoleService.list(new QueryWrapper<UserRole>().lambda().select(UserRole::getRoleId).eq(UserRole::getUserId, userId));
@@ -92,9 +91,6 @@ public class UserManageController {
                 }
             });
         });
-//        Map<String, List<SysRole>> roleMap = new HashMap<>();
-//        roleMap.put("userRoles", roleList);
-//        roleMap.put("allRoles", sysRoleList);
         return QueryResponseResult.success(roleList);
     }
 

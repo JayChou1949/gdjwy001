@@ -8,6 +8,9 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import com.alibaba.fastjson.JSON;
+import com.hirisun.cloud.common.contains.WorkflowActivityStatus;
+import com.hirisun.cloud.order.vo.OrderCode;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
@@ -338,7 +341,6 @@ public class ShoppingCartNewServiceImpl extends ServiceImpl<ShoppingCartMapper, 
         }
 	}
 
-	//TODO
 	@Transactional(rollbackFor = Throwable.class)
 	public void submit(UserVO user, SubmitRequest submitRequest) throws Exception {
 		
@@ -412,27 +414,14 @@ public class ShoppingCartNewServiceImpl extends ServiceImpl<ShoppingCartMapper, 
         	ApplyInfo info = configAndSaveBaseInfo(user,shoppingCart,baseInfo);
         	infoList.add(info);
         	updateFiles(info.getId(),shoppingCart.getId());
-//            HandlerWrapper hw  = FormNum.getHandlerWrapperByName(context,shoppingCart.getFormNum());
-//            IApplicationHandler handler = hw.getHandler();
-//            //根据购物车生成订单(其中包括订单选择哪个流程，用于后面的发起流程)
-//            ApplicationInfo info = configAndSaveBaseInfo(user,shoppingCart,baseInfo);
-//            updateFiles(info.getId(),shoppingCart.getId());
-//            infoList.add(info);
-//            if(handler != null){
-//                //关联订单,清楚购物车Item及关联
-//                handler.refAppInfoFromShoppingCart(shoppingCart.getId(),info.getId());
-//            }
-            
             ShoppingCartVo shoppingCartVo = new ShoppingCartVo();
         	BeanUtils.copyProperties(shoppingCart, shoppingCartVo);
         	shoppingCartVo.setAppInfoId(info.getId());
 			refAppInfoFromShoppingCart(shoppingCartVo);
             
             //新生成的订单发起流程
-//           R r =  instanceService.launchInstanceOfWorkFlow(user.getIdCard(),info.getWorkFlowId(),info.getId());
            workflowApi.launchInstanceOfWorkflow(user.getIdCard(),info.getWorkFlowId(),info.getId());
            
-//           logger.debug("launchInstance -> {}",r);
         }
 
         logger.debug("after deal without DS -> {}",infoList.size());
@@ -448,9 +437,8 @@ public class ShoppingCartNewServiceImpl extends ServiceImpl<ShoppingCartMapper, 
             	throw new CustomException(CommonCode.DRAFT_ERROR);
             }
             sysLogApi.saveLog(user.getIdCard(),"服务名称："+info.getServiceTypeName()+";申请单号："+info.getOrderNumber(),"提交申请", IpUtil.getIp());
-            
-            String json = workflowApi.getInstanceById(info.getId());
-            WorkflowInstanceVO instance = JSONObject.parseObject(json, WorkflowInstanceVO.class);
+
+            WorkflowInstanceVO instance = workflowApi.getWorkflowInstanceByBusinessId(info.getId());
             if (null==instance){
                 throw new CustomException(CommonCode.FLOW_INSTANCE_NULL_ERROR);
             }
@@ -462,7 +450,7 @@ public class ShoppingCartNewServiceImpl extends ServiceImpl<ShoppingCartMapper, 
 			WorkflowActivityVO workflowActivityVO = workflowApi.getActivityByParam(param);
             
             String flowId = instance.getWorkflowId();
-            Map<String, String> modelMapToPerson = new HashMap<String, String>();
+//            Map<String, String> modelMapToPerson = new HashMap<String, String>();
             info.setCreateTime(now);
             info.setModifiedTime(now);
             WorkflowNodeVO workflowNodeVO = new WorkflowNodeVO();
@@ -482,28 +470,24 @@ public class ShoppingCartNewServiceImpl extends ServiceImpl<ShoppingCartMapper, 
                 workflowNodeVO = workflowApi.getNodeByParam(workflowNodeParam);
 
             }
-            //环节处理人map key:环节ID value:审核人id ，分割
-            modelMapToPerson.put(workflowNodeVO.getId(),
-                    submitRequest.getUserIds());
-            AdvanceBeanVO advanceBeanVO = new AdvanceBeanVO();
-            //当前要流程的数据
-            advanceBeanVO.setCurrentActivityId(workflowActivityVO.getId());
-            //流程定义环节id与处理人对应关系
-            advanceBeanVO.setModelMapToPerson(modelMapToPerson);
             Map<String,String> map = new HashMap<>();
             map.put("name",info.getServiceTypeName());
             map.put("order",info.getOrderNumber());
-//            activityService.advanceCurrentActivity(advanceBeanVO,map);
-            
-            workflowApi.activityAdvance(advanceBeanVO, map);
-//            TODO 消息队列
-//            messageProvider.sendMessageAsync(messageProvider.buildSuccessMessage(user, info.getServiceTypeName(), info.getOrderNumber()));
+            map.put("depApproveUserIds",submitRequest.getUserIds());//申请后一个流程处理人
+            WorkflowActivityVO firstActivity = workflowApi.getOneWorkflowActivityByParams(WorkflowActivityStatus.WAITING.getCode(),instance.getId());
+            if (firstActivity==null) {
+                logger.info("未找到对应的流程活动信息！");
+                throw new CustomException(OrderCode.WORKFLOW_ACTIVITY_MISSING);
+            }
+            Map resultMap = workflowApi.advanceActivity(firstActivity.getId(),map);
+            if (!"200".equals(resultMap.get("code"))) {
+                logger.error("advanceCurrentActivity调用失败:{}",resultMap.get("msg"));
+                throw new CustomException(OrderCode.FEIGN_METHOD_ERROR);
+            }
         }
-//        applicationInfoService.updateBatchById(infoList);
         applyInfoService.updateBatchById(infoList);
         //删除购物车
         this.removeByIds(idList);
-		
 	}
 	
 	/**
@@ -532,7 +516,6 @@ public class ShoppingCartNewServiceImpl extends ServiceImpl<ShoppingCartMapper, 
         if(CollectionUtils.isNotEmpty(daaSResource)){
         	ApplyInfo info = dealMerge(user,daaSResource,baseInfo);
             infoList.add(info);
-//            instanceService.launchInstanceOfWorkFlow(user.getIdCard(),info.getWorkFlowId(),info.getId());
             workflowApi.launchInstanceOfWorkflow(user.getIdCard(),info.getWorkFlowId(),info.getId());
         }
         //获取数据服务(DaaS)购物车
@@ -543,7 +526,6 @@ public class ShoppingCartNewServiceImpl extends ServiceImpl<ShoppingCartMapper, 
             baseInfo.setVmIp(null);
             ApplyInfo info = dealMerge(user,daaSService,baseInfo);
             infoList.add(info);
-//            instanceService.launchInstanceOfWorkFlow(user.getIdCard(),info.getWorkFlowId(),info.getId());
             workflowApi.launchInstanceOfWorkflow(user.getIdCard(),info.getWorkFlowId(),info.getId());
         }
     }
@@ -624,19 +606,14 @@ public class ShoppingCartNewServiceImpl extends ServiceImpl<ShoppingCartMapper, 
             info.setExplanation(shoppingCart.getExplanation());
         }
 
-        info.setFlowStepId(null);
-        info.setFlowStepIdBak(null);
+//        info.setFlowStepId(null);
+//        info.setFlowStepIdBak(null);
         info.setServiceTypeId(shoppingCart.getServiceTypeId());
         info.setServiceTypeName(shoppingCart.getServiceTypeName());
         ResourceType resourceType = hw.getFormNum().getResourceType();
-        info.setFlowNew("1");
         //流程选择（重要选择流程逻辑）
-        String chooseWorkFlow = workflowApi.chooseWorkFlow(resourceType.getCode(), info.getServiceTypeId(), 
+        WorkflowVO workflow = workflowApi.chooseWorkFlow(resourceType.getCode(), info.getServiceTypeId(),
         		info.getAreaName(), info.getPoliceCategory(), info.getNationalSpecialProject());
-        
-        WorkflowVO workflow = JSONObject.parseObject(chooseWorkFlow, WorkflowVO.class);
-        
-//        Workflow workflow = workflowService.chooseWorkFlow(resourceType,info.getAreaName(),info.getPoliceCategory(),info.getServiceTypeId(),info.getNationalSpecialProject());
         if(workflow == null){
             logger.error("购物车ID:{} 资源类型:{} 地市:{} 警种: {} 服务ID:{} 国家专项:{}",shoppingCart.getId(),resourceType.toString(),info.getAreaName(),info.getPoliceCategory(),info.getServiceTypeId(),info.getNationalSpecialProject());
             throw  new Exception("资源类型: "+resourceType.toString()+ "地市: "+ info.getAreaName()+"警种: "

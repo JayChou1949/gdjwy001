@@ -3,6 +3,7 @@ package com.hirisun.cloud.order.controller.manage;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hirisun.cloud.api.workflow.WorkflowApi;
 import com.hirisun.cloud.common.annotation.LoginUser;
@@ -174,8 +175,7 @@ public class ApplyInfoManageController {
                                     @ApiParam(value = "当前环节id",required = true) @RequestParam String activityId,
                                     HttpServletRequest request) throws Exception {
         ApplyInfo info = applyInfoService.getById(id);
-        String activityStr = workflowApi.getActivityById(activityId);
-        WorkflowActivityVO activity = JSON.parseObject(workflowApi.getActivityById(activityId), WorkflowActivityVO.class);
+        WorkflowActivityVO activity = workflowApi.getActivityById(activityId);
 //        HandlerWrapper hw = FormNum.getHandlerWrapperByInfo(context, info);
         HandlerWrapper hw=null;
         String json = IOUtils.toString(request.getInputStream(), "UTF-8");
@@ -234,7 +234,7 @@ public class ApplyInfoManageController {
             lock.unlock(lockKey, uuid);
         }
         if ("1".equals(implRequest.getResult())){
-            workflowApi.advanceActivity(activityStr,null);
+//            workflowApi.advanceActivity(activityStr,null);
         }else {
             if (nodeId==null||nodeId.trim().equals("")) {
                 return QueryResponseResult.fail("回退环节ID不能为空, 回退失败");
@@ -249,13 +249,13 @@ public class ApplyInfoManageController {
 
             //查询回退环节id是否为业务办理，如果是，则走回退情况
             //如果只有一个环节，则直接回退到重新申请
-            WorkflowNodeVO thisModel = JSON.parseObject(workflowApi.getNodeById(nodeId), WorkflowNodeVO.class);
+            WorkflowNodeVO thisModel = workflowApi.getNodeById(nodeId);
             if(thisModel!=null&& WorkflowUtil.compareNodeAbility(thisModel.getNodeFeature(), WorkflowNodeAbilityType.IMPL.getCode())){
                 //找到申请环节，并回退
-                String firstNodeStr=workflowApi.getWorkflowNodeByParams(thisModel.getVersion(), thisModel.getWorkflowId(), 1);
+                List<WorkflowNodeVO> voList=workflowApi.getWorkflowNodeByParams(thisModel.getVersion(), thisModel.getWorkflowId(), 1);
 
-                if(firstNodeStr!=null){
-                    WorkflowNodeVO firstNode=JSON.parseObject(firstNodeStr, WorkflowNodeVO.class);
+                if(CollectionUtils.isNotEmpty(voList)){
+                    WorkflowNodeVO firstNode=voList.get(0);
                     vo.setFallBackModelIds(firstNode.getId());
                 }
                 workflowApi.fallbackOnApproveNotPass(vo, map);

@@ -22,4 +22,6 @@ public interface SysDictService extends IService<SysDict> {
     void removeDict(String id);
 
     void syncSysDictData();
+
+    boolean isBasePaaSService(String id);
 }

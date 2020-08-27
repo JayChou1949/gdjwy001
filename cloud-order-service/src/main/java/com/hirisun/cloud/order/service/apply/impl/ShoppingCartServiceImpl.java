@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import com.hirisun.cloud.common.contains.WorkflowActivityStatus;
 import com.hirisun.cloud.order.continer.ShoppingCartStatus;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -78,7 +79,7 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
     public void createCart(UserVO user, ShoppingCart shoppingCart) {
         logger.debug("create shoppingCart -> {}",shoppingCart);
 
-        shoppingCart.setResourceType(Long.valueOf(FormCode.serviceResourceTypeValueMap.get(shoppingCart.getFormNum())));
+//        shoppingCart.setResourceType(Long.valueOf(FormCode.serviceResourceTypeValueMap.get(shoppingCart.getFormNum())));
 //        shoppingCart.setStatus(ShoppingCart.STATUS_WAIT_SUBMIT);
 
         this.save(shoppingCart);
@@ -129,20 +130,16 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
                 logger.info("草稿不能提交!");
                 throw new CustomException(OrderCode.DRAFT_CAN_NOT_COMMIT);
             }
-            String instanceStr = workflowApi.getWorkflowInstanceByBusinessId(info.getId());
-            if (StringUtils.isEmpty(instanceStr)) {
+            WorkflowInstanceVO instance = workflowApi.getWorkflowInstanceByBusinessId(info.getId());
+            if (instance==null) {
                 logger.info("流程实例未找到");
                 throw new CustomException(OrderCode.WORKFLOW_INSTANSE_MISSING);
             }
-            WorkflowInstanceVO instance = JSON.parseObject(instanceStr, WorkflowInstanceVO.class);
-
-            String activityStr = workflowApi.getOneWorkflowActivityByParams(WorkflowActivityVO.STATUS_WAITING,instance.getId());
-            if (StringUtils.isEmpty(activityStr)) {
+            WorkflowActivityVO firstActivity = workflowApi.getOneWorkflowActivityByParams(WorkflowActivityStatus.WAITING.getCode(),instance.getId());
+            if (firstActivity==null) {
                 logger.info("未找到对应的流程活动信息！");
                 throw new CustomException(OrderCode.WORKFLOW_ACTIVITY_MISSING);
             }
-            WorkflowActivityVO firstActivity=JSON.parseObject(activityStr, WorkflowActivityVO.class);
-
             String flowId = instance.getWorkflowId();
             Date now = new Date();
             Map<String, String> modelMapToPerson = new HashMap<String, String>();
@@ -150,18 +147,12 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
             info.setModifiedTime(now);
 
             //查找第二个,获取处理人
-            String nodeStr = workflowApi.getWorkflowNodeByParams(instance.getVersion(),flowId,2);
-            if (StringUtils.isEmpty(nodeStr)) {
+            List<WorkflowNodeVO> nextNodeList= workflowApi.getWorkflowNodeByParams(instance.getVersion(),flowId,2);
+            if (CollectionUtils.isEmpty(nextNodeList)) {
                 logger.info("未找到对应的流程环节信息！");
                 throw new CustomException(OrderCode.WORKFLOW_MISSING);
             }
-            WorkflowNodeVO nextNode=null;
-            List<WorkflowNodeVO> nextNodeList=JSON.parseArray(nodeStr, WorkflowNodeVO.class);
-            if (CollectionUtils.isNotEmpty(nextNodeList)) {
-                nextNode = nextNodeList.get(0);
-            }else{
-                throw new CustomException(OrderCode.WORKFLOW_MISSING);
-            }
+            WorkflowNodeVO nextNode=nextNodeList.get(0);
             //环节处理人map key:环节ID value:审核人id ，分割
             modelMapToPerson.put(nextNode.getId(),
                     submitRequest.getUserIds());
@@ -251,7 +242,7 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
         info.setServiceTypeId(shoppingCart.getServiceTypeId());
         info.setServiceTypeName(shoppingCart.getServiceTypeName());
         //流程选择（重要选择流程逻辑）
-        String workflowStr = workflowApi.chooseWorkFlow(
+        WorkflowVO workflow = workflowApi.chooseWorkFlow(
                 shoppingCart.getResourceType().intValue(),
                 info.getServiceTypeId(),
                 info.getAreaName(),
@@ -259,11 +250,10 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
                 info.getNationalSpecialProject());
 
 
-        if(StringUtils.isEmpty(workflowStr)){
+        if(workflow==null){
             logger.error("购物车ID:{} 资源类型:{} 地市:{} 警种: {} 服务ID:{} 国家专项:{}",shoppingCart.getId(),shoppingCart.getResourceType(),info.getAreaName(),info.getPoliceCategory(),info.getServiceTypeId(),info.getNationalSpecialProject());
             throw new CustomException(OrderCode.WORKFLOW_MISSING);
         }
-        WorkflowVO workflow = JSON.parseObject(workflowStr, WorkflowVO.class);
         info.setWorkFlowId(workflow.getId());
         info.setResourceType(shoppingCart.getResourceType().intValue());
         info.setFormNum(shoppingCart.getFormNum());

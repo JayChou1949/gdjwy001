@@ -94,7 +94,6 @@ public class DevDocServiceImpl extends ServiceImpl<DevDocMapper, DevDoc> impleme
                     //TODO 物理删除文件
                 }
             }else if(!StringUtils.isEmpty(fileIds)){
-                //TODO 待优化文件处理
                 List<String> idList = fileList.stream().map(DevDocFile::getId).distinct().collect(Collectors.toList());
                 devDocFileService.removeByIds(idList);
                 fileList = new ArrayList<>();

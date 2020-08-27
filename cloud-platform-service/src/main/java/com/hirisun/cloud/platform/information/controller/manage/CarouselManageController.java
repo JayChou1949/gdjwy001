@@ -102,19 +102,7 @@ public class CarouselManageController {
     @PostMapping("/delete")
     public QueryResponseResult<Carousel> delete(@LoginUser UserVO user,
                                                 @ApiParam(value = "轮播图id",required = true) @RequestParam String id) {
-        Carousel carousel = carouselService.getById(id);
-        if(carousel==null){
-            return QueryResponseResult.fail("轮播图信息不存在");
-        }
-        String newsBelong = StringUtils.isEmpty(carousel.getArea())
-                ? StringUtils.isEmpty(carousel.getPoliceCategory())?carousel.getProject():carousel.getPoliceCategory() : carousel.getArea();
-        // 判断管理员权限
-        if(NewsParamUtil.checkUserInfomationPermission(user,carousel.getProvincial(),newsBelong)){
-            return QueryResponseResult.fail("无权操作该区域数据");
-        }
-        carousel.setStatus(ReviewStatus.DELETE.getCode());
-        carouselService.updateById(carousel);
-        //TODO 远程调用日志模块，记录操作人日志 sys_log
+
         return QueryResponseResult.success("删除成功");
     }
     /**
