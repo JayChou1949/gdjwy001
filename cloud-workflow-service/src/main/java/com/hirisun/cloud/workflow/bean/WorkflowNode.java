@@ -103,6 +103,10 @@ public class WorkflowNode implements Serializable {
     @TableField(exist = false)
     private String adviserPersonName;
 
+    @ApiModelProperty(value = "流转id")
+    @TableField(exist = false)
+    private String activityId;
+
     @Override
     public String toString() {
         return "WorkflowNode{" +

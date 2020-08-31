@@ -217,11 +217,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         if (CollectionUtils.isEmpty(userIdList)) {
             return resultMap;
         }
-        String userListStr = userApi.getUserByIdCardList(userIdList);
-        List<UserVO> userList = null;
-        if (StringUtils.isNotEmpty(userListStr)&&!"null".equals(userListStr)) {
-            userList = JSON.parseArray(userListStr,UserVO.class);
-        }
+        List<UserVO> userList = userApi.getUserByIdCardList(userIdList);
         for (WorkflowNode workflowNode : nodeList) {
             StringBuffer defaultHandlers = userIdConvertToName(workflowNode.getDefaultHandler(), userList);
             StringBuffer noticePersions = userIdConvertToName(workflowNode.getNoticePersion(), userList);

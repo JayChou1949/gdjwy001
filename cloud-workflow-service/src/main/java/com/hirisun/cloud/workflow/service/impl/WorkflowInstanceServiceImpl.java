@@ -82,11 +82,7 @@ public class WorkflowInstanceServiceImpl extends ServiceImpl<WorkflowInstanceMap
             logger.info("此流程没有定义开始环节,请联系管理员!");
             new CustomException(WorkflowCode.WORKFLOW_MISSING_START_NODE);
         }
-        UserVO user=null;
-        String userStr = userApi.getUserByIdCard(createPersonId);
-        if (!StringUtils.isEmpty(userStr)) {
-            user=JSON.parseObject(userStr, UserVO.class);
-        }
+        UserVO user= userApi.getUserByIdCard(createPersonId);
         logger.debug("创建流程实例的用户：{}",user);
         // 生成实例的ID
         String insId = UUIDUtil.getUUID();

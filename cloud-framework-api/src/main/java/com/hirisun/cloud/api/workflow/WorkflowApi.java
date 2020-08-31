@@ -145,8 +145,7 @@ public interface WorkflowApi {
     @ApiIgnore
     @ApiOperation("环节正常流转")
     @PutMapping(workflowActivityBaseUrl + "/feign/advanceActivity")
-    public Map<String, String> advanceActivity(@RequestBody String currentActivityId,
-                                               @RequestParam Map<String, String> map);
+    public Map<String, String> advanceActivity(@RequestParam String currentActivityId,@RequestParam Map map);
 
     /**
      * IPDS订单选择流程（s->saasService）
@@ -216,8 +215,7 @@ public interface WorkflowApi {
     @ApiIgnore
     @ApiOperation("记录申请流程驳回信息")
     @PostMapping(workflowActivityBaseUrl+"/feign/fallbackOnApproveNotPass")
-    public Map<String, String> fallbackOnApproveNotPass(@RequestBody FallBackVO fallBackVO,
-                                                        @RequestParam Map map);
+    public Map<String, String> fallbackOnApproveNotPass(@RequestBody FallBackVO fallBackVO,@RequestParam Map map);
 
     /**
      * 通知人流转信息
@@ -268,8 +266,38 @@ public interface WorkflowApi {
      */
     @ApiIgnore
     @ApiOperation("加办")
-    @PostMapping("/feign/add")
+    @PostMapping(workflowActivityBaseUrl+"/feign/add")
     public Map<String, String> add(@RequestParam String handlerPersonIds,
                                    @RequestParam String currentActivityId,
                                    @RequestParam String creatorId);
+
+    /**
+     * 流程转发
+     */
+    @ApiIgnore
+    @ApiOperation("流程转发")
+    @PostMapping(workflowActivityBaseUrl + "/feign/activityForward")
+    public Map<String, String> activityForward(@RequestParam String currentActivityId, @RequestParam String handlePersonIds);
+
+    /**
+     * 拒绝，回退到申请
+     */
+    @ApiIgnore
+    @ApiOperation("回退到申请")
+    @PostMapping(workflowActivityBaseUrl+"/feign/rejectApply")
+    public Map<String, String> rejectApply(
+            @RequestParam String currentActivityId,
+            @RequestParam String fallBackModelId);
+
+    /**
+     * 终止流程
+     *
+     * @param applyInfoId
+     * @return
+     */
+    @ApiIgnore
+    @ApiOperation("终止流程")
+    @PostMapping(workflowActivityBaseUrl + "/feign/terminationOrder")
+    public Map<String, String> terminationOrder(
+            @RequestParam String applyInfoId);
 }

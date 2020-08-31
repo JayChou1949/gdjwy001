@@ -2,6 +2,7 @@ package com.hirisun.cloud.workflow.controller.manage;
 
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hirisun.cloud.common.contains.WorkflowActivityStatus;
@@ -65,13 +66,13 @@ public class WorkflowNodeManageController {
             lambdaQueryWrapper.eq(WorkflowNode::getNodeSort, nodeSort);
         }
         List<WorkflowNode> nodeList = workflowNodeService.list(lambdaQueryWrapper);
-        List<WorkflowNodeVO> newList = new ArrayList<>();
-        nodeList.forEach(item->{
-            WorkflowNodeVO vo = new WorkflowNodeVO();
-            BeanUtils.copyProperties(item, vo);
-            newList.add(vo);
-        });
-        return newList;
+
+        if(CollectionUtils.isNotEmpty(nodeList)) {
+            List<WorkflowNodeVO> list = JSON.parseObject(JSON.toJSON(nodeList).toString(),
+                    new TypeReference<List<WorkflowNodeVO>>(){});
+            return list;
+        }
+        return null;
     }
     /**
      * 根据环节id获取环节信息
@@ -129,22 +130,27 @@ public class WorkflowNodeManageController {
         logger.info("workflowActivityList:{}",workflowActivityList);
         if (CollectionUtils.isNotEmpty(nodeList) && CollectionUtils.isNotEmpty(workflowActivityList)) {
             nodeList.forEach(node->{
-                workflowActivityList.forEach(activity->{
-                    node.setNodeStatus(WorkflowActivityStatus.SUBMIT.getCode());
+                for(WorkflowActivity activity:workflowActivityList){
+
                     if (node.getId().equals(activity.getNodeId())) {
+                        node.setActivityId(activity.getId());
                         if (WorkflowActivityStatus.SUBMIT.getCode().equals(activity.getActivityStatus())) {
+                            node.setNodeStatus(WorkflowActivityStatus.SUBMIT.getCode());
                             node.setNodeStatusCode("finished");
                         }else if (WorkflowActivityStatus.WAITING.getCode().equals(activity.getActivityStatus())) {
                             //查找到待办直接返回
                             node.setNodeStatusCode("underway");
-                            return;
+                            node.setNodeStatus(WorkflowActivityStatus.WAITING.getCode());
+                            break;
                         }else if (WorkflowActivityStatus.TERMINAT.getCode().equals(activity.getActivityStatus())) {
                             node.setNodeStatusCode("termination");
+                            node.setNodeStatus(WorkflowActivityStatus.TERMINAT.getCode());
                         }else{
                             node.setNodeStatusCode("unfinished");
+                            node.setNodeStatus(WorkflowActivityStatus.SUBMIT.getCode());
                         }
                     }
-                });
+                }
                 WorkflowNodeVO vo = new WorkflowNodeVO();
                 BeanUtils.copyProperties(node,vo);
                 nodeVoList.add(vo);
@@ -171,5 +177,7 @@ public class WorkflowNodeManageController {
         workflowNodeService.syncOldData();
         return ;
     }
+
+
 }
 

@@ -57,11 +57,23 @@ public interface ApplyInfoService extends IService<ApplyInfo> {
      * @param <I>
      * @throws Exception
      */
-    public void saveImpl(UserVO user, Map<String, Object> param, IImplHandler implHandler, String modelId) throws Exception;
+    <I> void saveImpl(UserVO user, Map<String, Object> param, IImplHandler implHandler, String modelId) throws Exception;
 
     public QueryResponseResult add(UserVO userVO, ApproveVO approveVO);
 
+    public QueryResponseResult adviser(UserVO user, FallBackVO fallBackVO);
+
+
+    public QueryResponseResult submit(UserVO user,String id,String type,String userIds);
+
 //    public QueryResponseResult deleteById(UserVO user,String id);
 
+    public QueryResponseResult forward(UserVO user, String activityId, String userIds, String applyInfoId);
+
+    public QueryResponseResult reject(UserVO user,FallBackVO fallBack);
+
+    public QueryResponseResult termination(String applyInfoId);
+
+    public QueryResponseResult newTodo(UserVO user);
 
 }

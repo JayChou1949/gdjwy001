@@ -12,5 +12,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2020-08-12
  */
 public interface ApplyReviewRecordService extends IService<ApplyReviewRecord> {
-
+    ApplyReviewRecord getLastPassReviewInfoByAppInfoId(String id);
 }

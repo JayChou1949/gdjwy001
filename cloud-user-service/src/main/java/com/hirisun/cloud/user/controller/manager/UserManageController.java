@@ -19,6 +19,7 @@ import com.hirisun.cloud.user.service.UserRoleService;
 import com.hirisun.cloud.user.service.UserService;
 import io.swagger.annotations.*;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -184,10 +185,12 @@ public class UserManageController {
     @ApiIgnore
     @ApiOperation("根据用户身份证查询用户")
     @GetMapping("/feign/getUserByIdCard")
-    public String getUserByIdCard(@ApiParam(value = "用户身份证", required = true) @RequestParam String idCard) {
+    public UserVO getUserByIdCard(@ApiParam(value = "用户身份证", required = true) @RequestParam String idCard) {
 
         User user = userService.getOne(new QueryWrapper<User>().lambda().eq(User::getIdCard, idCard));
-        return JSON.toJSONString(user);
+        UserVO vo = new UserVO();
+        BeanUtils.copyProperties(user, vo);
+        return vo;
     }
 
     /**
@@ -199,12 +202,18 @@ public class UserManageController {
     @ApiIgnore
     @ApiOperation("根据用户身份证列表获取用户列表")
     @GetMapping("/feign/getUserByIdCardList")
-    public String getUserByIdCardList(@ApiParam(value = "用户身份证列表", required = true) @RequestParam List<String> idCardList) {
+    public List<UserVO> getUserByIdCardList(@ApiParam(value = "用户身份证列表", required = true) @RequestParam List<String> idCardList) {
         List<String> distinctIdCardList = idCardList.stream().distinct().collect(Collectors.toList());
 
-        List<User> userList = userService.list(new QueryWrapper<User>().lambda().in(User::getIdCard, idCardList).isNotNull(User::getName));
+        List<User> userList = userService.list(new QueryWrapper<User>().lambda().in(User::getIdCard, distinctIdCardList).isNotNull(User::getName));
+        List<UserVO> voList = new ArrayList<>();
 
-        return JSON.toJSONString(userList);
+        userList.forEach(item->{
+            UserVO userVO = new UserVO();
+            BeanUtils.copyProperties(item, userVO);
+            voList.add(userVO);
+        });
+        return voList;
     }
 
 }

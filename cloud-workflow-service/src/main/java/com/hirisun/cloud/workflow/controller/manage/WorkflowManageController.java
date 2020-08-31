@@ -112,7 +112,6 @@ public class WorkflowManageController {
     @ApiOperation("删除申请流程配置")
     @PostMapping("/delete")
     public QueryResponseResult<Workflow> delete(@ApiParam(value = "流程配置id",required = true) @RequestParam String id) {
-
         Workflow workflow = workflowService.getById(id);
         workflow.setFlowStatus(WorkflowStatus.DELETE.getCode());
         workflowService.updateById(workflow);
@@ -147,19 +146,10 @@ public class WorkflowManageController {
     @ApiOperation("根据流程id获取流程信息")
     @PostMapping("/feign/getWorkflowById")
     public WorkflowVO getWorkflowById(@RequestParam String workflowId) {
-        logger.info("/feign/getWorkflowById：{},{},{}",workflowId);
-
         Workflow workflow = workflowService.getById(workflowId);
         WorkflowVO vo = new WorkflowVO();
         BeanUtils.copyProperties(workflow,vo);
         return vo;
-    }
-
-    @ApiOperation("短信发送")
-    @GetMapping("/sendMsg")
-    public QueryResponseResult sendMsg() {
-        smsApi.buildCompleteMessage("410184198209096919","wxx业务办理","202002020201");
-        return QueryResponseResult.success(null);
     }
 }
 

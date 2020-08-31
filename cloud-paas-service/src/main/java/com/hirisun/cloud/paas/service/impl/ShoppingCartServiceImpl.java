@@ -2,6 +2,11 @@ package com.hirisun.cloud.paas.service.impl;
 
 import java.util.List;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
+import com.hirisun.cloud.paas.service.IImplHandler;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
@@ -81,6 +86,33 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         }
 		
 	}
-
+	@Override
+	public List<JSONObject> getByAppInfoId(String formNum, String applyInfoId) {
+		HandlerWrapper hw  = FormNum.getHandlerWrapperByName(context,formNum);
+		IApplicationHandler handler = hw.getHandler();
+		if (handler != null) {
+			List list=handler.getByAppInfoId(applyInfoId);
+			if (CollectionUtils.isNotEmpty(list)) {
+				List<JSONObject> newList = JSON.parseObject(JSON.toJSON(list).toString(),
+						new TypeReference<List<JSONObject>>(){});
+				return newList;
+			}
+		}
+		return null;
+	}
+	@Override
+	public List<JSONObject> getImplServerListByAppInfoId(String formNum,String applyInfoId) {
+		HandlerWrapper hw  = FormNum.getHandlerWrapperByName(context,formNum);
+		IImplHandler implHandler = hw.getImplHandler();
+		if (implHandler != null) {
+			List list=implHandler.getImplServerListByAppInfoId(applyInfoId);
+			if (CollectionUtils.isNotEmpty(list)) {
+				List<JSONObject> newList = JSON.parseObject(JSON.toJSON(list).toString(),
+						new TypeReference<List<JSONObject>>(){});
+				return newList;
+			}
+		}
+		return null;
+	}
 	
 }

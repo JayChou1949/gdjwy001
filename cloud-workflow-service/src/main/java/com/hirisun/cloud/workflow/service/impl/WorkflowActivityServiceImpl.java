@@ -9,6 +9,10 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.hirisun.cloud.common.contains.ApplicationInfoStatus;
+import org.apache.catalina.User;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -65,6 +69,9 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
 
     @Autowired
     private WorkflowNodeMapper workflowNodeMapper;
+
+    @Autowired
+    private WorkflowActivityMapper workflowActivityMapper;
 
     @Autowired
     private WorkflowActivityService workflowActivityService;
@@ -194,7 +201,7 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
         }
         if (CollectionUtils.isNotEmpty(activityList)) {
             this.saveBatch(activityList);
-            if (messageMap != null) {
+            if (messageMap != null&&messageMap.get("name")!=null) {
                 activityList.forEach(item->{
                     smsApi.buildProcessingMessage(messageMap.get("name"), messageMap.get("order"), item.getHandlePersons());
                 });
@@ -343,7 +350,7 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
         if (adviserIds != null) {
             adviserArr = adviserIds.split(",");
         }
-        handleFlow(nextNode, currentActivity, personArr, adviserArr, null);
+        handleFlow(nextNode, currentActivity, personArr, adviserArr, map);
         currentActivity.setHandleTime(new Date());
         currentActivity.setActivityStatus(WorkflowActivityStatus.SUBMIT.getCode());
         workflowActivityService.updateById(currentActivity);
@@ -503,15 +510,16 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
 	@Override
 	public WorkflowActivityVO getActivityByParam(ActivityParam param) {
 		
-		WorkflowActivity workflowActivity = workflowActivityService.getOne(new QueryWrapper<WorkflowActivity>().eq("ACTIVITY_STATUS",0)
-                .eq("IS_START",0).eq("INSTANCE_ID",param.getInstanceId()));
+		WorkflowActivity workflowActivity = workflowActivityService.getOne(new QueryWrapper<WorkflowActivity>().lambda()
+                .eq(WorkflowActivity::getActivityStatus,WorkflowActivityStatus.WAITING.getCode())
+                .eq(WorkflowActivity::getIsStart,0)
+                .eq(WorkflowActivity::getInstanceId,param.getInstanceId()));
 		
 		if(workflowActivity != null) {
 			WorkflowActivityVO workflowActivityVO = new WorkflowActivityVO();
 			BeanUtils.copyProperties(workflowActivity, workflowActivityVO);
 			return workflowActivityVO;
 		}
-		
 		return null;
 	}
 
@@ -695,6 +703,99 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
         resultMap.put("type","6");
         resultMap.put("code", "200");
         resultMap.put("msg","成功");
-        return null;
+        return resultMap;
+    }
+
+    /**
+     * 终止流程
+     * @param applyInfoId
+     * @return
+     */
+    @Override
+    public Map<String,String> terminationOrder(String applyInfoId) {
+        Map<String, String> resultMap = new HashMap<>();
+        resultMap.put("code", "201");
+
+        WorkflowInstance instance=workflowInstanceService.getOne(new QueryWrapper<WorkflowInstance>().lambda().eq(WorkflowInstance::getBusinessId,applyInfoId));
+        if(instance==null){
+            resultMap.put("msg", "未找到相关流程实例");
+            return resultMap;
+        }
+        String instanceId=instance.getId();
+        instance.setCompleteTime(new Date());
+        instance.setInstanceStatus(WorkflowInstanceStatus.TERMINATE.getCode());
+        workflowInstanceService.updateById(instance);
+        this.update(new WorkflowActivity(), new UpdateWrapper<WorkflowActivity>().lambda()
+                .eq(WorkflowActivity::getInstanceId, instanceId)
+                .eq(WorkflowActivity::getActivityStatus, WorkflowActivityStatus.WAITING.getCode())
+                .set(WorkflowActivity::getActivityStatus, WorkflowActivityStatus.TERMINAT.getCode()));
+        resultMap.put("code", "200");
+        resultMap.put("msg", "成功");
+        return resultMap;
+    }
+    /**
+     * 拒绝回退到申请
+     * @param currentActivityId
+     * @param fallBackModelId
+     * @return
+     */
+    @Override
+    public Map<String,String> rejectApply(String currentActivityId,String fallBackModelId) {
+        Map resultMap = new HashMap();
+        resultMap.put("code", "201");
+        if (StringUtils.isEmpty(currentActivityId)) {
+            resultMap.put("msg","当前环节ID不能为空,回退失败");
+            return resultMap;
+        }
+        WorkflowActivity currentActivity=this.getById(currentActivityId);
+        if (currentActivity==null) {
+            resultMap.put("msg","未查询到当前环节信息,回退失败");
+            return resultMap;
+        }
+        String modelIds=fallBackModelId;
+        if (modelIds==null||modelIds.trim().equals("")) {
+            resultMap.put("msg","回退环节ID不能为空,回退失败");
+            return resultMap;
+        }
+        if (!currentActivity.getActivityStatus().equals(WorkflowActivityStatus.WAITING.getCode())) {
+            resultMap.put("msg","该任务已经处理，不能重复处理");
+            return resultMap;
+        }
+        //判断当前环节定义的处理模式是会签/抢占,如果为会签则当一个人处理了则不能回退,如果没有处理则直接回退
+        String currentModelid=currentActivity.getNodeId();
+        if (currentModelid==null) {
+            resultMap.put("msg","未找到当前环节定义,回退失败");
+            return resultMap;
+        }
+        int count=0;
+        List<WorkflowActivity> activities=selectFallBackActivity(currentActivity,modelIds);
+        for (WorkflowActivity activity:activities) {
+            count++;
+            String id=UUIDUtil.getUUID();
+            activity.setId(id);
+            activity.setActivityStatus(WorkflowActivityStatus.WAITING.getCode());
+            activity.setCreateTime(new Date());
+            activity.setCreator(currentActivity.getHandlePersons());
+            activity.setPreActivityId(currentActivityId);;
+            this.save(activity);
+        }
+        if (count==0) {
+            resultMap.put("msg","回退失败,未找到上级处理人或当前环节不能回退!");
+            return resultMap;
+        }
+        //更新当前环节为已回退
+        //同时流转给多个人时当前环节有多个待办
+        List<WorkflowActivity> currentactivities=this.list(new QueryWrapper<WorkflowActivity>().lambda()
+                .eq(WorkflowActivity::getNodeId,currentActivity.getNodeId())
+                .eq(WorkflowActivity::getInstanceId,currentActivity.getInstanceId()));
+        for (WorkflowActivity activity:currentactivities) {
+            activity.setHandleTime(new Date());
+            activity.setActivityStatus(WorkflowActivityStatus.REJECT.getCode());
+            this.updateById(activity);
+            resultMap.put("nodeId", activity.getNodeId());
+        }
+        resultMap.put("code", "200");
+        resultMap.put("msg", "成功");
+        return resultMap;
     }
 }

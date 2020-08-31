@@ -105,7 +105,7 @@ public class ShoppingCartNewServiceImpl extends ServiceImpl<ShoppingCartMapper, 
 	private SystemApi sysLogApi;
 	
 	@Transactional(rollbackFor = Throwable.class)
-	public void create(UserVO user, String json, ShoppingCartVo shoppingCartVo) {
+	public void create(UserVO user, ShoppingCartVo shoppingCartVo) {
 		
 		String formNum = shoppingCartVo.getFormNum();
 		
@@ -118,13 +118,11 @@ public class ShoppingCartNewServiceImpl extends ServiceImpl<ShoppingCartMapper, 
 		
 		ShoppingCart shoppingCart = new ShoppingCart();
 		BeanUtils.copyProperties(shoppingCartVo, shoppingCart);
-		
 		//保存购物车
 		shoppingCartMapper.insert(shoppingCart);
 		
 		shoppingCartVo.setId(shoppingCart.getId());
 		
-		logger.debug("create json -> {}",json);
 //        ShoppingCart shoppingCart = parseShoppingCart(json,hw.getApplicationType());
         logger.debug("parseShoppingCart -> {}",shoppingCart);
 
@@ -159,7 +157,7 @@ public class ShoppingCartNewServiceImpl extends ServiceImpl<ShoppingCartMapper, 
 		if(formNum.startsWith("IAAS")) {
 			return iaasShoppingCartApi.getShoppingCartItemList(shoppingCartVo);
 		}else if(formNum.startsWith("DAAS")) {
-			daasShoppingCartApi.getShoppingCartItemList(shoppingCartVo);
+			return daasShoppingCartApi.getShoppingCartItemList(shoppingCartVo);
 		}else if(formNum.startsWith("SAAS")) {
 			return saasShoppingCartApi.getShoppingCartItemList(shoppingCartVo);
 		}else if(formNum.startsWith("PAAS")) {
@@ -296,20 +294,10 @@ public class ShoppingCartNewServiceImpl extends ServiceImpl<ShoppingCartMapper, 
     }
 
 	@Transactional(rollbackFor = Throwable.class)
-	public void update(String json) {
-		
-        ShoppingCart shoppingCart = JSONObject.parseObject(json,ShoppingCart.class);
-        logger.debug("origin -> {}",shoppingCart);
+	public void update(ShoppingCart shoppingCart) {
+        logger.debug("shoppingCart -> {}",shoppingCart);
         shoppingCart.setStatus(ShoppingCartStatus.WAIT_SUBMIT.getCode());
         shoppingCartMapper.updateById(shoppingCart);
-        
-//        HandlerWrapper hw = FormNum.getHandlerWrapperByName(context,origin.getFormNum());
-//        IApplicationHandler handler = hw.getHandler();
-//        ShoppingCart<S> shoppingCart = parseShoppingCart(json,hw.getApplicationType());
-        //更新后草稿变待提交
-//        shoppingCart.setStatus(ShoppingCartStatus.WAIT_SUBMIT.getCode());
-//        shoppingCart.updateById();
-
 
         if(CollectionUtils.isNotEmpty(shoppingCart.getFileList())){
             refFiles(shoppingCart.getFileList(),shoppingCart.getId());
@@ -318,8 +306,6 @@ public class ShoppingCartNewServiceImpl extends ServiceImpl<ShoppingCartMapper, 
         ShoppingCartVo shoppingCartVo = new ShoppingCartVo();
         BeanUtils.copyProperties(shoppingCartVo, shoppingCartVo);
 		updateShoppingCartItem(shoppingCartVo);
-    
-		
 	}
 
 	@Transactional(rollbackFor = Throwable.class)
@@ -449,26 +435,14 @@ public class ShoppingCartNewServiceImpl extends ServiceImpl<ShoppingCartMapper, 
             param.setInstanceId(instance.getId());
 			WorkflowActivityVO workflowActivityVO = workflowApi.getActivityByParam(param);
             
-            String flowId = instance.getWorkflowId();
-//            Map<String, String> modelMapToPerson = new HashMap<String, String>();
             info.setCreateTime(now);
             info.setModifiedTime(now);
-            WorkflowNodeVO workflowNodeVO = new WorkflowNodeVO();
             if ("kx".equals(submitRequest.getType())) {
                 //科信待审核
                 info.setStatus(ApplicationInfoStatus.REVIEW.getCode());
-                
-				//查找名为服务台复核的环节
-                WorkflowNodeParam workflowNodeParam = new WorkflowNodeParam(flowId, ModelName.RECHECK.getName(), instance.getVersion());
-                workflowNodeVO = workflowApi.getNodeByParam(workflowNodeParam);
-
             }else {
                 //部门内待审核
                 info.setStatus(ApplicationInfoStatus.INNER_REVIEW.getCode());
-                //环节表找该流程名为本单位审批的环节
-                WorkflowNodeParam workflowNodeParam = new WorkflowNodeParam(flowId, ModelName.DEP_APPROVE.getName(), instance.getVersion());
-                workflowNodeVO = workflowApi.getNodeByParam(workflowNodeParam);
-
             }
             Map<String,String> map = new HashMap<>();
             map.put("name",info.getServiceTypeName());

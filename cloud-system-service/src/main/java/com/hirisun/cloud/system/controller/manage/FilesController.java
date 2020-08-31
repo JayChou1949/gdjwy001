@@ -3,11 +3,7 @@ package com.hirisun.cloud.system.controller.manage;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.hirisun.cloud.model.app.param.SubpageParam;
 import com.hirisun.cloud.model.file.FilesVo;
@@ -28,21 +24,21 @@ public class FilesController {
 	
 	@ApiIgnore
     @ApiOperation("保存文件信息")
-    @GetMapping("/refFiles")
+    @PutMapping("/refFiles")
 	public void refFiles(SubpageParam param) {
 		filesService.refFiles(param);
 	}
 	
 	@ApiIgnore
     @ApiOperation("根据 refId 删除文件信息")
-    @GetMapping("/remove")
+    @PutMapping("/remove")
     public void remove(@RequestBody SubpageParam param) {
 		filesService.remove(param.getSubpageId());
 	}
 	
 	@ApiIgnore
     @ApiOperation("根据 refid 获取文件信息")
-    @GetMapping("/find")
+    @PutMapping("/find")
     public List<FilesVo> find(@RequestBody SubpageParam param) {
 		List<FilesVo> list = filesService.findByRefId(param.getRefId());
 		return list;
@@ -50,21 +46,21 @@ public class FilesController {
 	
 	@ApiIgnore
     @ApiOperation("批量保存文件信息")
-    @PostMapping("/save/batch")
+    @PutMapping("/save/batch")
     public void saveBatch(@RequestBody FilesParam param) {
 		filesService.saveBatch(param);
 	}
 	
 	@ApiIgnore
     @ApiOperation("根据文件id集合批量删除文件信息")
-    @PostMapping("/save/delete")
+    @PutMapping("/save/delete")
     public void deleteBatch(@RequestBody FilesParam param) {
 		filesService.deleteBatch(param);
 	}
 	
 	@ApiIgnore
     @ApiOperation("更新file的关联关系")
-    @PostMapping("/update/ref")
+    @PutMapping("/update/ref")
     public void updateFileRef(@RequestBody FilesParam param) {
 		
 	}

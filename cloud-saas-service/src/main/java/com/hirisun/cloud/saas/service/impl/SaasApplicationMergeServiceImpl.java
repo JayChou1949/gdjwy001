@@ -175,10 +175,8 @@ public class SaasApplicationMergeServiceImpl extends ServiceImpl<SaasApplication
         if (null == info) {
             return null;
         }
-        
-        String userJson = userApi.getUserByIdCard(info.getCreator());
-        UserVO userVO = JSONObject.parseObject(userJson, UserVO.class);
-        
+
+        UserVO userVO = userApi.getUserByIdCard(info.getCreator());
         info.setUser(userVO);
         info.setApplicationList(saasApplicationService.getListByMergeId(id));
         

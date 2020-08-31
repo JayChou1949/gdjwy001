@@ -128,7 +128,7 @@ public enum FormNum {
 
     /**
      * 通过订单获取表单枚举
-     * @param info 订单
+     * @param formNum formnum
      * @return 表单枚举
      */
     public static FormNum getFormNumByInfo(String formNum) {

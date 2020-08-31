@@ -15,5 +15,13 @@
         <result column="WORKFLOW_NODE_ID" property="workflowNodeId" />
         <result column="RESULT" property="result" />
     </resultMap>
-
+    <select id="getLastPassReviewInfoByAppInfoId" resultMap="BaseResultMap">
+        SELECT * FROM (
+                        SELECT
+                          *
+                        FROM T_APPLY_REVIEW_RECORD
+                        WHERE APPLY_ID = #{appInfoId} AND RESULT = 1
+                        ORDER BY MODIFIED_TIME DESC
+                      ) R WHERE ROWNUM = 1
+    </select>
 </mapper>

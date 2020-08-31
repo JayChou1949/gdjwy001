@@ -363,8 +363,8 @@ public class ApplyInfo implements Serializable {
     /**
      * 实施结果(最后一条)
      */
-//    @TableField(exist = false)
-//    private AppReviewInfo impl;
+    @TableField(exist = false)
+    private ApplyReviewRecord impl;
 
     /**
      * 流程详情

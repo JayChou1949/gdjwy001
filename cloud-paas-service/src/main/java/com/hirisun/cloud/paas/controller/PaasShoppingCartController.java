@@ -3,13 +3,11 @@ package com.hirisun.cloud.paas.controller;
 import java.io.IOException;
 import java.util.List;
 
+import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.hirisun.cloud.model.shopping.vo.ShoppingCartVo;
 import com.hirisun.cloud.paas.service.ShoppingCartService;
@@ -66,5 +64,17 @@ public class PaasShoppingCartController {
     @PostMapping(value = "/item/ref")
     public void refAppInfoFromShoppingCart(@RequestBody ShoppingCartVo shoppingCartVo) {
     	shoppingCartService.refAppInfoFromShoppingCart(shoppingCartVo);
+    }
+
+    @ApiOperation("根据表单类型和工单信息获取表单列表")
+    @PostMapping(value = "/getByAppInfoId")
+    public List<JSONObject> getByAppInfoId(@RequestParam String formNum, @RequestParam String applyInfoId) {
+        return shoppingCartService.getByAppInfoId(formNum,applyInfoId);
+    }
+
+    @ApiOperation("根据表单类型和工单信息获取实施列表")
+    @PostMapping(value = "/getImplServerListByAppInfoId")
+    public List<JSONObject> getImplServerListByAppInfoId(@RequestParam String formNum, @RequestParam String applyInfoId) {
+        return shoppingCartService.getImplServerListByAppInfoId(formNum,applyInfoId);
     }
 }

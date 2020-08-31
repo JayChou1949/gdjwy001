@@ -1,6 +1,7 @@
 package com.hirisun.cloud.api.user;
 
 import com.alibaba.fastjson.JSON;
+import com.hirisun.cloud.model.user.UserVO;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -26,7 +27,7 @@ public interface UserApi {
      */
     @ApiOperation("根据用户身份证获取用户角色")
     @GetMapping("/user/userManage/feign/getUserByIdCard")
-    public String  getUserByIdCard(@ApiParam(value = "用户身份证",required = true) @RequestParam String idCard);
+    public UserVO getUserByIdCard(@ApiParam(value = "用户身份证",required = true) @RequestParam String idCard);
 
     /**
      * feign调用，提供查询用户方法，根据id list查询多个用户
@@ -37,5 +38,5 @@ public interface UserApi {
     @ApiIgnore
     @ApiOperation("根据用户身份证列表获取用户列表")
     @GetMapping("/user/userManage/feign/getUserByIdCardList")
-    public String getUserByIdCardList(@ApiParam(value = "用户身份证列表", required = true) @RequestParam List<String> idCardList);
+    public List<UserVO> getUserByIdCardList(@ApiParam(value = "用户身份证列表", required = true) @RequestParam List<String> idCardList);
 }

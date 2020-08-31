@@ -1,5 +1,6 @@
 package com.hirisun.cloud.order.service.apply.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -17,5 +18,10 @@ import com.hirisun.cloud.order.service.apply.ApplyReviewRecordService;
  */
 @Service
 public class ApplyReviewRecordServiceImpl extends ServiceImpl<ApplyReviewRecordMapper, ApplyReviewRecord> implements ApplyReviewRecordService {
-
+    @Autowired
+    private ApplyReviewRecordMapper applyReviewRecordMapper;
+    @Override
+    public ApplyReviewRecord getLastPassReviewInfoByAppInfoId(String id) {
+        return applyReviewRecordMapper.getLastPassReviewInfoByAppInfoId(id);
+    }
 }
