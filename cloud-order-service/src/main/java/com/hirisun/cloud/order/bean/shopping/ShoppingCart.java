@@ -42,7 +42,7 @@ public class ShoppingCart implements Serializable {
      * 资源类别
      */
          @TableField("RESOURCE_TYPE")
-    private Long resourceType;
+    private Integer resourceType;
 
         /**
      * 状态 0 :草稿 1:待提交
@@ -132,11 +132,11 @@ public class ShoppingCart implements Serializable {
         return this;
     }
 
-    public Long getResourceType() {
+    public Integer getResourceType() {
         return resourceType;
     }
 
-    public void setResourceType(Long resourceType) {
+    public void setResourceType(Integer resourceType) {
         this.resourceType = resourceType;
     }
 

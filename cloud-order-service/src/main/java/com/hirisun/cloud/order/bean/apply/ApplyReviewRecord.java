@@ -4,8 +4,10 @@ import com.baomidou.mybatisplus.annotation.*;
 
 import java.util.Date;
 import java.io.Serializable;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.hirisun.cloud.model.file.FilesVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -71,6 +73,16 @@ public class ApplyReviewRecord implements Serializable {
     @TableField("RESULT")
     private Integer result;
 
+    @TableField(exist = false)
+    private List<FilesVo> fileList;
+
+    public List<FilesVo> getFileList() {
+        return fileList;
+    }
+
+    public void setFileList(List<FilesVo> fileList) {
+        this.fileList = fileList;
+    }
 
     public String getId() {
         return id;

@@ -66,6 +66,9 @@ public class WorkflowNodeVO implements Serializable {
     @ApiModelProperty(value = "参与人名称")
     private String adviserPersonName;
 
+    @ApiModelProperty(value = "流转id")
+    private String activityId;
+
     @Override
     public String toString() {
         return "WorkflowNodeVO{" +

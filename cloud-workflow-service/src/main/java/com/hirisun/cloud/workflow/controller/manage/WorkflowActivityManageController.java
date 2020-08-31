@@ -1,11 +1,17 @@
 package com.hirisun.cloud.workflow.controller.manage;
 
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
+import com.alibaba.fastjson.TypeReference;
+import com.hirisun.cloud.common.contains.WorkflowActivityStatus;
+import com.hirisun.cloud.common.util.UUIDUtil;
+import com.hirisun.cloud.model.workflow.WorkflowVO;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -52,12 +58,55 @@ public class WorkflowActivityManageController {
     @ApiIgnore
     @ApiOperation("根据参数获取一个流程流转信息")
     @PostMapping("/feign/getOneWorkflowActivityByParams")
-    public String getOneWorkflowActivityByParams(@RequestParam Integer status,@RequestParam String instanceId) {
-        logger.info("/feign/getOneWorkflowActivityByParams：{},{}",status,instanceId);
+    public WorkflowActivityVO getOneWorkflowActivityByParams(@RequestParam Integer status,@RequestParam String instanceId) {
         WorkflowActivity activity = workflowActivityService.getOne(new QueryWrapper<WorkflowActivity>().lambda()
                 .eq(WorkflowActivity::getActivityStatus,status)
                 .eq(WorkflowActivity::getInstanceId,instanceId));
-        return JSON.toJSONString(activity);
+        WorkflowActivityVO vo = new WorkflowActivityVO();
+        if (activity != null) {
+            BeanUtils.copyProperties(activity,vo);
+        }
+        return vo;
+    }
+
+    /**
+     * 流程转发
+     * @param currentActivityId  流程活动状态
+     * @param handlePersonIds 流程实例id
+     */
+    @ApiIgnore
+    @ApiOperation("流程转发")
+    @PostMapping("/feign/activityForward")
+    public Map<String,String> activityForward(@RequestParam String currentActivityId,@RequestParam String handlePersonIds) {
+        Map<String, String> resultMap = new HashMap();
+        resultMap.put("code", "201");
+        WorkflowActivity currentActivity = workflowActivityService.getById(currentActivityId);
+        if (currentActivity == null) {
+            resultMap.put("msg","不存在当前环节");
+            return resultMap;
+        }
+        String[] handlePersonArr = handlePersonIds.split(",");
+        for (String handlePerson : handlePersonArr) {
+            WorkflowActivity forwardActivity = new WorkflowActivity();
+            String id = UUIDUtil.getUUID();
+            forwardActivity.setId(id);
+            forwardActivity.setActivityStatus(WorkflowActivityStatus.WAITING.getCode());
+            forwardActivity.setCreator(currentActivity.getHandlePersons());
+            forwardActivity.setCreateTime(new Date());
+//            forwardActivity.setCreatorOrgId(handleUser.getOrganization());
+            forwardActivity.setHandlePersons(handlePerson);
+            forwardActivity.setInstanceId(currentActivity.getInstanceId());
+            forwardActivity.setNodeId(currentActivity.getNodeId());
+            forwardActivity.setPreActivityId(currentActivity
+                    .getPreActivityId());
+            workflowActivityService.save(forwardActivity);
+        }
+        currentActivity.setActivityStatus(WorkflowActivityStatus.FORWARD.getCode());
+        currentActivity.setHandleTime(new Date());
+        workflowActivityService.updateById(currentActivity);
+        resultMap.put("code", "200");
+        resultMap.put("msg","不存在当前环节");
+        return resultMap;
     }
 
     /**
@@ -68,11 +117,17 @@ public class WorkflowActivityManageController {
     @ApiIgnore
     @ApiOperation("根据参数获取流程流转列表")
     @PostMapping("/feign/getWorkflowActivityListByParams")
-    public String getWorkflowActivityListByParams(@RequestParam Integer status,@RequestParam String instanceId) {
+    public List<WorkflowActivityVO> getWorkflowActivityListByParams(@RequestParam Integer status,@RequestParam String instanceId) {
         List<WorkflowActivity> activityList = workflowActivityService.list(new QueryWrapper<WorkflowActivity>().lambda()
                 .eq(WorkflowActivity::getActivityStatus,status)
                 .eq(WorkflowActivity::getInstanceId,instanceId));
-        return JSON.toJSONString(activityList);
+
+        if(CollectionUtils.isNotEmpty(activityList)) {
+            List<WorkflowActivityVO> list = JSON.parseObject(JSON.toJSON(activityList).toString(),
+                    new TypeReference<List<WorkflowActivityVO>>(){});
+            return list;
+        }
+        return null;
     }
 
     /**
@@ -95,7 +150,7 @@ public class WorkflowActivityManageController {
     @ApiIgnore
     @ApiOperation("环节正常流转")
     @PutMapping("/feign/advanceActivity")
-    public Map<String, String> advanceActivity(@RequestBody String currentActivityId,@RequestParam Map<String, String> map) {
+    public Map<String, String> advanceActivity(@RequestParam String currentActivityId,@RequestParam Map<String, String> map) {
         return workflowActivityService.advanceActivity(currentActivityId,map);
     }
     /**
@@ -116,10 +171,12 @@ public class WorkflowActivityManageController {
     @ApiIgnore
     @ApiOperation("通过id获取流程流转信息")
     @PostMapping("/feign/getActivityById")
-    public String getActivityById(@RequestParam String activityId) {
+    public WorkflowActivityVO getActivityById(@RequestParam String activityId) {
 
         WorkflowActivity workflowActivity = workflowActivityService.getById(activityId);
-        return JSON.toJSONString(workflowActivity);
+        WorkflowActivityVO vo = new WorkflowActivityVO();
+        BeanUtils.copyProperties(workflowActivity,vo);
+        return vo;
     }
 
     /**
@@ -185,6 +242,31 @@ public class WorkflowActivityManageController {
                                   @RequestParam String creatorId) {
         Map resultMap = workflowActivityService.add(handlerPersonIds,currentActivityId,creatorId);
         return resultMap;
+    }
+
+    /**
+     * 拒绝，回退到申请
+     */
+    @ApiIgnore
+    @ApiOperation("回退到申请")
+    @PostMapping("/feign/rejectApply")
+    public Map<String,String> rejectApply(
+                                  @RequestParam String currentActivityId,
+                                  @RequestParam String fallBackModelId) {
+        return workflowActivityService.rejectApply(currentActivityId,fallBackModelId);
+    }
+
+    /**
+     * 终止流程
+     * @param applyInfoId
+     * @return
+     */
+    @ApiIgnore
+    @ApiOperation("终止流程")
+    @PostMapping("/feign/terminationOrder")
+    public Map<String,String> terminationOrder(
+            @RequestParam String applyInfoId) {
+        return workflowActivityService.terminationOrder(applyInfoId);
     }
 
 }

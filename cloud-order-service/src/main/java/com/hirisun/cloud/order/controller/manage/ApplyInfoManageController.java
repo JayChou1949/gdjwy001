@@ -2,13 +2,13 @@ package com.hirisun.cloud.order.controller.manage;
 
 
 import com.alibaba.fastjson.JSON;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.alibaba.fastjson.TypeReference;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hirisun.cloud.api.workflow.WorkflowApi;
 import com.hirisun.cloud.common.annotation.LoginUser;
 import com.hirisun.cloud.common.contains.ApplyInfoStatus;
 import com.hirisun.cloud.common.contains.WorkflowNodeAbilityType;
-import com.hirisun.cloud.common.exception.CustomException;
 import com.hirisun.cloud.common.util.ExceptionPrintUtil;
 import com.hirisun.cloud.common.util.UUIDUtil;
 import com.hirisun.cloud.common.util.WorkflowUtil;
@@ -16,21 +16,15 @@ import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.model.apply.FallBackVO;
 import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.model.workflow.WorkflowActivityVO;
-import com.hirisun.cloud.model.workflow.WorkflowInstanceVO;
 import com.hirisun.cloud.model.workflow.WorkflowNodeVO;
-import com.hirisun.cloud.order.bean.apply.ApplyFeedback;
 import com.hirisun.cloud.order.bean.apply.ApplyInfo;
-import com.hirisun.cloud.order.bean.apply.ApplyReviewRecord;
+import com.hirisun.cloud.order.continer.FormNum;
 import com.hirisun.cloud.order.continer.HandlerWrapper;
-import com.hirisun.cloud.order.service.apply.ApplyFeedbackService;
 import com.hirisun.cloud.order.service.apply.ApplyInfoService;
-import com.hirisun.cloud.order.service.apply.ApplyReviewRecordService;
 import com.hirisun.cloud.order.vo.ApproveVO;
 import com.hirisun.cloud.order.vo.ImplRequest;
-import com.hirisun.cloud.order.vo.OrderCode;
 import com.hirisun.cloud.redis.lock.DistributeLock;
 import io.swagger.annotations.*;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,11 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p>
@@ -69,15 +59,7 @@ public class ApplyInfoManageController {
     private ApplyInfoService applyInfoService;
 
     @Autowired
-    private ApplyReviewRecordService applyReviewRecordService;
-
-    @Autowired
-    private ApplyFeedbackService applyFeedbackService;
-
-    @Autowired
     private WorkflowApi workflowApi;
-
-
 
     @ApiOperation("申请审批记录列表")
     @GetMapping("/page")
@@ -118,7 +100,7 @@ public class ApplyInfoManageController {
     @GetMapping("/detail")
     public QueryResponseResult<ApplyInfo> detail(
             @LoginUser UserVO user,
-            @ApiParam(value = "详情id",required = true) @RequestParam(required = true,defaultValue = "1") String id){
+            @ApiParam(value = "详情id",required = true) @RequestParam(required = true) String id){
         return applyInfoService.detail(id);
     }
 
@@ -153,34 +135,84 @@ public class ApplyInfoManageController {
     }
 
     @ApiOperation(value = "审批")
-    @RequestMapping(value = "/approve", method = RequestMethod.POST)
-    public QueryResponseResult approve(@LoginUser UserVO user,
+    @PutMapping("/approve")
+    public QueryResponseResult<FallBackVO> approve(@LoginUser UserVO user,
                      @RequestBody FallBackVO vo) {
 
         return applyInfoService.approve(user,vo);
     }
 
     @ApiOperation(value = "加办")
-    @PostMapping("/add")
-    public QueryResponseResult add(@LoginUser UserVO user, @RequestBody ApproveVO approveVO) {
+    @PutMapping("/add")
+    public QueryResponseResult<ApproveVO> add(@LoginUser UserVO user, @RequestBody ApproveVO approveVO) {
         return applyInfoService.add(user,approveVO);
     }
 
+    private static <S> ImplRequest<S> parseImplRequest(String json, Class type) {
+        return JSON.parseObject(json,
+                new TypeReference<ImplRequest<S>>(type) {});
+    }
+    @ApiOperation(value = "审核驳回后提交")
+    @PostMapping("/submit")
+    public QueryResponseResult submit(@LoginUser UserVO user,
+                                      @ApiParam(value = "申请工单id",required = true) @RequestParam("id") String id,
+                                      @ApiParam("类型 inner：部门内审批 kx：科信") @RequestParam(value = "type", defaultValue = "inner") String type,
+                                      @ApiParam("处理人身份证，多个使用逗号隔开") @RequestParam(value = "userIds", required = false) String userIds) {
+
+        return applyInfoService.submit(user, id, type, userIds);
+    }
+    @ApiOperation(value = "转发")
+    @RequestMapping(value = "/forward", method = RequestMethod.POST)
+    public QueryResponseResult forward(@LoginUser UserVO user,
+                                       @ApiParam("环节流转id") @RequestParam String activityId,
+                                       @ApiParam("转发审核人id，多个使用逗号隔开") @RequestParam String userIds,
+                                       @ApiParam("申请工单id") @RequestParam String applyInfoId) {
+
+        return applyInfoService.forward(user,activityId,userIds,applyInfoId);
+    }
+
+    @ApiOperation(value = "参与人意见")
+    @PutMapping("/adviser")
+    public QueryResponseResult<FallBackVO> adviser(@LoginUser UserVO user,
+                     @RequestBody FallBackVO vo) {
+        return applyInfoService.adviser(user, vo);
+    }
+
+    @ApiOperation(value = "回退")
+    @PutMapping("/reject")
+    public QueryResponseResult reject(@LoginUser UserVO user,
+                    @RequestBody FallBackVO vo) {
+        return applyInfoService.reject(user, vo);
+    }
+
+    @ApiOperation(value = "中止业务")
+    @RequestMapping(value = "/termination", method = RequestMethod.POST)
+    public QueryResponseResult termination(@ApiParam("申请工单id") @RequestParam String applyInfoId){
+        return applyInfoService.termination(applyInfoId);
+    }
+
+    @ApiOperation(value = "待办数量")
+    @RequestMapping(value = "/todo", method = RequestMethod.GET)
+    public QueryResponseResult todo(@LoginUser UserVO user) {
+        return applyInfoService.newTodo(user);
+    }
+
+    @ApiOperation(value = "修改申请信息")
+    @RequestMapping(value = "/update", method = RequestMethod.GET)
+    public QueryResponseResult update(@LoginUser UserVO user) {
+        return applyInfoService.newTodo(user);
+    }
+
     @ApiOperation(value = "业务办理")
-    @RequestMapping(value = "/impl", method = RequestMethod.POST)
-    public QueryResponseResult impl(@LoginUser UserVO user,
-                                    @ApiParam(value = "工单id",required = true) @RequestParam String id,
-                                    @ApiParam(value = "驳回的环节id",required = true) @RequestParam String nodeId,
-                                    @ApiParam(value = "当前环节id",required = true) @RequestParam String activityId,
-                                    HttpServletRequest request) throws Exception {
-        ApplyInfo info = applyInfoService.getById(id);
-        String activityStr = workflowApi.getActivityById(activityId);
-        WorkflowActivityVO activity = JSON.parseObject(workflowApi.getActivityById(activityId), WorkflowActivityVO.class);
-//        HandlerWrapper hw = FormNum.getHandlerWrapperByInfo(context, info);
-        HandlerWrapper hw=null;
-        String json = IOUtils.toString(request.getInputStream(), "UTF-8");
-//        ImplRequest implRequest = parseImplRequest(json, hw.getImplType());
-        ImplRequest implRequest = new ImplRequest();
+    @PutMapping("/impl")
+    public QueryResponseResult<ImplRequest> impl(@LoginUser UserVO user,
+                                    @RequestBody ImplRequest implRequest) throws Exception {
+        String applyInfoId = implRequest.getApplyInfoId();
+        String nodeId = implRequest.getNodeId();
+        String activityId = implRequest.getActivityId();
+        ApplyInfo info = applyInfoService.getById(applyInfoId);
+        WorkflowActivityVO activity = workflowApi.getActivityById(activityId);
+        HandlerWrapper hw = FormNum.getHandlerWrapperByName(info.getFormNum());
         if (implRequest.getResult() == null) {
             QueryResponseResult.fail("请选择实施结果！");
         }
@@ -195,9 +227,8 @@ public class ApplyInfoManageController {
         String uuid = UUIDUtil.getUUID();
         try {
             if (lock.lock(lockKey, uuid)) {
-            	//TODO
                 //服务审核信息表 自动订购 实施表
-//                applyInfoService.saveImpl(user, param, hw.getImplHandler(),activity.getNodeId());
+                applyInfoService.saveImpl(user, param, hw.getImplHandler(),activity.getNodeId());
 //                if ("1".equals(implRequest.getResult())&& hw.getImplHandler() instanceof IIaasYzmyzyUserService) {
 //                    ImplRequest<IaasYzmyzyUser> implreq = implRequest;
 //                    List<IaasYzmyzyUser> impls = implreq.getImplServerList();
@@ -234,7 +265,9 @@ public class ApplyInfoManageController {
             lock.unlock(lockKey, uuid);
         }
         if ("1".equals(implRequest.getResult())){
-            workflowApi.advanceActivity(activityStr,null);
+            Map map = new HashMap();
+            map.put("depApproveUserIds", info.getCreator());
+            workflowApi.advanceActivity(activityId,map);
         }else {
             if (nodeId==null||nodeId.trim().equals("")) {
                 return QueryResponseResult.fail("回退环节ID不能为空, 回退失败");
@@ -249,13 +282,13 @@ public class ApplyInfoManageController {
 
             //查询回退环节id是否为业务办理，如果是，则走回退情况
             //如果只有一个环节，则直接回退到重新申请
-            WorkflowNodeVO thisModel = JSON.parseObject(workflowApi.getNodeById(nodeId), WorkflowNodeVO.class);
+            WorkflowNodeVO thisModel = workflowApi.getNodeById(nodeId);
             if(thisModel!=null&& WorkflowUtil.compareNodeAbility(thisModel.getNodeFeature(), WorkflowNodeAbilityType.IMPL.getCode())){
                 //找到申请环节，并回退
-                String firstNodeStr=workflowApi.getWorkflowNodeByParams(thisModel.getVersion(), thisModel.getWorkflowId(), 1);
+                List<WorkflowNodeVO> voList=workflowApi.getWorkflowNodeByParams(thisModel.getVersion(), thisModel.getWorkflowId(), 1);
 
-                if(firstNodeStr!=null){
-                    WorkflowNodeVO firstNode=JSON.parseObject(firstNodeStr, WorkflowNodeVO.class);
+                if(CollectionUtils.isNotEmpty(voList)){
+                    WorkflowNodeVO firstNode=voList.get(0);
                     vo.setFallBackModelIds(firstNode.getId());
                 }
                 workflowApi.fallbackOnApproveNotPass(vo, map);

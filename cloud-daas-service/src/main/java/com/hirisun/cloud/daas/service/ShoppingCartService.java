@@ -2,6 +2,7 @@ package com.hirisun.cloud.daas.service;
 
 import java.util.List;
 
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.hirisun.cloud.model.shopping.vo.ShoppingCartVo;
@@ -45,4 +46,19 @@ public interface ShoppingCartService {
      * @param shoppingCartVo
      */
     public void refAppInfoFromShoppingCart(@RequestBody ShoppingCartVo shoppingCartVo);
+
+    /**
+     * 根据表单类型和工单信息获取表单列表
+     * @param formNum 表单编码
+     * @param applyInfoId 工单id
+     * @return
+     */
+    public List<JSONObject> getByAppInfoId(String formNum, String applyInfoId);
+    /**
+     * 根据表单类型和工单信息获取实施列表
+     * @param formNum 表单编码
+     * @param applyInfoId 工单id
+     * @return
+     */
+    public List<JSONObject> getImplServerListByAppInfoId(String formNum, String applyInfoId);
 }

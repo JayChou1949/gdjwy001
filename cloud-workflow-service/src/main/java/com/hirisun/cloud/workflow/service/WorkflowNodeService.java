@@ -19,4 +19,6 @@ public interface WorkflowNodeService extends IService<WorkflowNode> {
     
     WorkflowNodeVO getNodeByParam(WorkflowNodeParam param);
 
+    void syncOldData();
+
 }

@@ -238,12 +238,11 @@ public class MessageProvider {
         return toUser;
     }
     public UserVO getUserByIdCard(String idCard){
-        String userStr = userApi.getUserByIdCard(idCard);
-        if(StringUtils.isEmpty(userStr)){
+        UserVO user = userApi.getUserByIdCard(idCard);
+        if(user==null){
             logger.error("feign user is not null");
             return null;
         }
-        UserVO user = JSON.parseObject(userStr, UserVO.class);
         return user;
     }
 }

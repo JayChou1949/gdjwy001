@@ -12,15 +12,12 @@ import com.hirisun.cloud.order.bean.shopping.ShoppingCart;
 import com.hirisun.cloud.order.service.shopping.ShoppingCartService;
 import com.hirisun.cloud.order.vo.SubmitRequest;
 
+import io.swagger.annotations.ApiParam;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
@@ -33,7 +30,7 @@ import io.swagger.annotations.ApiOperation;
 /**
  * 购物车
  */
-@Api("购物车")
+@Api(tags = "购物车")
 @RestController
 @RequestMapping("/shoppingCart")
 public class ShoppingCartNewController {
@@ -45,63 +42,60 @@ public class ShoppingCartNewController {
 
 
     @ApiOperation("添加到购物车")
-    @RequestMapping(value = "/create",method = RequestMethod.POST)
-    public QueryResponseResult create(@LoginUser UserVO user, HttpServletRequest request) throws IOException {
-        String json = IOUtils.toString(request.getInputStream(), "UTF-8");
-        logger.debug("json -> {}",json);
-        ShoppingCartVo origin = JSONObject.parseObject(json,ShoppingCartVo.class);
-        logger.debug("origin -> {}",origin);
-        shoppingCartService.create(user,json,origin);
+    @PutMapping("/create")
+    public QueryResponseResult<ShoppingCartVo> create(@LoginUser UserVO user,
+                                                      @RequestBody ShoppingCartVo shoppingCartVo) throws IOException {
+        shoppingCartService.create(user,shoppingCartVo);
         return QueryResponseResult.success("添加到购物车成功");
     }
 
     @ApiOperation("购物车数目总览-类别分组")
-    @RequestMapping(value = "/num-overview",method = RequestMethod.GET)
+    @GetMapping("/num-overview")
     public QueryResponseResult numOverview(@LoginUser UserVO user){
         if(user == null)return QueryResponseResult.fail("请登录");
         return QueryResponseResult.success(shoppingCartService.getNumGroupByType(user.getIdCard()));
     }
 
     @ApiOperation("购物车总数")
-    @RequestMapping(value = "/num-total",method = RequestMethod.GET)
+    @GetMapping("/num-total")
     public QueryResponseResult totalNum(@LoginUser UserVO user){
     	if(user == null)return QueryResponseResult.fail("请登录");
         return QueryResponseResult.success(shoppingCartService.count(user.getIdCard()));
     }
 
     @ApiOperation("购物车列表")
-    @RequestMapping(value = "/list/{type}",method = RequestMethod.GET)
-    public QueryResponseResult list(@LoginUser UserVO user,@PathVariable Long type,String name){
+    @GetMapping("/list")
+    public QueryResponseResult list(@LoginUser UserVO user,
+                                    @ApiParam(value = "资源类型，1SAAS 2DAAS 3PAAS 5SAAS",required = true,defaultValue = "1") @RequestParam Long type,
+                                    @ApiParam(value = "资源名称",required = false,defaultValue = "") @RequestParam String name){
     	return QueryResponseResult.success(shoppingCartService.getShoppingCartList(user.getIdCard(),type,name));
     }
 
-    @ApiOperation("详情")
-    @RequestMapping(value = "/{id}",method = RequestMethod.GET)
-    public QueryResponseResult detail(@PathVariable String id){
+    @ApiOperation("购物车详情")
+    @GetMapping("detail")
+    public QueryResponseResult detail(@ApiParam(value = "购物车id",required = true) @RequestParam String id){
     	return QueryResponseResult.success(shoppingCartService.detail(id));
     }
 
 
-    @ApiOperation("更新")
-    @RequestMapping(value = "/update",method = RequestMethod.POST)
-    public ResponseResult update(HttpServletRequest request) throws IOException {
-        String json = IOUtils.toString(request.getInputStream(), "UTF-8");
-        logger.debug("json -> {}",json);
-        shoppingCartService.update(json);
+    @ApiOperation("购物车更新")
+    @PutMapping("/update")
+    public ResponseResult<ShoppingCart> update(@RequestBody ShoppingCart shoppingCart) throws IOException {
+        shoppingCartService.update(shoppingCart);
         return QueryResponseResult.success();
     }
 
-    @ApiOperation("删除")
-    @RequestMapping(value = "/delete",method = RequestMethod.GET)
-    public ResponseResult delete(String ids){
+    @ApiOperation("购物车删除")
+    @PostMapping("/delete")
+    public ResponseResult delete(@ApiParam(value = "购物车id,多个使用逗号隔开",required = true) @RequestParam String ids){
         logger.debug("id -> {}",ids);
         shoppingCartService.delete(ids);
         return QueryResponseResult.success();
     }
 
-    @ApiOperation("提交")
-    @RequestMapping(value = "/submit",method = RequestMethod.POST)
-    public ResponseResult submit(@LoginUser UserVO user, @RequestBody SubmitRequest submitRequest) throws Exception{
+    @ApiOperation("购物车提交")
+    @PutMapping("/submit")
+    public ResponseResult<SubmitRequest> submit(@LoginUser UserVO user, @RequestBody SubmitRequest submitRequest) throws Exception{
         shoppingCartService.submit(user,submitRequest);
         return QueryResponseResult.success();
     }

@@ -248,17 +248,17 @@ public class ApplyInfo implements Serializable {
     @TableField("VM_IP")
     private String vmIp;
     
-    @ApiModelProperty(value = "流程 id")
-    @TableField("FLOW_STEP_ID")
-    private String flowStepId;
-
-    @ApiModelProperty(value = "流程 id备份,用于加办,转发")
-    @TableField("FLOW_STEP_ID_BAK")
-    private String flowStepIdBak;
-    
-    @ApiModelProperty(value = "是否新流程")
-    @TableField("FLOW_NEW")
-    private String flowNew;
+//    @ApiModelProperty(value = "流程 id")
+//    @TableField("FLOW_STEP_ID")
+//    private String flowStepId;
+//
+//    @ApiModelProperty(value = "流程 id备份,用于加办,转发")
+//    @TableField("FLOW_STEP_ID_BAK")
+//    private String flowStepIdBak;
+//
+//    @ApiModelProperty(value = "是否新流程")
+//    @TableField("FLOW_NEW")
+//    private String flowNew;
     
     /**
      * 组件信息(申请)
@@ -363,8 +363,8 @@ public class ApplyInfo implements Serializable {
     /**
      * 实施结果(最后一条)
      */
-//    @TableField(exist = false)
-//    private AppReviewInfo impl;
+    @TableField(exist = false)
+    private ApplyReviewRecord impl;
 
     /**
      * 流程详情

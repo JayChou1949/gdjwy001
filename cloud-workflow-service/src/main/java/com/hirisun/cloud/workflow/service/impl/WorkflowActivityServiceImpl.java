@@ -9,6 +9,10 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.hirisun.cloud.common.contains.ApplicationInfoStatus;
+import org.apache.catalina.User;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -65,6 +69,9 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
 
     @Autowired
     private WorkflowNodeMapper workflowNodeMapper;
+
+    @Autowired
+    private WorkflowActivityMapper workflowActivityMapper;
 
     @Autowired
     private WorkflowActivityService workflowActivityService;
@@ -194,7 +201,7 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
         }
         if (CollectionUtils.isNotEmpty(activityList)) {
             this.saveBatch(activityList);
-            if (messageMap != null) {
+            if (messageMap != null&&messageMap.get("name")!=null) {
                 activityList.forEach(item->{
                     smsApi.buildProcessingMessage(messageMap.get("name"), messageMap.get("order"), item.getHandlePersons());
                 });
@@ -317,9 +324,16 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
             throw new CustomException(WorkflowCode.WORKFLOW_ACTIVITY_MISSING);
         }
         //取得对应环节的处理人
-        String personids = nextNode.getDefaultHandler();
+        String personids =null;
+        if (map.get("depApproveUserIds") != null) {
+            personids = map.get("depApproveUserIds");
+        }else{
+            personids=nextNode.getDefaultHandler();
+        }
+
         //如果默认处理人也为空则直接返回提示信息给前台
-        if (personids == null || personids.trim().equals("")) {
+        boolean isApply= WorkflowUtil.compareNodeAbility(nextNode.getNodeFeature(), WorkflowNodeAbilityType.APPLY.getCode());
+        if (!isApply&&(personids == null || personids.trim().equals(""))) {
             logger.error("流程未配置处理人");
             throw new CustomException(WorkflowCode.WORKFLOW_NODE_NO_HANDLER);
 
@@ -336,7 +350,7 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
         if (adviserIds != null) {
             adviserArr = adviserIds.split(",");
         }
-        handleFlow(nextNode, currentActivity, personArr, adviserArr, null);
+        handleFlow(nextNode, currentActivity, personArr, adviserArr, map);
         currentActivity.setHandleTime(new Date());
         currentActivity.setActivityStatus(WorkflowActivityStatus.SUBMIT.getCode());
         workflowActivityService.updateById(currentActivity);
@@ -348,55 +362,7 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
 
 //    @Override
     public Map<String,String> add(AppReviewInfoVo approve, String handleIds, String currentActivityId, UserVO user) {
-//        WorkflowActivity currentActivity = null;
-//        Map<String, String> modelMapToPerson=new HashMap<String, String>();
-//
-//        if (currentActivityId!=null&&!currentActivityId.equals("")) {
-//            currentActivity=this.getById(currentActivityId);
-//        }else {
-//            return R.error(201, "当前环节ID不能为空");
-//        }
-//        if (approve==null) {
-//            return R.error(201, "审批信息不能为空");
-//        }
-//        if (approve.getAppInfoId()==null||approve.getAppInfoId().trim().equals("")) {
-//            return R.error(201, "申请信息ID不能为空");
-//        }
-//      /*  if (approve.getrType()==null||approve.getrType().trim().equals("")) {
-//            return R.error(201, "审批信息类型不能为空");
-//        }*/
-//        approve.setCreator(user.getIdcard());
-//        Workflowmodel curmodel = workFlowModelDao.selectById(currentActivity.getModelid());
-//        approve.setStepName(curmodel.getModelname());
-//        approve.setFlowStepId(currentActivity.getModelid());
-//        approve.setrType("6");
-//        if (approve.getId()==null||approve.getId().trim().equals("")) {
-//            approve.insert();
-//        }else {
-//            approve.updateById();
-//        }
-//        currentActivity.setActivitystatus("已呈批");
-//        activityDao.updateById(currentActivity);
-//        // 其它参与人改为抢占
-//        Activity activity = new Activity();
-//        activity.setHandletime(new Date());
-//        activity.setActivitystatus("已抢占");
-//        int updateR=activityDao.update(activity,new QueryWrapper<Activity>().eq("modelid",currentActivity.getModelid())
-//                .eq("instanceid",currentActivity.getInstanceid()).ne("id",currentActivity.getId()));
-//        // 插入指定加办人
-//        Activity advanceActivity=new Activity();
-//        advanceActivity.setId(UUIDUtil.getUUID());
-//        advanceActivity.setActivitystatus("待办");
-//        advanceActivity.setCreatetime(new Date());
-//        advanceActivity.setIsstart(1);
-//        advanceActivity.setCreatepersonid(user.getIdcard());
-//        advanceActivity.setInstanceid(currentActivity.getInstanceid());
-//        advanceActivity.setModelid(currentActivity.getModelid());
-//        advanceActivity.setPreviousactivityids(currentActivity.getPreviousactivityids());
-//        advanceActivity.setHandlepersonids(handleIds);
-//        activityDao.insert(advanceActivity);
-//
-//        return R.ok();
+
         return null;
     }
 
@@ -544,15 +510,16 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
 	@Override
 	public WorkflowActivityVO getActivityByParam(ActivityParam param) {
 		
-		WorkflowActivity workflowActivity = workflowActivityService.getOne(new QueryWrapper<WorkflowActivity>().eq("ACTIVITY_STATUS",0)
-                .eq("IS_START",0).eq("INSTANCE_ID",param.getInstanceId()));
+		WorkflowActivity workflowActivity = workflowActivityService.getOne(new QueryWrapper<WorkflowActivity>().lambda()
+                .eq(WorkflowActivity::getActivityStatus,WorkflowActivityStatus.WAITING.getCode())
+                .eq(WorkflowActivity::getIsStart,0)
+                .eq(WorkflowActivity::getInstanceId,param.getInstanceId()));
 		
 		if(workflowActivity != null) {
 			WorkflowActivityVO workflowActivityVO = new WorkflowActivityVO();
 			BeanUtils.copyProperties(workflowActivity, workflowActivityVO);
 			return workflowActivityVO;
 		}
-		
 		return null;
 	}
 
@@ -736,6 +703,99 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
         resultMap.put("type","6");
         resultMap.put("code", "200");
         resultMap.put("msg","成功");
-        return null;
+        return resultMap;
+    }
+
+    /**
+     * 终止流程
+     * @param applyInfoId
+     * @return
+     */
+    @Override
+    public Map<String,String> terminationOrder(String applyInfoId) {
+        Map<String, String> resultMap = new HashMap<>();
+        resultMap.put("code", "201");
+
+        WorkflowInstance instance=workflowInstanceService.getOne(new QueryWrapper<WorkflowInstance>().lambda().eq(WorkflowInstance::getBusinessId,applyInfoId));
+        if(instance==null){
+            resultMap.put("msg", "未找到相关流程实例");
+            return resultMap;
+        }
+        String instanceId=instance.getId();
+        instance.setCompleteTime(new Date());
+        instance.setInstanceStatus(WorkflowInstanceStatus.TERMINATE.getCode());
+        workflowInstanceService.updateById(instance);
+        this.update(new WorkflowActivity(), new UpdateWrapper<WorkflowActivity>().lambda()
+                .eq(WorkflowActivity::getInstanceId, instanceId)
+                .eq(WorkflowActivity::getActivityStatus, WorkflowActivityStatus.WAITING.getCode())
+                .set(WorkflowActivity::getActivityStatus, WorkflowActivityStatus.TERMINAT.getCode()));
+        resultMap.put("code", "200");
+        resultMap.put("msg", "成功");
+        return resultMap;
+    }
+    /**
+     * 拒绝回退到申请
+     * @param currentActivityId
+     * @param fallBackModelId
+     * @return
+     */
+    @Override
+    public Map<String,String> rejectApply(String currentActivityId,String fallBackModelId) {
+        Map resultMap = new HashMap();
+        resultMap.put("code", "201");
+        if (StringUtils.isEmpty(currentActivityId)) {
+            resultMap.put("msg","当前环节ID不能为空,回退失败");
+            return resultMap;
+        }
+        WorkflowActivity currentActivity=this.getById(currentActivityId);
+        if (currentActivity==null) {
+            resultMap.put("msg","未查询到当前环节信息,回退失败");
+            return resultMap;
+        }
+        String modelIds=fallBackModelId;
+        if (modelIds==null||modelIds.trim().equals("")) {
+            resultMap.put("msg","回退环节ID不能为空,回退失败");
+            return resultMap;
+        }
+        if (!currentActivity.getActivityStatus().equals(WorkflowActivityStatus.WAITING.getCode())) {
+            resultMap.put("msg","该任务已经处理，不能重复处理");
+            return resultMap;
+        }
+        //判断当前环节定义的处理模式是会签/抢占,如果为会签则当一个人处理了则不能回退,如果没有处理则直接回退
+        String currentModelid=currentActivity.getNodeId();
+        if (currentModelid==null) {
+            resultMap.put("msg","未找到当前环节定义,回退失败");
+            return resultMap;
+        }
+        int count=0;
+        List<WorkflowActivity> activities=selectFallBackActivity(currentActivity,modelIds);
+        for (WorkflowActivity activity:activities) {
+            count++;
+            String id=UUIDUtil.getUUID();
+            activity.setId(id);
+            activity.setActivityStatus(WorkflowActivityStatus.WAITING.getCode());
+            activity.setCreateTime(new Date());
+            activity.setCreator(currentActivity.getHandlePersons());
+            activity.setPreActivityId(currentActivityId);;
+            this.save(activity);
+        }
+        if (count==0) {
+            resultMap.put("msg","回退失败,未找到上级处理人或当前环节不能回退!");
+            return resultMap;
+        }
+        //更新当前环节为已回退
+        //同时流转给多个人时当前环节有多个待办
+        List<WorkflowActivity> currentactivities=this.list(new QueryWrapper<WorkflowActivity>().lambda()
+                .eq(WorkflowActivity::getNodeId,currentActivity.getNodeId())
+                .eq(WorkflowActivity::getInstanceId,currentActivity.getInstanceId()));
+        for (WorkflowActivity activity:currentactivities) {
+            activity.setHandleTime(new Date());
+            activity.setActivityStatus(WorkflowActivityStatus.REJECT.getCode());
+            this.updateById(activity);
+            resultMap.put("nodeId", activity.getNodeId());
+        }
+        resultMap.put("code", "200");
+        resultMap.put("msg", "成功");
+        return resultMap;
     }
 }

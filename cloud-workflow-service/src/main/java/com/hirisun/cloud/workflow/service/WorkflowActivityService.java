@@ -38,4 +38,8 @@ public interface WorkflowActivityService extends IService<WorkflowActivity> {
     public void advanceCurrentActivity(AdvanceBeanVO advanceBeanVO, Map<String, String> map);
     public Map<String,String> add(String handlerPersonIds, String currentActivityId,String creatorId);
 
+    public Map<String, String> rejectApply(String currentActivityId, String fallBackModelIds);
+
+    public Map<String, String> terminationOrder(String applyInfoId);
+
 }

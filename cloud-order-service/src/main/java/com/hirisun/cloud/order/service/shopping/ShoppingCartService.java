@@ -15,10 +15,9 @@ public interface ShoppingCartService {
     /**
      * 提交到购物车
      * @param user session用户
-     * @param json 前端请求json
-     * @param origin 根据json转换的基础实体(无泛型信息)
+     * @param shoppingCartVo 根据json转换的基础实体(无泛型信息)
      */
-    void create(UserVO user,String json,ShoppingCartVo shoppingCartVo);
+    void create(UserVO user,ShoppingCartVo shoppingCartVo);
 
     /**
      * 购物车列表
@@ -36,9 +35,9 @@ public interface ShoppingCartService {
 
     /**
      * 更新购物车信息
-     * @param json 前端请求json
+     * @param shoppingCart 购物车
      */
-    void update(String json);
+    void update(ShoppingCart shoppingCart);
 
     /**
      * 删除购物车

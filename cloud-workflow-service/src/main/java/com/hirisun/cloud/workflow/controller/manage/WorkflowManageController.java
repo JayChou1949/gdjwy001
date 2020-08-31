@@ -23,6 +23,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -111,7 +112,6 @@ public class WorkflowManageController {
     @ApiOperation("删除申请流程配置")
     @PostMapping("/delete")
     public QueryResponseResult<Workflow> delete(@ApiParam(value = "流程配置id",required = true) @RequestParam String id) {
-
         Workflow workflow = workflowService.getById(id);
         workflow.setFlowStatus(WorkflowStatus.DELETE.getCode());
         workflowService.updateById(workflow);
@@ -128,13 +128,15 @@ public class WorkflowManageController {
     @ApiIgnore
     @ApiOperation("根据参数选择并返回申请流程")
     @PostMapping("/feign/chooseWorkFlow")
-    public String  chooseWorkFlow(@RequestParam Integer resourceType,
-                                  @RequestParam String serviceId,
+    public WorkflowVO  chooseWorkFlow(@RequestParam Integer resourceType,
+                                  @RequestParam(required = false) String serviceId,
                                   @RequestParam(required = false) String area,
                                   @RequestParam(required = false) String policeCategory,
                                   @RequestParam(required = false) String nationalSpecialProject) {
        Workflow workflow= workflowService.chooseWorkFlow(resourceType, area, policeCategory, serviceId, nationalSpecialProject);
-        return JSON.toJSONString(workflow);
+        WorkflowVO vo = new WorkflowVO();
+        BeanUtils.copyProperties(workflow,vo);
+        return vo;
     }
 
     /**
@@ -143,18 +145,11 @@ public class WorkflowManageController {
     @ApiIgnore
     @ApiOperation("根据流程id获取流程信息")
     @PostMapping("/feign/getWorkflowById")
-    public String getWorkflowById(@RequestParam String workflowId) {
-        logger.info("/feign/getWorkflowById：{},{},{}",workflowId);
-
+    public WorkflowVO getWorkflowById(@RequestParam String workflowId) {
         Workflow workflow = workflowService.getById(workflowId);
-        return JSON.toJSONString(workflow);
-    }
-
-    @ApiOperation("短信发送")
-    @GetMapping("/sendMsg")
-    public QueryResponseResult sendMsg() {
-        smsApi.buildCompleteMessage("410184198209096919","wxx业务办理","202002020201");
-        return QueryResponseResult.success(null);
+        WorkflowVO vo = new WorkflowVO();
+        BeanUtils.copyProperties(workflow,vo);
+        return vo;
     }
 }
 

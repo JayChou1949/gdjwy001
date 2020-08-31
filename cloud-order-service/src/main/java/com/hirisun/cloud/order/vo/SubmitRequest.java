@@ -3,6 +3,7 @@ package com.hirisun.cloud.order.vo;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -110,6 +111,7 @@ public class SubmitRequest {
     private String creatorPhone;
 
     @ApiModelProperty(value = "申请时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date applicationTime;
 
     @ApiModelProperty(value = "项目名称")

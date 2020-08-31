@@ -75,6 +75,14 @@ public class WorkflowNode implements Serializable {
     @TableField("REJECT_NUM")
     private Integer rejectNum;
 
+    @TableField("NEXTMODELIDS")
+    @ApiModelProperty("下一环节id")
+    private String nextmodelids;
+
+    @ApiModelProperty(value = "环节状态名")
+    @TableField(exist = false)
+    private Integer modeltype;
+
     @ApiModelProperty(value = "环节状态名")
     @TableField(exist = false)
     private Integer nodeStatus;
@@ -94,6 +102,10 @@ public class WorkflowNode implements Serializable {
     @ApiModelProperty(value = "参与人名称")
     @TableField(exist = false)
     private String adviserPersonName;
+
+    @ApiModelProperty(value = "流转id")
+    @TableField(exist = false)
+    private String activityId;
 
     @Override
     public String toString() {

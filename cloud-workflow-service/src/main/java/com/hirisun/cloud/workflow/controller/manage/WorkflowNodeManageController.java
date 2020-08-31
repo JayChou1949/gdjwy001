@@ -2,10 +2,12 @@ package com.hirisun.cloud.workflow.controller.manage;
 
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hirisun.cloud.common.contains.WorkflowActivityStatus;
 import com.hirisun.cloud.model.param.WorkflowNodeParam;
+import com.hirisun.cloud.model.workflow.WorkflowActivityVO;
 import com.hirisun.cloud.model.workflow.WorkflowNodeVO;
 import com.hirisun.cloud.workflow.bean.WorkflowActivity;
 import com.hirisun.cloud.workflow.bean.WorkflowNode;
@@ -19,11 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.lang.reflect.Array;
@@ -60,8 +58,7 @@ public class WorkflowNodeManageController {
     @ApiIgnore
     @ApiOperation("根据参数获取流程环节")
     @PostMapping("/feign/getWorkflowNodeByParams")
-    public String getWorkflowNodeByParams(@RequestParam Integer version,@RequestParam String workflowId,@RequestParam(required = false) Integer nodeSort) {
-        logger.info("/feign/getWorkflowNodeByParams：{},{},{}",version,workflowId,nodeSort);
+    public List<WorkflowNodeVO> getWorkflowNodeByParams(@RequestParam Integer version,@RequestParam String workflowId,@RequestParam(required = false) Integer nodeSort) {
         LambdaQueryWrapper<WorkflowNode> lambdaQueryWrapper = new QueryWrapper<WorkflowNode>().lambda()
                 .eq(WorkflowNode::getVersion, version)
                 .eq(WorkflowNode::getWorkflowId, workflowId).orderByAsc(WorkflowNode::getNodeSort);
@@ -69,7 +66,13 @@ public class WorkflowNodeManageController {
             lambdaQueryWrapper.eq(WorkflowNode::getNodeSort, nodeSort);
         }
         List<WorkflowNode> nodeList = workflowNodeService.list(lambdaQueryWrapper);
-        return JSON.toJSONString(nodeList);
+
+        if(CollectionUtils.isNotEmpty(nodeList)) {
+            List<WorkflowNodeVO> list = JSON.parseObject(JSON.toJSON(nodeList).toString(),
+                    new TypeReference<List<WorkflowNodeVO>>(){});
+            return list;
+        }
+        return null;
     }
     /**
      * 根据环节id获取环节信息
@@ -77,11 +80,13 @@ public class WorkflowNodeManageController {
     @ApiIgnore
     @ApiOperation("根据环节id获取环节信息")
     @PostMapping("/feign/getNodeById")
-    public String getNodeById(@RequestParam String nodeId) {
+    public WorkflowNodeVO getNodeById(@RequestParam String nodeId) {
         logger.info("/feign/getNodeById：{}",nodeId);
 
         WorkflowNode workflowNode = workflowNodeService.getById(nodeId);
-        return JSON.toJSONString(workflowNode);
+        WorkflowNodeVO vo = new WorkflowNodeVO();
+        BeanUtils.copyProperties(workflowNode,vo);
+        return vo;
     }
 
     /**
@@ -106,7 +111,7 @@ public class WorkflowNodeManageController {
     @ApiIgnore
     @ApiOperation("根据参数获取流程环节")
     @PostMapping("/feign/getWorkflowNodeAndActivitys")
-    public String getWorkflowNodeAndActivitys(@RequestParam Integer version,
+    public List<WorkflowNodeVO> getWorkflowNodeAndActivitys(@RequestParam Integer version,
                                               @RequestParam String workflowId,
                                               @RequestParam String instanceId) {
         LambdaQueryWrapper<WorkflowNode> lambdaQueryWrapper = new QueryWrapper<WorkflowNode>().lambda()
@@ -114,6 +119,7 @@ public class WorkflowNodeManageController {
                 .eq(WorkflowNode::getWorkflowId, workflowId).orderByAsc(WorkflowNode::getNodeSort);
 
         List<WorkflowNode> nodeList = workflowNodeService.list(lambdaQueryWrapper);
+        List<WorkflowNodeVO> nodeVoList = new ArrayList<>();
 
         List<Integer> notInStatus = Arrays.asList(WorkflowActivityStatus.REJECT.getCode(),
                 WorkflowActivityStatus.FORWARD.getCode(),
@@ -124,26 +130,33 @@ public class WorkflowNodeManageController {
         logger.info("workflowActivityList:{}",workflowActivityList);
         if (CollectionUtils.isNotEmpty(nodeList) && CollectionUtils.isNotEmpty(workflowActivityList)) {
             nodeList.forEach(node->{
-                workflowActivityList.forEach(activity->{
-                    node.setNodeStatus(WorkflowActivityStatus.SUBMIT.getCode());
+                for(WorkflowActivity activity:workflowActivityList){
+
                     if (node.getId().equals(activity.getNodeId())) {
+                        node.setActivityId(activity.getId());
                         if (WorkflowActivityStatus.SUBMIT.getCode().equals(activity.getActivityStatus())) {
+                            node.setNodeStatus(WorkflowActivityStatus.SUBMIT.getCode());
                             node.setNodeStatusCode("finished");
                         }else if (WorkflowActivityStatus.WAITING.getCode().equals(activity.getActivityStatus())) {
                             //查找到待办直接返回
                             node.setNodeStatusCode("underway");
-                            return;
+                            node.setNodeStatus(WorkflowActivityStatus.WAITING.getCode());
+                            break;
                         }else if (WorkflowActivityStatus.TERMINAT.getCode().equals(activity.getActivityStatus())) {
                             node.setNodeStatusCode("termination");
+                            node.setNodeStatus(WorkflowActivityStatus.TERMINAT.getCode());
                         }else{
                             node.setNodeStatusCode("unfinished");
+                            node.setNodeStatus(WorkflowActivityStatus.SUBMIT.getCode());
                         }
                     }
-                });
-
+                }
+                WorkflowNodeVO vo = new WorkflowNodeVO();
+                BeanUtils.copyProperties(node,vo);
+                nodeVoList.add(vo);
             });
         }
-        return JSON.toJSONString(nodeList);
+        return nodeVoList;
     }
     
     /**
@@ -156,5 +169,15 @@ public class WorkflowNodeManageController {
         WorkflowNodeVO workflowNode = workflowNodeService.getNodeByParam(param);
         return workflowNode;
     }
+
+    @ApiIgnore
+    @ApiOperation("旧数据迁移到新表")
+    @GetMapping("/syncOldData")
+    public void syncOldData() {
+        workflowNodeService.syncOldData();
+        return ;
+    }
+
+
 }
 

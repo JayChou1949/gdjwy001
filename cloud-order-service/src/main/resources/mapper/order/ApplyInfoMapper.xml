@@ -56,6 +56,8 @@
         <result column="APPLY_TYPE" property="applyType" />
         <result column="NATIONAL_SPECIAL_PROJECT" property="nationalSpecialProject" />
         <result column="SERVICE_SOURCE" property="serviceSource" />
+        <result column="VM_IP" property="vmIp" />
+        <result column="CLUSTER_ACCOUNT" property="clusterAccount" />
     </resultMap>
 
     <sql id="publicQuery">
@@ -109,6 +111,27 @@
             <include refid="publicQuery"/>
         </where>
         ORDER BY ai.MODIFIED_TIME DESC
+    </select>
+
+    <select id="getAppInfo" resultType="com.hirisun.cloud.order.bean.apply.ApplyInfo">
+        SELECT A.*,O1.ID AS jsUnitId,O2.ID AS cjUnitId FROM t_apply_info A
+        LEFT JOIN TB_ORG O1 ON A.BUILD_UNIT = O1.FULL_NAME
+        LEFT JOIN TB_MANUFACTURERS O2 ON A.CONTRACT_UNIT = O2.MANUFACTURER_NAME
+        WHERE A.ID = #{id}
+    </select>
+
+    <select id="getNewCount" resultType="java.lang.Integer">
+        SELECT
+        count(DISTINCT ai.ID)
+        FROM T_APPLY_INFO ai
+			inner join T_WORKFLOW_INSTANCE ins on ins.BUSINESS_ID = ai.ID
+            inner join T_WORKFLOW_ACTIVITY act  on act.INSTANCE_ID = ins.ID
+        WHERE
+        ai.RESOURCE_TYPE = #{resourceType}
+        and ai.STATUS in (1,2,7,101,102)
+        and act.HANDLE_PERSONS = #{user.idCard}
+        and act.ACTIVITY_TYPE is null
+        and act.ACTIVITY_STATUS = 0
     </select>
 
 </mapper>

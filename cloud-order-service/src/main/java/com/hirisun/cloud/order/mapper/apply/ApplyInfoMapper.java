@@ -20,4 +20,8 @@ public interface ApplyInfoMapper extends BaseMapper<ApplyInfo> {
 
     Page<ApplyInfo> getPage(Page<ApplyInfo> page, @Param("user") UserVO user, @Param("param") Map map);
 
+    ApplyInfo getAppInfo(@Param("id") String id);
+
+    int getNewCount(@Param("user") UserVO user, @Param("resourceType") Integer resourceType);
+
 }

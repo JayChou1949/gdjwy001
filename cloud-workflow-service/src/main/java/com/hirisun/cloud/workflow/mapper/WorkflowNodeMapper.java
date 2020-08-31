@@ -5,6 +5,8 @@ import com.hirisun.cloud.workflow.bean.WorkflowNode;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * <p>
  * 流程模型 Mapper 接口
@@ -16,5 +18,7 @@ import org.apache.ibatis.annotations.Param;
 public interface WorkflowNodeMapper extends BaseMapper<WorkflowNode> {
 
     WorkflowNode getNextNodeById(@Param("id") String id);
+
+    List<WorkflowNode> getOldData();
 
 }
