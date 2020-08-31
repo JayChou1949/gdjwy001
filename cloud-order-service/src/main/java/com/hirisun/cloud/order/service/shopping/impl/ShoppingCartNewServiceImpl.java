@@ -33,6 +33,7 @@ import com.hirisun.cloud.api.paas.PaasShoppingCartApi;
 import com.hirisun.cloud.api.saas.SaasApplicationApi;
 import com.hirisun.cloud.api.saas.SaasShoppingCartApi;
 import com.hirisun.cloud.api.system.FilesApi;
+import com.hirisun.cloud.api.system.SmsApi;
 import com.hirisun.cloud.api.system.SystemApi;
 import com.hirisun.cloud.api.workflow.WorkflowApi;
 import com.hirisun.cloud.common.constant.RedisKey;
@@ -100,6 +101,8 @@ public class ShoppingCartNewServiceImpl extends ServiceImpl<ShoppingCartMapper, 
     private StringRedisTemplate stringRedisTemplate;
 	@Autowired
 	private SystemApi sysLogApi;
+	@Autowired
+	private SmsApi smsApi;
 	
 	@Transactional(rollbackFor = Throwable.class)
 	public void create(UserVO user, String json, ShoppingCartVo shoppingCartVo) {
@@ -496,8 +499,7 @@ public class ShoppingCartNewServiceImpl extends ServiceImpl<ShoppingCartMapper, 
 //            activityService.advanceCurrentActivity(advanceBeanVO,map);
             
             workflowApi.activityAdvance(advanceBeanVO, map);
-//            TODO 消息队列
-//            messageProvider.sendMessageAsync(messageProvider.buildSuccessMessage(user, info.getServiceTypeName(), info.getOrderNumber()));
+            smsApi.buildSuccessMessage(user.getIdCard(), info.getServiceTypeName(), info.getOrderNumber());
         }
 //        applicationInfoService.updateBatchById(infoList);
         applyInfoService.updateBatchById(infoList);

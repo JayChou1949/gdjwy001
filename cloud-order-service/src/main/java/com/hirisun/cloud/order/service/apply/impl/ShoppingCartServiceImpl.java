@@ -135,8 +135,8 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
                 throw new CustomException(OrderCode.WORKFLOW_INSTANSE_MISSING);
             }
             WorkflowInstanceVO instance = JSON.parseObject(instanceStr, WorkflowInstanceVO.class);
-
-            String activityStr = workflowApi.getOneWorkflowActivityByParams(WorkflowActivityVO.STATUS_WAITING,instance.getId());
+            String activityStr = "";
+//            String activityStr = workflowApi.getOneWorkflowActivityByParams(WorkflowActivityVO.STATUS_WAITING,instance.getId());
             if (StringUtils.isEmpty(activityStr)) {
                 logger.info("未找到对应的流程活动信息！");
                 throw new CustomException(OrderCode.WORKFLOW_ACTIVITY_MISSING);

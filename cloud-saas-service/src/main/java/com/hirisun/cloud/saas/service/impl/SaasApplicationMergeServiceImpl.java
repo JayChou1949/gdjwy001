@@ -1,7 +1,6 @@
 package com.hirisun.cloud.saas.service.impl;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -13,7 +12,6 @@ import java.util.Objects;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +26,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hirisun.cloud.api.file.FileApi;
 import com.hirisun.cloud.api.platform.UserDocApi;
 import com.hirisun.cloud.api.system.FilesApi;
+import com.hirisun.cloud.api.system.SmsApi;
 import com.hirisun.cloud.api.user.UserApi;
+import com.hirisun.cloud.common.constant.BusinessName;
 import com.hirisun.cloud.common.contains.ApplicationInfoStatus;
 import com.hirisun.cloud.common.exception.CustomException;
 import com.hirisun.cloud.common.util.AreaPoliceCategoryUtils;
@@ -36,7 +36,6 @@ import com.hirisun.cloud.model.app.param.SubpageParam;
 import com.hirisun.cloud.model.file.FilesVo;
 import com.hirisun.cloud.model.impl.vo.ImplRequestVo;
 import com.hirisun.cloud.model.platform.vo.UserDocVo;
-import com.hirisun.cloud.model.saas.contains.SaasFileupload;
 import com.hirisun.cloud.model.saas.vo.SaasOrderTotalVo;
 import com.hirisun.cloud.model.saas.vo.SaasTotalVo;
 import com.hirisun.cloud.model.saas.vo.SaasUseTotalVo;
@@ -76,20 +75,21 @@ public class SaasApplicationMergeServiceImpl extends ServiceImpl<SaasApplication
 //    private IWorkflowService workflowService;
 //    @Autowired
 //    private IFilesService filesService;
+//    @Autowired
+//  private ISpeedUpService speedUpService;
     @Autowired
     private FilesApi filesApi;
 //    @Autowired
 //    private IAppReviewInfoService appReviewInfoService;
     @Autowired
     private UserApi userApi;
-//    @Autowired
-//    private MessageProvider messageProvider;
-//    @Autowired
-//    private ISpeedUpService speedUpService;
+//    
     @Autowired
     private FileApi fileApi;
     @Autowired
     private UserDocApi userDocApi;
+    @Autowired
+    private SmsApi smsApi;
     
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -149,8 +149,7 @@ public class SaasApplicationMergeServiceImpl extends ServiceImpl<SaasApplication
 //        map.put("name", BusinessName.SAAS_RESOURCE);
 //        map.put("order", merge.getOrderNumber());
 //        activityService.advanceCurrentActivity(advanceBeanVO, map);
-//        messageProvider.sendMessageAsync(messageProvider.buildSuccessMessage(user, BusinessName.SAAS_RESOURCE, merge.getOrderNumber()));
-//        return merge;
+//    	  smsApi.buildSuccessMessage(user.getIdCard(), BusinessName.SAAS_RESOURCE, merge.getOrderNumber());
     	return null;
     }
 
@@ -244,6 +243,7 @@ public class SaasApplicationMergeServiceImpl extends ServiceImpl<SaasApplication
 //        // 实施附件
 //        filesService.refFiles(implRequest.getFileList(), reviewInfo.getId());
 //        
+//        新改造的代码别删
 //        SubpageParam abc = new SubpageParam();
 //        abc.setFiles(implRequest.getFileList());
 //        abc.setRefId(reviewInfo.getId());
@@ -259,7 +259,7 @@ public class SaasApplicationMergeServiceImpl extends ServiceImpl<SaasApplication
             //通过合并后的id查找申请信息集合，然后依次给申请人发送短信
             List<SaasApplication> saasApplicationList = saasApplicationService.getListByMergeId(info.getId());
             for (SaasApplication saasApplication:saasApplicationList) {
-//                messageProvider.sendMessageAsync(messageProvider.buildCompleteMessage(saasApplication.getCreator(), BusinessName.SAAS_RESOURCE, saasApplication.getOrderNumber()));
+            	smsApi.buildSuccessMessage(saasApplication.getCreator(), BusinessName.SAAS_RESOURCE, saasApplication.getOrderNumber());
             }
         }
         this.update(new SaasApplicationMerge(), new UpdateWrapper<SaasApplicationMerge>().lambda()

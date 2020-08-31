@@ -33,6 +33,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Maps;
 import com.hirisun.cloud.api.file.FileApi;
 import com.hirisun.cloud.api.system.FilesApi;
+import com.hirisun.cloud.api.system.SmsApi;
+import com.hirisun.cloud.common.constant.BusinessName;
 import com.hirisun.cloud.common.constant.RedisKey;
 import com.hirisun.cloud.common.contains.ApplicationInfoStatus;
 import com.hirisun.cloud.common.contains.UserType;
@@ -92,13 +94,12 @@ public class SaasApplicationServiceImpl extends ServiceImpl<SaasApplicationMappe
 //    private IInstanceService instanceService;
 //    @Autowired
 //    private IWorkflowmodelService workflowmodelService;
-//    @Autowired
-//    private MessageProvider messageProvider;
     @Autowired
     private SaasApplicationMapper saasApplicationMapper;
     @Autowired
     private ISaasAppExtResourceService saasAppExtResourceService;
-
+    @Autowired
+    private SmsApi smsApi;
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void create(UserVO user, SaasApplication info) {
@@ -130,9 +131,7 @@ public class SaasApplicationServiceImpl extends ServiceImpl<SaasApplicationMappe
         param.setRefId(info.getId());
 		filesApi.refFiles(param );
         
-//        messageProvider.sendMessageAsync(messageProvider.buildSuccessMessage(user, BusinessName.SAAS_RESOURCE, info.getOrderNumber()));
-    
-		//TODO: 消息队列改造
+		smsApi.buildSuccessMessage(user.getIdCard(), BusinessName.SAAS_RESOURCE, info.getOrderNumber());
     }
 
     private void saveExtResource(SaasApplication info) {
@@ -375,7 +374,7 @@ public class SaasApplicationServiceImpl extends ServiceImpl<SaasApplicationMappe
         saasApplication.updateById();
         // 发送短信
         saasApplication = this.getById(id);
-//        TODO messageProvider.sendMessageAsync(messageProvider.buildSuccessMessage(user, BusinessName.SAAS_RESOURCE, saasApplication.getOrderNumber()));
+        smsApi.buildSuccessMessage(user.getIdCard(), BusinessName.SAAS_RESOURCE, saasApplication.getOrderNumber());
     }
 
     @Override
@@ -386,7 +385,7 @@ public class SaasApplicationServiceImpl extends ServiceImpl<SaasApplicationMappe
         saasApplication.updateById();
         // 发送短信
         saasApplication = this.getById(id);
-//        TODO messageProvider.sendMessageAsync(messageProvider.buildRejectMessage(saasApplication.getCreator(), BusinessName.SAAS_RESOURCE));
+        smsApi.buildRejectMessage(user.getIdCard(), BusinessName.SAAS_RESOURCE);
     }
 
     /**

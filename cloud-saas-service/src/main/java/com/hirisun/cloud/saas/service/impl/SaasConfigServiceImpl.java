@@ -4,15 +4,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hirisun.cloud.api.system.OperateRecordApi;
+import com.hirisun.cloud.api.system.SystemApi;
 import com.hirisun.cloud.common.contains.ReviewStatus;
 import com.hirisun.cloud.common.exception.CustomException;
 import com.hirisun.cloud.common.util.StringBooleanCheck;
@@ -21,6 +25,7 @@ import com.hirisun.cloud.common.vo.CommonCode;
 import com.hirisun.cloud.model.service.alter.vo.ServiceAlterVo;
 import com.hirisun.cloud.model.service.publish.vo.ServicePublishVo;
 import com.hirisun.cloud.model.system.OperateRecordVo;
+import com.hirisun.cloud.model.system.SysDictVO;
 import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.model.workbench.vo.QueryVO;
 import com.hirisun.cloud.saas.bean.SaasConfig;
@@ -34,6 +39,8 @@ public class SaasConfigServiceImpl implements SaasConfigService {
 	private SaasConfigMapper saasConfigMapper;
 	@Autowired
 	private OperateRecordApi operateRecordApi;
+	@Autowired
+	private SystemApi systemApi;
 	
 	@Override
 	public void publish(UserVO user, String id, Integer result, String remark) {
@@ -103,7 +110,28 @@ public class SaasConfigServiceImpl implements SaasConfigService {
 	@Override
 	public IPage<SaasConfig> getPage(IPage<SaasConfig> page, UserVO user, Integer status, String name, String subType,
 			Integer serviceFlag, Integer pilotApp) {
-		return saasConfigMapper.getPage(page, user, status, name, subType,serviceFlag,pilotApp);
+		IPage<SaasConfig> page2 = saasConfigMapper.getPage(page, user, status, 
+				name, subType,serviceFlag,pilotApp);
+		
+		List<SaasConfig> records = page2.getRecords();
+		if(CollectionUtils.isNotEmpty(records)) {
+			records.forEach(iaasConfig->{
+				String configSubType = iaasConfig.getSubType();
+				
+				List<SysDictVO> dictVoList = JSON.parseObject(systemApi.feignList(), 
+		    			new TypeReference<List<SysDictVO>>(){});
+				
+				if(CollectionUtils.isNotEmpty(dictVoList)) {
+					dictVoList.forEach(sysDictVO->{
+						if(configSubType.equals(sysDictVO.getId())) {
+							iaasConfig.setSubTypeName(sysDictVO.getName());
+						}
+					});
+				}
+			});
+		}
+		
+		return null;
 	}
 
 	@Override

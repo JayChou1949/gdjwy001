@@ -2,11 +2,14 @@ package com.hirisun.cloud.paas.service.impl;
 
 import java.util.List;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -21,6 +24,7 @@ import com.hirisun.cloud.common.vo.CommonCode;
 import com.hirisun.cloud.model.app.param.SubpageParam;
 import com.hirisun.cloud.model.file.FilesVo;
 import com.hirisun.cloud.model.system.OperateRecordVo;
+import com.hirisun.cloud.model.system.SysDictVO;
 import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.paas.bean.PaasConfig;
 import com.hirisun.cloud.paas.mapper.PaasConfigMapper;
@@ -126,6 +130,25 @@ public class PaasConfigServiceImpl implements PaasConfigService {
 	@Override
 	public IPage<PaasConfig> getPage(IPage<PaasConfig> page, UserVO user, Integer status, String name, String subType) {
 		IPage<PaasConfig> paasConfigPage = paasConfigMapper.getPage(page, user, status, name, subType);
+		
+		List<PaasConfig> records = paasConfigPage.getRecords();
+		if(CollectionUtils.isNotEmpty(records)) {
+			records.forEach(iaasConfig->{
+				String configSubType = iaasConfig.getSubType();
+				
+				List<SysDictVO> dictVoList = JSON.parseObject(systemApi.feignList(), 
+		    			new TypeReference<List<SysDictVO>>(){});
+				
+				if(CollectionUtils.isNotEmpty(dictVoList)) {
+					dictVoList.forEach(sysDictVO->{
+						if(configSubType.equals(sysDictVO.getId())) {
+							iaasConfig.setSubTypeName(sysDictVO.getName());
+						}
+					});
+				}
+			});
+		}
+		
 		return paasConfigPage;
 	}
 

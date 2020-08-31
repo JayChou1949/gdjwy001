@@ -335,6 +335,7 @@ public class ApplyInfoServiceImpl extends ServiceImpl<ApplyInfoMapper, ApplyInfo
                 info.setStatus(ApplyInfoStatus.REVIEW_REJECT.getCode());
                 //TODO 发送短信
 //                messageProvider.sendMessageAsync(messageProvider.buildRejectMessage(info.getCreator(), info.getServiceTypeName()));
+                smsApi.buildRejectMessage(info.getCreator(), info.getServiceTypeName());
             }else{
 //                1.复制回退环节历史流程环节信息，设置为待办，处理人时间修改等插入流转表；2.复核后环节后的到当前环节间流转信息设置为已回退
                 workflowApi.fallbackOnApproveNotPass(vo, map);

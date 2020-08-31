@@ -1,6 +1,8 @@
 package com.hirisun.cloud.common.util;
 
+import com.hirisun.cloud.common.contains.UserType;
 import com.hirisun.cloud.model.user.UserVO;
+
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -77,6 +79,55 @@ public class PermissionUtil {
                 || type.equals(UserVO.USER_TYPE_PROVINCIAL_MANAGER)
                 || type.equals(UserVO.USER_TYPE_TENANT_MANAGER)){
             return  true;
+        }
+        return false;
+    }
+    
+    /**
+     * 限额权限检测
+     * @param user
+     * @param opType 0 ：查 1： 增删改
+     * @param area
+     * @return
+     */
+    public static boolean checkLimitPermission(UserVO user,int opType, String area) {
+        long type = user.getType();
+        if(opType == 0){
+            return  limitShowPermission(type,area,user.getTenantArea());
+        }else if(opType == 1){
+            return limitModifiedInsertAndDeletePermission(type);
+        }
+        return false;
+    }
+    
+    /**
+     * 限额查看权限
+     * @param type 用户类型
+     * @param area 查看地区
+     * @param tenantArea 租户地区
+     * @return
+     */
+    private static boolean limitShowPermission(long type,String area,String tenantArea){
+        //管理员和省厅管理员能看全部 直接返回
+        if(type == UserType.PROVINCIAL_MANAGER.getCode() || type == UserType.MANAGER.getCode()){
+            return true;
+        }else if (type == UserType.TENANT_MANAGER.getCode()){
+            //租户管理能看本地市的
+            if(StringUtils.isNotBlank(area)){
+                return StringUtils.equals(area,tenantArea);
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * 限额增删改权限
+     * @param type
+     * @return
+     */
+    private static boolean limitModifiedInsertAndDeletePermission(long type){
+        if(type == UserType.PROVINCIAL_MANAGER.getCode() || type == UserType.MANAGER.getCode()){
+            return true;
         }
         return false;
     }
