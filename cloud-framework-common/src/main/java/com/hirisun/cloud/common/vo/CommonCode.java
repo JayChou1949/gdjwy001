@@ -36,6 +36,7 @@ public enum CommonCode implements ResultCode{
     DRAFT_ERROR(1028,"草稿不能提交."),
     FLOW_INSTANCE_NULL_ERROR(1029,"流程实例未找到."),
     WORK_ORDERSTATUS_ERROR(1030,"工作台订单状态码错误."),
+    IMPORT_ERROR(1031,"导入数据异常."),
     SERVER_ERROR(9999,"系统繁忙，稍后重试");
     /**
      * 状态码

@@ -195,6 +195,23 @@ public class UserManageController {
         BeanUtils.copyProperties(user, vo);
         return vo;
     }
+    
+    /**
+     * feign调用，提供查询用户方法
+     *
+     * @param id
+     * @return
+     */
+    @ApiIgnore
+    @ApiOperation("根据用户id查询用户")
+    @GetMapping("/feign/getUserById")
+    public UserVO getUserById(@ApiParam(value = "用户id", required = true) @RequestParam String id) {
+
+        User user = userService.getOne(new QueryWrapper<User>().lambda().eq(User::getId, id));
+        UserVO vo = new UserVO();
+        BeanUtils.copyProperties(user, vo);
+        return vo;
+    }
 
     /**
      * feign调用，提供查询用户方法，根据id list查询多个用户
@@ -243,6 +260,29 @@ public class UserManageController {
             wrapper.eq(User::getTenantArea, user.getTenantArea());
         }
         List<User> userList = userService.list(wrapper);
+        if(CollectionUtils.isNotEmpty(userList)) {
+            List<UserVO> list = JSON.parseObject(JSON.toJSON(userList).toString(),
+                    new TypeReference<List<UserVO>>(){});
+            return list;
+        }
+        return null;
+    }
+    
+    /**
+     * feign调用，根据名称集合查询用户
+     *
+     * @param user
+     * @return
+     */
+    @ApiIgnore
+    @ApiOperation("根据名称集合查询用户")
+    @GetMapping("/feign/findUserByUserName")
+    public List<UserVO> findUserByParams(@ApiParam(value = "用户名称集合", required = true) 
+    	@RequestParam List<String> nameList) {
+    	
+    	List<User> userList = userService.list(new QueryWrapper<User>().lambda()
+    			.in(User::getName,nameList));
+    	
         if(CollectionUtils.isNotEmpty(userList)) {
             List<UserVO> list = JSON.parseObject(JSON.toJSON(userList).toString(),
                     new TypeReference<List<UserVO>>(){});

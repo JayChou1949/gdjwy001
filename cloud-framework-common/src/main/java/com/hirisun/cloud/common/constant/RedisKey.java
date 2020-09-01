@@ -12,5 +12,9 @@ public class RedisKey {
 
     public static  String KEY_ORDER_NUM_PREFIX = "OrderNum:";
 
+    public static  String KEY_RESOURCE_RECOVER = "ResourceRecover:";
+    
+    
+
 
 }

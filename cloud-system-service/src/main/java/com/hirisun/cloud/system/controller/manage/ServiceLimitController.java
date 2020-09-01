@@ -27,7 +27,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 @Api("服务限额")
 @RestController
-@RequestMapping("/system/resource/limit")
+@RequestMapping("/system/service/limit")
 public class ServiceLimitController {
 
     @Autowired

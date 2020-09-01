@@ -5,119 +5,41 @@ import java.util.Date;
 
 import com.hirisun.cloud.model.user.UserVO;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
+@Data
+@ApiModel("审批反馈的意见")
 public class ApplicationFeedbackVo implements Serializable {
 
 	private static final long serialVersionUID = 7771498164129366341L;
 
+	@ApiModelProperty("id")
 	private String id;
 
-        /**
-     * 审批人
-     */
+	@ApiModelProperty("审批人(身份证)")
     private String creator;
 
+	@ApiModelProperty("创建日期")
     private Date createTime;
 
+	@ApiModelProperty("修改日期")
     private Date modifiedTime;
 
-        /**
-     * 结果 0:未完成 1:完成
-     */
+	@ApiModelProperty("结果 0:未完成 1:完成")
     private String result;
 
+	@ApiModelProperty("备注")
     private String remark;
 
-        /**
-     * 服务信息id
-     */
+	@ApiModelProperty("服务信息 appInfoId")
     private String appInfoId;
 
-        /**
-     * 满意度
-     */
+	@ApiModelProperty("满意度")
     private String score;
 
+	@ApiModelProperty("用户")
     private UserVO user;
-
-    public String getId() {
-        return id;
-    }
-
-    public ApplicationFeedbackVo setId(String id) {
-        this.id = id;
-        return this;
-    }
-
-    public String getCreator() {
-        return creator;
-    }
-
-    public ApplicationFeedbackVo setCreator(String creator) {
-        this.creator = creator;
-        return this;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public ApplicationFeedbackVo setCreateTime(Date createTime) {
-        this.createTime = createTime;
-        return this;
-    }
-
-    public Date getModifiedTime() {
-        return modifiedTime;
-    }
-
-    public ApplicationFeedbackVo setModifiedTime(Date modifiedTime) {
-        this.modifiedTime = modifiedTime;
-        return this;
-    }
-
-    public String getResult() {
-        return result;
-    }
-
-    public ApplicationFeedbackVo setResult(String result) {
-        this.result = result;
-        return this;
-    }
-
-    public String getRemark() {
-        return remark;
-    }
-
-    public ApplicationFeedbackVo setRemark(String remark) {
-        this.remark = remark;
-        return this;
-    }
-
-    public String getAppInfoId() {
-        return appInfoId;
-    }
-
-    public ApplicationFeedbackVo setAppInfoId(String appInfoId) {
-        this.appInfoId = appInfoId;
-        return this;
-    }
-
-    public String getScore() {
-        return score;
-    }
-
-    public ApplicationFeedbackVo setScore(String score) {
-        this.score = score;
-        return this;
-    }
-
-    public UserVO getUser() {
-        return user;
-    }
-
-    public void setUser(UserVO user) {
-        this.user = user;
-    }
 
 }
