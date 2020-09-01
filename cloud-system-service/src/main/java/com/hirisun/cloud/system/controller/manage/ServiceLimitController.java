@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.hirisun.cloud.api.user.UserApi;
 import com.hirisun.cloud.common.annotation.LoginUser;
 import com.hirisun.cloud.common.util.PermissionUtil;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
@@ -34,9 +33,6 @@ public class ServiceLimitController {
     @Autowired
     private ServiceLimitService serviceLimitService;
 
-    @Autowired
-    private UserApi userApi;
-
     @ApiOperation("获取总配额")
     @GetMapping(value = "/quota")
     public QueryResponseResult quota(@RequestParam(value = "formNum")String formNum,
@@ -46,9 +42,7 @@ public class ServiceLimitController {
     		@RequestParam(value = "clusterName",required = false) String clusterName){
     	
     	ServiceLimitVo serviceLimitVo = serviceLimitService.getQuota(formNum,area,policeCategory,nationalSpecialProject,clusterName);
-    	
-    	
-            return QueryResponseResult.success(serviceLimitVo);
+        return QueryResponseResult.success(serviceLimitVo);
     }
 
     @ApiOperation("新增或更新")
@@ -59,16 +53,11 @@ public class ServiceLimitController {
         }
         if(serviceLimit.getId()==null){
             int count = serviceLimitService.count(new QueryWrapper<ServiceLimit>().lambda().eq(ServiceLimit::getArea,serviceLimit.getArea()).eq(ServiceLimit::getResourceType,serviceLimit.getResourceType()));
-            if(count>0){
-                return QueryResponseResult.fail("该限额配置已存在");
-            }
+            if(count>0)return QueryResponseResult.fail("该限额配置已存在");
         }
        Boolean res =  serviceLimitService.saveOrUpdate(serviceLimit);
-       if(res){
-           return QueryResponseResult.success();
-       }else {
-           return QueryResponseResult.fail("操作失败");
-       }
+       if(res)return QueryResponseResult.success();
+       return QueryResponseResult.fail("操作失败");    
     }
 
     @ApiOperation("删除")
@@ -81,9 +70,7 @@ public class ServiceLimitController {
         }
 
         boolean res = serviceLimitService.removeById(id);
-        if(res){
-        	return QueryResponseResult.success();
-        }
+        if(res)return QueryResponseResult.success();
         return QueryResponseResult.fail("删除失败");
     }
 

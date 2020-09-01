@@ -1,16 +1,12 @@
 package com.hirisun.cloud.order.vo;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 
-import com.google.common.base.Converter;
-import com.hirisun.cloud.common.exception.CustomException;
-import com.hirisun.cloud.common.vo.CommonCode;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hirisun.cloud.model.file.FilesVo;
 import com.hirisun.cloud.order.bean.apply.ApplyInfo;
 
@@ -27,10 +23,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @ApiModel(description = "购物车提交请求VO")
-public class SubmitRequest {
+public class SubmitRequest implements Serializable{
 
-    private static  final Logger logger = LoggerFactory.getLogger(SubmitRequest.class);
-
+	private static final long serialVersionUID = 5140813862774089657L;
 
     //@ApiModelProperty(value = "表单编码")
     //private String formNum;
@@ -41,7 +36,7 @@ public class SubmitRequest {
     //@ApiModelProperty(value = "服务类别名")
     //private String serviceTypeName;
 
-    @ApiModelProperty(value = "建设单位")
+	@ApiModelProperty(value = "建设单位")
     private String jsUnit;
 
     @ApiModelProperty(value = "建设单位负责人")
@@ -161,30 +156,8 @@ public class SubmitRequest {
     private String vmIp;
 
     public ApplyInfo convertToApplicationInfo(){
-        SubmitRequestConvert submitRequestConvert = new SubmitRequestConvert();
-        ApplyInfo info = submitRequestConvert.convert(this);
+        ApplyInfo info = new ApplyInfo();
+        BeanUtils.copyProperties(this,info);
         return info;
-    }
-
-    private static class SubmitRequestConvert extends Converter<SubmitRequest,ApplyInfo>{
-        @Override
-        protected ApplyInfo doForward(SubmitRequest submitRequest) {
-            logger.info("SubmitRequest: {}",submitRequest);
-            ApplyInfo info = new ApplyInfo();
-            try {
-                BeanUtils.copyProperties(submitRequest,info);
-                logger.info("info: {}",info);
-            } catch (Exception e) {
-                e.printStackTrace();
-                logger.error("SubmitRequest Convert Fail :{}",e.getMessage());
-                throw new CustomException(CommonCode.SUBMITREQUEST_CONVERT_FAIL);
-            }
-            return info;
-        }
-
-        @Override
-        protected SubmitRequest doBackward(ApplyInfo info) {
-        	throw new CustomException(CommonCode.CONVERT_ERROR);
-        }
     }
 }

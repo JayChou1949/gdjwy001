@@ -108,9 +108,7 @@ public class ServiceLimitServiceImpl extends ServiceImpl<ServiceLimitMapper,
         //todo:二级门户改造-新增国家专项维度
 
         if(CollectionUtils.isNotEmpty(ecsList)){
-           if(CollectionUtils.isNotEmpty(ecsList)){
                dealEcs(ecsList,area,policeCategory,nationalSpecialProject);
-           }
         }
 
         List<PaasReportVo> oaasReportVoList = paasReportApi.find(appInfoId);
@@ -131,30 +129,20 @@ public class ServiceLimitServiceImpl extends ServiceImpl<ServiceLimitMapper,
             double paasCpu = 0;
             double paasMemory = 0;
             double paasStorage = 0;
-            if (paas.getCpu() != null) {
-                paasCpu = paas.getCpu();
-            }
-            if (paas.getMemory() != null) {
-                paasMemory = paas.getMemory();
-            }
-            if (paas.getDisk() != null) {
-                paasStorage = paas.getDisk();
-            }
-            String description = null;
-            if (StringUtils.startsWith(paas.getResourceName(),"Redis")) {
-                description = "Redis";
-            }else if (StringUtils.startsWith(paas.getResourceName(),"Elasticsearch")) {
-                description = "Elasticsearch";
-            }else if (StringUtils.startsWith(paas.getResourceName(),"Libra")) {
-                description = "Libra";
-            }else if (StringUtils.startsWith(paas.getResourceName(),"数据库")) {
-                description = "关系型数据库";
-            }else {
-                description = "YARN";
-            }
+            if (paas.getCpu() != null) paasCpu = paas.getCpu();
+            if (paas.getMemory() != null) paasMemory = paas.getMemory();
+            if (paas.getDisk() != null) paasStorage = paas.getDisk();
+            
+            String description = "YARN";
+            if (StringUtils.startsWith(paas.getResourceName(),"Redis"))description = "Redis"; 
+            if (StringUtils.startsWith(paas.getResourceName(),"Elasticsearch"))description = "Elasticsearch";
+            if (StringUtils.startsWith(paas.getResourceName(),"Libra"))description = "Libra";
+            if (StringUtils.startsWith(paas.getResourceName(),"数据库"))description = "关系型数据库";
+            
 //            double totalCpu = paasList.parallelStream().filter(item->item.getCpu() != null).map(ReportPaas::getCpu).reduce(Double::sum).get();
 //            double totalMemory = paasList.parallelStream().filter(item->item.getMemory() != null).map(ReportPaas::getMemory).reduce(Double::sum).get();
 //            double totalStorage = paasList.parallelStream().filter(item->item.getDisk() != null).map(ReportPaas::getDisk).reduce(Double::sum).get();
+            
             ServiceLimit serviceLimit = new ServiceLimit();
             if (StringUtils.isNotBlank(nationalSpecialProject)){//国家专项限额
                 serviceLimit = this.getOne(new QueryWrapper<ServiceLimit>().lambda().eq(ServiceLimit::getNationalSpecialProject,nationalSpecialProject)
