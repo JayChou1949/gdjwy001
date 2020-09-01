@@ -106,7 +106,7 @@ public class WorkflowInstanceServiceImpl extends ServiceImpl<WorkflowInstanceMap
             firstActivity.setHandlePersons(null);
             firstActivity.setActivityStatus(WorkflowActivityStatus.SUBMIT.getCode());
         }else {
-            firstActivity.setCreator(user.getIdCard());
+            firstActivity.setCreator(user.getIdcard());
             firstActivity.setHandlePersons(createPersonId);
             firstActivity.setActivityStatus(WorkflowActivityStatus.WAITING.getCode());
         }

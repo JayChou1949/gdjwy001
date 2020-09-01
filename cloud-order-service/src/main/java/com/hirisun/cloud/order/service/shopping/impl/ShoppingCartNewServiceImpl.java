@@ -95,7 +95,7 @@ public class ShoppingCartNewServiceImpl extends ServiceImpl<ShoppingCartMapper, 
 		shoppingCartVo.setResourceType(hw.getFormNum().getResourceType().getCode());
 		shoppingCartVo.setFormNum(hw.getFormNum().name());
 		shoppingCartVo.setStatus(ShoppingCartStatus.WAIT_SUBMIT.getCode());
-		shoppingCartVo.setCreatorIdCard(user.getIdCard());
+		shoppingCartVo.setCreatorIdCard(user.getIdcard());
 		shoppingCartVo.setCreatorName(user.getName());
 		
 		ShoppingCart shoppingCart = new ShoppingCart();
@@ -232,10 +232,10 @@ public class ShoppingCartNewServiceImpl extends ServiceImpl<ShoppingCartMapper, 
         //获取提交购物车集合
         if(StringUtils.equals("all",submitRequest.getShoppingCartIds())){
             shoppingCartItems = this.list(new QueryWrapper<ShoppingCart>().lambda()
-                                            .eq(ShoppingCart::getCreatorIdCard,user.getIdCard())
+                                            .eq(ShoppingCart::getCreatorIdCard,user.getIdcard())
                                             .eq(ShoppingCart::getStatus,ShoppingCartStatus.WAIT_SUBMIT.getCode()));
         }else {
-            shoppingCartItems = getShoppingCartItems(user.getIdCard(),submitRequest.getShoppingCartIds());
+            shoppingCartItems = getShoppingCartItems(user.getIdcard(),submitRequest.getShoppingCartIds());
         }
         if(StringUtils.isBlank(submitRequest.getShoppingCartIds())){
             throw new CustomException(CommonCode.ITEM_NULL);
@@ -300,7 +300,7 @@ public class ShoppingCartNewServiceImpl extends ServiceImpl<ShoppingCartMapper, 
         	shoppingCartItemService.refAppInfoFromShoppingCart(shoppingCartVo);
             
             //新生成的订单发起流程
-           workflowApi.launchInstanceOfWorkflow(user.getIdCard(),info.getWorkFlowId(),info.getId());
+           workflowApi.launchInstanceOfWorkflow(user.getIdcard(),info.getWorkFlowId(),info.getId());
            
         }
 
@@ -316,7 +316,7 @@ public class ShoppingCartNewServiceImpl extends ServiceImpl<ShoppingCartMapper, 
             if ("1".equals(info.getDraft())) {
             	throw new CustomException(CommonCode.DRAFT_ERROR);
             }
-            sysLogApi.saveLog(user.getIdCard(),"服务名称："+info.getServiceTypeName()+";申请单号："+info.getOrderNumber(),"提交申请", IpUtil.getIp());
+            sysLogApi.saveLog(user.getIdcard(),"服务名称："+info.getServiceTypeName()+";申请单号："+info.getOrderNumber(),"提交申请", IpUtil.getIp());
 
             WorkflowInstanceVO instance = workflowApi.getWorkflowInstanceByBusinessId(info.getId());
             if (null==instance){
@@ -383,7 +383,7 @@ public class ShoppingCartNewServiceImpl extends ServiceImpl<ShoppingCartMapper, 
         if(CollectionUtils.isNotEmpty(daaSResource)){
         	ApplyInfo info = dealMerge(user,daaSResource,baseInfo);
             infoList.add(info);
-            workflowApi.launchInstanceOfWorkflow(user.getIdCard(),info.getWorkFlowId(),info.getId());
+            workflowApi.launchInstanceOfWorkflow(user.getIdcard(),info.getWorkFlowId(),info.getId());
         }
         //获取数据服务(DaaS)购物车
         List<ShoppingCart> daaSService = getDaaSService(allItems);
@@ -393,7 +393,7 @@ public class ShoppingCartNewServiceImpl extends ServiceImpl<ShoppingCartMapper, 
             baseInfo.setVmIp(null);
             ApplyInfo info = dealMerge(user,daaSService,baseInfo);
             infoList.add(info);
-            workflowApi.launchInstanceOfWorkflow(user.getIdCard(),info.getWorkFlowId(),info.getId());
+            workflowApi.launchInstanceOfWorkflow(user.getIdcard(),info.getWorkFlowId(),info.getId());
         }
     }
 	
@@ -461,7 +461,7 @@ public class ShoppingCartNewServiceImpl extends ServiceImpl<ShoppingCartMapper, 
         BeanUtils.copyProperties(baseInfo,info);
         info.setId(UUIDUtil.getUUID());
         logger.debug("ID -> {}",info.getId());
-        info.setCreator(user.getIdCard());
+        info.setCreator(user.getIdcard());
         info.setCreatorName(user.getName());
         info.setStatus(ApplicationInfoStatus.SHOPPING_CART.getCode());
 

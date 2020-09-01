@@ -214,7 +214,7 @@ public class ApplyInfoManageController {
         WorkflowActivityVO activity = workflowApi.getActivityById(activityId);
         HandlerWrapper hw = FormNum.getHandlerWrapperByName(info.getFormNum());
         if (implRequest.getResult() == null) {
-            QueryResponseResult.fail("请选择实施结果！");
+            return QueryResponseResult.fail("请选择实施结果！");
         }
         if (!"1".equals(implRequest.getResult())) {
             implRequest.setResult("0");

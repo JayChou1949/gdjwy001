@@ -107,7 +107,7 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
         ApplyInfo baseInfo = submitRequest.convertToApplicationInfo();
         logger.info("baseInfo -> {}",baseInfo);
         List<ApplyInfo> infoList = Lists.newArrayList();
-        List<ShoppingCart> shoppingCartItems = getShoppingCartItems(user.getIdCard(),submitRequest.getShoppingCartIds());
+        List<ShoppingCart> shoppingCartItems = getShoppingCartItems(user.getIdcard(),submitRequest.getShoppingCartIds());
         if(CollectionUtils.isEmpty(shoppingCartItems)) {
             logger.info("购物车不能为空!");
             throw new CustomException(OrderCode.CART_CAN_NOT_NULL);
@@ -122,7 +122,7 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
             //根据购物车生成订单(其中包括订单选择哪个流程，用于后面的发起流程)
             ApplyInfo info = configAndSaveBaseInfo(user,shoppingCart,baseInfo);
 
-            workflowApi.launchInstanceOfWorkflow(user.getIdCard(),info.getWorkFlowId(),info.getId());
+            workflowApi.launchInstanceOfWorkflow(user.getIdcard(),info.getWorkFlowId(),info.getId());
             infoList.add(info);
         }
         for(ApplyInfo info:infoList){
@@ -228,7 +228,7 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
         BeanUtils.copyProperties(baseInfo,info);
         info.setId(UUIDUtil.getUUID());
         logger.debug("ID -> {}",info.getId());
-        info.setCreator(user.getIdCard());
+        info.setCreator(user.getIdcard());
         info.setCreatorName(user.getName());
         info.setStatus(ApplyInfoStatus.SHOPPING_CART.getCode());
         //全部提交时，如果有daas或saas，申请说明会有两个字段，此处将iaas、paas和daas用explanation，saas用explanationSaas

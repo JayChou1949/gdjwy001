@@ -309,7 +309,7 @@ public class ApplyInfoServiceImpl extends ServiceImpl<ApplyInfoMapper, ApplyInfo
             ApplyInfoStatus applyInfoStatus = ApplyInfoStatus.codeOf(record.getStatus());
             // 判断是否能删除
             if (applyInfoStatus != ApplyInfoStatus.DELETE
-                    && Objects.equals(user.getIdCard(), record.getCreator())) {
+                    && Objects.equals(user.getIdcard(), record.getCreator())) {
                 record.setCanDelete(true);
             }
         }
@@ -335,7 +335,7 @@ public class ApplyInfoServiceImpl extends ServiceImpl<ApplyInfoMapper, ApplyInfo
             if (CollectionUtils.isEmpty(userList)) {
                 throw new CustomException(OrderCode.USER_SELECT_ERROR);
             }
-            return userList.stream().collect(Collectors.toMap(UserVO::getIdCard,UserVO::getName));
+            return userList.stream().collect(Collectors.toMap(UserVO::getIdcard,UserVO::getName));
         }
         return null;
     }
@@ -373,7 +373,7 @@ public class ApplyInfoServiceImpl extends ServiceImpl<ApplyInfoMapper, ApplyInfo
         if (info == null) {
             throw new CustomException(OrderCode.APPLY_MISSING);
         }
-        if (!Objects.equals(user.getIdCard(), info.getCreator())) {
+        if (!Objects.equals(user.getIdcard(), info.getCreator())) {
             throw new CustomException(OrderCode.USER_CANT_EDIT_OTHER_USER_APPLY);
         }
         // 逻辑删除,并设置相应的状态
@@ -443,7 +443,8 @@ public class ApplyInfoServiceImpl extends ServiceImpl<ApplyInfoMapper, ApplyInfo
                 throw new CustomException(OrderCode.WORKFLOW_MISSING);
             }
             //检查环节名，是否是业务办理，
-            if (model.getNodeFeature().indexOf("3")>=0){
+            boolean isImpl= WorkflowUtil.compareNodeAbility(model.getNodeFeature(), WorkflowNodeAbilityType.APPLY.getCode());
+            if (isImpl){
                 //下一环节名为业务办理,设置订单状态为 待实施
                 info.setStatus(ApplyInfoStatus.IMPL.getCode());
             }else {
@@ -477,7 +478,7 @@ public class ApplyInfoServiceImpl extends ServiceImpl<ApplyInfoMapper, ApplyInfo
         saveReviewRecord.setRemark(approve.getRemark());
         saveReviewRecord.setResult(approve.getResult());
         saveReviewRecord.setApplyId(approve.getApplyId());
-        saveReviewRecord.setCreator(user.getIdCard());
+        saveReviewRecord.setCreator(user.getIdcard());
         saveReviewRecord.setStepName(curNode.getNodeName());
         saveReviewRecord.setWorkflowNodeId(curNode.getId());
         saveReviewRecord.setType(ApplyReviewRecord.TYPE_AUDIT);
@@ -514,7 +515,7 @@ public class ApplyInfoServiceImpl extends ServiceImpl<ApplyInfoMapper, ApplyInfo
         String remark = implRequest.getRemark();
         WorkflowNodeVO curNode = workflowApi.getNodeById(modelId);
         ApplyReviewRecord reviewInfo = new ApplyReviewRecord();
-        reviewInfo.setCreator(user.getIdCard());
+        reviewInfo.setCreator(user.getIdcard());
         reviewInfo.setResult(Integer.parseInt(result));
         reviewInfo.setRemark(remark);
         reviewInfo.setType("2");
@@ -598,12 +599,12 @@ public class ApplyInfoServiceImpl extends ServiceImpl<ApplyInfoMapper, ApplyInfo
     @Override
     public QueryResponseResult add(UserVO user, ApproveVO approveVO) {
         ApplyInfo info = applyInfoService.getById(approveVO.getApplyReviewRecord().getApplyId());
-        Map<String, String> resultMap = workflowApi.add(approveVO.getUserIds(), approveVO.getCurrentActivityId(), user.getIdCard());
+        Map<String, String> resultMap = workflowApi.add(approveVO.getUserIds(), approveVO.getCurrentActivityId(), user.getIdcard());
         if ("200".equals(resultMap.get("code"))) {
             ApplyReviewRecord applyReviewRecord= approveVO.getApplyReviewRecord();
             applyReviewRecord.setType(resultMap.get("type"));
             applyReviewRecord.setStepName(resultMap.get("stepName"));
-            applyReviewRecord.setCreator(user.getIdCard());
+            applyReviewRecord.setCreator(user.getIdcard());
             if (StringUtils.isEmpty(applyReviewRecord.getId())) {
                 applyReviewRecordService.save(applyReviewRecord);
             }else{
@@ -619,7 +620,7 @@ public class ApplyInfoServiceImpl extends ServiceImpl<ApplyInfoMapper, ApplyInfo
     @Override
     public QueryResponseResult adviser(UserVO user, FallBackVO vo) {
         ApplyReviewRecordVO approve = vo.getApplyReviewRecord();
-        approve.setCreator(user.getIdCard());
+        approve.setCreator(user.getIdcard());
         Map<String,String> resultMap=workflowApi.adviseActivity(vo.getCurrentActivityId());
         if (resultMap.get("code") != null && resultMap.get("code").equals("200")) {
             approve.setStepName(resultMap.get("nodeName"));
@@ -714,7 +715,7 @@ public class ApplyInfoServiceImpl extends ServiceImpl<ApplyInfoMapper, ApplyInfo
     @Override
     public QueryResponseResult reject(UserVO user,FallBackVO vo) {
         ApplyReviewRecordVO approve = vo.getApplyReviewRecord();
-        approve.setCreator(user.getIdCard());
+        approve.setCreator(user.getIdcard());
         ApplyInfo info = applyInfoService.getById(approve.getApplyId());
         if(null==info){
             return QueryResponseResult.fail("未找到待办数据");

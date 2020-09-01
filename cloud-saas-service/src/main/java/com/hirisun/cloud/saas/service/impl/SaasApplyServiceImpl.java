@@ -54,7 +54,7 @@ public class SaasApplyServiceImpl extends ServiceImpl<SaasApplyMapper, SaasApply
     @Transactional
     public void create(UserVO user, SaasApply info) {
         info.setId(null);
-        info.setCreator(user.getIdCard());
+        info.setCreator(user.getIdcard());
         info.setCreatorName(user.getName());
         info.setOrgId(user.getOrgId());
         info.setOrgName(user.getOrgName());
@@ -74,7 +74,7 @@ public class SaasApplyServiceImpl extends ServiceImpl<SaasApplyMapper, SaasApply
             List<String> fileList = Arrays.asList(info.getFileIds().split(","));
             fileBindingApi.saveByIds(fileList, info.getId());
         }
-        smsApi.buildSuccessMessage(user.getIdCard(),BusinessName.SAAS_RESOURCE, info.getOrderNumber());
+        smsApi.buildSuccessMessage(user.getIdcard(),BusinessName.SAAS_RESOURCE, info.getOrderNumber());
     }
 
     private void saveExt(SaasApply info) {

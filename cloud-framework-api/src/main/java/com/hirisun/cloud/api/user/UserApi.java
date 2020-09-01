@@ -6,6 +6,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -39,4 +41,14 @@ public interface UserApi {
     @ApiOperation("根据用户身份证列表获取用户列表")
     @GetMapping("/user/userManage/feign/getUserByIdCardList")
     public List<UserVO> getUserByIdCardList(@ApiParam(value = "用户身份证列表", required = true) @RequestParam List<String> idCardList);
+
+    /**
+     * feign调用，提供查询用户方法
+     * @param user
+     * @return
+     */
+    @ApiIgnore
+    @ApiOperation("根据参数查询用户")
+    @PutMapping("/user/userManage/feign/getUserByParams")
+    public List<UserVO> getUserByParams(@RequestBody UserVO user);
 }

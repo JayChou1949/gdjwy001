@@ -84,7 +84,7 @@ public class IaasReportingController {
 //        info.setWorkFlowId(workflow.getId());
 //        info.setWorkFlowVersion(workflow.getVersion());
 //        iaasZysbService.save(user,info);
-//        R r= instanceService.launchInstanceOfWorkFlow(user.getIdCard(),info.getWorkFlowId(),info.getId());
+//        R r= instanceService.launchInstanceOfWorkFlow(user.getIdcard(),info.getWorkFlowId(),info.getId());
 //
 //        Workflowmodel workflowmodel = workflowmodelService.getOne(new QueryWrapper<Workflowmodel>().eq("WORKFLOWID",workflow.getId()).eq("modelname", ModelName.DEP_APPROVE.getName()).eq("VERSION",workflow.getVersion()));
 //
@@ -98,7 +98,7 @@ public class IaasReportingController {
 //        map.put("name", getBusinessName());
 //        map.put("order", info.getOrderNumber());
 //        activityService.advanceCurrentActivity(advanceBeanVO, map);
-//        smsApi.buildSuccessMessage(user.getIdCard(), BusinessName.IAAS_ZYSB, info.getOrderNumber());
+//        smsApi.buildSuccessMessage(user.getIdcard(), BusinessName.IAAS_ZYSB, info.getOrderNumber());
         return QueryResponseResult.success("发起流程成功");
     }
   
@@ -196,7 +196,7 @@ public class IaasReportingController {
 //        try {
 //            if (lock.lock(lockKey, uuid)) {
 //                IaasZysb iaasZysb = iaasZysbService.getById(id);
-//                if (!Objects.equals(user.getIdCard(), iaasZysb.getCreator())) {
+//                if (!Objects.equals(user.getIdcard(), iaasZysb.getCreator())) {
 //                    throw new BaseException("只能删除自己的申请!");
 //                }
 //                // 逻辑删除,并设置相应的状态
@@ -304,7 +304,7 @@ public class IaasReportingController {
                      @RequestBody FallBackVO vo) {
 
 //        AppReviewInfo approve = vo.getApprove();
-//        approve.setCreator(user.getIdCard());
+//        approve.setCreator(user.getIdcard());
 //        activityService.adviseActivity(vo.getCurrentActivityId(), approve);
         return QueryResponseResult.success();
     }

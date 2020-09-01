@@ -9,6 +9,7 @@ import java.util.Date;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 /**
  * <p>
@@ -18,7 +19,8 @@ import io.swagger.annotations.ApiModelProperty;
  * @author wuxiaoxing
  * @since 2020-07-23
  */
-@TableName("T_USER")
+@Data
+@TableName("TB_USER")
 @ApiModel(value = "User对象", description = "用户表")
 public class User implements Serializable {
 
@@ -37,8 +39,8 @@ public class User implements Serializable {
     private String name;
 
     @ApiModelProperty(value = "身份证")
-    @TableField("ID_CARD")
-    private String idCard;
+    @TableField("IDCARD")
+    private String idcard;
 
     @ApiModelProperty(value = "民族,引用表码3.4")
     @TableField("NATION")
@@ -209,21 +211,21 @@ public class User implements Serializable {
     @TableField("DELETE_TIME")
     private String deleteTime;
 
-    @ApiModelProperty(value = "政务人员信息字段：职务")
-    @TableField("POST")
-    private String post;
+//    @ApiModelProperty(value = "政务人员信息字段：职务")
+//    @TableField("POST")
+//    private String post;
 
-    @ApiModelProperty(value = "政务人员信息字段：政务机构id")
-    @TableField("GOV_ID")
-    private String govId;
-
-    @ApiModelProperty(value = "政务人员信息字段：政务机构名称")
-    @TableField("GOV_NAME")
-    private String govName;
-
-    @ApiModelProperty(value = "登录人员类型 01警务 02政务")
-    @TableField("PERSON_NELTYPE")
-    private String personNeltype;
+//    @ApiModelProperty(value = "政务人员信息字段：政务机构id")
+//    @TableField("GOV_ID")
+//    private String govId;
+//
+//    @ApiModelProperty(value = "政务人员信息字段：政务机构名称")
+//    @TableField("GOV_NAME")
+//    private String govName;
+//
+//    @ApiModelProperty(value = "登录人员类型 01警务 02政务")
+//    @TableField("PERSON_NELTYPE")
+//    private String personNeltype;
 
     @ApiModelProperty(value = "租户所属国家专项")
     @TableField("NATIONAL_PROJECT")
@@ -242,453 +244,13 @@ public class User implements Serializable {
     private String roleName;
 
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getUserType() {
-        return userType;
-    }
-
-    public void setUserType(String userType) {
-        this.userType = userType;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getIdCard() {
-        return idCard;
-    }
-
-    public void setIdCard(String idCard) {
-        this.idCard = idCard;
-    }
-
-    public String getNation() {
-        return nation;
-    }
-
-    public void setNation(String nation) {
-        this.nation = nation;
-    }
-
-    public String getSex() {
-        return sex;
-    }
-
-    public void setSex(String sex) {
-        this.sex = sex;
-    }
-
-    public Date getBirth() {
-        return birth;
-    }
-
-    public void setBirth(Date birth) {
-        this.birth = birth;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public String getPhoto() {
-        return photo;
-    }
-
-    public void setPhoto(String photo) {
-        this.photo = photo;
-    }
-
-    public String getOrgId() {
-        return orgId;
-    }
-
-    public void setOrgId(String orgId) {
-        this.orgId = orgId;
-    }
-
-    public String getOrgName() {
-        return orgName;
-    }
-
-    public void setOrgName(String orgName) {
-        this.orgName = orgName;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public Long getSortNo() {
-        return sortNo;
-    }
-
-    public void setSortNo(Long sortNo) {
-        this.sortNo = sortNo;
-    }
-
-    public String getManType() {
-        return manType;
-    }
-
-    public void setManType(String manType) {
-        this.manType = manType;
-    }
-
-    public String getRank() {
-        return rank;
-    }
-
-    public void setRank(String rank) {
-        this.rank = rank;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getPoliceId() {
-        return policeId;
-    }
-
-    public void setPoliceId(String policeId) {
-        this.policeId = policeId;
-    }
-
-    public String getPoliceName() {
-        return policeName;
-    }
-
-    public void setPoliceName(String policeName) {
-        this.policeName = policeName;
-    }
-
-    public String getCompany() {
-        return company;
-    }
-
-    public void setCompany(String company) {
-        this.company = company;
-    }
-
-    public String getCompanyPerson() {
-        return companyPerson;
-    }
-
-    public void setCompanyPerson(String companyPerson) {
-        this.companyPerson = companyPerson;
-    }
-
-    public String getPersonMobile() {
-        return personMobile;
-    }
-
-    public void setPersonMobile(String personMobile) {
-        this.personMobile = personMobile;
-    }
-
-    public String getProject() {
-        return project;
-    }
-
-    public void setProject(String project) {
-        this.project = project;
-    }
-
-    public String getDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(String deleted) {
-        this.deleted = deleted;
-    }
-
-    public String getPoliceCategory() {
-        return policeCategory;
-    }
-
-    public void setPoliceCategory(String policeCategory) {
-        this.policeCategory = policeCategory;
-    }
-
-    public String getPoliceNumber() {
-        return policeNumber;
-    }
-
-    public void setPoliceNumber(String policeNumber) {
-        this.policeNumber = policeNumber;
-    }
-
-    public String getMobilePrivte() {
-        return mobilePrivte;
-    }
-
-    public void setMobilePrivte(String mobilePrivte) {
-        this.mobilePrivte = mobilePrivte;
-    }
-
-    public String getMobileWork() {
-        return mobileWork;
-    }
-
-    public void setMobileWork(String mobileWork) {
-        this.mobileWork = mobileWork;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getQqAccount() {
-        return qqAccount;
-    }
-
-    public void setQqAccount(String qqAccount) {
-        this.qqAccount = qqAccount;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getWxAccount() {
-        return wxAccount;
-    }
-
-    public void setWxAccount(String wxAccount) {
-        this.wxAccount = wxAccount;
-    }
-
-    public String getBirthStr() {
-        return birthStr;
-    }
-
-    public void setBirthStr(String birthStr) {
-        this.birthStr = birthStr;
-    }
-
-    public String getCreateTimeStr() {
-        return createTimeStr;
-    }
-
-    public void setCreateTimeStr(String createTimeStr) {
-        this.createTimeStr = createTimeStr;
-    }
-
-    public Long getType() {
-        return type;
-    }
-
-    public void setType(Long type) {
-        this.type = type;
-    }
-
-    public String getNotifyType() {
-        return notifyType;
-    }
-
-    public void setNotifyType(String notifyType) {
-        this.notifyType = notifyType;
-    }
-
-    public String getAuxiliaryType() {
-        return auxiliaryType;
-    }
-
-    public void setAuxiliaryType(String auxiliaryType) {
-        this.auxiliaryType = auxiliaryType;
-    }
-
-    public String getJobType() {
-        return jobType;
-    }
-
-    public void setJobType(String jobType) {
-        this.jobType = jobType;
-    }
-
-    public String getPostType() {
-        return postType;
-    }
-
-    public void setPostType(String postType) {
-        this.postType = postType;
-    }
-
-    public String getIsParentOrg() {
-        return isParentOrg;
-    }
-
-    public void setIsParentOrg(String isParentOrg) {
-        this.isParentOrg = isParentOrg;
-    }
-
-    public String getTenantArea() {
-        return tenantArea;
-    }
-
-    public void setTenantArea(String tenantArea) {
-        this.tenantArea = tenantArea;
-    }
-
-    public String getTenantPoliceCategory() {
-        return tenantPoliceCategory;
-    }
-
-    public void setTenantPoliceCategory(String tenantPoliceCategory) {
-        this.tenantPoliceCategory = tenantPoliceCategory;
-    }
-
-    public String getDefaultTenant() {
-        return defaultTenant;
-    }
-
-    public void setDefaultTenant(String defaultTenant) {
-        this.defaultTenant = defaultTenant;
-    }
-
-    public String getBelongArea() {
-        return belongArea;
-    }
-
-    public void setBelongArea(String belongArea) {
-        this.belongArea = belongArea;
-    }
-
-    public String getBelongPoliceType() {
-        return belongPoliceType;
-    }
-
-    public void setBelongPoliceType(String belongPoliceType) {
-        this.belongPoliceType = belongPoliceType;
-    }
-
-    public String getUserNumber() {
-        return userNumber;
-    }
-
-    public void setUserNumber(String userNumber) {
-        this.userNumber = userNumber;
-    }
-
-    public String getGovCode() {
-        return govCode;
-    }
-
-    public void setGovCode(String govCode) {
-        this.govCode = govCode;
-    }
-
-    public String getDeleteTime() {
-        return deleteTime;
-    }
-
-    public void setDeleteTime(String deleteTime) {
-        this.deleteTime = deleteTime;
-    }
-
-    public String getPost() {
-        return post;
-    }
-
-    public void setPost(String post) {
-        this.post = post;
-    }
-
-    public String getGovId() {
-        return govId;
-    }
-
-    public void setGovId(String govId) {
-        this.govId = govId;
-    }
-
-    public String getGovName() {
-        return govName;
-    }
-
-    public void setGovName(String govName) {
-        this.govName = govName;
-    }
-
-    public String getPersonNeltype() {
-        return personNeltype;
-    }
-
-    public void setPersonNeltype(String personNeltype) {
-        this.personNeltype = personNeltype;
-    }
-
-    public String getNationalProject() {
-        return nationalProject;
-    }
-
-    public void setNationalProject(String nationalProject) {
-        this.nationalProject = nationalProject;
-    }
-
-    public String getCompanyName() {
-        return companyName;
-    }
-
-    public void setCompanyName(String companyName) {
-        this.companyName = companyName;
-    }
-
-    public String getPoliceCategoryName() {
-        return policeCategoryName;
-    }
-
-    public void setPoliceCategoryName(String policeCategoryName) {
-        this.policeCategoryName = policeCategoryName;
-    }
-
-    public String getRoleName() {
-        return roleName;
-    }
-
-    public void setRoleName(String roleName) {
-        this.roleName = roleName;
-    }
-
     @Override
     public String toString() {
         return "User{" +
                 "id=" + id +
                 ", userType=" + userType +
                 ", name=" + name +
-                ", idCard=" + idCard +
+                ", idcard=" + idcard +
                 ", nation=" + nation +
                 ", sex=" + sex +
                 ", birth=" + birth +
@@ -732,10 +294,6 @@ public class User implements Serializable {
                 ", userNumber=" + userNumber +
                 ", govCode=" + govCode +
                 ", deleteTime=" + deleteTime +
-                ", post=" + post +
-                ", govId=" + govId +
-                ", govName=" + govName +
-                ", personNeltype=" + personNeltype +
                 ", nationalProject=" + nationalProject +
                 "}";
     }

@@ -100,7 +100,7 @@ public class IaasZysbServiceImpl extends ServiceImpl<IaasZysbMapper, IaasZysb> i
     @Override
     public void save(UserVO user, IaasZysb info) {
         info.setId(null);
-        info.setCreator(user.getIdCard());
+        info.setCreator(user.getIdcard());
         info.setCreatorName(user.getName());
         info.setCreatorPhone(user.getMobileWork());
         info.setCreatorUnit(user.getOrgName());
@@ -191,7 +191,7 @@ public class IaasZysbServiceImpl extends ServiceImpl<IaasZysbMapper, IaasZysb> i
                 ApplicationInfoStatus ais = ApplicationInfoStatus.codeOf(record.getStatus());
                 // 判断是否能删除
                 if (ais != ApplicationInfoStatus.DELETE
-                        && Objects.equals(user.getIdCard(), record.getCreator())) {
+                        && Objects.equals(user.getIdcard(), record.getCreator())) {
                     record.setCanDelete(true);
                 }
             }

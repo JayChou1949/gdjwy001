@@ -93,7 +93,7 @@ public class MessageProvider {
                             producerService.sendMsg(TOPIC, msg,0);
                         }
                         if (NotifyType.WX.getCode().equals(type)) {
-                            MessageInfoDTO msg = getWxMsg(user.getIdCard(), String.format(content, "微信"));
+                            MessageInfoDTO msg = getWxMsg(user.getIdcard(), String.format(content, "微信"));
                             producerService.sendMsg(TOPIC, msg,0);
                         }
                     }

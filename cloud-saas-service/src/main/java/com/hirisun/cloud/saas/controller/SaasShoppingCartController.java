@@ -15,7 +15,7 @@ import com.hirisun.cloud.saas.service.ShoppingCartService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
-@Api("saas 购物车保存购物项")
+@Api(tags = "saas 购物车保存购物项")
 @RequestMapping("/saas/shopping")
 @RestController
 public class SaasShoppingCartController {

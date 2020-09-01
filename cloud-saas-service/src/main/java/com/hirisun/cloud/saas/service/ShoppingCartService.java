@@ -16,7 +16,7 @@ public interface ShoppingCartService {
 
     /**
      * 根据购物车id获取对应的购物项
-     * @param idCard 用户身份证号
+     * @param shoppingCartVo
      * @return 购物车列表
      */
     List getShoppingCartItemList(ShoppingCartVo shoppingCartVo);

@@ -15,7 +15,7 @@
         SELECT
         l.id,l.IP,l.REMARK,l.CREATE_TIME,l.path,
         u.name
-        FROM T_SYS_LOG l left join t_user u on l.CREATOR_ID=u.ID_CARD
+        FROM T_SYS_LOG l left join tb_user u on l.CREATOR_ID=u.IDCARD
         <where>
             <if test="(param.startDate != null and param.startDate != '') and (param.endDate != null and param.endDate != '')">
                 AND TO_CHAR(l.CREATE_TIME,'YYYY-MM-DD') &gt;= #{param.startDate}

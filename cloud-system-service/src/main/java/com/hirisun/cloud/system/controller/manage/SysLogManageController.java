@@ -53,7 +53,7 @@ public class SysLogManageController {
          * 如果不是管理员身份，则只能查询自己的操作日志
          */
         if(!user.getType().equals(UserVO.USER_TYPE_MANAGER)){
-            userId = user.getIdCard();
+            userId = user.getIdcard();
         }
         Map map = new HashMap<>();
         map.put("userId", userId);

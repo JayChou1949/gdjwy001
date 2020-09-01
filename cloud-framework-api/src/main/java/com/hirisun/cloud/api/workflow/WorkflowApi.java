@@ -300,4 +300,12 @@ public interface WorkflowApi {
     @PostMapping(workflowActivityBaseUrl + "/feign/terminationOrder")
     public Map<String, String> terminationOrder(
             @RequestParam String applyInfoId);
+
+    /**
+     * 根据流程类型获取流程信息
+     */
+    @ApiIgnore
+    @ApiOperation("根据流程类型获取流程信息")
+    @PostMapping(workflowBaseUrl+"/feign/getWorkflowByDefaultProcess")
+    public WorkflowVO getWorkflowByDefaultProcess(@RequestParam String defaultProcess);
 }

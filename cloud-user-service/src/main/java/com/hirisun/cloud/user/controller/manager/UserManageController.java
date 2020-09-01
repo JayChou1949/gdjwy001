@@ -1,6 +1,7 @@
 package com.hirisun.cloud.user.controller.manager;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
@@ -11,6 +12,7 @@ import com.hirisun.cloud.common.annotation.support.LoginUserHandlerMethodArgumen
 import com.hirisun.cloud.common.util.AreaPoliceCategoryUtils;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.model.user.UserVO;
+import com.hirisun.cloud.model.workflow.WorkflowNodeVO;
 import com.hirisun.cloud.user.bean.SysRole;
 import com.hirisun.cloud.user.bean.User;
 import com.hirisun.cloud.user.bean.UserRole;
@@ -18,6 +20,7 @@ import com.hirisun.cloud.user.service.SysRoleService;
 import com.hirisun.cloud.user.service.UserRoleService;
 import com.hirisun.cloud.user.service.UserService;
 import io.swagger.annotations.*;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -145,7 +148,7 @@ public class UserManageController {
                                                 @LoginUser UserVO user,
                                                 @ApiParam(value = "通知类型  0：短信 1:邮箱 2:微信,多个以逗号分隔", required = true) @RequestParam String notifyType) {
         userService.update(new User(), new UpdateWrapper<User>().lambda()
-                .eq(User::getIdCard, user.getIdCard())
+                .eq(User::getIdcard, user.getIdcard())
                 .set(User::getNotifyType, notifyType));
 
         // 修改成功后修改 session 中的值
@@ -187,7 +190,7 @@ public class UserManageController {
     @GetMapping("/feign/getUserByIdCard")
     public UserVO getUserByIdCard(@ApiParam(value = "用户身份证", required = true) @RequestParam String idCard) {
 
-        User user = userService.getOne(new QueryWrapper<User>().lambda().eq(User::getIdCard, idCard));
+        User user = userService.getOne(new QueryWrapper<User>().lambda().eq(User::getIdcard, idCard));
         UserVO vo = new UserVO();
         BeanUtils.copyProperties(user, vo);
         return vo;
@@ -205,7 +208,7 @@ public class UserManageController {
     public List<UserVO> getUserByIdCardList(@ApiParam(value = "用户身份证列表", required = true) @RequestParam List<String> idCardList) {
         List<String> distinctIdCardList = idCardList.stream().distinct().collect(Collectors.toList());
 
-        List<User> userList = userService.list(new QueryWrapper<User>().lambda().in(User::getIdCard, distinctIdCardList).isNotNull(User::getName));
+        List<User> userList = userService.list(new QueryWrapper<User>().lambda().in(User::getIdcard, distinctIdCardList).isNotNull(User::getName));
         List<UserVO> voList = new ArrayList<>();
 
         userList.forEach(item->{
@@ -214,6 +217,38 @@ public class UserManageController {
             voList.add(userVO);
         });
         return voList;
+    }
+
+    /**
+     * feign调用，提供查询用户方法
+     *
+     * @param user
+     * @return
+     */
+    @ApiIgnore
+    @ApiOperation("根据参数查询用户")
+    @PutMapping("/feign/getUserByParams")
+    public List<UserVO> getUserByParams(@RequestBody UserVO user) {
+        LambdaQueryWrapper<User> wrapper = new QueryWrapper<User>().lambda();
+        if (user.getType() != null) {
+            wrapper.eq(User::getType, user.getType());
+        }
+        if (user.getDefaultTenant() != null) {
+            wrapper.eq(User::getDefaultTenant, user.getDefaultTenant());
+        }
+        if (user.getTenantPoliceCategory() != null) {
+            wrapper.eq(User::getTenantPoliceCategory, user.getTenantPoliceCategory());
+        }
+        if (user.getTenantArea() != null) {
+            wrapper.eq(User::getTenantArea, user.getTenantArea());
+        }
+        List<User> userList = userService.list(wrapper);
+        if(CollectionUtils.isNotEmpty(userList)) {
+            List<UserVO> list = JSON.parseObject(JSON.toJSON(userList).toString(),
+                    new TypeReference<List<UserVO>>(){});
+            return list;
+        }
+        return null;
     }
 
 }

@@ -73,7 +73,7 @@ public class UserVO {
     private String name;
 
     @ApiModelProperty(value = "身份证")
-    private String idCard;
+    private String idcard;
 
     @ApiModelProperty(value = "民族,引用表码3.4")
     private String nation;
@@ -201,18 +201,27 @@ public class UserVO {
     @ApiModelProperty(value = "删除时间")
     private String deleteTime;
 
-    @ApiModelProperty(value = "政务人员信息字段：职务")
-    private String post;
+//    @ApiModelProperty(value = "政务人员信息字段：职务")
+//    private String post;
 
-    @ApiModelProperty(value = "政务人员信息字段：政务机构id")
-    private String govId;
-
-    @ApiModelProperty(value = "政务人员信息字段：政务机构名称")
-    private String govName;
-
-    @ApiModelProperty(value = "登录人员类型 01警务 02政务")
-    private String personNeltype;
+//    @ApiModelProperty(value = "政务人员信息字段：政务机构id")
+//    private String govId;
+//
+//    @ApiModelProperty(value = "政务人员信息字段：政务机构名称")
+//    private String govName;
+//
+//    @ApiModelProperty(value = "登录人员类型 01警务 02政务")
+//    private String personNeltype;
 
     @ApiModelProperty(value = "租户所属国家专项")
     private String nationalProject;
+
+    @ApiModelProperty(value = "所属公司")
+    private String companyName;
+
+    @ApiModelProperty(value = "警种")
+    private String policeCategoryName;
+
+    @ApiModelProperty(value = "角色名")
+    private String roleName;
 }

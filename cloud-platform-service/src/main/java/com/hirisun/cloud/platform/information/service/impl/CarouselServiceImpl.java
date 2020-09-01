@@ -212,7 +212,7 @@ public class CarouselServiceImpl extends ServiceImpl<CarouselMapper, Carousel> i
         }
         carousel.setStatus(ReviewStatus.DELETE.getCode());
         this.updateById(carousel);
-        systemApi.saveLog(user.getIdCard(), "删除id：" + id, "删除轮播图", IpUtil.getIp());
+        systemApi.saveLog(user.getIdcard(), "删除id：" + id, "删除轮播图", IpUtil.getIp());
         return QueryResponseResult.success(carousel);
     }
 

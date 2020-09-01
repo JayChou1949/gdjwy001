@@ -47,7 +47,7 @@ public class UserDocServiceImpl extends ServiceImpl<UserDocMapper, UserDoc> impl
     @Override
     public void saveOrUpdateUserDoc(UserVO user, UserDoc userDoc) {
         if (StringUtils.isEmpty(userDoc.getId())) {
-            userDoc.setCreator(user.getIdCard());
+            userDoc.setCreator(user.getIdcard());
             userDoc.setStatus(ReviewStatus.PRO_ONLINE.getCode());
             this.save(userDoc);
         }else{

@@ -85,7 +85,11 @@ public class SaasApplicationServiceImpl extends ServiceImpl<SaasApplicationMappe
     private FileApi fileApi;
     @Autowired
     private ISaasApplicationMergeService saasApplicationMergeService;
-    
+
+    @Autowired
+    private SmsApi smsApi;
+
+
     //TODO
     
 //    @Autowired
@@ -94,17 +98,18 @@ public class SaasApplicationServiceImpl extends ServiceImpl<SaasApplicationMappe
 //    private IInstanceService instanceService;
 //    @Autowired
 //    private IWorkflowmodelService workflowmodelService;
+//    @Autowired
+//    private MessageProvider messageProvider;
     @Autowired
     private SaasApplicationMapper saasApplicationMapper;
     @Autowired
     private ISaasAppExtResourceService saasAppExtResourceService;
-    @Autowired
-    private SmsApi smsApi;
+
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void create(UserVO user, SaasApplication info) {
         info.setId(null);
-        info.setCreator(user.getIdCard());
+        info.setCreator(user.getIdcard());
         info.setCreatorName(user.getName());
         info.setOrgId(user.getOrgId());
         info.setOrgName(user.getOrgName());
@@ -130,8 +135,7 @@ public class SaasApplicationServiceImpl extends ServiceImpl<SaasApplicationMappe
         param.setFiles(info.getFileList());
         param.setRefId(info.getId());
 		filesApi.refFiles(param );
-        
-		smsApi.buildSuccessMessage(user.getIdCard(), BusinessName.SAAS_RESOURCE, info.getOrderNumber());
+        smsApi.buildSuccessMessage(user.getIdcard(), BusinessName.SAAS_RESOURCE, info.getOrderNumber());
     }
 
     private void saveExtResource(SaasApplication info) {
@@ -210,7 +214,7 @@ public class SaasApplicationServiceImpl extends ServiceImpl<SaasApplicationMappe
         info.setResourceList(resourceList);
 
         boolean isMerged = StringUtils.isNotEmpty(info.getMergeId());
-        if (!isMerged && Objects.equals(user.getIdCard(), info.getCreator())) {
+        if (!isMerged && Objects.equals(user.getIdcard(), info.getCreator())) {
             info.setCanEdit(true);
             info.setCanDelete(true);
             if (ApplicationInfoStatus.REVIEW_REJECT.getCode().equals(info.getStatus())) {
@@ -313,7 +317,7 @@ public class SaasApplicationServiceImpl extends ServiceImpl<SaasApplicationMappe
             queryVO.setArea(user.getTenantArea());
             queryVO.setPoliceCategory(CommonHandler.dealNameforQuery(user.getTenantPoliceCategory()));
         }else {
-            queryVO.setCreator(user.getIdCard());
+            queryVO.setCreator(user.getIdcard());
         }
         param.put("queryVO",queryVO);
 
@@ -328,7 +332,7 @@ public class SaasApplicationServiceImpl extends ServiceImpl<SaasApplicationMappe
             queryVO.setArea(user.getTenantArea());
             queryVO.setPoliceCategory(CommonHandler.dealNameforQuery(user.getTenantPoliceCategory()));
         }else {
-            queryVO.setCreator(user.getIdCard());
+            queryVO.setCreator(user.getIdcard());
         }
         param.put("queryVO",queryVO);
         return baseMapper.getImplCount(user,param);
@@ -341,7 +345,7 @@ public class SaasApplicationServiceImpl extends ServiceImpl<SaasApplicationMappe
             queryVO.setArea(user.getTenantArea());
             queryVO.setPoliceCategory(CommonHandler.dealNameforQuery(user.getTenantPoliceCategory()));
         }else {
-            queryVO.setCreator(user.getIdCard());
+            queryVO.setCreator(user.getIdcard());
         }
         param.put("queryVO",queryVO);
         return baseMapper.getRejectCount(user,param);
@@ -355,7 +359,7 @@ public class SaasApplicationServiceImpl extends ServiceImpl<SaasApplicationMappe
             queryVO.setArea(user.getTenantArea());
             queryVO.setPoliceCategory(CommonHandler.dealNameforQuery(user.getTenantPoliceCategory()));
         }else {
-            queryVO.setCreator(user.getIdCard());
+            queryVO.setCreator(user.getIdcard());
         }
         param.put("queryVO",queryVO);
         return baseMapper.getUseCount(user,param);
@@ -374,7 +378,7 @@ public class SaasApplicationServiceImpl extends ServiceImpl<SaasApplicationMappe
         saasApplication.updateById();
         // 发送短信
         saasApplication = this.getById(id);
-        smsApi.buildSuccessMessage(user.getIdCard(), BusinessName.SAAS_RESOURCE, saasApplication.getOrderNumber());
+        smsApi.buildSuccessMessage(user.getIdcard(), BusinessName.SAAS_RESOURCE, saasApplication.getOrderNumber());
     }
 
     @Override
@@ -385,7 +389,7 @@ public class SaasApplicationServiceImpl extends ServiceImpl<SaasApplicationMappe
         saasApplication.updateById();
         // 发送短信
         saasApplication = this.getById(id);
-        smsApi.buildRejectMessage(user.getIdCard(), BusinessName.SAAS_RESOURCE);
+        smsApi.buildRejectMessage(user.getIdcard(), BusinessName.SAAS_RESOURCE);
     }
 
     /**

@@ -40,7 +40,7 @@ public class PaasConfigController {
     @PostMapping(value = "/create")
     @ResponseBody
     public QueryResponseResult create(@LoginUser UserVO user, @ModelAttribute PaasConfig paas) {
-		paas.setCreator(user.getIdCard());
+		paas.setCreator(user.getIdcard());
 		String passId = paasConfigService.create(paas);
         return QueryResponseResult.success(passId);
     }

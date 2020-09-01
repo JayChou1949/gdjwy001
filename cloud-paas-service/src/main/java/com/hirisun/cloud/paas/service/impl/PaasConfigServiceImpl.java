@@ -93,7 +93,7 @@ public class PaasConfigServiceImpl implements PaasConfigService {
             boolean isNotEmpty = operateRecordApi.isNotEmpty(id);
             OperateRecordVo vo = new OperateRecordVo();
             vo.setTargetId(id);
-			vo.setOperator(user.getIdCard());
+			vo.setOperator(user.getIdcard());
 			vo.setOperate("上/下线");
 			vo.setResult("上线");
 			vo.setRemark(remark);
@@ -109,7 +109,7 @@ public class PaasConfigServiceImpl implements PaasConfigService {
 
             OperateRecordVo vo = new OperateRecordVo();
             vo.setTargetId(id);
-			vo.setOperator(user.getIdCard());
+			vo.setOperator(user.getIdcard());
 			vo.setOperate("上/下线");
 			vo.setResult("下线");
 			vo.setRemark(remark);
@@ -158,7 +158,7 @@ public class PaasConfigServiceImpl implements PaasConfigService {
 		PaasConfig paas = paasConfigMapper.selectById(id);
         paas.setStatus(ReviewStatus.DELETE.getCode());
         paasConfigMapper.updateById(paas);
-        systemApi.saveLog(user.getIdCard(),"PaaS服务id："+id,"删除服务", IpUtil.getIp());
+        systemApi.saveLog(user.getIdcard(),"PaaS服务id："+id,"删除服务", IpUtil.getIp());
 		
 	}
 

@@ -54,7 +54,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 清空租户管理员对应的警种或地市
         if (!UserVO.USER_TYPE_TENANT_MANAGER.equals(type)) {
             this.update(new User(), new UpdateWrapper<User>().lambda()
-                    .eq(User::getIdCard, userId)
+                    .eq(User::getIdcard, userId)
                     .set(User::getType, type)
                     .set(User::getTenantArea, null)
                     .set(User::getTenantPoliceCategory, null)
@@ -67,9 +67,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 LambdaQueryWrapper<User> checkUser = new QueryWrapper<User>().lambda()
                         .eq(User::getType, UserVO.USER_TYPE_TENANT_MANAGER)
                         .eq(User::getDefaultTenant, "1")
-                        .ne(User::getIdCard, userId);
+                        .ne(User::getIdcard, userId);
                 LambdaUpdateWrapper<User> updateUser = new UpdateWrapper<User>().lambda()
-                        .eq(User::getIdCard, userId)
+                        .eq(User::getIdcard, userId)
                         .set(User::getType, type)
                         .set(User::getDefaultTenant, "1");
                 if (StringUtils.isNotEmpty(areas)) {
@@ -102,7 +102,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 }
             } else {
                 LambdaUpdateWrapper<User> updateUser = new UpdateWrapper<User>().lambda()
-                        .eq(User::getIdCard, userId)
+                        .eq(User::getIdcard, userId)
                         .set(User::getType, type)
                         .set(User::getDefaultTenant, "0");
                 if (StringUtils.isNotEmpty(areas)) {

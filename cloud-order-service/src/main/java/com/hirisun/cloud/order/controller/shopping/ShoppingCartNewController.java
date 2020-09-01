@@ -53,14 +53,14 @@ public class ShoppingCartNewController {
     @GetMapping("/num-overview")
     public QueryResponseResult numOverview(@LoginUser UserVO user){
         if(user == null)return QueryResponseResult.fail("请登录");
-        return QueryResponseResult.success(shoppingCartService.getNumGroupByType(user.getIdCard()));
+        return QueryResponseResult.success(shoppingCartService.getNumGroupByType(user.getIdcard()));
     }
 
     @ApiOperation("购物车总数")
     @GetMapping("/num-total")
     public QueryResponseResult totalNum(@LoginUser UserVO user){
     	if(user == null)return QueryResponseResult.fail("请登录");
-        return QueryResponseResult.success(shoppingCartService.count(user.getIdCard()));
+        return QueryResponseResult.success(shoppingCartService.count(user.getIdcard()));
     }
 
     @ApiOperation("购物车列表")
@@ -68,7 +68,7 @@ public class ShoppingCartNewController {
     public QueryResponseResult list(@LoginUser UserVO user,
                                     @ApiParam(value = "资源类型，1SAAS 2DAAS 3PAAS 5SAAS",required = true,defaultValue = "1") @RequestParam Long type,
                                     @ApiParam(value = "资源名称",required = false,defaultValue = "") @RequestParam String name){
-    	return QueryResponseResult.success(shoppingCartService.getShoppingCartList(user.getIdCard(),type,name));
+    	return QueryResponseResult.success(shoppingCartService.getShoppingCartList(user.getIdcard(),type,name));
     }
 
     @ApiOperation("购物车详情")

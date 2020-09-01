@@ -151,5 +151,18 @@ public class WorkflowManageController {
         BeanUtils.copyProperties(workflow,vo);
         return vo;
     }
+
+    /**
+     * 根据流程类型获取流程信息
+     */
+    @ApiIgnore
+    @ApiOperation("根据流程类型获取流程信息")
+    @PostMapping("/feign/getWorkflowByDefaultProcess")
+    public WorkflowVO getWorkflowByDefaultProcess(@RequestParam String defaultProcess) {
+        Workflow workflow = workflowService.getOne(new QueryWrapper<Workflow>().lambda().eq(Workflow::getDefaultProcess, defaultProcess));
+        WorkflowVO vo = new WorkflowVO();
+        BeanUtils.copyProperties(workflow,vo);
+        return vo;
+    }
 }
 

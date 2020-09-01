@@ -94,7 +94,7 @@ public class CommonHandler {
         //资源类型转为对应编码
         vo.setType(resourceType);
         vo.setStatus(status);
-        vo.setHandler(user.getIdCard());
+        vo.setHandler(user.getIdcard());
         /*if (ApplicationInfoStatus.SHOPPING_CART.getCode().equals(status)
                 || ApplicationInfoStatus.SHOPPING_CART_DEL.getCode().equals(status)) {
             vo.setStatus(null); // 不能查购物车的数据
@@ -108,7 +108,7 @@ public class CommonHandler {
             vo.setArea(user.getTenantArea());
         }else{
             //此处为处理人
-            vo.setCreator(user.getIdCard());
+            vo.setCreator(user.getIdcard());
         }
         param.put("queryVO",vo);
         return  param;
@@ -136,14 +136,14 @@ public class CommonHandler {
             vo.setProcessType(null);
         }
 
-        vo.setHandler(user.getIdCard());
+        vo.setHandler(user.getIdcard());
 
         if(CommonHandler.isTenantManager(user)){
             vo.setPoliceCategory(user.getTenantPoliceCategory());
             vo.setArea(user.getTenantArea());
         }else{
             //此处为处理人
-            vo.setCreator(user.getIdCard());
+            vo.setCreator(user.getIdcard());
         }
         param.put("queryVO",vo);
         return  param;
@@ -172,7 +172,7 @@ public class CommonHandler {
             vo.setArea(user.getTenantArea());
         }else{
             //此处为处理人
-            vo.setCreator(user.getIdCard());
+            vo.setCreator(user.getIdcard());
         }
         param.put("queryVO",vo);
         return  param;
@@ -200,7 +200,7 @@ public class CommonHandler {
             vo.setArea(user.getTenantArea());
         }else{
             //此处为处理人
-            vo.setCreator(user.getIdCard());
+            vo.setCreator(user.getIdcard());
         }
         param.put("queryVO",vo);
         return  param;
@@ -214,7 +214,7 @@ public class CommonHandler {
             vo.setArea(user.getTenantArea());
         }else{
             //此处为处理人
-            vo.setCreator(user.getIdCard());
+            vo.setCreator(user.getIdcard());
         }
         param.put("queryVO",vo);
         return  param;

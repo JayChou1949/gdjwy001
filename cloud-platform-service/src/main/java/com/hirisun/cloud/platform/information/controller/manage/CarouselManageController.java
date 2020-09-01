@@ -89,7 +89,7 @@ public class CarouselManageController {
         if(NewsParamUtil.checkUserInfomationPermission(user,carousel.getProvincial(),newsBelong)){
             return QueryResponseResult.fail("无权操作该区域数据");
         }
-        carousel.setCreator(user.getIdCard());
+        carousel.setCreator(user.getIdcard());
         carousel.setUpdateTime(new Date());
         carousel.setStatus(ReviewStatus.PRO_ONLINE.getCode());
         carouselService.save(carousel);

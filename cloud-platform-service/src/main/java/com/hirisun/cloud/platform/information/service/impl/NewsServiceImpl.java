@@ -84,7 +84,7 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper, News> implements Ne
     public void deleteNews(News news,UserVO user) {
         this.updateById(news);
         // 远程调用日志模块，记录操作人日志 sys_log
-        systemApi.saveLog(user.getIdCard(),"删除新闻，新闻id："+news.getId(),"删除新闻", IpUtil.getIp());
+        systemApi.saveLog(user.getIdcard(),"删除新闻，新闻id："+news.getId(),"删除新闻", IpUtil.getIp());
     }
 
 

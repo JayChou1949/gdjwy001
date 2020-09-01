@@ -7,7 +7,9 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.hirisun.cloud.model.saas.vo.SaasApplicationMergeVO;
 import com.hirisun.cloud.model.saas.vo.SaasOrderTotalVo;
 import com.hirisun.cloud.model.saas.vo.SaasTotalVo;
 import com.hirisun.cloud.model.saas.vo.SaasUseTotalVo;
@@ -23,19 +25,19 @@ public interface ISaasApplicationMergeService extends IService<SaasApplicationMe
      * 合并单子
      * @param ids 待合并单子的id,多个使用,分隔
      */
-    SaasApplicationMerge merge(UserVO user, String ids);
+    SaasApplicationMerge merge(String userId, String ids);
 
-    void update(UserVO user, SaasApplicationMerge info);
+    void update(String userId, SaasApplicationMerge info);
 
     SaasApplicationMerge getDetails(String id);
 
-    void deleteById(UserVO user, String id);
+    void deleteById(String userId, String id);
 
     void saveImpl(UserVO user, Map<String, Object> param, String modelid);
 
-    IPage<SaasApplicationMerge> getFlowPage(UserVO user, IPage<SaasApplicationMerge> page, Map<String, Object> param);
+    Page<SaasApplicationMergeVO> getFlowPage(String userId, Map<String, Object> param);
 
-    IPage<SaasApplicationMerge> getFlowPageWithServiceName(UserVO user, IPage<SaasApplicationMerge> page, Map<String, Object> param);
+    Page<SaasApplicationMergeVO> getFlowPageWithServiceName(String userId, Map<String, Object> param);
 
     List<SaasTotalVo> saasTotal(String areas, String policeCategory, Map<String, String> params);
 

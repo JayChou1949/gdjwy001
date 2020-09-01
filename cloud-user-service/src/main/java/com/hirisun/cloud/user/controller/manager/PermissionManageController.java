@@ -87,7 +87,7 @@ public class PermissionManageController {
     @GetMapping("/menu")
     public QueryResponseResult<Permission> menu(@LoginUser UserVO user) {
         Map map = new HashMap<>();
-        map.put("uid", user.getIdCard());
+        map.put("uid", user.getIdcard());
         map.put("type", PermissionType.PERMISSION_TYPE_MENU);
         List<Permission> menu = permissionService.listUserMenu(map);
         menu = (List<Permission>) TreeUtils.listWithTree(menu);

@@ -103,7 +103,7 @@ public class SaasSubpageConfigController {
         boolean permission = false;
         SaasConfig saas = saasConfigService.getSaasConfigById(id);
         if (saas != null) {
-            boolean isCreator = Objects.equals(user.getIdCard(), saas.getCreator());
+            boolean isCreator = Objects.equals(user.getIdcard(), saas.getCreator());
             boolean isManager = Objects.equals(UserType.MANAGER.getCode(), user.getType());
             if (isCreator || isManager) {
                 permission = true;

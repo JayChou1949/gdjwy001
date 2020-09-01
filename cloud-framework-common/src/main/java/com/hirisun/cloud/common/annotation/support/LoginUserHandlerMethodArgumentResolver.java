@@ -44,7 +44,7 @@ public class LoginUserHandlerMethodArgumentResolver implements HandlerMethodArgu
             if ("dev".equals(profile) && null == currentUser) {
                 UserVO devUser=new UserVO();
                 devUser.setName("唐彪");
-                devUser.setIdCard("410184198209096919");
+                devUser.setIdcard("410184198209096919");
                 devUser.setOrgId("7B038CBFE0BFC09CE0530A282E21C09C");
                 devUser.setOrgName("北京海联捷讯科技股份有限公司");
                 devUser.setPostType("科长");

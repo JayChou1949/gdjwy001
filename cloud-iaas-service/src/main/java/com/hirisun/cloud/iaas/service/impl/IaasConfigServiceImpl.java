@@ -47,7 +47,7 @@ public class IaasConfigServiceImpl implements IaasConfigService {
 	@Transactional(rollbackFor = Exception.class)
 	public String create(UserVO user, IaasConfig iaas) {
 		
-		iaas.setCreator(user.getIdCard());
+		iaas.setCreator(user.getIdcard());
         iaas.setStatus(ReviewStatus.PRO_ONLINE.getCode());
         verifyParams(iaas);
         iaasConfigMapper.insert(iaas);
@@ -82,7 +82,7 @@ public class IaasConfigServiceImpl implements IaasConfigService {
             
             OperateRecordVo vo = new OperateRecordVo();
             vo.setTargetId(id);
-			vo.setOperator(user.getIdCard());
+			vo.setOperator(user.getIdcard());
 			vo.setOperate("上/下线");
 			vo.setResult("上线");
 			vo.setRemark(remark);
@@ -93,7 +93,7 @@ public class IaasConfigServiceImpl implements IaasConfigService {
             
             OperateRecordVo vo = new OperateRecordVo();
             vo.setTargetId(id);
-			vo.setOperator(user.getIdCard());
+			vo.setOperator(user.getIdcard());
 			vo.setOperate("上/下线");
 			vo.setResult("下线");
 			vo.setRemark(remark);
@@ -171,7 +171,7 @@ public class IaasConfigServiceImpl implements IaasConfigService {
 		IaasConfig iaas = iaasConfigMapper.selectById(id);
         iaas.setStatus(ReviewStatus.DELETE.getCode());
         iaasConfigMapper.updateById(iaas);
-        systemApi.saveLog(user.getIdCard(), "IaaS服务id："+id, "删除服务", IpUtil.getIp());
+        systemApi.saveLog(user.getIdcard(), "IaaS服务id："+id, "删除服务", IpUtil.getIp());
 		
 	}
 

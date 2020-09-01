@@ -120,7 +120,7 @@ public class NewsManageController {
         if(NewsParamUtil.checkUserInfomationPermission(user,news.getProvincial(),newsBelong)){
             return QueryResponseResult.fail("无权操作该区域数据");
         }
-        news.setCreator(user.getIdCard());
+        news.setCreator(user.getIdcard());
         news.setUpdateTime(new Date());
         news.setViewCount(0L);
         news.setStatus(ReviewStatus.PRO_ONLINE.getCode());

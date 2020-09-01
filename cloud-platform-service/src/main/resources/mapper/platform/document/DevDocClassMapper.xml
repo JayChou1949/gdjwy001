@@ -30,7 +30,7 @@
                 )
             </if>
             <if test="user.type != 100">
-                AND D.CREATOR = #{user.idCard}
+                AND D.CREATOR = #{user.idcard}
             </if>
         </where>
         ORDER BY D.SORT ASC, D.UPDATE_TIME DESC

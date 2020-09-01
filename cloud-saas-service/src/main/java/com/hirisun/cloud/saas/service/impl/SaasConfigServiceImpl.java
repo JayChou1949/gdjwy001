@@ -54,7 +54,7 @@ public class SaasConfigServiceImpl implements SaasConfigService {
             
             OperateRecordVo vo = new OperateRecordVo();
             vo.setTargetId(id);
-			vo.setOperator(user.getIdCard());
+			vo.setOperator(user.getIdcard());
 			vo.setOperate("上/下线");
 			vo.setResult("上线");
 			vo.setRemark(remark);
@@ -70,7 +70,7 @@ public class SaasConfigServiceImpl implements SaasConfigService {
             saasConfigMapper.updateById(saas);
             OperateRecordVo vo = new OperateRecordVo();
             vo.setTargetId(id);
-			vo.setOperator(user.getIdCard());
+			vo.setOperator(user.getIdcard());
 			vo.setOperate("上/下线");
 			vo.setResult("下线");
 			vo.setRemark(remark);
@@ -240,7 +240,7 @@ public class SaasConfigServiceImpl implements SaasConfigService {
 	public String create(UserVO user, SaasConfig saasConfig) {
 		
 		saasConfig.setId(UUIDUtil.getUUID());
-    	saasConfig.setCreator(user.getIdCard());
+    	saasConfig.setCreator(user.getIdcard());
     	saasConfig.setStatus(ReviewStatus.PRO_ONLINE.getCode());
         verifyParams(saasConfig);
         saasConfigMapper.insert(saasConfig);
@@ -294,7 +294,7 @@ public class SaasConfigServiceImpl implements SaasConfigService {
         
         OperateRecordVo vo = new OperateRecordVo();
         vo.setTargetId(id);
-		vo.setOperator(user.getIdCard());
+		vo.setOperator(user.getIdcard());
 		vo.setOperate("删除");
 		vo.setResult("删除");
         operateRecordApi.save(vo);

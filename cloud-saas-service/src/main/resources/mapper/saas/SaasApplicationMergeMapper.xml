@@ -28,7 +28,7 @@
         <result column="IS_IMPORT" property="isImport" />
     </resultMap>
 
-    <select id="getFlowPage" resultMap="BaseResultMap">
+    <select id="getFlowPage" resultType="com.hirisun.cloud.model.saas.vo.SaasApplicationMergeVO">
       select r.*,n.NUM from (SELECT distinct ai.*,ins.ID instanceId
       from  TB_SAAS_APPLICATION_MERGE ai ,TB_WFM_ACTIVITY act,TB_WFM_INSTANCE ins,TB_WFM_WORKFLOWMODEL m
         <where>
@@ -77,7 +77,7 @@
       ORDER BY r.MODIFIED_TIME DESC
     </select>
 
-    <select id="getFlowPageWithServiceName" resultMap="BaseResultMap">
+    <select id="getFlowPageWithServiceName" resultType="com.hirisun.cloud.model.saas.vo.SaasApplicationMergeVO">
         select r.*,n.NUM from (SELECT distinct ai.*,ins.ID instanceId
         from  TB_SAAS_APPLICATION_MERGE ai ,TB_WFM_ACTIVITY act,TB_WFM_INSTANCE ins,TB_WFM_WORKFLOWMODEL m,TB_SAAS_APPLICATION sa,TB_SAAS_APPLICATION_EXT ext
         <where>

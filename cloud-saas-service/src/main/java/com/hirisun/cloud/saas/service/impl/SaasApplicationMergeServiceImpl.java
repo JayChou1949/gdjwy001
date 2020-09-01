@@ -8,9 +8,20 @@ import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 
+import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
+import com.hirisun.cloud.api.workflow.WorkflowApi;
+import com.hirisun.cloud.common.contains.ApplyInfoStatus;
+import com.hirisun.cloud.common.vo.CommonCode;
+import com.hirisun.cloud.model.saas.vo.SaasApplicationMergeVO;
+import com.hirisun.cloud.model.workflow.WorkflowActivityVO;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -79,6 +90,9 @@ public class SaasApplicationMergeServiceImpl extends ServiceImpl<SaasApplication
 //  private ISpeedUpService speedUpService;
     @Autowired
     private FilesApi filesApi;
+
+    @Autowired
+    private WorkflowApi workflowApi;
 //    @Autowired
 //    private IAppReviewInfoService appReviewInfoService;
     @Autowired
@@ -93,7 +107,9 @@ public class SaasApplicationMergeServiceImpl extends ServiceImpl<SaasApplication
     
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public SaasApplicationMerge merge(UserVO user, String ids) {
+    public SaasApplicationMerge merge(String userId, String ids) {
+
+        UserVO user = userApi.getUserByIdCard(userId);
     	//TODO
 //        String[] idArray = ids.split(",");
 //        SaasApplication application = saasApplicationService.getById(idArray[0]);
@@ -110,7 +126,7 @@ public class SaasApplicationMergeServiceImpl extends ServiceImpl<SaasApplication
 //            throw new BaseException("未配置流程");
 //        }
 //        SaasApplicationMerge merge = new SaasApplicationMerge();
-//        merge.setCreator(user.getIdCard());
+//        merge.setCreator(user.getIdcard());
 //        merge.setCreatorName(user.getName());
 //        merge.setOrgId(user.getOrgId());
 //        merge.setOrgName(user.getOrgName());
@@ -149,13 +165,13 @@ public class SaasApplicationMergeServiceImpl extends ServiceImpl<SaasApplication
 //        map.put("name", BusinessName.SAAS_RESOURCE);
 //        map.put("order", merge.getOrderNumber());
 //        activityService.advanceCurrentActivity(advanceBeanVO, map);
-//    	  smsApi.buildSuccessMessage(user.getIdCard(), BusinessName.SAAS_RESOURCE, merge.getOrderNumber());
+//    	  smsApi.buildSuccessMessage(user.getIdcard(), BusinessName.SAAS_RESOURCE, merge.getOrderNumber());
     	return null;
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void update(UserVO user, SaasApplicationMerge info) {
+    public void update(String userId, SaasApplicationMerge info) {
         info.setStatus(null);
         info.setOrderNumber(null);
         info.setWorkFlowId(null);
@@ -204,12 +220,12 @@ public class SaasApplicationMergeServiceImpl extends ServiceImpl<SaasApplication
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void deleteById(UserVO user, String id) {
+    public void deleteById(String userId, String id) {
         SaasApplicationMerge info = this.getById(id);
         if (info == null) {
             throw new CustomException(SaasExceptionCode.RECORD_NULL_ERROR);
         }
-        if (!Objects.equals(user.getIdCard(), info.getCreator())) {
+        if (!Objects.equals(userId, info.getCreator())) {
             throw new CustomException(SaasExceptionCode.DELETE_ERROR);
         }
         saasApplicationService.update(new SaasApplication(), new UpdateWrapper<SaasApplication>().lambda()
@@ -230,7 +246,7 @@ public class SaasApplicationMergeServiceImpl extends ServiceImpl<SaasApplication
         String remark = implRequest.getRemark();
         //TODO
 //        AppReviewInfo reviewInfo = new AppReviewInfo();
-//        reviewInfo.setCreator(user.getIdCard());
+//        reviewInfo.setCreator(user.getIdcard());
 //        reviewInfo.setResult(result);
 //        reviewInfo.setRemark(remark);
 //        reviewInfo.setrType("2");
@@ -267,23 +283,31 @@ public class SaasApplicationMergeServiceImpl extends ServiceImpl<SaasApplication
     }
 
     @Override
-    public IPage<SaasApplicationMerge> getFlowPage(UserVO user, IPage<SaasApplicationMerge> page, Map<String, Object> param) {
+    public Page<SaasApplicationMergeVO> getFlowPage(String userId, Map<String, Object> param) {
+        Page<SaasApplicationMergeVO> page = new Page<>();
+        page.setCurrent(Integer.parseInt(param.get("pageNum").toString()));
+        page.setSize(Integer.parseInt(param.get("pageSize").toString()));
+        UserVO user =JSON.parseObject(param.get("user").toString(), UserVO.class);
+        param.put("user", user);
         page = baseMapper.getFlowPage(page, param);
-        List<SaasApplicationMerge> records = page.getRecords();
+        List<SaasApplicationMergeVO> records = page.getRecords();
         if (records != null && !records.isEmpty()) {
-        	//TODO
-//          speedUpService.dealProcessingPersonApplication(records,user);
+            curHandlerPerson(records, user);
         }
         return page;
     }
 
     @Override
-    public IPage<SaasApplicationMerge> getFlowPageWithServiceName(UserVO user, IPage<SaasApplicationMerge> page, Map<String, Object> param) {
+    public Page<SaasApplicationMergeVO> getFlowPageWithServiceName(String userId, Map<String, Object> param) {
+        Page<SaasApplicationMergeVO> page = new Page<>();
+        page.setCurrent(Integer.parseInt(param.get("pageNum").toString()));
+        page.setSize(Integer.parseInt(param.get("pageSize").toString()));
+        UserVO user =JSON.parseObject(param.get("user").toString(), UserVO.class);
+        param.put("user", user);
         page = baseMapper.getFlowPageWithServiceName(page, param);
-        List<SaasApplicationMerge> records = page.getRecords();
+        List<SaasApplicationMergeVO> records = page.getRecords();
         if (records != null && !records.isEmpty()) {
-        	//TODO
-//            speedUpService.dealProcessingPersonApplication(records,user);
+            curHandlerPerson(records, user);
         }
         return page;
     }
@@ -385,6 +409,93 @@ public class SaasApplicationMergeServiceImpl extends ServiceImpl<SaasApplication
             InputStream inputStream = new ByteArrayInputStream(download);
             IOUtils.copy(inputStream, response.getOutputStream());
     	}
+    }
+
+    /**
+     *
+     * @param applyInfoList
+     * @param user
+     */
+    public  void curHandlerPerson(List<SaasApplicationMergeVO> applyInfoList, UserVO user){
+        List<String> instanceId = applyInfoList.stream().map(SaasApplicationMergeVO::getInstanceId).distinct().collect(Collectors.toList());
+        //实例Id到处理人身份证的集合(单表查询)
+        Map<String,String> instance2IdCardsMap = workflowApi.instanceToHandleIdCards(instanceId);
+        List<String> handlePeronIdsList = Lists.newArrayList();
+        instance2IdCardsMap.forEach((k,v)->{
+            if(StringUtils.isNotBlank(v)){
+                handlePeronIdsList.add(v);
+            }
+        });
+        //获取身份证号到名字的Map
+        Map<String,String> idCard2NameMap = idCardsNameMap(handlePeronIdsList);
+        //获取实例-待办处理人身份证号Map
+        for(SaasApplicationMergeVO record:applyInfoList){
+            if(instance2IdCardsMap.size()!=0){
+                if(instance2IdCardsMap.containsKey(record.getInstanceId()) && instance2IdCardsMap.get(record.getInstanceId()) != null){
+                    record.setProcessingPerson(instance2IdCardsMap.get(record.getInstanceId()));
+                }
+            }
+        }
+        for (SaasApplicationMergeVO record : applyInfoList) {
+            if(idCard2NameMap != null){
+                //身份证号集合字符串替换为名字集合字符串
+                convertIdCardToName(idCard2NameMap,record);
+            }
+            ApplyInfoStatus applyInfoStatus = ApplyInfoStatus.codeOf(record.getStatus());
+            // 判断是否能删除
+            if (applyInfoStatus != ApplyInfoStatus.DELETE
+                    && Objects.equals(user.getIdcard(), record.getCreator())) {
+                record.setCanDelete(true);
+            }
+        }
+    }
+    /**
+     * 获取身份证号与名字关联的Map
+     * @param idCardsList 身份证号集合 {"5110022522,545451515","45454551515,454554"}
+     * @return  {"5110022522":"jack"}
+     */
+    public Map<String,String> idCardsNameMap(List<String> idCardsList){
+        List<String> idCardElementList = Lists.newArrayList();
+        idCardsList.forEach(idCards->{
+            if(StringUtils.isNotEmpty(idCards)){
+                List<String> idCardList = Splitter.on(",").trimResults().omitEmptyStrings().splitToList(idCards);
+                if(CollectionUtils.isNotEmpty(idCardList)){
+                    idCardElementList.addAll(idCardList);
+                }
+            }
+        });
+        if(CollectionUtils.isNotEmpty(idCardElementList)){
+            List<UserVO> userList = userApi.getUserByIdCardList(idCardElementList);
+            if (CollectionUtils.isEmpty(userList)) {
+                throw new CustomException(CommonCode.SERVER_ERROR);
+            }
+            return userList.stream().collect(Collectors.toMap(UserVO::getIdcard,UserVO::getName));
+        }
+        return null;
+    }
+
+    /**
+     * 身份证号转名字
+     * @param idCardToNameMap
+     * @param record
+     */
+    public void convertIdCardToName(Map<String,String> idCardToNameMap,SaasApplicationMergeVO record){
+        if(idCardToNameMap != null){
+            if(StringUtils.isNotBlank(record.getProcessingPerson())){
+                List<String> nameList = Lists.newArrayList();
+                List<String> idCardList = Splitter.on(",")
+                        .trimResults().omitEmptyStrings().splitToList(record.getProcessingPerson());
+
+                idCardList.forEach(idCard->{
+                    if(idCardToNameMap.containsKey(idCard)){
+                        nameList.add(idCardToNameMap.get(idCard));
+                    }
+                });
+
+                String names = Joiner.on(",").skipNulls().join(nameList);
+                record.setProcessingPerson(names);
+            }
+        }
     }
 
 }

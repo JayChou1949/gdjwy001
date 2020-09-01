@@ -3,6 +3,8 @@ package com.hirisun.cloud.saas.mapper;
 import java.util.List;
 import java.util.Map;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.hirisun.cloud.model.saas.vo.SaasApplicationMergeVO;
 import org.apache.ibatis.annotations.Param;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -18,10 +20,10 @@ import com.hirisun.cloud.saas.bean.SaasApplicationMerge;
  */
 public interface SaasApplicationMergeMapper extends BaseMapper<SaasApplicationMerge> {
 
-    IPage<SaasApplicationMerge> getFlowPage(IPage<SaasApplicationMerge> page, @Param("p") Map<String, Object> param);
+    Page<SaasApplicationMergeVO> getFlowPage(IPage<SaasApplicationMergeVO> page, @Param("p") Map<String, Object> param);
 
     //查服务用
-    IPage<SaasApplicationMerge> getFlowPageWithServiceName(IPage<SaasApplicationMerge> page, @Param("p") Map<String, Object> param);
+    Page<SaasApplicationMergeVO> getFlowPageWithServiceName(IPage<SaasApplicationMergeVO> page, @Param("p") Map<String, Object> param);
 
     //优化前的SQL
     IPage<SaasApplicationMerge> getFlowPageBank(IPage<SaasApplicationMerge> page, @Param("p") Map<String, Object> param);

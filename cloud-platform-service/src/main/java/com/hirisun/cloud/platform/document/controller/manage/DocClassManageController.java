@@ -67,7 +67,7 @@ public class DocClassManageController {
     @PutMapping("/saveOrUpdate")
     public QueryResponseResult<DevDocClass> saveOrUpdate(@LoginUser UserVO user, @RequestBody DevDocClass devDocClass) {
 
-        devDocClass.setCreator(user.getIdCard());
+        devDocClass.setCreator(user.getIdcard());
         devDocClass.setUpdateTime(new Date());
         if (StringUtils.isEmpty(devDocClass.getId())) {
             devDocClassService.save(devDocClass);

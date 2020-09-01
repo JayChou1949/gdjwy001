@@ -67,7 +67,7 @@ public class DevDocServiceImpl extends ServiceImpl<DevDocMapper, DevDoc> impleme
         if (StringUtils.isEmpty(devDoc.getId())) {
             String id = UUIDUtil.getUUID();
             devDoc.setId(id);
-            devDoc.setCreator(user.getIdCard());
+            devDoc.setCreator(user.getIdcard());
             devDoc.setStatus(ReviewStatus.PRO_ONLINE.getCode());
             if (!StringUtils.isEmpty(devDoc.getFileIds())) {
                 List<DevDocFile> fileList = new ArrayList<>();
@@ -147,7 +147,6 @@ public class DevDocServiceImpl extends ServiceImpl<DevDocMapper, DevDoc> impleme
         DevDoc document = this.getById(id);
         document.setStatus(ReviewStatus.DELETE.getCode());
         this.updateById(document);
-//        systemApi.saveLog(user.getIdCard(), "文档id：" + id, "删除开发文档", IpUtil.getIp());
         //TODO 物理删除文件
         log.info("删除图片");
         fileApi.delete(document.getImage());

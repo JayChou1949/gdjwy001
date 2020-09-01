@@ -112,7 +112,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
         }
         workflow.setVersion(version);
         workflow.setCreator(user.getName());
-        workflow.setCreatorId(user.getIdCard());
+        workflow.setCreatorId(user.getIdcard());
         workflow.setCreatorOrgId(user.getOrgId());
         this.updateById(workflow);
         workflowNodeService.saveBatch(nodeList);
@@ -145,7 +145,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             sort++;
         }
         workflow.setCreator(user.getName());
-        workflow.setCreatorId(user.getIdCard());
+        workflow.setCreatorId(user.getIdcard());
         workflow.setCreatorOrgId(user.getOrgId());
         workflow.setId(workflowId);
         workflow.setVersion(0);
@@ -258,7 +258,7 @@ public class WorkflowServiceImpl extends ServiceImpl<WorkflowMapper, Workflow> i
             String[] handlerArr = userStr.split(",");
             for (String str : handlerArr) {
                 for (UserVO user : userList) {
-                    if (str.equals(user.getIdCard())) {
+                    if (str.equals(user.getIdcard())) {
                         defaultHandlers.append("," + user.getName());
                     }
                 }
