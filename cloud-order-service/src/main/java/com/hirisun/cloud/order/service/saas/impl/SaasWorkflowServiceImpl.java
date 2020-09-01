@@ -114,7 +114,6 @@ public class SaasWorkflowServiceImpl implements SaasWorkflowService {
 
         Map map = new HashMap();
         map.put("bizData", detail);
-//        map.put("instance", instance);
         map.put("nodeList", nodeVoList);
         map.put("reviewList", reviewList);
         map.put("feedbackList", feedbackList);

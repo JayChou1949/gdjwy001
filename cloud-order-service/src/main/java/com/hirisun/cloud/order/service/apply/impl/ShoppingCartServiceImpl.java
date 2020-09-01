@@ -83,7 +83,6 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
 //        shoppingCart.setStatus(ShoppingCart.STATUS_WAIT_SUBMIT);
 
         this.save(shoppingCart);
-        //TODO 保存附件  表单信息
 //        applicationInfoService.addToShoppingCart(user, shoppingCart, hw.getHandler());
     }
 
@@ -101,7 +100,6 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
          * 3.每个购物车申请生成流程实例
          * 4.每个流程实例的申请环节自动提交
          *
-         * TODO 合并工单、发送消息、只实现弹性云服务器流程
          */
         logger.info("submitRequest -> {}",submitRequest);
         ApplyInfo baseInfo = submitRequest.convertToApplicationInfo();
@@ -185,9 +183,6 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
         logger.info("baseInfo -> {}",baseInfo);
         //根据购物车生成订单(其中包括订单选择哪个流程，用于后面的发起流程)
         ApplyInfo info = configAndSaveBaseInfoByArea(baseInfo);
-        /**
-         * TODO 保存第三方提交数据为json
-         */
 
         String flag=workflowApi.launchInstanceByArea(baseInfo.getCreatorName(),info.getId(),"IAAS");
         logger.info("launchInstanceByArea:{}",flag);

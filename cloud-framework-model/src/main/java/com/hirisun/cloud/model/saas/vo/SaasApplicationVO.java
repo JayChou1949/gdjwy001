@@ -1,6 +1,7 @@
 package com.hirisun.cloud.model.saas.vo;
 
 import cn.afterturn.easypoi.excel.annotation.Excel;
+import com.hirisun.cloud.model.apply.ApplyReviewRecordVO;
 import com.hirisun.cloud.model.file.FilesVo;
 import com.hirisun.cloud.model.service.AppReviewInfoVo;
 import lombok.Data;
@@ -166,12 +167,12 @@ public class SaasApplicationVO implements Serializable {
     /**
      * 审核记录(包含实施记录)
      */
-    private List<AppReviewInfoVo> reviewList;
+    private List<ApplyReviewRecordVO> reviewList;
 
     /**
      * 实施信息
      */
-    private AppReviewInfoVo impl;
+    private ApplyReviewRecordVO impl;
 
     /**
      * saas申请用用统计

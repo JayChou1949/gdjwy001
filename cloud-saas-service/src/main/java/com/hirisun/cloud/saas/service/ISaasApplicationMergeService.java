@@ -33,8 +33,6 @@ public interface ISaasApplicationMergeService extends IService<SaasApplicationMe
 
     void deleteById(String userId, String id);
 
-    void saveImpl(UserVO user, Map<String, Object> param, String modelid);
-
     Page<SaasApplicationMergeVO> getFlowPage(String userId, Map<String, Object> param);
 
     Page<SaasApplicationMergeVO> getFlowPageWithServiceName(String userId, Map<String, Object> param);

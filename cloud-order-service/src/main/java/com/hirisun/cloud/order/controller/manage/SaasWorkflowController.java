@@ -371,7 +371,6 @@ public class SaasWorkflowController {
 //            SaasApplication saasApplication = getSaasApplication(impt, merge);
 //            if ("是".equals(impt.getLvl2Recycle())) {
 //                saasApplication.setRecoverFlag("-1");
-//                // TODO: 2019/10/31 回收记录
 //                insertRevocerData(impt,saasApplication);
 //            } else switch (impt.getBigDataRecycle()) {
 //                case "否":
@@ -379,24 +378,20 @@ public class SaasWorkflowController {
 //                    break;
 //                case "是":
 //                    saasApplication.setRecoverFlag("-1"); // 导出表格中使用权限状态为:否
-//                    // TODO: 2019/10/31 回收记录
 //                    insertRevocerData(impt, saasApplication);
 //                    break;
 //                case "是，一键申请重复":
 //                    saasApplication.setRecoverFlag("0");
 //                    createNewRecord(impt);
-//                    // TODO: 2019/10/31 回收记录
 //                    insertRevocerData(impt, saasApplication);
 //                    break;
 //                case "再开通":
 //                    saasApplication.setRecoverFlag("0");
-//                    // TODO: 2019/10/31 回收记录
 //                    insertRevocerData(impt, saasApplication);
 //                    break;
 //                case "再开通，一键申请重复":
 //                    saasApplication.setRecoverFlag("0");
 //                    createNewRecord(impt);
-//                    // TODO: 2019/10/31 回收记录
 //                    insertRevocerData(impt, saasApplication);
 //                    break;
 //                default:

@@ -5,9 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
@@ -17,11 +15,20 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
+import com.hirisun.cloud.api.order.ApplyReviewRecordApi;
 import com.hirisun.cloud.api.workflow.WorkflowApi;
+import com.hirisun.cloud.common.constant.RedisKey;
 import com.hirisun.cloud.common.contains.ApplyInfoStatus;
+import com.hirisun.cloud.common.contains.WorkflowActivityStatus;
 import com.hirisun.cloud.common.vo.CommonCode;
+import com.hirisun.cloud.model.apply.ApplyReviewRecordVO;
+import com.hirisun.cloud.model.param.ActivityParam;
 import com.hirisun.cloud.model.saas.vo.SaasApplicationMergeVO;
+import com.hirisun.cloud.model.service.AppReviewInfoVo;
 import com.hirisun.cloud.model.workflow.WorkflowActivityVO;
+import com.hirisun.cloud.model.workflow.WorkflowInstanceVO;
+import com.hirisun.cloud.model.workflow.WorkflowVO;
+import com.hirisun.cloud.redis.service.RedisService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -75,98 +82,94 @@ public class SaasApplicationMergeServiceImpl extends ServiceImpl<SaasApplication
     private StringRedisTemplate stringRedisTemplate;
     @Autowired
     private ISaasApplicationService saasApplicationService;
-    //TODO
-//    @Autowired
-//    private IActivityService activityService;
-//    @Autowired
-//    private IInstanceService instanceService;
-//    @Autowired
-//    private IWorkflowmodelService workflowmodelService;
-//    @Autowired
-//    private IWorkflowService workflowService;
-//    @Autowired
-//    private IFilesService filesService;
-//    @Autowired
-//  private ISpeedUpService speedUpService;
     @Autowired
     private FilesApi filesApi;
-
     @Autowired
     private WorkflowApi workflowApi;
-//    @Autowired
-//    private IAppReviewInfoService appReviewInfoService;
     @Autowired
     private UserApi userApi;
-//    
     @Autowired
     private FileApi fileApi;
     @Autowired
     private UserDocApi userDocApi;
     @Autowired
     private SmsApi smsApi;
+
+    @Autowired
+    private ApplyReviewRecordApi applyReviewRecordApi;
+
+    @Autowired
+    private RedisService redisService;
     
     @Transactional(rollbackFor = Exception.class)
     @Override
     public SaasApplicationMerge merge(String userId, String ids) {
 
         UserVO user = userApi.getUserByIdCard(userId);
-    	//TODO
-//        String[] idArray = ids.split(",");
-//        SaasApplication application = saasApplicationService.getById(idArray[0]);
-//        Workflow workflow = null;
-//        //将可视化建模平台和通用应用流程区分开
-//        if ("1".equals(application.getVisible())){
-//            workflow = workflowService.getOne(new QueryWrapper<Workflow>().eq("DEFAULT_PROCESS","SAAS_VISIBLE"));
-//        }else if ("2".equals(application.getVisible())){ //将广东公安数据接入平台和通用应用流程区分开
-//            workflow = workflowService.getOne(new QueryWrapper<Workflow>().eq("DEFAULT_PROCESS","SAAS_DATA_ACCESS"));
-//        }else {
-//            workflow = workflowService.getOne(new QueryWrapper<Workflow>().eq("DEFAULT_PROCESS","SAAS"));
-//        }
-//        if (workflow==null){
-//            throw new BaseException("未配置流程");
-//        }
-//        SaasApplicationMerge merge = new SaasApplicationMerge();
-//        merge.setCreator(user.getIdcard());
-//        merge.setCreatorName(user.getName());
-//        merge.setOrgId(user.getOrgId());
-//        merge.setOrgName(user.getOrgName());
-//        merge.setPostType(user.getPostType());
-//        merge.setMobileWork(user.getMobileWork());
-//        merge.setApplicationTime(new Date());
-//        merge.setStatus(ApplicationInfoStatus.INNER_REVIEW.getCode());
-//        merge.setWorkFlowId(workflow.getId());
-//        merge.setWorkFlowVersion(workflow.getVersion());
-//        String orderNum = OrderNum.gen(stringRedisTemplate, RedisKey.KEY_ORDER_NUM_PREFIX);
-//        merge.setOrderNumber(orderNum);
-//        merge.setAreas(user.getTenantArea());
-//        merge.setPoliceCategory(user.getTenantPoliceCategory());
-//        this.save(merge);
-//        // 更新原始单据为已关联
-//        List<SaasApplication> list = new ArrayList<>(idArray.length);
-//        for (String id : idArray) {
-//            SaasApplication saasApplication = new SaasApplication();
-//            saasApplication.setId(id);
-//            saasApplication.setMergeId(merge.getId());
-//            list.add(saasApplication);
-//        }
-//        saasApplicationService.updateBatchById(list);
-//
-//        R r= instanceService.launchInstanceOfWorkFlow(user.getIdcard(), merge.getWorkFlowId(), merge.getId());
-//
-//        Workflowmodel workflowmodel = workflowmodelService.getOne(new QueryWrapper<Workflowmodel>()
-//                .eq("WORKFLOWID",workflow.getId()).eq("modelname", ModelName.LVL2_MANAGER.getName()).eq("VERSION",workflow.getVersion()));
-//
-//        Map<String, String> modelMapToPerson = new HashMap<>();
-//        modelMapToPerson.put(workflowmodel.getId(), user.getIdcard());
-//        AdvanceBeanVO advanceBeanVO = new AdvanceBeanVO();
-//        advanceBeanVO.setCurrentActivityId(r.get("data").toString());
-//        advanceBeanVO.setModelMapToPerson(modelMapToPerson);
-//        Map<String,String> map = new HashMap<>();
-//        map.put("name", BusinessName.SAAS_RESOURCE);
-//        map.put("order", merge.getOrderNumber());
-//        activityService.advanceCurrentActivity(advanceBeanVO, map);
-//    	  smsApi.buildSuccessMessage(user.getIdcard(), BusinessName.SAAS_RESOURCE, merge.getOrderNumber());
-    	return null;
+        String[] idArray = ids.split(",");
+        SaasApplication application = saasApplicationService.getById(idArray[0]);
+        WorkflowVO workflow = null;
+        //将可视化建模平台和通用应用流程区分开
+        if ("1".equals(application.getVisible())){
+            workflow=workflowApi.getWorkflowByDefaultProcess("SAAS_VISIBLE");
+        }else if ("2".equals(application.getVisible())){ //将广东公安数据接入平台和通用应用流程区分开
+            workflow=workflowApi.getWorkflowByDefaultProcess("SAAS_DATA_ACCESS");
+        }else {
+            workflow=workflowApi.getWorkflowByDefaultProcess("SAAS");
+        }
+        if (workflow==null){
+            throw new CustomException(SaasExceptionCode.NO_WORKFLOW_CONFIG);
+        }
+        SaasApplicationMerge merge = new SaasApplicationMerge();
+        merge.setCreator(user.getIdcard());
+        merge.setCreatorName(user.getName());
+        merge.setOrgId(user.getOrgId());
+        merge.setOrgName(user.getOrgName());
+        merge.setPostType(user.getPostType());
+        merge.setMobileWork(user.getMobileWork());
+        merge.setApplicationTime(new Date());
+        merge.setStatus(ApplicationInfoStatus.INNER_REVIEW.getCode());
+        merge.setWorkFlowId(workflow.getId());
+        merge.setWorkFlowVersion(workflow.getVersion());
+        String orderNum = redisService.genOrderNum(RedisKey.KEY_ORDER_NUM_PREFIX);
+        merge.setOrderNumber(orderNum);
+        merge.setAreas(user.getTenantArea());
+        merge.setPoliceCategory(user.getTenantPoliceCategory());
+        this.save(merge);
+        // 更新原始单据为已关联
+        List<SaasApplication> list = new ArrayList<>(idArray.length);
+        for (String id : idArray) {
+            SaasApplication saasApplication = new SaasApplication();
+            saasApplication.setId(id);
+            saasApplication.setMergeId(merge.getId());
+            list.add(saasApplication);
+        }
+        saasApplicationService.updateBatchById(list);
+        workflowApi.launchInstanceOfWorkflow(user.getIdcard(),merge.getWorkFlowId(), merge.getId());
+        WorkflowInstanceVO instance = workflowApi.getWorkflowInstanceByBusinessId(merge.getId());
+        if (null==instance){
+            throw new CustomException(CommonCode.FLOW_INSTANCE_NULL_ERROR);
+        }
+        ActivityParam param = new ActivityParam();
+        param.setActivitystatus(0);
+        param.setIsstart(0);
+        param.setInstanceId(instance.getId());
+
+        Map<String,String> map = new HashMap<>();
+        map.put("name",BusinessName.SAAS_RESOURCE);
+        map.put("order",merge.getOrderNumber());
+        map.put("depApproveUserIds",user.getIdcard());//申请后一个流程处理人
+        WorkflowActivityVO firstActivity = workflowApi.getOneWorkflowActivityByParams(WorkflowActivityStatus.WAITING.getCode(),instance.getId());
+        if (firstActivity==null) {
+            log.error("未找到对应的流程活动信息！");
+            throw new CustomException(SaasExceptionCode.WORKFLOW_ACTIVITY_MISSING);
+        }
+        Map resultMap = workflowApi.advanceActivity(firstActivity.getId(),map);
+        if (!"200".equals(resultMap.get("code"))) {
+            throw new CustomException(SaasExceptionCode.FEIGN_METHOD_ERROR);
+        }
+        smsApi.buildSuccessMessage(user.getIdcard(), BusinessName.SAAS_RESOURCE, merge.getOrderNumber());
+    	return merge;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -190,7 +193,6 @@ public class SaasApplicationMergeServiceImpl extends ServiceImpl<SaasApplication
         if (null == info) {
             return null;
         }
-
         UserVO userVO = userApi.getUserByIdCard(info.getCreator());
         info.setUser(userVO);
         info.setApplicationList(saasApplicationService.getListByMergeId(id));
@@ -198,23 +200,19 @@ public class SaasApplicationMergeServiceImpl extends ServiceImpl<SaasApplication
         SubpageParam param = new SubpageParam();
         param.setRefId(id);
 		List<FilesVo> fileList = filesApi.find(param);
-        
 		info.setFileList(fileList);
         // 审核信息
-		// TODO
-//        List<AppReviewInfo> allReviewInfo = appReviewInfoService.getAllReviewInfoByAppInfoId(id);
-//        info.setReviewList(allReviewInfo);
-//        // 实施审批信息
-//        AppReviewInfo implInfo = null;
-//        AppReviewInfo lastReviewInfo = appReviewInfoService.getLastPassReviewInfoByAppInfoId(id);
-//        if (lastReviewInfo != null && "2".equals(lastReviewInfo.getrType())) {
-//            // 最近一条审核记录为实施记录
-//            implInfo = lastReviewInfo;
-//            param.setRefId(implInfo.getId());
-//    		fileList = filesApi.find(param);
-//            implInfo.setFileList(fileList);
-//            info.setImpl(implInfo);
-//        }
+        List<ApplyReviewRecordVO> allReviewInfo = applyReviewRecordApi.getAllReviewInfoByAppInfoId(id);
+        info.setReviewList(allReviewInfo);
+        // 实施审批信息
+        ApplyReviewRecordVO lastReviewInfo = applyReviewRecordApi.getLastPassReviewInfoByAppInfoId(id);
+        if (lastReviewInfo != null && "2".equals(lastReviewInfo.getType())) {
+            // 最近一条审核记录为实施记录
+            param.setRefId(lastReviewInfo.getId());
+    		fileList = filesApi.find(param);
+            lastReviewInfo.setFileList(fileList);
+            info.setImpl(lastReviewInfo);
+        }
         return info;
     }
 
@@ -233,53 +231,6 @@ public class SaasApplicationMergeServiceImpl extends ServiceImpl<SaasApplication
                 .set(SaasApplication::getMergeId, null)
                 .set(SaasApplication::getStatus, ApplicationInfoStatus.INNER_REVIEW.getCode()));
         info.deleteById();
-    }
-
-
-    @Transactional(rollbackFor = Throwable.class)
-    @Override
-    public void saveImpl(UserVO user, Map<String, Object> param, String modelId) {
-        SaasApplicationMerge info = (SaasApplicationMerge) param.get("info");
-        // 添加实施信息
-        ImplRequestVo implRequest = (ImplRequestVo) param.get("implRequest");
-        String result = implRequest.getResult();
-        String remark = implRequest.getRemark();
-        //TODO
-//        AppReviewInfo reviewInfo = new AppReviewInfo();
-//        reviewInfo.setCreator(user.getIdcard());
-//        reviewInfo.setResult(result);
-//        reviewInfo.setRemark(remark);
-//        reviewInfo.setrType("2");
-//        reviewInfo.setStepName(ModelName.CARRY.getName());
-//        reviewInfo.setFlowStepId(modelId);
-//        reviewInfo.setAppInfoId(info.getId());
-//        reviewInfo.insert();
-//        // 实施附件
-//        filesService.refFiles(implRequest.getFileList(), reviewInfo.getId());
-//        
-//        新改造的代码别删
-//        SubpageParam abc = new SubpageParam();
-//        abc.setFiles(implRequest.getFileList());
-//        abc.setRefId(reviewInfo.getId());
-//		filesApi.refFiles(abc );
-        
-        ApplicationInfoStatus status;
-        if ("0".equals(result)) {
-            // 驳回申请
-            status = ApplicationInfoStatus.REVIEW;
-        } else {
-            // 实施步骤已完成,修改申请为使用状态
-            status = ApplicationInfoStatus.USE;
-            //通过合并后的id查找申请信息集合，然后依次给申请人发送短信
-            List<SaasApplication> saasApplicationList = saasApplicationService.getListByMergeId(info.getId());
-            for (SaasApplication saasApplication:saasApplicationList) {
-            	smsApi.buildSuccessMessage(saasApplication.getCreator(), BusinessName.SAAS_RESOURCE, saasApplication.getOrderNumber());
-            }
-        }
-        this.update(new SaasApplicationMerge(), new UpdateWrapper<SaasApplicationMerge>().lambda()
-                .eq(SaasApplicationMerge::getId, info.getId())
-                .set(SaasApplicationMerge::getStatus, status.getCode()));
-        saasApplicationService.updateStatus(info.getId(), status.getCode());
     }
 
     @Override

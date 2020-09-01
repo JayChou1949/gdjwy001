@@ -13,6 +13,15 @@ import java.util.Objects;
 
 import javax.servlet.http.HttpServletResponse;
 
+import com.hirisun.cloud.api.order.ApplyReviewRecordApi;
+import com.hirisun.cloud.api.workflow.WorkflowApi;
+import com.hirisun.cloud.common.contains.WorkflowActivityStatus;
+import com.hirisun.cloud.common.vo.CommonCode;
+import com.hirisun.cloud.model.apply.ApplyReviewRecordVO;
+import com.hirisun.cloud.model.workflow.WorkflowActivityVO;
+import com.hirisun.cloud.model.workflow.WorkflowInstanceVO;
+import com.hirisun.cloud.model.workflow.WorkflowNodeVO;
+import com.hirisun.cloud.saas.bean.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -46,10 +55,6 @@ import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.model.workbench.vo.QueryVO;
 import com.hirisun.cloud.model.workbench.vo.ResourceOverviewVO;
 import com.hirisun.cloud.redis.service.RedisService;
-import com.hirisun.cloud.saas.bean.SaasAppExtResource;
-import com.hirisun.cloud.saas.bean.SaasApplication;
-import com.hirisun.cloud.saas.bean.SaasApplicationExt;
-import com.hirisun.cloud.saas.bean.SaasApplicationImport;
 import com.hirisun.cloud.saas.handle.CommonHandler;
 import com.hirisun.cloud.saas.mapper.SaasApplicationMapper;
 import com.hirisun.cloud.saas.service.ISaasAppExtResourceService;
@@ -89,21 +94,16 @@ public class SaasApplicationServiceImpl extends ServiceImpl<SaasApplicationMappe
     @Autowired
     private SmsApi smsApi;
 
+    @Autowired
+    private WorkflowApi workflowApi;
 
-    //TODO
-    
-//    @Autowired
-//    private IActivityService activityService;
-//    @Autowired
-//    private IInstanceService instanceService;
-//    @Autowired
-//    private IWorkflowmodelService workflowmodelService;
-//    @Autowired
-//    private MessageProvider messageProvider;
     @Autowired
     private SaasApplicationMapper saasApplicationMapper;
     @Autowired
     private ISaasAppExtResourceService saasAppExtResourceService;
+
+    @Autowired
+    private ApplyReviewRecordApi applyReviewRecordApi;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -221,43 +221,28 @@ public class SaasApplicationServiceImpl extends ServiceImpl<SaasApplicationMappe
                 info.setCanSubmit(true);
             }
         }
-        //TODO
-//        String activityId = "";
-//        Map<String, List<AppReviewInfo>> reviews = null;
-//        WorkFlowModelVo modelVo = null;
-//        if (isMerged) {
-//            SaasApplicationMerge merge = saasApplicationMergeService.getDetails(info.getMergeId());
-//            if (merge != null) {
-//                Instance instance = instanceService.getInstanceByBusinessId(info.getMergeId());
-//                Activity activity = null;
-//                if (null!=instance){
-//                    List<Activity> activitys = activityService.list(new QueryWrapper<Activity>().lambda()
-//                            .eq(Activity::getInstanceid,instance.getId()).eq(Activity::getHandlepersonids,user.getIdcard()).eq(Activity::getActivitystatus,"待办").isNull(Activity::getActivitytype));
-//                    if (null==activitys||activitys.size()==0){
-//                        activitys = activityService.list(new QueryWrapper<Activity>().lambda()
-//                                .eq(Activity::getInstanceid,instance.getId()).eq(Activity::getHandlepersonids,user.getIdcard()).eq(Activity::getActivitystatus,"待办").eq(Activity::getActivitytype,"adviser"));
-//                    }
-//                    if (null!=activitys&&activitys.size()>0) activity = activitys.get(0);
-//                }
-//                if (activity!=null) {
-//                    activityId = activity.getId();
-//                }
-//                List<AppReviewInfo> allReviewInfo = merge.getReviewList();
-//                if (allReviewInfo!=null){
-//                    reviews = allReviewInfo.stream().collect(Collectors.groupingBy(a->a.getFlowStepId()+""));
-//                }
-//                modelVo = workflowmodelService.getWorkFlowDefinition(info.getMergeId());
-//                // 放入审批记录
-//                info.setReviewList(merge.getReviewList());
-//                info.setImpl(merge.getImpl());
-//            }
-//        }
+        String activityId = "";
+        Map<String, List<ApplyReviewRecordVO>> reviews = null;
+        List<WorkflowNodeVO> nodeVoList = null;
+        if (isMerged) {
+            SaasApplicationMerge merge = saasApplicationMergeService.getDetails(info.getMergeId());
+            if (merge != null) {
+                WorkflowInstanceVO  instance = workflowApi.getWorkflowInstanceByBusinessId(info.getMergeId());
+                if (null==instance){
+                    throw new CustomException(CommonCode.FLOW_INSTANCE_NULL_ERROR);
+                }
+                nodeVoList = workflowApi.getWorkflowNodeAndActivitys(instance.getVersion(), instance.getWorkflowId(), instance.getId());
+                // 放入审批记录
+                info.setReviewList(merge.getReviewList());
+                info.setImpl(merge.getImpl());
+            }
+        }
 
         Map<String, Object> map = new HashMap<>();
         map.put("bizData", info);
-//        map.put("review", reviews);
-//        map.put("model", modelVo);
-//        map.put("activityId", activityId);
+        map.put("nodeList", nodeVoList);
+        map.put("reviewList", reviews);
+        map.put("activityId", activityId);
         map.put("merge", isMerged ? "已合并" : "未合并");
         return map;
     }

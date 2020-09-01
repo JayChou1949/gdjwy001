@@ -24,21 +24,21 @@ public class SaasApplicationMergeController {
 	private ISaasApplicationMergeService saasApplicationMergeService;
 	
 	@ApiIgnore
-	@ApiOperation("getFlowPage")
+	@ApiOperation("获取工单列表")
     @PostMapping(value = "/getFlowPage")
     public Page<SaasApplicationMergeVO> getFlowPage(@RequestParam String userId, @RequestParam Map<String, Object> param) {
 		return saasApplicationMergeService.getFlowPage(userId, param);
 	}
 
 	@ApiIgnore
-	@ApiOperation("getFlowPageWithServiceName")
+	@ApiOperation("根据服务名筛选工单列表")
 	@PostMapping(value = "/getFlowPageWithServiceName")
 	public Page<SaasApplicationMergeVO> getFlowPageWithServiceName(@RequestParam String userId,@RequestParam Map<String, Object> param) {
 		return saasApplicationMergeService.getFlowPageWithServiceName(userId,param);
 	}
 
 	@ApiIgnore
-	@ApiOperation("merge")
+	@ApiOperation("工单合并")
 	@GetMapping(value = "/merge")
 	public SaasApplicationMergeVO merge(@RequestParam String userId, @RequestParam String ids) {
 		SaasApplicationMerge merge = saasApplicationMergeService.merge(userId, ids);
@@ -48,7 +48,7 @@ public class SaasApplicationMergeController {
 	}
 
 	@ApiIgnore
-	@ApiOperation("deleteById")
+	@ApiOperation("删除工单")
 	@GetMapping(value = "/deleteById")
 	public void deleteById(@RequestParam String userId, @RequestParam String id) {
 		saasApplicationMergeService.deleteById(userId, id);
@@ -56,7 +56,7 @@ public class SaasApplicationMergeController {
 	}
 
 	@ApiIgnore
-	@ApiOperation("update")
+	@ApiOperation("更新工单")
 	@PutMapping(value = "/update")
 	public void update(@RequestParam String userId, @RequestBody SaasApplicationMergeVO	vo) {
 		SaasApplicationMerge saasApplicationMerge = new SaasApplicationMerge();
@@ -66,7 +66,7 @@ public class SaasApplicationMergeController {
 	}
 
 	@ApiIgnore
-	@ApiOperation("getById")
+	@ApiOperation("获取合并工单信息")
 	@GetMapping(value = "/getById")
 	public SaasApplicationMergeVO getById(@RequestParam String id) {
 		SaasApplicationMerge merge = saasApplicationMergeService.getById(id);
@@ -76,7 +76,7 @@ public class SaasApplicationMergeController {
 	}
 
 	@ApiIgnore
-	@ApiOperation("getDetails")
+	@ApiOperation("获取合并工单明细")
 	@GetMapping(value = "/getDetails")
 	public SaasApplicationMergeVO getDetails(@RequestParam String id) {
 		SaasApplicationMerge merge = saasApplicationMergeService.getDetails(id);
@@ -86,7 +86,7 @@ public class SaasApplicationMergeController {
 	}
 
 	@ApiIgnore
-	@ApiOperation("updateById")
+	@ApiOperation("更新工单")
 	@GetMapping(value = "/updateById")
 	public void updateById(@RequestBody SaasApplicationMergeVO vo) {
 		SaasApplicationMerge saasApplicationMerge = new SaasApplicationMerge();
@@ -103,7 +103,7 @@ public class SaasApplicationMergeController {
 				.set(SaasApplicationMerge::getCarryTime, new Date()));
 	}
 	@ApiIgnore
-	@ApiOperation("根据参数更新")
+	@ApiOperation("根据参数更新合并工单")
 	@PutMapping(value = "/updateByParams")
 	public void updateByParams(@RequestBody SaasApplicationMergeVO vo) {
 		LambdaUpdateWrapper<SaasApplicationMerge> wrapper = new UpdateWrapper<SaasApplicationMerge>().lambda()
