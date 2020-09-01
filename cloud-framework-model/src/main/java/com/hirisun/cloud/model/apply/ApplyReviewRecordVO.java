@@ -1,12 +1,14 @@
 package com.hirisun.cloud.model.apply;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.hirisun.cloud.model.file.FilesVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * <p>
@@ -59,6 +61,9 @@ public class ApplyReviewRecordVO implements Serializable {
 
     @ApiModelProperty(value = "审批结果 0:驳回 1:通过")
     private Integer result;
+
+    private List<FilesVo> fileList;
+
 
 
     @Override

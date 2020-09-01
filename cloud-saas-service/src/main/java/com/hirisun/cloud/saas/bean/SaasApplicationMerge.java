@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
+import com.hirisun.cloud.model.apply.ApplyReviewRecordVO;
 import com.hirisun.cloud.model.file.FilesVo;
 import com.hirisun.cloud.model.service.AppReviewInfoVo;
 import com.hirisun.cloud.model.user.UserVO;
@@ -146,7 +147,7 @@ public class SaasApplicationMerge extends Model<SaasApplicationMerge> {
      * 审核记录(包含实施记录)
      */
     @TableField(exist = false)
-    private List<AppReviewInfoVo> reviewList;
+    private List<ApplyReviewRecordVO> reviewList;
     /**
      * 创建人
      */
@@ -214,7 +215,7 @@ public class SaasApplicationMerge extends Model<SaasApplicationMerge> {
      * 实施信息
      */
     @TableField(exist = false)
-    private AppReviewInfoVo impl;
+    private ApplyReviewRecordVO impl;
 
     /**
      * 当前环节处理人
@@ -249,13 +250,7 @@ public class SaasApplicationMerge extends Model<SaasApplicationMerge> {
         this.num = num;
     }
 
-    public void setImpl(AppReviewInfoVo impl) {
-        this.impl = impl;
-    }
 
-    public AppReviewInfoVo getImpl() {
-        return impl;
-    }
 
     public List<FilesVo> getFileList() {
         return fileList;
@@ -444,12 +439,20 @@ public class SaasApplicationMerge extends Model<SaasApplicationMerge> {
         this.isImport = isImport;
     }
 
-    public List<AppReviewInfoVo> getReviewList() {
+    public List<ApplyReviewRecordVO> getReviewList() {
         return reviewList;
     }
 
-    public void setReviewList(List<AppReviewInfoVo> reviewList) {
+    public void setReviewList(List<ApplyReviewRecordVO> reviewList) {
         this.reviewList = reviewList;
+    }
+
+    public ApplyReviewRecordVO getImpl() {
+        return impl;
+    }
+
+    public void setImpl(ApplyReviewRecordVO impl) {
+        this.impl = impl;
     }
 
     public UserVO getUser() {

@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
+import com.hirisun.cloud.model.apply.ApplyReviewRecordVO;
 import com.hirisun.cloud.model.file.FilesVo;
 import com.hirisun.cloud.model.service.AppReviewInfoVo;
 
@@ -202,13 +203,13 @@ public class SaasApplication extends Model<SaasApplication> {
      * 审核记录(包含实施记录)
      */
     @TableField(exist = false)
-    private List<AppReviewInfoVo> reviewList;
+    private List<ApplyReviewRecordVO> reviewList;
 
     /**
      * 实施信息
      */
     @TableField(exist = false)
-    private AppReviewInfoVo impl;
+    private ApplyReviewRecordVO impl;
 
     /**
      * saas申请用用统计
@@ -270,19 +271,20 @@ public class SaasApplication extends Model<SaasApplication> {
     public void setTotal(String total) {
         this.total = total;
     }
-    public List<AppReviewInfoVo> getReviewList() {
+
+    public List<ApplyReviewRecordVO> getReviewList() {
         return reviewList;
     }
 
-    public void setReviewList(List<AppReviewInfoVo> reviewList) {
+    public void setReviewList(List<ApplyReviewRecordVO> reviewList) {
         this.reviewList = reviewList;
     }
 
-    public AppReviewInfoVo getImpl() {
+    public ApplyReviewRecordVO getImpl() {
         return impl;
     }
 
-    public void setImpl(AppReviewInfoVo impl) {
+    public void setImpl(ApplyReviewRecordVO impl) {
         this.impl = impl;
     }
 

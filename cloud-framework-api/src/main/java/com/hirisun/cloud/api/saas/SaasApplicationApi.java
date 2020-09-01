@@ -33,42 +33,42 @@ public interface SaasApplicationApi {
     public List<SaasApplicationVO> getListByMergeId(@RequestParam String id);
 
     @ApiIgnore
-    @ApiOperation("getFlowPage")
+    @ApiOperation("获取工单列表")
     @PostMapping(value = "/saas/saasApplicationMerge/getFlowPage")
     public Page<SaasApplicationMergeVO> getFlowPage(@RequestParam String userId, @RequestParam Map<String, Object> param);
 
     @ApiIgnore
-    @ApiOperation("getFlowPageWithServiceName")
+    @ApiOperation("根据服务名筛选工单列表")
     @PostMapping(value = "/saas/saasApplicationMerge/getFlowPageWithServiceName")
     public Page<SaasApplicationMergeVO> getFlowPageWithServiceName(@RequestParam String userId, @RequestParam Map<String, Object> param);
 
     @ApiIgnore
-    @ApiOperation("merge")
+    @ApiOperation("工单合并")
     @GetMapping(value = "/saas/saasApplicationMerge/merge")
     public SaasApplicationMergeVO merge(@RequestParam String userId, @RequestParam String ids);
 
     @ApiIgnore
-    @ApiOperation("deleteById")
+    @ApiOperation("删除工单")
     @GetMapping(value = "/saas/saasApplicationMerge/deleteById")
     public void deleteById(@RequestParam String userId, @RequestParam String id);
 
     @ApiIgnore
-    @ApiOperation("update")
+    @ApiOperation("更新工单")
     @PutMapping(value = "/saas/saasApplicationMerge/update")
     public void update(@RequestParam String userId, @RequestBody SaasApplicationMergeVO vo);
 
     @ApiIgnore
-    @ApiOperation("getById")
+    @ApiOperation("获取合并工单信息")
     @GetMapping(value = "/saas/saasApplicationMerge/getById")
     public SaasApplicationMergeVO getById(@RequestParam String id);
 
     @ApiIgnore
-    @ApiOperation("getDetails")
+    @ApiOperation("获取合并工单明细")
     @GetMapping(value = "/saas/saasApplicationMerge/getDetails")
     public SaasApplicationMergeVO getDetails(@RequestParam String id);
 
     @ApiIgnore
-    @ApiOperation("updateById")
+    @ApiOperation("更新工单")
     @GetMapping(value = "/saas/saasApplicationMerge/updateById")
     public void updateById(@RequestBody SaasApplicationMergeVO vo);
 
@@ -78,7 +78,7 @@ public interface SaasApplicationApi {
     public void updateCarryTime(@RequestParam String id);
 
     @ApiIgnore
-    @ApiOperation("根据参数更新")
+    @ApiOperation("根据参数更新合并工单")
     @PutMapping(value = "/saas/saasApplicationMerge/updateByParams")
     public void updateByParams(@RequestBody SaasApplicationMergeVO vo);
 }
