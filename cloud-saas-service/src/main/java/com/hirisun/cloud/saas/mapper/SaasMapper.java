@@ -8,38 +8,38 @@ import org.apache.ibatis.annotations.Param;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.hirisun.cloud.model.user.UserVO;
-import com.hirisun.cloud.saas.bean.SaasConfig;
+import com.hirisun.cloud.saas.bean.Saas;
 
-public interface SaasConfigMapper extends BaseMapper<SaasConfig> {
+public interface SaasMapper extends BaseMapper<Saas> {
 	
-    IPage<SaasConfig> getPage(IPage<SaasConfig> page, @Param("user") UserVO user, @Param("status") Integer status,
+    IPage<Saas> getPage(IPage<Saas> page, @Param("user") UserVO user, @Param("status") Integer status,
                         @Param("name") String name, @Param("subType") String subType,@Param("serviceFlag") Integer serviceFlag,@Param("pilotApp")Integer pilotApp);
 
-    IPage<SaasConfig> getNewPage(IPage<SaasConfig> page, @Param("p") Map<String,Object> param);
+    IPage<Saas> getNewPage(IPage<Saas> page, @Param("p") Map<String,Object> param);
 
-    List<SaasConfig> getLabel(@Param("typeId") String typeId, @Param("canApplication") Integer canApplication);
+    List<Saas> getLabel(@Param("typeId") String typeId, @Param("canApplication") Integer canApplication);
 
-    IPage<SaasConfig> getPageByCondition(IPage<SaasConfig> page, @Param("typeId") String typeId, @Param("label") String label,
+    IPage<Saas> getPageByCondition(IPage<Saas> page, @Param("typeId") String typeId, @Param("label") String label,
                                    @Param("canApplication") Integer canApplication,
                                    @Param("keyword") String keyword, @Param("areaName") String areaName,
                                    @Param("policeCategory") String policeCategory);
 
-    IPage<SaasConfig> getServicePageByCondition(IPage<SaasConfig> page,
+    IPage<Saas> getServicePageByCondition(IPage<Saas> page,
                                    @Param("keyword") String keyword);
 
-    List<SaasConfig> getApplicationApplyPageByCondition(@Param("keyword") String keyword);
+    List<Saas> getApplicationApplyPageByCondition(@Param("keyword") String keyword);
 
-    List<SaasConfig> getPageByCondition(@Param("typeId") String typeId, @Param("label") String label,
+    List<Saas> getPageByCondition(@Param("typeId") String typeId, @Param("label") String label,
                                    @Param("canApplication") Integer canApplication,
                                    @Param("keyword") String keyword, @Param("areaName") String areaName,
                                    @Param("policeCategory") String policeCategory);
 
-    SaasConfig getDetailWithSubTypeName(@Param("serviceId") String serviceId);
+    Saas getDetailWithSubTypeName(@Param("serviceId") String serviceId);
 
     void updateViewCountById(@Param("id") String id);
 
-    List<SaasConfig> getOnlineList(@Param("serviceFlag") Integer serviceFlag);
-    List<SaasConfig> getAppName(String creator);
+    List<Saas> getOnlineList(@Param("serviceFlag") Integer serviceFlag);
+    List<Saas> getAppName(String creator);
 
     Integer userOfSaasApplication(String id);
 

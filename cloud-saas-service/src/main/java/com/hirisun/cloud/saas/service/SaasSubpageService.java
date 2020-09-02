@@ -8,15 +8,15 @@ import com.hirisun.cloud.model.daas.vo.DaasServiceOverview;
 import com.hirisun.cloud.model.daas.vo.InnerServiceOverview;
 import com.hirisun.cloud.model.daas.vo.ServiceOverview;
 import com.hirisun.cloud.model.user.UserVO;
-import com.hirisun.cloud.saas.bean.SaasSubpageConfig;
+import com.hirisun.cloud.saas.bean.SaasSubpage;
 
-public interface SaasSubpageConfigService {
+public interface SaasSubpageService {
 
-	public void saveSaasPage(UserVO user, SaasSubpageConfig iaas);
+	public void saveSaasPage(UserVO user, SaasSubpage iaas);
 
-	public void updateIaasPage(UserVO user, SaasSubpageConfig iaas);
+	public void updateIaasPage(UserVO user, SaasSubpage iaas);
 	
-	public SaasSubpageConfig getDetail(String iaasId);
+	public SaasSubpage getDetail(String iaasId);
 	
 	List<DaasServiceOverview> daas(String name);
 

@@ -11,53 +11,53 @@ import com.hirisun.cloud.model.service.alter.vo.ServiceAlterVo;
 import com.hirisun.cloud.model.service.publish.vo.ServicePublishVo;
 import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.model.workbench.vo.QueryVO;
-import com.hirisun.cloud.saas.bean.SaasConfig;
+import com.hirisun.cloud.saas.bean.Saas;
 
 
-public interface SaasConfigService {
+public interface SaasService {
 
-	SaasConfig getSaasConfigById(String saasConfigId);
+	Saas getSaasConfigById(String saasConfigId);
 	
     void publish(UserVO user, String id, Integer result, String remark);
 
     Map<String, Object> getFrontData(Integer serviceFlag);
 
-    List<SaasConfig>  getServiceFrontData();
+    List<Saas>  getServiceFrontData();
 
     List<Map<String, Object>> getApplicationFrontData(String projectName);
 
     Set<String> getLabel(String typeId);
 
-    IPage<SaasConfig> getPage(IPage<SaasConfig> page, UserVO user, 
+    IPage<Saas> getPage(IPage<Saas> page, UserVO user, 
     		Integer status, String name, String subType,Integer serviceFlag,Integer pilotApp);
 
-    IPage<SaasConfig> getNewPage(IPage<SaasConfig> page, QueryVO queryVO);
+    IPage<Saas> getNewPage(IPage<Saas> page, QueryVO queryVO);
 
-    SaasConfig getDetail(UserVO user,String id);
+    Saas getDetail(UserVO user,String id);
 
     /**
      * 更多页面
      */
-    IPage<SaasConfig> getMorePage(IPage<SaasConfig> page, String typeId, String keyword, String areaName, String policeCategory);
+    IPage<Saas> getMorePage(IPage<Saas> page, String typeId, String keyword, String areaName, String policeCategory);
 
 
-    IPage<SaasConfig> getServiceMorePage(IPage<SaasConfig> page, String keyword);
+    IPage<Saas> getServiceMorePage(IPage<Saas> page, String keyword);
 
 
-    SaasConfig getDetailWithSubTypeName(String serviceId);
+    Saas getDetailWithSubTypeName(String serviceId);
 
     List<Map<String, Object>> getLabelWithCount(String typeId);
 
     /**
      * 一键申请页面
      */
-    IPage<SaasConfig> getOneClickPage(IPage<SaasConfig> page, String typeId, String label, String keyword);
+    IPage<Saas> getOneClickPage(IPage<Saas> page, String typeId, String label, String keyword);
 
-    List<SaasConfig> saasList(String keyword);
+    List<Saas> saasList(String keyword);
 
     void updateViewCountById(@Param("id") String id);
 
-    List<SaasConfig> getAppName(String creator);
+    List<Saas> getAppName(String creator);
 
     boolean servicePublish2SaaS(ServicePublishVo servicePublish,String serviceGuid);
     
@@ -71,16 +71,16 @@ public interface SaasConfigService {
 
     void hotfix();
     
-    public String create(UserVO user,SaasConfig saasConfig);
+    public String create(UserVO user,Saas saasConfig);
     
     public void serviceSort(String id,String ope);
     
     public void delete(UserVO user,String id);
     
-    public void edit(SaasConfig saas);
+    public void edit(Saas saas);
     
-    public SaasConfig setflow(UserVO user, String id,String flowId);
+    public Saas setflow(UserVO user, String id,String flowId);
     
-    public List<SaasConfig> findSaasConfigByName(String name);
+    public List<Saas> findSaasConfigByName(String name);
 
 }

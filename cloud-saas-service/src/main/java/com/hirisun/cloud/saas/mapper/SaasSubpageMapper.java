@@ -8,10 +8,10 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.hirisun.cloud.model.daas.vo.DaasServiceOverview;
 import com.hirisun.cloud.model.daas.vo.InnerServiceOverview;
 import com.hirisun.cloud.model.daas.vo.ServiceOverview;
-import com.hirisun.cloud.saas.bean.SaasSubpageConfig;
+import com.hirisun.cloud.saas.bean.SaasSubpage;
 
 
-public interface SaasSubpageConfigMapper extends BaseMapper<SaasSubpageConfig> {
+public interface SaasSubpageMapper extends BaseMapper<SaasSubpage> {
 
     List<DaasServiceOverview> daas(@Param("name") String name);
 

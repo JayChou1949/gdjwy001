@@ -28,15 +28,15 @@ import com.hirisun.cloud.model.system.OperateRecordVo;
 import com.hirisun.cloud.model.system.SysDictVO;
 import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.model.workbench.vo.QueryVO;
-import com.hirisun.cloud.saas.bean.SaasConfig;
-import com.hirisun.cloud.saas.mapper.SaasConfigMapper;
-import com.hirisun.cloud.saas.service.SaasConfigService;
+import com.hirisun.cloud.saas.bean.Saas;
+import com.hirisun.cloud.saas.mapper.SaasMapper;
+import com.hirisun.cloud.saas.service.SaasService;
 
 @Service
-public class SaasConfigServiceImpl implements SaasConfigService {
+public class SaasServiceImpl implements SaasService {
 
 	@Autowired
-	private SaasConfigMapper saasConfigMapper;
+	private SaasMapper saasConfigMapper;
 	@Autowired
 	private OperateRecordApi operateRecordApi;
 	@Autowired
@@ -45,7 +45,7 @@ public class SaasConfigServiceImpl implements SaasConfigService {
 	@Override
 	public void publish(UserVO user, String id, Integer result, String remark) {
 
-        SaasConfig saas = saasConfigMapper.selectById(id);
+        Saas saas = saasConfigMapper.selectById(id);
         if (result.equals(1)) { // 上线
             saas.setStatus(ReviewStatus.ONLINE.getCode());
             saasConfigMapper.updateById(saas);
@@ -90,7 +90,7 @@ public class SaasConfigServiceImpl implements SaasConfigService {
 	}
 
 	@Override
-	public List<SaasConfig> getServiceFrontData() {
+	public List<Saas> getServiceFrontData() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -108,12 +108,12 @@ public class SaasConfigServiceImpl implements SaasConfigService {
 	}
 
 	@Override
-	public IPage<SaasConfig> getPage(IPage<SaasConfig> page, UserVO user, Integer status, String name, String subType,
+	public IPage<Saas> getPage(IPage<Saas> page, UserVO user, Integer status, String name, String subType,
 			Integer serviceFlag, Integer pilotApp) {
-		IPage<SaasConfig> page2 = saasConfigMapper.getPage(page, user, status, 
+		IPage<Saas> page2 = saasConfigMapper.getPage(page, user, status, 
 				name, subType,serviceFlag,pilotApp);
 		
-		List<SaasConfig> records = page2.getRecords();
+		List<Saas> records = page2.getRecords();
 		if(CollectionUtils.isNotEmpty(records)) {
 			records.forEach(iaasConfig->{
 				String configSubType = iaasConfig.getSubType();
@@ -135,15 +135,15 @@ public class SaasConfigServiceImpl implements SaasConfigService {
 	}
 
 	@Override
-	public IPage<SaasConfig> getNewPage(IPage<SaasConfig> page, QueryVO queryVO) {
+	public IPage<Saas> getNewPage(IPage<Saas> page, QueryVO queryVO) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public SaasConfig getDetail(UserVO user,String id) {
+	public Saas getDetail(UserVO user,String id) {
 
-        SaasConfig saas = saasConfigMapper.selectById(id);
+        Saas saas = saasConfigMapper.selectById(id);
         if (saas != null) {
             saas.setUser(user);
         }
@@ -152,20 +152,20 @@ public class SaasConfigServiceImpl implements SaasConfigService {
 	}
 
 	@Override
-	public IPage<SaasConfig> getMorePage(IPage<SaasConfig> page, String typeId, String keyword, String areaName,
+	public IPage<Saas> getMorePage(IPage<Saas> page, String typeId, String keyword, String areaName,
 			String policeCategory) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public IPage<SaasConfig> getServiceMorePage(IPage<SaasConfig> page, String keyword) {
+	public IPage<Saas> getServiceMorePage(IPage<Saas> page, String keyword) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public SaasConfig getDetailWithSubTypeName(String serviceId) {
+	public Saas getDetailWithSubTypeName(String serviceId) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -177,13 +177,13 @@ public class SaasConfigServiceImpl implements SaasConfigService {
 	}
 
 	@Override
-	public IPage<SaasConfig> getOneClickPage(IPage<SaasConfig> page, String typeId, String label, String keyword) {
+	public IPage<Saas> getOneClickPage(IPage<Saas> page, String typeId, String label, String keyword) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<SaasConfig> saasList(String keyword) {
+	public List<Saas> saasList(String keyword) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -195,7 +195,7 @@ public class SaasConfigServiceImpl implements SaasConfigService {
 	}
 
 	@Override
-	public List<SaasConfig> getAppName(String creator) {
+	public List<Saas> getAppName(String creator) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -237,7 +237,7 @@ public class SaasConfigServiceImpl implements SaasConfigService {
 	}
 
 	@Override
-	public String create(UserVO user, SaasConfig saasConfig) {
+	public String create(UserVO user, Saas saasConfig) {
 		
 		saasConfig.setId(UUIDUtil.getUUID());
     	saasConfig.setCreator(user.getIdcard());
@@ -247,7 +247,7 @@ public class SaasConfigServiceImpl implements SaasConfigService {
         return saasConfig.getId();
 	}
 	
-	private void verifyParams(SaasConfig saas) {
+	private void verifyParams(Saas saas) {
         if (!StringBooleanCheck.check(saas.getHome())) {
             throw new CustomException(CommonCode.INVALID_PARAM);
         }
@@ -264,15 +264,15 @@ public class SaasConfigServiceImpl implements SaasConfigService {
 
 	@Transactional(rollbackFor = Exception.class)
     public void serviceSort(String id, String ope) {
-        SaasConfig entity = saasConfigMapper.selectById(id);
-        SaasConfig change = null;
-        QueryWrapper<SaasConfig> wrapper = new QueryWrapper<SaasConfig>().eq("status",entity.getStatus()).eq("SUB_TYPE",entity.getSubType());
+        Saas entity = saasConfigMapper.selectById(id);
+        Saas change = null;
+        QueryWrapper<Saas> wrapper = new QueryWrapper<Saas>().eq("status",entity.getStatus()).eq("SUB_TYPE",entity.getSubType());
         if ("down".equals(ope)) {
            wrapper.gt("sort", entity.getSort()).orderByAsc("sort");
         }else if ("up".equals(ope)){
             wrapper.lt("sort", entity.getSort()).orderByDesc("sort");
         }
-        List<SaasConfig> pres = saasConfigMapper.selectPage(new Page<SaasConfig>(1, 1),wrapper).getRecords();
+        List<Saas> pres = saasConfigMapper.selectPage(new Page<Saas>(1, 1),wrapper).getRecords();
         if (pres!=null&&pres.size()==1) {
             change = pres.get(0);
         }
@@ -287,7 +287,7 @@ public class SaasConfigServiceImpl implements SaasConfigService {
 
 	@Transactional(rollbackFor = Exception.class)
 	public void delete(UserVO user, String id) {
-		SaasConfig saas = saasConfigMapper.selectById(id);
+		Saas saas = saasConfigMapper.selectById(id);
         saas.setStatus(ReviewStatus.DELETE.getCode());
         saasConfigMapper.updateById(saas);
         
@@ -301,7 +301,7 @@ public class SaasConfigServiceImpl implements SaasConfigService {
 	}
 
 	@Transactional(rollbackFor = Exception.class)
-	public void edit(SaasConfig saas) {
+	public void edit(Saas saas) {
 		
         verifyParams(saas);
         if (StringUtils.isEmpty(saas.getCreator())) {
@@ -313,9 +313,9 @@ public class SaasConfigServiceImpl implements SaasConfigService {
 	}
 
 	@Transactional(rollbackFor = Exception.class)
-	public SaasConfig setflow(UserVO user, String id, String flowId) {
+	public Saas setflow(UserVO user, String id, String flowId) {
 		
-		SaasConfig saas = saasConfigMapper.selectById(id);
+		Saas saas = saasConfigMapper.selectById(id);
 		if(saas != null) {
 			saas.setWorkFlowId(flowId);
 			saasConfigMapper.updateById(saas);
@@ -324,16 +324,16 @@ public class SaasConfigServiceImpl implements SaasConfigService {
 	}
 
 	@Override
-	public List<SaasConfig> findSaasConfigByName(String name) {
-		List<SaasConfig> selectList = saasConfigMapper.selectList(new QueryWrapper<SaasConfig>().lambda()
-                .eq(SaasConfig::getName, name)
+	public List<Saas> findSaasConfigByName(String name) {
+		List<Saas> selectList = saasConfigMapper.selectList(new QueryWrapper<Saas>().lambda()
+                .eq(Saas::getName, name)
                 .or()
-                .eq(SaasConfig::getShortName, name));
+                .eq(Saas::getShortName, name));
 		return selectList;
 	}
 
 	@Override
-	public SaasConfig getSaasConfigById(String saasConfigId) {
+	public Saas getSaasConfigById(String saasConfigId) {
 		return saasConfigMapper.selectById(saasConfigId);
 	}
 

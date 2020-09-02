@@ -16,8 +16,8 @@ import com.hirisun.cloud.model.file.FilesVo;
 
 import io.swagger.annotations.ApiModelProperty;
 
-@TableName("T_SAAS_SUBPAGE_CONFIG")
-public class SaasSubpageConfig implements Serializable{
+@TableName("TB_SAAS_SUBPAGE")
+public class SaasSubpage implements Serializable{
 	
 	private static final long serialVersionUID = 782323748379924226L;
 

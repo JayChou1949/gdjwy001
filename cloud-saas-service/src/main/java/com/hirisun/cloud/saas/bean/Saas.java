@@ -10,8 +10,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.hirisun.cloud.model.user.UserVO;
 
-@TableName("T_SAAS_CONFIG")
-public class SaasConfig implements Serializable {
+@TableName("TB_SAAS")
+public class Saas implements Serializable {
 
     /**
 	 * 
@@ -372,7 +372,7 @@ public class SaasConfig implements Serializable {
         return id;
     }
 
-    public SaasConfig setId(String id) {
+    public Saas setId(String id) {
         this.id = id;
         return this;
     }
@@ -381,7 +381,7 @@ public class SaasConfig implements Serializable {
         return name;
     }
 
-    public SaasConfig setName(String name) {
+    public Saas setName(String name) {
         this.name = name;
         return this;
     }
@@ -398,7 +398,7 @@ public class SaasConfig implements Serializable {
         return subType;
     }
 
-    public SaasConfig setSubType(String subType) {
+    public Saas setSubType(String subType) {
         this.subType = subType;
         return this;
     }
@@ -415,7 +415,7 @@ public class SaasConfig implements Serializable {
         return sort;
     }
 
-    public SaasConfig setSort(Long sort) {
+    public Saas setSort(Long sort) {
         this.sort = sort;
         return this;
     }
@@ -424,7 +424,7 @@ public class SaasConfig implements Serializable {
         return versionCode;
     }
 
-    public SaasConfig setVersionCode(String versionCode) {
+    public Saas setVersionCode(String versionCode) {
         this.versionCode = versionCode;
         return this;
     }
@@ -433,7 +433,7 @@ public class SaasConfig implements Serializable {
         return userName;
     }
 
-    public SaasConfig setUserName(String userName) {
+    public Saas setUserName(String userName) {
         this.userName = userName;
         return this;
     }
@@ -450,7 +450,7 @@ public class SaasConfig implements Serializable {
         return password;
     }
 
-    public SaasConfig setPassword(String password) {
+    public Saas setPassword(String password) {
         this.password = password;
         return this;
     }
@@ -459,7 +459,7 @@ public class SaasConfig implements Serializable {
         return url;
     }
 
-    public SaasConfig setUrl(String url) {
+    public Saas setUrl(String url) {
         this.url = url;
         return this;
     }
@@ -476,7 +476,7 @@ public class SaasConfig implements Serializable {
         return image;
     }
 
-    public SaasConfig setImage(String image) {
+    public Saas setImage(String image) {
         this.image = image;
         return this;
     }
@@ -485,7 +485,7 @@ public class SaasConfig implements Serializable {
         return description;
     }
 
-    public SaasConfig setDescription(String description) {
+    public Saas setDescription(String description) {
         this.description = description;
         return this;
     }
@@ -494,7 +494,7 @@ public class SaasConfig implements Serializable {
         return proApplication;
     }
 
-    public SaasConfig setProApplication(String proApplication) {
+    public Saas setProApplication(String proApplication) {
         this.proApplication = proApplication;
         return this;
     }
@@ -503,7 +503,7 @@ public class SaasConfig implements Serializable {
         return proUse;
     }
 
-    public SaasConfig setProUse(String proUse) {
+    public Saas setProUse(String proUse) {
         this.proUse = proUse;
         return this;
     }
@@ -512,7 +512,7 @@ public class SaasConfig implements Serializable {
         return testForm;
     }
 
-    public SaasConfig setTestForm(String testForm) {
+    public Saas setTestForm(String testForm) {
         this.testForm = testForm;
         return this;
     }
@@ -521,7 +521,7 @@ public class SaasConfig implements Serializable {
         return testApplication;
     }
 
-    public SaasConfig setTestApplication(String testApplication) {
+    public Saas setTestApplication(String testApplication) {
         this.testApplication = testApplication;
         return this;
     }
@@ -530,7 +530,7 @@ public class SaasConfig implements Serializable {
         return testUse;
     }
 
-    public SaasConfig setTestUse(String testUse) {
+    public Saas setTestUse(String testUse) {
         this.testUse = testUse;
         return this;
     }
@@ -539,7 +539,7 @@ public class SaasConfig implements Serializable {
         return guide;
     }
 
-    public SaasConfig setGuide(String guide) {
+    public Saas setGuide(String guide) {
         this.guide = guide;
         return this;
     }
@@ -548,7 +548,7 @@ public class SaasConfig implements Serializable {
         return guideIntranet;
     }
 
-    public SaasConfig setGuideIntranet(String guideIntranet) {
+    public Saas setGuideIntranet(String guideIntranet) {
         this.guideIntranet = guideIntranet;
         return this;
     }
@@ -557,7 +557,7 @@ public class SaasConfig implements Serializable {
         return firstInterfacePerson;
     }
 
-    public SaasConfig setFirstInterfacePerson(String firstInterfacePerson) {
+    public Saas setFirstInterfacePerson(String firstInterfacePerson) {
         this.firstInterfacePerson = firstInterfacePerson;
         return this;
     }
@@ -566,7 +566,7 @@ public class SaasConfig implements Serializable {
         return upInterfacePerson;
     }
 
-    public SaasConfig setUpInterfacePerson(String upInterfacePerson) {
+    public Saas setUpInterfacePerson(String upInterfacePerson) {
         this.upInterfacePerson = upInterfacePerson;
         return this;
     }
@@ -575,7 +575,7 @@ public class SaasConfig implements Serializable {
         return createTime;
     }
 
-    public SaasConfig setCreateTime(Date createTime) {
+    public Saas setCreateTime(Date createTime) {
         this.createTime = createTime;
         return this;
     }
@@ -584,7 +584,7 @@ public class SaasConfig implements Serializable {
         return modifiedTime;
     }
 
-    public SaasConfig setModifiedTime(Date modifiedTime) {
+    public Saas setModifiedTime(Date modifiedTime) {
         this.modifiedTime = modifiedTime;
         return this;
     }
@@ -593,7 +593,7 @@ public class SaasConfig implements Serializable {
         return status;
     }
 
-    public SaasConfig setStatus(Long status) {
+    public Saas setStatus(Long status) {
         this.status = status;
         return this;
     }
@@ -602,7 +602,7 @@ public class SaasConfig implements Serializable {
         return creator;
     }
 
-    public SaasConfig setCreator(String creator) {
+    public Saas setCreator(String creator) {
         this.creator = creator;
         return this;
     }
@@ -611,7 +611,7 @@ public class SaasConfig implements Serializable {
         return top;
     }
 
-    public SaasConfig setTop(String top) {
+    public Saas setTop(String top) {
         this.top = top;
         return this;
     }

@@ -21,15 +21,15 @@ import com.hirisun.cloud.model.daas.vo.InnerServiceOverview;
 import com.hirisun.cloud.model.daas.vo.ServiceOverview;
 import com.hirisun.cloud.model.file.FilesVo;
 import com.hirisun.cloud.model.user.UserVO;
-import com.hirisun.cloud.saas.bean.SaasSubpageConfig;
-import com.hirisun.cloud.saas.mapper.SaasSubpageConfigMapper;
-import com.hirisun.cloud.saas.service.SaasSubpageConfigService;
+import com.hirisun.cloud.saas.bean.SaasSubpage;
+import com.hirisun.cloud.saas.mapper.SaasSubpageMapper;
+import com.hirisun.cloud.saas.service.SaasSubpageService;
 
 @Service
-public class SaasSubpageConfigServiceImpl implements SaasSubpageConfigService {
+public class SaasSubpageServiceImpl implements SaasSubpageService {
 
 	@Autowired
-	private SaasSubpageConfigMapper saasSubpageConfigMapper;
+	private SaasSubpageMapper saasSubpageConfigMapper;
 	@Autowired
 	private FilesApi filesApi;
 	@Autowired
@@ -40,7 +40,7 @@ public class SaasSubpageConfigServiceImpl implements SaasSubpageConfigService {
 	private FunDetailApi funDetailApi;
 	
 	@Transactional(rollbackFor = Exception.class)
-	public void saveSaasPage(UserVO user, SaasSubpageConfig saas) {
+	public void saveSaasPage(UserVO user, SaasSubpage saas) {
 		
 		//页面设置一个master 就是iaas id
 //		iaas.setMasterId(iaas.geti);
@@ -71,7 +71,7 @@ public class SaasSubpageConfigServiceImpl implements SaasSubpageConfigService {
 	}
 
 	@Transactional(rollbackFor = Exception.class)
-	public void updateIaasPage(UserVO user, SaasSubpageConfig iaas) {
+	public void updateIaasPage(UserVO user, SaasSubpage iaas) {
 		deleteSubpage(iaas.getMasterId());
 		saveSaasPage(user, iaas);
 	}
@@ -81,8 +81,8 @@ public class SaasSubpageConfigServiceImpl implements SaasSubpageConfigService {
 		SubpageParam param = new SubpageParam();
     	param.setMasterId(masterId);
 		
-		SaasSubpageConfig page = saasSubpageConfigMapper.selectOne(new QueryWrapper<SaasSubpageConfig>()
-				.lambda().eq(SaasSubpageConfig::getMasterId,masterId));
+		SaasSubpage page = saasSubpageConfigMapper.selectOne(new QueryWrapper<SaasSubpage>()
+				.lambda().eq(SaasSubpage::getMasterId,masterId));
 		appSceneApi.remove(param);
 		funChaApi.remove(param);
 		funDetailApi.remove(param);
@@ -91,18 +91,18 @@ public class SaasSubpageConfigServiceImpl implements SaasSubpageConfigService {
         	param.setSubpageId(page.getId());
         	filesApi.remove(param);
         }
-        saasSubpageConfigMapper.delete(new QueryWrapper<SaasSubpageConfig>()
-        		.lambda().eq(SaasSubpageConfig::getMasterId,masterId));
+        saasSubpageConfigMapper.delete(new QueryWrapper<SaasSubpage>()
+        		.lambda().eq(SaasSubpage::getMasterId,masterId));
     }
 
 	@Override
-	public SaasSubpageConfig getDetail(String masterId) {
+	public SaasSubpage getDetail(String masterId) {
 
 		SubpageParam param = new SubpageParam();
     	param.setMasterId(masterId);
 		
-		SaasSubpageConfig subpage =  saasSubpageConfigMapper.selectOne(new QueryWrapper<SaasSubpageConfig>()
-				.lambda().eq(SaasSubpageConfig::getMasterId,masterId));
+		SaasSubpage subpage =  saasSubpageConfigMapper.selectOne(new QueryWrapper<SaasSubpage>()
+				.lambda().eq(SaasSubpage::getMasterId,masterId));
 		
         if (subpage != null) {
         	param.setRefId(subpage.getId());

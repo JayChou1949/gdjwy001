@@ -29,12 +29,12 @@ import com.hirisun.cloud.model.daas.vo.DaasServiceOverview;
 import com.hirisun.cloud.model.daas.vo.InnerServiceOverview;
 import com.hirisun.cloud.model.daas.vo.ServiceOverview;
 import com.hirisun.cloud.model.user.UserVO;
-import com.hirisun.cloud.saas.bean.SaasConfig;
-import com.hirisun.cloud.saas.bean.SaasInfoConfig;
-import com.hirisun.cloud.saas.bean.SaasSubpageConfig;
-import com.hirisun.cloud.saas.service.SaasConfigService;
-import com.hirisun.cloud.saas.service.SaasInfoConfigService;
-import com.hirisun.cloud.saas.service.SaasSubpageConfigService;
+import com.hirisun.cloud.saas.bean.Saas;
+import com.hirisun.cloud.saas.bean.SaasSubpageConf;
+import com.hirisun.cloud.saas.bean.SaasSubpage;
+import com.hirisun.cloud.saas.service.SaasService;
+import com.hirisun.cloud.saas.service.SaasSubpageConfService;
+import com.hirisun.cloud.saas.service.SaasSubpageService;
 
 import cn.afterturn.easypoi.excel.ExcelExportUtil;
 import cn.afterturn.easypoi.excel.entity.ExportParams;
@@ -48,18 +48,18 @@ import io.swagger.annotations.ApiOperation;
 public class SaasSubpageConfigController {
 	
 	@Autowired
-    private SaasSubpageConfigService saasSubpageConfigService;
+    private SaasSubpageService saasSubpageConfigService;
 	@Autowired
-	private SaasInfoConfigService saasSubpageConfService;
+	private SaasSubpageConfService saasSubpageConfService;
 	@Autowired
-	private SaasConfigService saasConfigService;
+	private SaasService saasConfigService;
 	
 	private static final int MAX_ROW = 10;
 
     @ApiOperation("新增")
     @PostMapping(value = "/create")
     @ResponseBody
-    public ResponseResult create(@LoginUser UserVO user, @ModelAttribute SaasSubpageConfig saas) {
+    public ResponseResult create(@LoginUser UserVO user, @ModelAttribute SaasSubpage saas) {
     	saasSubpageConfigService.saveSaasPage(user,saas);
         return ResponseResult.success();
     }
@@ -68,7 +68,7 @@ public class SaasSubpageConfigController {
     @ApiOperation("修改二级页面配置信息")
     @PostMapping(value = "/edit")
     @ResponseBody
-    public ResponseResult edit(@LoginUser UserVO user, @ModelAttribute SaasSubpageConfig saas) {
+    public ResponseResult edit(@LoginUser UserVO user, @ModelAttribute SaasSubpage saas) {
     	saasSubpageConfigService.updateIaasPage(user,saas);
         return ResponseResult.success();
     }
@@ -78,13 +78,13 @@ public class SaasSubpageConfigController {
     @GetMapping(value = "/detail")
     @ResponseBody
     public ResponseResult detail(@LoginUser UserVO user, @PathVariable String iaasId) {
-    	SaasSubpageConfig iaas = saasSubpageConfigService.getDetail(iaasId);
+    	SaasSubpage iaas = saasSubpageConfigService.getDetail(iaasId);
         return QueryResponseResult.success(iaas);
     }
     
     @ApiImplicitParam(name="saasId", value="服务id", required = true, paramType="path", dataType="String")
     @PostMapping(value = "/conf/save/{saasId}")
-    public ResponseResult save(@PathVariable String saasId, @ModelAttribute SaasInfoConfig conf) {
+    public ResponseResult save(@PathVariable String saasId, @ModelAttribute SaasSubpageConf conf) {
         saasSubpageConfService.save(saasId, conf);
         return ResponseResult.success();
     }
@@ -92,8 +92,8 @@ public class SaasSubpageConfigController {
     @ApiImplicitParam(name="saasId", value="服务id", required = true, paramType="path", dataType="String")
     @GetMapping(value = "/conf/detail")
     public ResponseResult detail(String saasId) {
-        SaasInfoConfig conf = saasSubpageConfService.getOne(new QueryWrapper<SaasInfoConfig>().lambda()
-                .eq(SaasInfoConfig::getMasterId, saasId));
+        SaasSubpageConf conf = saasSubpageConfService.getOne(new QueryWrapper<SaasSubpageConf>().lambda()
+                .eq(SaasSubpageConf::getMasterId, saasId));
         return QueryResponseResult.success(conf);
     }
     
@@ -101,7 +101,7 @@ public class SaasSubpageConfigController {
     @GetMapping(value = "/permission")
     public ResponseResult permission(@LoginUser UserVO user,String id) {
         boolean permission = false;
-        SaasConfig saas = saasConfigService.getSaasConfigById(id);
+        Saas saas = saasConfigService.getSaasConfigById(id);
         if (saas != null) {
             boolean isCreator = Objects.equals(user.getIdcard(), saas.getCreator());
             boolean isManager = Objects.equals(UserType.MANAGER.getCode(), user.getType());

@@ -16,8 +16,8 @@ import com.hirisun.cloud.common.contains.ReviewStatus;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.common.vo.ResponseResult;
 import com.hirisun.cloud.model.user.UserVO;
-import com.hirisun.cloud.saas.bean.SaasConfig;
-import com.hirisun.cloud.saas.service.SaasConfigService;
+import com.hirisun.cloud.saas.bean.Saas;
+import com.hirisun.cloud.saas.service.SaasService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -32,7 +32,7 @@ import io.swagger.annotations.ApiResponses;
 public class SaasConfigController {
 
 	@Autowired
-    private SaasConfigService saasConfigService;
+    private SaasService saasConfigService;
 
     @ApiOperation("新增服务")
     @ApiResponses(
@@ -40,7 +40,7 @@ public class SaasConfigController {
     )
     @PostMapping(value = "/create")
     public QueryResponseResult create(@LoginUser UserVO user, 
-    		@ModelAttribute SaasConfig saasConfig) {
+    		@ModelAttribute Saas saasConfig) {
     	
     	String saasId = saasConfigService.create(user, saasConfig);
     	return QueryResponseResult.success(saasId);
@@ -85,7 +85,7 @@ public class SaasConfigController {
      */
     @ApiOperation("分页查询服务列表")
     @ApiResponses(
-            @ApiResponse(code = 200, message = "success", response = SaasConfig.class)
+            @ApiResponse(code = 200, message = "success", response = Saas.class)
     )
     @ApiImplicitParams({
             @ApiImplicitParam(name="pageNum", value="页码", defaultValue = "1", dataType="String"),
@@ -100,7 +100,7 @@ public class SaasConfigController {
                   @RequestParam(required = false, defaultValue = "20") Integer pageSize, Integer status,
                   @RequestParam(required = false) String name,@RequestParam(required = false) String subType,@RequestParam(required = false,defaultValue = "0") Integer serviceFlag,
                  @RequestParam(required = false) Integer pilotApp) {
-        IPage<SaasConfig> page = new Page<>();
+        IPage<Saas> page = new Page<>();
         page.setCurrent(pageNum);
         page.setSize(pageSize);
         page = saasConfigService.getPage(page, user, status, name, subType,serviceFlag,pilotApp);
@@ -123,25 +123,25 @@ public class SaasConfigController {
             @ApiResponse(code = 200, message = "success", response = ResponseResult.class)
     )
     @PostMapping(value = "/edit")
-    public ResponseResult edit(@ModelAttribute SaasConfig saas) {
+    public ResponseResult edit(@ModelAttribute Saas saas) {
     	saasConfigService.edit(saas);
     	return QueryResponseResult.success();
     }
     
     @ApiOperation("服务信息详情")
     @ApiResponses(
-            @ApiResponse(code = 200, message = "success", response = SaasConfig.class)
+            @ApiResponse(code = 200, message = "success", response = Saas.class)
     )
     @ApiImplicitParam(name="id", value="服务id", required = true, dataType="String")
     @PostMapping(value = "/detail")
     public ResponseResult detail(@LoginUser UserVO user,String id) {
-        SaasConfig saas = saasConfigService.getDetail(user,id);
+        Saas saas = saasConfigService.getDetail(user,id);
         return QueryResponseResult.success(saas);
     }
     
     @ApiOperation("流程配置")
     @ApiResponses(
-            @ApiResponse(code = 200, message = "success", response = SaasConfig.class)
+            @ApiResponse(code = 200, message = "success", response = Saas.class)
     )
     @ApiImplicitParams({ 
     			@ApiImplicitParam(name="id", value="服务id", required = true, dataType="String"),
@@ -150,20 +150,20 @@ public class SaasConfigController {
     @PostMapping(value = "/set/workflow")
     public ResponseResult setflow(@LoginUser UserVO user, String id,String flowId) {
     	
-    	SaasConfig saasConfig = saasConfigService.setflow(user, id, flowId);
+    	Saas saasConfig = saasConfigService.setflow(user, id, flowId);
     	return QueryResponseResult.success(saasConfig);
     }
 	
     @ApiOperation("通过名字搜索SaaS服务")
     @ApiResponses(
-            @ApiResponse(code = 200, message = "success", response = SaasConfig.class)
+            @ApiResponse(code = 200, message = "success", response = Saas.class)
     )
     @ApiImplicitParams({
             @ApiImplicitParam(name="name", value="服务名",dataType="String")
     })
     @PostMapping(value = "/list")
     public ResponseResult list(String name) {
-    	List<SaasConfig> list = saasConfigService.findSaasConfigByName(name);
+    	List<Saas> list = saasConfigService.findSaasConfigByName(name);
     	return QueryResponseResult.success(list);
     }
     
