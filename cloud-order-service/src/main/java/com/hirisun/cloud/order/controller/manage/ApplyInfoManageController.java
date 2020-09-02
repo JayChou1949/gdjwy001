@@ -291,7 +291,11 @@ public class ApplyInfoManageController {
                     WorkflowNodeVO firstNode=voList.get(0);
                     vo.setFallBackModelIds(firstNode.getId());
                 }
-                workflowApi.fallbackOnApproveNotPass(vo, map);
+                Map<String,String> resultMap=workflowApi.fallbackOnApproveNotPass(vo, map);
+                if (resultMap.get("code") != null && !resultMap.get("code").equals("200")) {
+                    return QueryResponseResult.fail(resultMap.get("msg"));
+                }
+
                 info.setStatus(ApplyInfoStatus.IMPL_REJECT.getCode());
                 applyInfoService.updateById(info);
             }else{

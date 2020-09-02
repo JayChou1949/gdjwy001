@@ -308,4 +308,12 @@ public interface WorkflowApi {
     @ApiOperation("根据流程类型获取流程信息")
     @PostMapping(workflowBaseUrl+"/feign/getWorkflowByDefaultProcess")
     public WorkflowVO getWorkflowByDefaultProcess(@RequestParam String defaultProcess);
+
+    /**
+     * 根据对象内容获取流程流转信息
+     */
+    @ApiIgnore
+    @ApiOperation("根据对象内容获取流程流转信息")
+    @PutMapping(workflowActivityBaseUrl + "/feign/getActivityByObj")
+    public List<WorkflowActivityVO> getActivityByObj(@RequestBody WorkflowActivityVO vo);
 }

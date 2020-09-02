@@ -30,6 +30,7 @@ import com.hirisun.cloud.model.app.param.SubpageParam;
 import com.hirisun.cloud.model.apply.ApplyFeedbackVO;
 import com.hirisun.cloud.model.apply.ApplyReviewRecordVO;
 import com.hirisun.cloud.model.apply.FallBackVO;
+import com.hirisun.cloud.model.common.WorkOrder;
 import com.hirisun.cloud.model.file.FilesVo;
 import com.hirisun.cloud.model.param.FilesParam;
 import com.hirisun.cloud.model.saas.vo.SaasConfigVO;
@@ -462,13 +463,40 @@ public class ApplyInfoServiceImpl extends ServiceImpl<ApplyInfoMapper, ApplyInfo
             //驳回到申请,重新申请
             boolean isApply= WorkflowUtil.compareNodeAbility(fallbackModel.getNodeFeature(), WorkflowNodeAbilityType.APPLY.getCode());
             if (isApply) {
-                workflowApi.fallbackOnApproveNotPass(vo, new HashMap());
+                Map<String,String> resultMap=workflowApi.fallbackOnApproveNotPass(vo, new HashMap());
+                if (resultMap.get("code") != null && !resultMap.get("code").equals("200")) {
+                    return QueryResponseResult.fail(resultMap.get("msg"));
+                }
                 //订单状态设置为 科信审核驳回
                 info.setStatus(ApplyInfoStatus.REVIEW_REJECT.getCode());
                 smsApi.buildRejectMessage(info.getCreator(), info.getServiceTypeName());
+            }else if(StringUtils.isEmpty(fallbackModel.getDefaultHandler())){
+                //非申请,且无默认处理人,则使用该环节之前的处理人
+                WorkflowActivityVO selectVo = new WorkflowActivityVO();
+                selectVo.setInstanceId(activity.getInstanceId());
+                selectVo.setNodeId(fallbackModel.getId());
+                List<WorkflowActivityVO> voList = workflowApi.getActivityByObj(selectVo);
+                if (CollectionUtils.isNotEmpty(voList)) {
+                    StringBuffer sb = new StringBuffer();
+                    List<String> userIds = voList.stream().map(WorkflowActivityVO::getHandlePersons).distinct().collect(Collectors.toList());
+                    userIds.forEach(item->{
+                        sb.append("," + item);
+                    });
+                    map.put("depApproveUserIds", sb.substring(1).toString());
+                    //1.复制回退环节历史流程环节信息，设置为待办，处理人时间修改等插入流转表；2.复核后环节后的到当前环节间流转信息设置为已回退
+                    Map<String,String> resultMap=workflowApi.fallbackOnApproveNotPass(vo, map);
+                    if (resultMap.get("code") != null && !resultMap.get("code").equals("200")) {
+                        return QueryResponseResult.fail(resultMap.get("msg"));
+                    }
+                    //订单状态设置为 科信待审核
+                    info.setStatus(ApplyInfoStatus.REVIEW.getCode());
+                }
             }else{
 //                1.复制回退环节历史流程环节信息，设置为待办，处理人时间修改等插入流转表；2.复核后环节后的到当前环节间流转信息设置为已回退
-                workflowApi.fallbackOnApproveNotPass(vo, map);
+                Map<String,String> resultMap=workflowApi.fallbackOnApproveNotPass(vo, map);
+                if (resultMap.get("code") != null && !resultMap.get("code").equals("200")) {
+                    return QueryResponseResult.fail(resultMap.get("msg"));
+                }
                 //订单状态设置为 科信待审核
                 info.setStatus(ApplyInfoStatus.REVIEW.getCode());
             }
@@ -698,7 +726,10 @@ public class ApplyInfoServiceImpl extends ServiceImpl<ApplyInfoMapper, ApplyInfo
             if (lock.lock(lockKey, uuid)) {
 
                 ApplyInfo info = applyInfoService.getById(applyInfoId);
-                workflowApi.activityForward(activityId, userIds);
+                Map<String,String> resultMap =  workflowApi.activityForward(activityId, userIds);
+                if (!"200".equals(resultMap.get("code"))) {
+                    return QueryResponseResult.fail(resultMap.get("msg"));
+                }
                 String[] handlePersonArr = userIds.split(",");
                 for (String uid : handlePersonArr) {
                     smsApi.buildProcessingMessage(info.getServiceTypeName(),info.getOrderNumber(),uid);

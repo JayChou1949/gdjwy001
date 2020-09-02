@@ -411,7 +411,12 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
             }
         } else {
             //取得对应环节的处理人
-            String personids=fallbackModel.getDefaultHandler();
+            String personids=null;
+            if (map != null && map.get("depApproveUserIds") != null) {
+                personids = map.get("depApproveUserIds");
+            } else {
+                personids = fallbackModel.getDefaultHandler();
+            }
             //如果默认处理人也为空则直接返回提示信息给前台
             if (personids==null||personids.trim().equals("")) {
                 resultMap.put("msg", "流程未配置处理人");

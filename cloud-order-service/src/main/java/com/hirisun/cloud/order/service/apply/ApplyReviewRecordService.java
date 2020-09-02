@@ -3,6 +3,8 @@ package com.hirisun.cloud.order.service.apply;
 import com.hirisun.cloud.order.bean.apply.ApplyReviewRecord;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 /**
  * <p>
  * 服务申请审核信息表 服务类
@@ -13,4 +15,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface ApplyReviewRecordService extends IService<ApplyReviewRecord> {
     ApplyReviewRecord getLastPassReviewInfoByAppInfoId(String id);
+
+    List<ApplyReviewRecord> getAllReviewInfoByAppInfoId(String id);
 }

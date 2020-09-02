@@ -18,4 +18,9 @@ public interface RedisKey {
      */
     String KEY_DAAS_COLUMN_CONFIG = "daas:column:config";
 
+    /**
+     * 服务发布申请单号前缀
+     */
+    String KEY_PUBLISH_PREFIX = "PublishOrdNum:";
+
 }

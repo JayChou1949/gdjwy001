@@ -61,10 +61,11 @@ public class MpGenerator {
         // 策略配置
         StrategyConfig strategy = new StrategyConfig();
         // 表名生成策略
-        strategy.setTablePrefix(new String[]{"t_"});//去掉表前缀
+        strategy.setTablePrefix(new String[]{"tb_"});//去掉表前缀
         strategy.setNaming(NamingStrategy.underline_to_camel);
         // 需要生成的表
-        strategy.setInclude("T_SAAS_APPLICATION_MERGE"
+        strategy.setInclude("TB_API_OPERATION","TB_API_AC_IP"
+
 
         );
 //        strategy.setInclude("T_USER","S_PERMISSION","S_ROLE_PERMISSION","SYS_ROLE","S_USER_ROLE");

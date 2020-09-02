@@ -21,6 +21,7 @@ import com.hirisun.cloud.common.exception.CustomException;
 import com.hirisun.cloud.common.util.ExcelUtil;
 import com.hirisun.cloud.common.util.UUIDUtil;
 import com.hirisun.cloud.common.util.WorkflowUtil;
+import com.hirisun.cloud.common.vo.CommonCode;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.model.app.param.SubpageParam;
 import com.hirisun.cloud.model.apply.ApplyReviewRecordVO;
@@ -200,7 +201,10 @@ public class SaasWorkflowServiceImpl implements SaasWorkflowService {
                 workflowApi.fallbackOnApproveNotPass(vo, new HashMap());
                 info.setStatus(ApplyInfoStatus.INNER_REVIEW.getCode());
             }else{
-                workflowApi.fallbackOnApproveNotPass(vo, map);
+                Map<String,String> resultMap=workflowApi.fallbackOnApproveNotPass(vo, map);
+                if (resultMap.get("code") != null && !resultMap.get("code").equals("200")) {
+                    return QueryResponseResult.fail(resultMap.get("msg"));
+                }
                 //订单状态设置为 科信待审核
                 info.setStatus(ApplyInfoStatus.REVIEW.getCode());
             }
@@ -257,7 +261,10 @@ public class SaasWorkflowServiceImpl implements SaasWorkflowService {
         if ("1".equals(implRequest.getResult())){
             Map map = new HashMap();
             map.put("depApproveUserIds", info.getCreator());
-            workflowApi.advanceActivity(activityId,map);
+            Map resultMap = workflowApi.advanceActivity(activityId,map);
+            if (!"200".equals(resultMap.get("code"))) {
+                throw new CustomException(OrderCode.FEIGN_METHOD_ERROR);
+            }
             saasApplicationApi.updateCarryTime(info.getId());
         }else {
             if (nodeId==null||nodeId.trim().equals("")) {
@@ -269,7 +276,10 @@ public class SaasWorkflowServiceImpl implements SaasWorkflowService {
             Map<String,String> map = new HashMap<>();
             map.put("name", BusinessName.SAAS_RESOURCE);
             map.put("order", info.getOrderNumber());
-            workflowApi.fallbackOnApproveNotPass(vo, map);
+            Map<String,String> resultMap=workflowApi.fallbackOnApproveNotPass(vo, map);
+            if (resultMap.get("code") != null && !resultMap.get("code").equals("200")) {
+                return QueryResponseResult.fail(resultMap.get("msg"));
+            }
         }
         return QueryResponseResult.success(null);
     }

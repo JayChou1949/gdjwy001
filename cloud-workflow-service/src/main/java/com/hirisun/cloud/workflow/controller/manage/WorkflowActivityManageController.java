@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.alibaba.fastjson.TypeReference;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.hirisun.cloud.common.contains.WorkflowActivityStatus;
 import com.hirisun.cloud.common.util.UUIDUtil;
 import com.hirisun.cloud.model.workflow.WorkflowVO;
@@ -93,7 +94,6 @@ public class WorkflowActivityManageController {
             forwardActivity.setActivityStatus(WorkflowActivityStatus.WAITING.getCode());
             forwardActivity.setCreator(currentActivity.getHandlePersons());
             forwardActivity.setCreateTime(new Date());
-//            forwardActivity.setCreatorOrgId(handleUser.getOrganization());
             forwardActivity.setHandlePersons(handlePerson);
             forwardActivity.setInstanceId(currentActivity.getInstanceId());
             forwardActivity.setNodeId(currentActivity.getNodeId());
@@ -121,6 +121,38 @@ public class WorkflowActivityManageController {
         List<WorkflowActivity> activityList = workflowActivityService.list(new QueryWrapper<WorkflowActivity>().lambda()
                 .eq(WorkflowActivity::getActivityStatus,status)
                 .eq(WorkflowActivity::getInstanceId,instanceId));
+
+        if(CollectionUtils.isNotEmpty(activityList)) {
+            List<WorkflowActivityVO> list = JSON.parseObject(JSON.toJSON(activityList).toString(),
+                    new TypeReference<List<WorkflowActivityVO>>(){});
+            return list;
+        }
+        return null;
+    }
+    /**
+     * 根据对象内容获取流程流转信息
+     */
+    @ApiIgnore
+    @ApiOperation("根据对象内容获取流程流转信息")
+    @PutMapping("/feign/getActivityByObj")
+    public List<WorkflowActivityVO> getActivityByObj(@RequestBody WorkflowActivityVO vo) {
+        LambdaQueryWrapper<WorkflowActivity> wrapper = new QueryWrapper<WorkflowActivity>().lambda();
+        if (vo.getNodeId() != null) {
+            wrapper.eq(WorkflowActivity::getNodeId, vo.getNodeId());
+        }
+        if (vo.getActivityStatus() != null) {
+            wrapper.eq(WorkflowActivity::getActivityStatus, vo.getActivityStatus());
+        }
+        if (vo.getInstanceId() != null) {
+            wrapper.eq(WorkflowActivity::getInstanceId, vo.getInstanceId());
+        }
+        if (vo.getId() != null) {
+            wrapper.eq(WorkflowActivity::getId, vo.getId());
+        }
+        if (vo.getActivityType() != null) {
+            wrapper.eq(WorkflowActivity::getActivityType, vo.getActivityType());
+        }
+        List<WorkflowActivity> activityList = workflowActivityService.list(wrapper);
 
         if(CollectionUtils.isNotEmpty(activityList)) {
             List<WorkflowActivityVO> list = JSON.parseObject(JSON.toJSON(activityList).toString(),

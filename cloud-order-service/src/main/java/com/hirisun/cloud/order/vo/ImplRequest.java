@@ -1,6 +1,7 @@
 package com.hirisun.cloud.order.vo;
 
 import com.hirisun.cloud.model.file.FilesVo;
+import io.swagger.annotations.ApiModelProperty;
 
 import java.util.List;
 import java.util.Map;
@@ -13,10 +14,13 @@ import java.util.Map;
  */
 public class ImplRequest<I> {
 
+    @ApiModelProperty(value = "工单id")
     private String applyInfoId;
 
+    @ApiModelProperty(value = "当前环节id")
     private String nodeId;
 
+    @ApiModelProperty(value = "当前环节流转id")
     private String activityId;
 
     /**

@@ -68,12 +68,9 @@ public class ApplyReviewRecordManageController {
     @ApiOperation("根据工单id获取对应的审核记录")
     @PostMapping("/feign/getAllReviewInfoByAppInfoId")
     public List<ApplyReviewRecordVO> getAllReviewInfoByAppInfoId(@RequestParam String id) {
-
-        List<ApplyReviewRecord> reviewList= applyReviewRecordService.list(new QueryWrapper<ApplyReviewRecord>().lambda()
-                .eq(ApplyReviewRecord::getApplyId, id)
-                .orderByDesc(ApplyReviewRecord::getCreateTime));
-        if(CollectionUtils.isNotEmpty(reviewList)) {
-            List<ApplyReviewRecordVO> newList = JSON.parseObject(JSON.toJSON(reviewList).toString(),
+        List<ApplyReviewRecord> list = applyReviewRecordService.getAllReviewInfoByAppInfoId(id);
+        if(CollectionUtils.isNotEmpty(list)) {
+            List<ApplyReviewRecordVO> newList = JSON.parseObject(JSON.toJSON(list).toString(),
                     new TypeReference<List<ApplyReviewRecordVO>>(){});
             return newList;
         }
