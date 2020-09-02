@@ -3,8 +3,10 @@ package com.hirisun.cloud.saas.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,7 +28,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
-@Api(description = "后台-服务管理-基础设施服务(SaaS)")
+@Api(tags ="后台-服务管理-基础设施服务(SaaS)")
 @RestController
 @RequestMapping("/saas/config")
 public class SaasConfigController {
@@ -38,9 +40,9 @@ public class SaasConfigController {
     @ApiResponses(
             @ApiResponse(code = 200, message = "success", response = String.class)
     )
-    @PostMapping(value = "/create")
+    @PutMapping(value = "/create")
     public QueryResponseResult create(@LoginUser UserVO user, 
-    		@ModelAttribute Saas saasConfig) {
+    		@RequestBody Saas saasConfig) {
     	
     	String saasId = saasConfigService.create(user, saasConfig);
     	return QueryResponseResult.success(saasId);
@@ -69,7 +71,7 @@ public class SaasConfigController {
             @ApiImplicitParam(name="result", value="操作结果 1:上线,其它:下线", required = true, dataType="String"),
             @ApiImplicitParam(name="remark", value="操作描述", dataType="String"),
     })
-    @PostMapping(value = "/publish")
+    @GetMapping(value = "/publish")
     public ResponseResult publish(@LoginUser UserVO user, String id, Integer result,
                      @RequestParam(required = false) String remark) {
         if (result == null) {
@@ -95,10 +97,13 @@ public class SaasConfigController {
             @ApiImplicitParam(name = "subType",value = "子类", dataType = "String"),
             @ApiImplicitParam(name = "subType",value = "子类", dataType = "String"),
     })
-    @PostMapping(value = "/page")
-    public QueryResponseResult page(@LoginUser UserVO user, @RequestParam(required = false, defaultValue = "1") Integer pageNum,
+    @GetMapping(value = "/page")
+    public QueryResponseResult page(@LoginUser UserVO user, 
+    		@RequestParam(required = false, defaultValue = "1") Integer pageNum,
                   @RequestParam(required = false, defaultValue = "20") Integer pageSize, Integer status,
-                  @RequestParam(required = false) String name,@RequestParam(required = false) String subType,@RequestParam(required = false,defaultValue = "0") Integer serviceFlag,
+                  @RequestParam(required = false) String name,
+                  @RequestParam(required = false) String subType,
+                  @RequestParam(required = false,defaultValue = "0") Integer serviceFlag,
                  @RequestParam(required = false) Integer pilotApp) {
         IPage<Saas> page = new Page<>();
         page.setCurrent(pageNum);
@@ -112,7 +117,7 @@ public class SaasConfigController {
             @ApiResponse(code = 200, message = "success", response = ResponseResult.class)
     )
     @ApiImplicitParam(name="id", value="服务id", required = true, dataType="String")
-    @PostMapping(value = "/delete")
+    @GetMapping(value = "/delete")
     public ResponseResult delete(@LoginUser UserVO user,String id) {
     	saasConfigService.delete(user, id);
     	return QueryResponseResult.success();
@@ -122,8 +127,8 @@ public class SaasConfigController {
     @ApiResponses(
             @ApiResponse(code = 200, message = "success", response = ResponseResult.class)
     )
-    @PostMapping(value = "/edit")
-    public ResponseResult edit(@ModelAttribute Saas saas) {
+    @PutMapping(value = "/edit")
+    public ResponseResult edit(@RequestBody Saas saas) {
     	saasConfigService.edit(saas);
     	return QueryResponseResult.success();
     }
@@ -133,7 +138,7 @@ public class SaasConfigController {
             @ApiResponse(code = 200, message = "success", response = Saas.class)
     )
     @ApiImplicitParam(name="id", value="服务id", required = true, dataType="String")
-    @PostMapping(value = "/detail")
+    @GetMapping(value = "/detail")
     public ResponseResult detail(@LoginUser UserVO user,String id) {
         Saas saas = saasConfigService.getDetail(user,id);
         return QueryResponseResult.success(saas);
@@ -161,7 +166,7 @@ public class SaasConfigController {
     @ApiImplicitParams({
             @ApiImplicitParam(name="name", value="服务名",dataType="String")
     })
-    @PostMapping(value = "/list")
+    @GetMapping(value = "/list")
     public ResponseResult list(String name) {
     	List<Saas> list = saasConfigService.findSaasConfigByName(name);
     	return QueryResponseResult.success(list);

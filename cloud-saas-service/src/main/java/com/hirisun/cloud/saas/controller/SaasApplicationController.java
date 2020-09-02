@@ -138,7 +138,7 @@ public class SaasApplicationController {
 	}
 
 	@ApiOperation(value = "申请详情(原始单据)")
-	@RequestMapping(value = "/detail", method = RequestMethod.GET)
+	@GetMapping(value = "/detail")
 	public QueryResponseResult detail(@LoginUser UserVO user, @ApiParam(value = "申请工单id",required = true) @RequestParam String id) {
 		Map<String, Object> map = saasApplicationService.getDetail(user, id);
 		return QueryResponseResult.success(map);
@@ -146,7 +146,7 @@ public class SaasApplicationController {
 
 
 	@ApiOperation("待合并列表")
-	@RequestMapping(value = "/mergePage", method = RequestMethod.GET)
+	@GetMapping(value = "/mergePage")
 	public QueryResponseResult mergePage(@LoginUser UserVO user,
 					   @RequestParam(required = false, defaultValue = "1") Integer pageNum,
 					   @RequestParam(required = false, defaultValue = "20") Integer pageSize,

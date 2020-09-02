@@ -14,8 +14,10 @@ import com.hirisun.cloud.saas.service.ShoppingCartService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import springfox.documentation.annotations.ApiIgnore;
 
 @Api(tags = "saas 购物车保存购物项")
+@ApiIgnore
 @RequestMapping("/saas/shopping")
 @RestController
 public class SaasShoppingCartController {
