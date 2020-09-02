@@ -13,8 +13,8 @@ import com.hirisun.cloud.common.annotation.LoginUser;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.common.vo.ResponseResult;
 import com.hirisun.cloud.model.user.UserVO;
-import com.hirisun.cloud.paas.bean.PaasSubpageConfig;
-import com.hirisun.cloud.paas.service.PaasSubpageConfigService;
+import com.hirisun.cloud.paas.bean.PaasSubpage;
+import com.hirisun.cloud.paas.service.PaasSubpageService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -26,12 +26,12 @@ import io.swagger.annotations.ApiOperation;
 public class PaasSubpageConfigController {
 	
 	@Autowired
-    private PaasSubpageConfigService paasSubpageConfigService;
+    private PaasSubpageService paasSubpageConfigService;
 
     @ApiOperation("新增")
     @PostMapping(value = "/create")
     @ResponseBody
-    public ResponseResult create(@LoginUser UserVO user, @ModelAttribute PaasSubpageConfig paas) {
+    public ResponseResult create(@LoginUser UserVO user, @ModelAttribute PaasSubpage paas) {
     	paasSubpageConfigService.savePaasPage(user,paas);
         return ResponseResult.success();
     }
@@ -40,7 +40,7 @@ public class PaasSubpageConfigController {
     @ApiOperation("修改二级页面配置信息")
     @PostMapping(value = "/edit")
     @ResponseBody
-    public ResponseResult edit(@LoginUser UserVO user, @ModelAttribute PaasSubpageConfig paas) {
+    public ResponseResult edit(@LoginUser UserVO user, @ModelAttribute PaasSubpage paas) {
     	paasSubpageConfigService.updateIaasPage(user,paas);
         return ResponseResult.success();
     }
@@ -50,7 +50,7 @@ public class PaasSubpageConfigController {
     @GetMapping(value = "/detail")
     @ResponseBody
     public ResponseResult detail(@LoginUser UserVO user, @PathVariable String iaasId) {
-    	PaasSubpageConfig iaas = paasSubpageConfigService.getDetail(iaasId);
+    	PaasSubpage iaas = paasSubpageConfigService.getDetail(iaasId);
         return QueryResponseResult.success(iaas);
     }
 	

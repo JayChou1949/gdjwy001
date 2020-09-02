@@ -8,20 +8,20 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.hirisun.cloud.model.pass.vo.OnLineServiceVo;
 import com.hirisun.cloud.model.user.UserVO;
-import com.hirisun.cloud.paas.bean.PaasConfig;
+import com.hirisun.cloud.paas.bean.Paas;
 
-public interface PaasConfigMapper extends BaseMapper<PaasConfig> {
+public interface PaasMapper extends BaseMapper<Paas> {
 
-    IPage<PaasConfig> getPage(IPage<PaasConfig> page, @Param("user") UserVO user, @Param("status") Integer status
+    IPage<Paas> getPage(IPage<Paas> page, @Param("user") UserVO user, @Param("status") Integer status
             , @Param("name") String name, @Param("subType") String subType);
 
-    List<PaasConfig> getLabel(@Param("typeId") String typeId, @Param("home") Integer home, @Param("canApplication") Integer canApplication);
+    List<Paas> getLabel(@Param("typeId") String typeId, @Param("home") Integer home, @Param("canApplication") Integer canApplication);
 
-    IPage<PaasConfig> getPageByCondition(IPage<PaasConfig> page, @Param("typeId") String typeId, @Param("label") String label,
+    IPage<Paas> getPageByCondition(IPage<Paas> page, @Param("typeId") String typeId, @Param("label") String label,
                                    @Param("home") Integer home, @Param("canApplication") Integer canApplication,
                                    @Param("keyword") String keyword,@Param("applicationShow") Integer applicationShow);
 
-    List<PaasConfig> getPageByCondition(@Param("typeId") String typeId, @Param("label") String label,
+    List<Paas> getPageByCondition(@Param("typeId") String typeId, @Param("label") String label,
                                   @Param("home") Integer home, @Param("canApplication") Integer canApplication,
                                   @Param("keyword") String keyword,@Param("applicationShow") Integer applicationShow);
 

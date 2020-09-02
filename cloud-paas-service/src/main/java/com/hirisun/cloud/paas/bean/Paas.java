@@ -14,8 +14,8 @@ import com.hirisun.cloud.model.user.UserVO;
 
 import io.swagger.annotations.ApiModelProperty;
 
-@TableName("T_PAAS_CONFIG")
-public class PaasConfig implements Serializable {
+@TableName("TB_PAAS")
+public class Paas implements Serializable {
 
 	private static final long serialVersionUID = -3955494181702424476L;
 
@@ -223,7 +223,7 @@ public class PaasConfig implements Serializable {
         this.fileList = fileList;
     }
 
-    public PaasConfig setId(String id) {
+    public Paas setId(String id) {
         this.id = id;
         return this;
     }
@@ -264,7 +264,7 @@ public class PaasConfig implements Serializable {
         return name;
     }
 
-    public PaasConfig setName(String name) {
+    public Paas setName(String name) {
         this.name = name;
         return this;
     }
@@ -289,7 +289,7 @@ public class PaasConfig implements Serializable {
         return subType;
     }
 
-    public PaasConfig setSubType(String subType) {
+    public Paas setSubType(String subType) {
         this.subType = subType;
         return this;
     }
@@ -298,7 +298,7 @@ public class PaasConfig implements Serializable {
         return sort;
     }
 
-    public PaasConfig setSort(Long sort) {
+    public Paas setSort(Long sort) {
         this.sort = sort;
         return this;
     }
@@ -307,7 +307,7 @@ public class PaasConfig implements Serializable {
         return versionCode;
     }
 
-    public PaasConfig setVersionCode(String versionCode) {
+    public Paas setVersionCode(String versionCode) {
         this.versionCode = versionCode;
         return this;
     }
@@ -317,7 +317,7 @@ public class PaasConfig implements Serializable {
         return url;
     }
 
-    public PaasConfig setUrl(String url) {
+    public Paas setUrl(String url) {
         this.url = url;
         return this;
     }
@@ -334,7 +334,7 @@ public class PaasConfig implements Serializable {
         return image;
     }
 
-    public PaasConfig setImage(String image) {
+    public Paas setImage(String image) {
         this.image = image;
         return this;
     }
@@ -351,7 +351,7 @@ public class PaasConfig implements Serializable {
         return description;
     }
 
-    public PaasConfig setDescription(String description) {
+    public Paas setDescription(String description) {
         this.description = description;
         return this;
     }
@@ -360,7 +360,7 @@ public class PaasConfig implements Serializable {
         return createTime;
     }
 
-    public PaasConfig setCreateTime(Date createTime) {
+    public Paas setCreateTime(Date createTime) {
         this.createTime = createTime;
         return this;
     }
@@ -369,7 +369,7 @@ public class PaasConfig implements Serializable {
         return modifiedTime;
     }
 
-    public PaasConfig setModifiedTime(Date modifiedTime) {
+    public Paas setModifiedTime(Date modifiedTime) {
         this.modifiedTime = modifiedTime;
         return this;
     }
@@ -378,7 +378,7 @@ public class PaasConfig implements Serializable {
         return status;
     }
 
-    public PaasConfig setStatus(Long status) {
+    public Paas setStatus(Long status) {
         this.status = status;
         return this;
     }
@@ -387,7 +387,7 @@ public class PaasConfig implements Serializable {
         return creator;
     }
 
-    public PaasConfig setCreator(String creator) {
+    public Paas setCreator(String creator) {
         this.creator = creator;
         return this;
     }
@@ -396,7 +396,7 @@ public class PaasConfig implements Serializable {
         return top;
     }
 
-    public PaasConfig setTop(String top) {
+    public Paas setTop(String top) {
         this.top = top;
         return this;
     }

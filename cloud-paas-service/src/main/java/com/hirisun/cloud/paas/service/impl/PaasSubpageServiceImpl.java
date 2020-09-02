@@ -18,15 +18,15 @@ import com.hirisun.cloud.model.app.vo.FunChaVo;
 import com.hirisun.cloud.model.app.vo.FunDetailVo;
 import com.hirisun.cloud.model.file.FilesVo;
 import com.hirisun.cloud.model.user.UserVO;
-import com.hirisun.cloud.paas.bean.PaasSubpageConfig;
-import com.hirisun.cloud.paas.mapper.PaasSubpageConfigMapper;
-import com.hirisun.cloud.paas.service.PaasSubpageConfigService;
+import com.hirisun.cloud.paas.bean.PaasSubpage;
+import com.hirisun.cloud.paas.mapper.PaasSubpageMapper;
+import com.hirisun.cloud.paas.service.PaasSubpageService;
 
 @Service
-public class PaasSubpageConfigServiceImpl implements PaasSubpageConfigService {
+public class PaasSubpageServiceImpl implements PaasSubpageService {
 
 	@Autowired
-	private PaasSubpageConfigMapper paasSubpageConfigMapper;
+	private PaasSubpageMapper paasSubpageConfigMapper;
 	@Autowired
 	private FilesApi filesApi;
 	@Autowired
@@ -37,7 +37,7 @@ public class PaasSubpageConfigServiceImpl implements PaasSubpageConfigService {
 	private FunDetailApi funDetailApi;
 	
 	@Transactional(rollbackFor = Exception.class)
-	public void savePaasPage(UserVO user, PaasSubpageConfig paas) {
+	public void savePaasPage(UserVO user, PaasSubpage paas) {
 		
 		//页面设置一个master 就是iaas id
 //		iaas.setMasterId(iaas.geti);
@@ -69,7 +69,7 @@ public class PaasSubpageConfigServiceImpl implements PaasSubpageConfigService {
 	}
 
 	@Transactional(rollbackFor = Exception.class)
-	public void updateIaasPage(UserVO user, PaasSubpageConfig iaas) {
+	public void updateIaasPage(UserVO user, PaasSubpage iaas) {
 		deleteSubpage(iaas.getMasterId());
 		savePaasPage(user, iaas);
 	}
@@ -79,8 +79,8 @@ public class PaasSubpageConfigServiceImpl implements PaasSubpageConfigService {
 		SubpageParam param = new SubpageParam();
     	param.setMasterId(masterId);
 		
-		PaasSubpageConfig page = paasSubpageConfigMapper.selectOne(new QueryWrapper<PaasSubpageConfig>()
-				.lambda().eq(PaasSubpageConfig::getMasterId,masterId));
+		PaasSubpage page = paasSubpageConfigMapper.selectOne(new QueryWrapper<PaasSubpage>()
+				.lambda().eq(PaasSubpage::getMasterId,masterId));
 		appSceneApi.remove(param);
 		funChaApi.remove(param);
 		funDetailApi.remove(param);
@@ -89,18 +89,18 @@ public class PaasSubpageConfigServiceImpl implements PaasSubpageConfigService {
         	param.setSubpageId(page.getId());
         	filesApi.remove(param);
         }
-        paasSubpageConfigMapper.delete(new QueryWrapper<PaasSubpageConfig>()
-        		.lambda().eq(PaasSubpageConfig::getMasterId,masterId));
+        paasSubpageConfigMapper.delete(new QueryWrapper<PaasSubpage>()
+        		.lambda().eq(PaasSubpage::getMasterId,masterId));
     }
 
 	@Override
-	public PaasSubpageConfig getDetail(String paasId) {
+	public PaasSubpage getDetail(String paasId) {
 
 		SubpageParam param = new SubpageParam();
     	param.setMasterId(paasId);
 		
-		PaasSubpageConfig subpage =  paasSubpageConfigMapper.selectOne(new QueryWrapper<PaasSubpageConfig>()
-				.lambda().eq(PaasSubpageConfig::getMasterId,paasId));
+		PaasSubpage subpage =  paasSubpageConfigMapper.selectOne(new QueryWrapper<PaasSubpage>()
+				.lambda().eq(PaasSubpage::getMasterId,paasId));
         if (subpage != null) {
         	
         	param.setRefId(subpage.getId());

@@ -26,24 +26,24 @@ import com.hirisun.cloud.model.file.FilesVo;
 import com.hirisun.cloud.model.system.OperateRecordVo;
 import com.hirisun.cloud.model.system.SysDictVO;
 import com.hirisun.cloud.model.user.UserVO;
-import com.hirisun.cloud.paas.bean.PaasConfig;
-import com.hirisun.cloud.paas.mapper.PaasConfigMapper;
-import com.hirisun.cloud.paas.service.PaasConfigService;
+import com.hirisun.cloud.paas.bean.Paas;
+import com.hirisun.cloud.paas.mapper.PaasMapper;
+import com.hirisun.cloud.paas.service.PaasService;
 
 @Service
-public class PaasConfigServiceImpl implements PaasConfigService {
+public class PaasServiceImpl implements PaasService {
 
 	@Autowired
 	private FilesApi filesApi;
 	@Autowired
-	private PaasConfigMapper paasConfigMapper;
+	private PaasMapper paasConfigMapper;
 	@Autowired
 	private OperateRecordApi operateRecordApi;
 	@Autowired
 	private SystemApi systemApi;
 	
 	@Transactional(rollbackFor = Exception.class)
-	public String create(PaasConfig paas) {
+	public String create(Paas paas) {
 		
 		verifyParams(paas);
         paas.setId(UUIDUtil.getUUID());
@@ -60,15 +60,15 @@ public class PaasConfigServiceImpl implements PaasConfigService {
 	@Transactional(rollbackFor = Exception.class)
 	public void serviceSort(String id, String ope) {
 		
-        PaasConfig entity = paasConfigMapper.selectById(id);
-        PaasConfig change = null;
-        QueryWrapper<PaasConfig> wrapper = new QueryWrapper<PaasConfig>().eq("status",entity.getStatus()).eq("SUB_TYPE",entity.getSubType());
+        Paas entity = paasConfigMapper.selectById(id);
+        Paas change = null;
+        QueryWrapper<Paas> wrapper = new QueryWrapper<Paas>().eq("status",entity.getStatus()).eq("SUB_TYPE",entity.getSubType());
         if ("down".equals(ope)) {
             wrapper.gt("sort", entity.getSort()).orderByAsc("sort");
         }else if ("up".equals(ope)){
             wrapper.lt("sort", entity.getSort()).orderByDesc("sort");
         }
-        List<PaasConfig> pres =  paasConfigMapper.selectPage(new Page<PaasConfig>(1, 1),wrapper).getRecords();
+        List<Paas> pres =  paasConfigMapper.selectPage(new Page<Paas>(1, 1),wrapper).getRecords();
         if (pres!=null&&pres.size()==1) {
             change = pres.get(0);
         }
@@ -84,7 +84,7 @@ public class PaasConfigServiceImpl implements PaasConfigService {
 	
 	@Transactional(rollbackFor = Exception.class)
     public void publish(UserVO user, String id, Integer result, String remark) {
-        PaasConfig paas = paasConfigMapper.selectById(id);
+        Paas paas = paasConfigMapper.selectById(id);
         if (result.equals(1)) { // 上线
             paas.setStatus(ReviewStatus.ONLINE.getCode());
             paasConfigMapper.updateById(paas);
@@ -121,17 +121,17 @@ public class PaasConfigServiceImpl implements PaasConfigService {
 	/**
      * 校验参数
      */
-	private void verifyParams(PaasConfig paas) {
+	private void verifyParams(Paas paas) {
         if (!"0".equals(paas.getCanApplication()) || "1".equals(paas.getCanApplication())) {
             throw new CustomException(CommonCode.INVALID_PARAM);
         }
     }
 
 	@Override
-	public IPage<PaasConfig> getPage(IPage<PaasConfig> page, UserVO user, Integer status, String name, String subType) {
-		IPage<PaasConfig> paasConfigPage = paasConfigMapper.getPage(page, user, status, name, subType);
+	public IPage<Paas> getPage(IPage<Paas> page, UserVO user, Integer status, String name, String subType) {
+		IPage<Paas> paasConfigPage = paasConfigMapper.getPage(page, user, status, name, subType);
 		
-		List<PaasConfig> records = paasConfigPage.getRecords();
+		List<Paas> records = paasConfigPage.getRecords();
 		if(CollectionUtils.isNotEmpty(records)) {
 			records.forEach(iaasConfig->{
 				String configSubType = iaasConfig.getSubType();
@@ -155,7 +155,7 @@ public class PaasConfigServiceImpl implements PaasConfigService {
 	@Transactional(rollbackFor = Exception.class)
 	public void delete(UserVO user,String id) {
 		
-		PaasConfig paas = paasConfigMapper.selectById(id);
+		Paas paas = paasConfigMapper.selectById(id);
         paas.setStatus(ReviewStatus.DELETE.getCode());
         paasConfigMapper.updateById(paas);
         systemApi.saveLog(user.getIdcard(),"PaaS服务id："+id,"删除服务", IpUtil.getIp());
@@ -163,7 +163,7 @@ public class PaasConfigServiceImpl implements PaasConfigService {
 	}
 
 	@Transactional(rollbackFor = Exception.class)
-	public void edit(PaasConfig paas) {
+	public void edit(Paas paas) {
 		
 		verifyParams(paas);
         if (StringUtils.isEmpty(paas.getCreator())) {
@@ -180,8 +180,8 @@ public class PaasConfigServiceImpl implements PaasConfigService {
 	}
 	
 	@Override
-    public PaasConfig getDetail(UserVO user, String id) {
-		PaasConfig paas = paasConfigMapper.selectById(id);
+    public Paas getDetail(UserVO user, String id) {
+		Paas paas = paasConfigMapper.selectById(id);
         if (paas != null) {
             paas.setUser(user);
             
@@ -194,8 +194,8 @@ public class PaasConfigServiceImpl implements PaasConfigService {
     }
 
 	@Override
-	public PaasConfig setWorkflow(String id, String flowId) {
-		PaasConfig saas = new PaasConfig();
+	public Paas setWorkflow(String id, String flowId) {
+		Paas saas = new Paas();
         saas.setId(id);
         saas.setWorkFlowId(flowId);
         paasConfigMapper.updateById(saas);

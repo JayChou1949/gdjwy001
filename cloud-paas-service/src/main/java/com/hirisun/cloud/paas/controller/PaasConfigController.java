@@ -15,8 +15,8 @@ import com.hirisun.cloud.common.contains.ReviewStatus;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.common.vo.ResponseResult;
 import com.hirisun.cloud.model.user.UserVO;
-import com.hirisun.cloud.paas.bean.PaasConfig;
-import com.hirisun.cloud.paas.service.PaasConfigService;
+import com.hirisun.cloud.paas.bean.Paas;
+import com.hirisun.cloud.paas.service.PaasService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -31,7 +31,7 @@ import io.swagger.annotations.ApiResponses;
 public class PaasConfigController {
 
 	@Autowired
-	private PaasConfigService paasConfigService;
+	private PaasService paasConfigService;
 	
 	@ApiOperation("新增服务配置")
 	@ApiResponses(
@@ -39,7 +39,7 @@ public class PaasConfigController {
     )
     @PostMapping(value = "/create")
     @ResponseBody
-    public QueryResponseResult create(@LoginUser UserVO user, @ModelAttribute PaasConfig paas) {
+    public QueryResponseResult create(@LoginUser UserVO user, @ModelAttribute Paas paas) {
 		paas.setCreator(user.getIdcard());
 		String passId = paasConfigService.create(paas);
         return QueryResponseResult.success(passId);
@@ -85,7 +85,7 @@ public class PaasConfigController {
      */
     @ApiOperation("分页查询服务列表")
     @ApiResponses(
-            @ApiResponse(code = 200, message = "分页数据", response = PaasConfig.class)
+            @ApiResponse(code = 200, message = "分页数据", response = Paas.class)
     )
     @ApiImplicitParams({
             @ApiImplicitParam(name="pageNum", value="页码", defaultValue = "1", dataType="String"),
@@ -99,7 +99,7 @@ public class PaasConfigController {
     public QueryResponseResult page(@LoginUser UserVO user, @RequestParam(required = false, defaultValue = "1") Integer pageNum,
                   @RequestParam(required = false, defaultValue = "20") Integer pageSize, Integer status,
                   @RequestParam(required = false) String name,@RequestParam(required = false) String subType) {
-        IPage<PaasConfig> page = new Page<>();
+        IPage<Paas> page = new Page<>();
         page.setCurrent(pageNum);
         page.setSize(pageSize);
         page = paasConfigService.getPage(page, user, status, name,subType);
@@ -124,33 +124,33 @@ public class PaasConfigController {
     )
     @PostMapping(value = "/edit")
     @ResponseBody
-    public ResponseResult edit(@LoginUser UserVO user, @ModelAttribute PaasConfig paas) {
+    public ResponseResult edit(@LoginUser UserVO user, @ModelAttribute Paas paas) {
     	paasConfigService.edit(paas);
     	return QueryResponseResult.success();
     }
     
     @ApiOperation("服务信息详情")
     @ApiResponses(
-            @ApiResponse(code = 200, message = "返回 paas 配置", response = PaasConfig.class)
+            @ApiResponse(code = 200, message = "返回 paas 配置", response = Paas.class)
     )
     @ApiImplicitParam(name="id", value="服务id", required = true,dataType="String")
     @PostMapping(value = "/detail")
     @ResponseBody
     public QueryResponseResult detail(@LoginUser UserVO user,String id) {
-    	PaasConfig detail = paasConfigService.getDetail(user, id);
+    	Paas detail = paasConfigService.getDetail(user, id);
     	return QueryResponseResult.success(detail);
     }
     
     @ApiOperation("流程配置-废弃")
     @ApiResponses(
-            @ApiResponse(code = 200, message = "返回 paas 配置", response = PaasConfig.class)
+            @ApiResponse(code = 200, message = "返回 paas 配置", response = Paas.class)
     )
     @ApiImplicitParams({ @ApiImplicitParam(name="id", value="服务id", required = true, dataType="String"),
             @ApiImplicitParam(name="flowId", value="流程id", required = true, dataType="String")})
     @PostMapping(value = "/set/workflow")
     @ResponseBody
     public QueryResponseResult setflow(@LoginUser UserVO user, String id,String flowId) {
-    	PaasConfig paasConfig = paasConfigService.setWorkflow(id, flowId);
+    	Paas paasConfig = paasConfigService.setWorkflow(id, flowId);
         return QueryResponseResult.success(paasConfig);
     }
 	

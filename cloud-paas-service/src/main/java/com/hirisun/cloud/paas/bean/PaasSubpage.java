@@ -16,8 +16,8 @@ import com.hirisun.cloud.model.file.FilesVo;
 
 import io.swagger.annotations.ApiModelProperty;
 
-@TableName("T_PAAS_SUBPAGE_CONFIG")
-public class PaasSubpageConfig implements Serializable{
+@TableName("TB_PAAS_SUBPAGE")
+public class PaasSubpage implements Serializable{
 	
 	private static final long serialVersionUID = 782323748379924226L;
 
