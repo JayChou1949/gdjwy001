@@ -15,8 +15,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hirisun.cloud.common.annotation.LoginUser;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.common.vo.ResponseResult;
-import com.hirisun.cloud.iaas.bean.IaasConfig;
-import com.hirisun.cloud.iaas.service.IaasConfigService;
+import com.hirisun.cloud.iaas.bean.Iaas;
+import com.hirisun.cloud.iaas.service.IaasService;
 import com.hirisun.cloud.model.user.UserVO;
 
 import io.swagger.annotations.Api;
@@ -32,14 +32,14 @@ import io.swagger.annotations.ApiResponses;
 public class IaasConfigController {
 
 	@Autowired
-	private IaasConfigService iaasConfigService;
+	private IaasService iaasConfigService;
 	
 	@ApiOperation(value = "创建 iaas 配置", notes = "接口说明")
     @ApiResponses(
             @ApiResponse(code = 200, message = "成功返回id", response = String.class)
     )
     @GetMapping("/create")
-    public QueryResponseResult create(@LoginUser UserVO user,@ModelAttribute IaasConfig iaas) {
+    public QueryResponseResult create(@LoginUser UserVO user,@ModelAttribute Iaas iaas) {
 		
 		String iaasConfigId = iaasConfigService.create(user, iaas);
         return QueryResponseResult.success(iaasConfigId);
@@ -84,7 +84,7 @@ public class IaasConfigController {
 	
     @ApiOperation("分页查询iaas 服务列表")
     @ApiResponses(
-            @ApiResponse(code = 200, message = "success", response = IaasConfig.class)
+            @ApiResponse(code = 200, message = "success", response = Iaas.class)
     )
     @ApiImplicitParams({
             @ApiImplicitParam(name="pageNum", value="页码", defaultValue = "1", paramType="form", dataType="String"),
@@ -105,7 +105,7 @@ public class IaasConfigController {
         if (pageSize == null || pageSize <= 0) {
             pageSize = 20;
         }
-        IPage<IaasConfig> page = new Page<>();
+        IPage<Iaas> page = new Page<>();
         page.setCurrent(pageNum);
         page.setSize(pageSize);
         page = iaasConfigService.getPage(page, user, status, name, subType);
@@ -127,7 +127,7 @@ public class IaasConfigController {
     @ApiOperation("修改服务信息")
     @RequestMapping(value = "/edit", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseResult edit(@LoginUser UserVO user, @ModelAttribute IaasConfig iaas) {
+    public ResponseResult edit(@LoginUser UserVO user, @ModelAttribute Iaas iaas) {
     	String id = iaasConfigService.edit(user, iaas);
     	return QueryResponseResult.success(id);
     }
@@ -135,26 +135,26 @@ public class IaasConfigController {
     
     @ApiOperation("iaas 服务信息详情")
     @ApiResponses(
-            @ApiResponse(code = 200, message = "success",response = IaasConfig.class)
+            @ApiResponse(code = 200, message = "success",response = Iaas.class)
     )
     @ApiImplicitParam(name="id", value="服务id", required = true,dataType="String")
     @PostMapping(value = "/detail")
     @ResponseBody
     public ResponseResult detail(@LoginUser UserVO user,String id) {
-        IaasConfig iaas = iaasConfigService.getDetail(user, id);
+        Iaas iaas = iaasConfigService.getDetail(user, id);
         return QueryResponseResult.success(iaas);
     }
     
     @ApiOperation("流程配置")
     @ApiResponses(
-            @ApiResponse(code = 200, message = "success",response = IaasConfig.class)
+            @ApiResponse(code = 200, message = "success",response = Iaas.class)
     )
     @ApiImplicitParams({ @ApiImplicitParam(name="id", value="服务id", required = true, paramType="form", dataType="String"),
             @ApiImplicitParam(name="flowId", value="流程id", required = true, paramType="form", dataType="String")})
     @PostMapping(value = "/set/workflow")
     @ResponseBody
     public ResponseResult setFlow(String id,String flowId) {
-    	IaasConfig iaas = iaasConfigService.setWorkflow(id, flowId);
+    	Iaas iaas = iaasConfigService.setWorkflow(id, flowId);
         return QueryResponseResult.success(iaas);
     }
 	

@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.hirisun.cloud.common.annotation.LoginUser;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.common.vo.ResponseResult;
-import com.hirisun.cloud.iaas.bean.IaasSubpageConfig;
-import com.hirisun.cloud.iaas.service.IaasConfigSubpageService;
+import com.hirisun.cloud.iaas.bean.IaasSubpage;
+import com.hirisun.cloud.iaas.service.IaasSubpageService;
 import com.hirisun.cloud.model.user.UserVO;
 
 import io.swagger.annotations.Api;
@@ -26,12 +26,12 @@ import io.swagger.annotations.ApiOperation;
 public class IaasSubpageController {
 	
 	@Autowired
-    private IaasConfigSubpageService iaasSubpageService;
+    private IaasSubpageService iaasSubpageService;
 
     @ApiOperation("新增")
     @PostMapping(value = "/create")
     @ResponseBody
-    public ResponseResult create(@LoginUser UserVO user, @ModelAttribute IaasSubpageConfig iaas) {
+    public ResponseResult create(@LoginUser UserVO user, @ModelAttribute IaasSubpage iaas) {
         iaasSubpageService.saveIaasPage(user,iaas);
         return ResponseResult.success();
     }
@@ -40,7 +40,7 @@ public class IaasSubpageController {
     @ApiOperation("修改二级页面配置信息")
     @PostMapping(value = "/edit")
     @ResponseBody
-    public ResponseResult edit(@LoginUser UserVO user, @ModelAttribute IaasSubpageConfig iaas) {
+    public ResponseResult edit(@LoginUser UserVO user, @ModelAttribute IaasSubpage iaas) {
         iaasSubpageService.updateIaasPage(user,iaas);
         return ResponseResult.success();
     }
@@ -50,7 +50,7 @@ public class IaasSubpageController {
     @GetMapping(value = "/detail")
     @ResponseBody
     public ResponseResult detail(@LoginUser UserVO user, @PathVariable String iaasId) {
-    	IaasSubpageConfig iaas = iaasSubpageService.getDetail(iaasId);
+    	IaasSubpage iaas = iaasSubpageService.getDetail(iaasId);
         return QueryResponseResult.success(iaas);
     }
 	

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.hirisun.cloud.iaas.mapper.IaasConfigMapper">
+<mapper namespace="com.hirisun.cloud.iaas.mapper.IaasMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.hirisun.cloud.iaas.bean.IaasConfig">
+    <resultMap id="BaseResultMap" type="com.hirisun.cloud.iaas.bean.Iaas">
         <id column="ID" property="id" />
         <result column="NAME" property="name" />
         <result column="SHORT_NAME" property="shortName" />
@@ -83,7 +83,7 @@
 
     <select id="getPage" resultMap="BaseResultMap">
         SELECT S.*
-        FROM T_IAAS_CONFIG S
+        FROM TB_IAAS S
         WHERE
         <choose>
             <when test="status != null and status == 0">
@@ -108,7 +108,7 @@
     <select id="getLabel" resultMap="SubpageResultMap">
         select ss.SERVICE_ID,ss.USE
         from TB_SUBPAGE ss
-        left join T_IAAS_CONFIG s on ss.SERVICE_ID = s.ID
+        left join TB_IAAS s on ss.SERVICE_ID = s.ID
         where s.STATUS = 2 and ss.USE is not null
         <if test="home != null">
             and s.HOME = #{home}
@@ -120,7 +120,7 @@
 
     <select id="getPageByCondition" resultMap="BaseResultMap">
         select DISTINCT s.*
-        from T_IAAS_CONFIG s
+        from TB_IAAS s
         left join TB_SUBPAGE ss on ss.SERVICE_ID = s.ID
         where s.STATUS = 2
         <if test="home != null">
@@ -139,7 +139,7 @@
     </select>
 
     <select id="getCloudDesktopByName" resultMap="BaseResultMap">
-        SELECT ID,NAME,FORM_NUM,INSTRUCTIONS FROM T_IAAS_CONFIG WHERE NAME=#{name}
+        SELECT ID,NAME,FORM_NUM,INSTRUCTIONS FROM TB_IAAS WHERE NAME=#{name}
     </select>
 
 </mapper>

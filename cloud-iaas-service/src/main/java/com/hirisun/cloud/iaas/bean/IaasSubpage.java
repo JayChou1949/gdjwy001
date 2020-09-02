@@ -16,8 +16,8 @@ import com.hirisun.cloud.model.file.FilesVo;
 
 import io.swagger.annotations.ApiModelProperty;
 
-@TableName("T_IAAS_SUBPAGE_CONFIG")
-public class IaasSubpageConfig implements Serializable{
+@TableName("TB_IAAS_SUBPAGE")
+public class IaasSubpage implements Serializable{
 	
 	private static final long serialVersionUID = 782323748379924226L;
 

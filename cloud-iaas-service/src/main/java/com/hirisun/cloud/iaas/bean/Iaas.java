@@ -20,8 +20,8 @@ import io.swagger.annotations.ApiModelProperty;
  * @author cjh
  *
  */
-@TableName("T_IAAS_CONFIG")
-public class IaasConfig implements Serializable {
+@TableName("TB_IAAS")
+public class Iaas implements Serializable {
 
     /**
 	 * 
@@ -220,7 +220,7 @@ public class IaasConfig implements Serializable {
         return id;
     }
 
-    public IaasConfig setId(String id) {
+    public Iaas setId(String id) {
         this.id = id;
         return this;
     }
@@ -245,7 +245,7 @@ public class IaasConfig implements Serializable {
         return name;
     }
 
-    public IaasConfig setName(String name) {
+    public Iaas setName(String name) {
         this.name = name;
         return this;
     }
@@ -254,7 +254,7 @@ public class IaasConfig implements Serializable {
         return subType;
     }
 
-    public IaasConfig setSubType(String subType) {
+    public Iaas setSubType(String subType) {
         this.subType = subType;
         return this;
     }
@@ -263,7 +263,7 @@ public class IaasConfig implements Serializable {
         return sort;
     }
 
-    public IaasConfig setSort(Long sort) {
+    public Iaas setSort(Long sort) {
         this.sort = sort;
         return this;
     }
@@ -272,7 +272,7 @@ public class IaasConfig implements Serializable {
         return versionCode;
     }
 
-    public IaasConfig setVersionCode(String versionCode) {
+    public Iaas setVersionCode(String versionCode) {
         this.versionCode = versionCode;
         return this;
     }
@@ -281,7 +281,7 @@ public class IaasConfig implements Serializable {
         return url;
     }
 
-    public IaasConfig setUrl(String url) {
+    public Iaas setUrl(String url) {
         this.url = url;
         return this;
     }
@@ -290,7 +290,7 @@ public class IaasConfig implements Serializable {
         return image;
     }
 
-    public IaasConfig setImage(String image) {
+    public Iaas setImage(String image) {
         this.image = image;
         return this;
     }
@@ -307,7 +307,7 @@ public class IaasConfig implements Serializable {
         return description;
     }
 
-    public IaasConfig setDescription(String description) {
+    public Iaas setDescription(String description) {
         this.description = description;
         return this;
     }
@@ -316,7 +316,7 @@ public class IaasConfig implements Serializable {
         return tagDesc;
     }
 
-    public IaasConfig setTagDesc(String tagDesc) {
+    public Iaas setTagDesc(String tagDesc) {
         this.tagDesc = tagDesc;
         return this;
     }
@@ -325,7 +325,7 @@ public class IaasConfig implements Serializable {
         return apNum;
     }
 
-    public IaasConfig setApNum(String apNum) {
+    public Iaas setApNum(String apNum) {
         this.apNum = apNum;
         return this;
     }
@@ -334,7 +334,7 @@ public class IaasConfig implements Serializable {
         return createTime;
     }
 
-    public IaasConfig setCreateTime(Date createTime) {
+    public Iaas setCreateTime(Date createTime) {
         this.createTime = createTime;
         return this;
     }
@@ -343,7 +343,7 @@ public class IaasConfig implements Serializable {
         return modifiedTime;
     }
 
-    public IaasConfig setModifiedTime(Date modifiedTime) {
+    public Iaas setModifiedTime(Date modifiedTime) {
         this.modifiedTime = modifiedTime;
         return this;
     }
@@ -352,7 +352,7 @@ public class IaasConfig implements Serializable {
         return status;
     }
 
-    public IaasConfig setStatus(Long status) {
+    public Iaas setStatus(Long status) {
         this.status = status;
         return this;
     }
@@ -361,7 +361,7 @@ public class IaasConfig implements Serializable {
         return creator;
     }
 
-    public IaasConfig setCreator(String creator) {
+    public Iaas setCreator(String creator) {
         this.creator = creator;
         return this;
     }
@@ -370,7 +370,7 @@ public class IaasConfig implements Serializable {
         return top;
     }
 
-    public IaasConfig setTop(Integer top) {
+    public Iaas setTop(Integer top) {
         this.top = top;
         return this;
     }
@@ -379,7 +379,7 @@ public class IaasConfig implements Serializable {
         return subPageUrl;
     }
 
-    public IaasConfig setSubPageUrl(String subPageUrl) {
+    public Iaas setSubPageUrl(String subPageUrl) {
         this.subPageUrl = subPageUrl;
         return this;
     }
@@ -388,7 +388,7 @@ public class IaasConfig implements Serializable {
         return buildStatus;
     }
 
-    public IaasConfig setBuildStatus(Integer buildStatus) {
+    public Iaas setBuildStatus(Integer buildStatus) {
         this.buildStatus = buildStatus;
         return this;
     }
@@ -397,7 +397,7 @@ public class IaasConfig implements Serializable {
         return subPagePermission;
     }
 
-    public IaasConfig setSubPagePermission(Integer subPagePermission) {
+    public Iaas setSubPagePermission(Integer subPagePermission) {
         this.subPagePermission = subPagePermission;
         return this;
     }
@@ -406,7 +406,7 @@ public class IaasConfig implements Serializable {
         return home;
     }
 
-    public IaasConfig setHome(String home) {
+    public Iaas setHome(String home) {
         this.home = home;
         return this;
     }
@@ -415,7 +415,7 @@ public class IaasConfig implements Serializable {
         return canApplication;
     }
 
-    public IaasConfig setCanApplication(String canApplication) {
+    public Iaas setCanApplication(String canApplication) {
         this.canApplication = canApplication;
         return this;
     }
@@ -424,7 +424,7 @@ public class IaasConfig implements Serializable {
         return hasDoc;
     }
 
-    public IaasConfig setHasDoc(String hasDoc) {
+    public Iaas setHasDoc(String hasDoc) {
         this.hasDoc = hasDoc;
         return this;
     }
@@ -433,7 +433,7 @@ public class IaasConfig implements Serializable {
         return formNum;
     }
 
-    public IaasConfig setFormNum(String formNum) {
+    public Iaas setFormNum(String formNum) {
         this.formNum = formNum;
         return this;
     }
@@ -442,7 +442,7 @@ public class IaasConfig implements Serializable {
         return shortName;
     }
 
-    public IaasConfig setShortName(String shortName) {
+    public Iaas setShortName(String shortName) {
         this.shortName = shortName;
         return this;
     }
@@ -451,7 +451,7 @@ public class IaasConfig implements Serializable {
         return instructions;
     }
 
-    public IaasConfig setInstructions(String instructions) {
+    public Iaas setInstructions(String instructions) {
         this.instructions = instructions;
         return this;
     }
@@ -460,7 +460,7 @@ public class IaasConfig implements Serializable {
         return workFlowId;
     }
 
-    public IaasConfig setWorkFlowId(String workFlowId) {
+    public Iaas setWorkFlowId(String workFlowId) {
         this.workFlowId = workFlowId;
         return this;
     }

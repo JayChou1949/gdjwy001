@@ -1,10 +1,10 @@
 package com.hirisun.cloud.iaas.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.hirisun.cloud.iaas.bean.IaasConfig;
+import com.hirisun.cloud.iaas.bean.Iaas;
 import com.hirisun.cloud.model.user.UserVO;
 
-public interface IaasConfigService {
+public interface IaasService {
     
 	/**
 	 * 创建 iaas 配置
@@ -12,7 +12,7 @@ public interface IaasConfigService {
 	 * @param iaas
 	 * @return
 	 */
-	public String create(UserVO user,IaasConfig iaas);
+	public String create(UserVO user,Iaas iaas);
 	
 	/**
      * 上/下线
@@ -38,7 +38,7 @@ public interface IaasConfigService {
      * @param subType
      * @return
      */
-	public IPage<IaasConfig> getPage(IPage<IaasConfig> page, UserVO user, Integer status, String name, String subType);
+	public IPage<Iaas> getPage(IPage<Iaas> page, UserVO user, Integer status, String name, String subType);
 	
 	/**
 	 * 删除服务
@@ -52,14 +52,14 @@ public interface IaasConfigService {
 	 * @param user
 	 * @param id
 	 */
-	public String edit(UserVO user,IaasConfig iaas);
+	public String edit(UserVO user,Iaas iaas);
 
 	/**
 	 * 根据id 获取iaas配置详情
 	 * @param user
 	 * @param id
 	 */
-	public IaasConfig getDetail(UserVO user, String id);
+	public Iaas getDetail(UserVO user, String id);
 	
 	/**
 	 * 设置流程id
@@ -67,7 +67,7 @@ public interface IaasConfigService {
 	 * @param workFlowId
 	 * @return
 	 */
-	public IaasConfig setWorkflow(String id,String workFlowId);
+	public Iaas setWorkflow(String id,String workFlowId);
 	
 	
 	

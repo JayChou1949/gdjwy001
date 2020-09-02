@@ -20,9 +20,9 @@ import com.hirisun.cloud.common.contains.ReviewStatus;
 import com.hirisun.cloud.common.exception.CustomException;
 import com.hirisun.cloud.common.util.IpUtil;
 import com.hirisun.cloud.common.vo.CommonCode;
-import com.hirisun.cloud.iaas.bean.IaasConfig;
-import com.hirisun.cloud.iaas.mapper.IaasConfigMapper;
-import com.hirisun.cloud.iaas.service.IaasConfigService;
+import com.hirisun.cloud.iaas.bean.Iaas;
+import com.hirisun.cloud.iaas.mapper.IaasMapper;
+import com.hirisun.cloud.iaas.service.IaasService;
 import com.hirisun.cloud.model.app.param.SubpageParam;
 import com.hirisun.cloud.model.file.FilesVo;
 import com.hirisun.cloud.model.system.OperateRecordVo;
@@ -30,12 +30,12 @@ import com.hirisun.cloud.model.system.SysDictVO;
 import com.hirisun.cloud.model.user.UserVO;
 
 @Service
-public class IaasConfigServiceImpl implements IaasConfigService {
+public class IaasServiceImpl implements IaasService {
 
 	@Autowired
 	private FilesApi filesApi;
 	@Autowired
-	private IaasConfigMapper iaasConfigMapper;
+	private IaasMapper iaasConfigMapper;
 	@Autowired
 	private OperateRecordApi operateRecordApi;
 	@Autowired
@@ -45,7 +45,7 @@ public class IaasConfigServiceImpl implements IaasConfigService {
 	 * 保存iaas流程配置及文档上传
 	 */
 	@Transactional(rollbackFor = Exception.class)
-	public String create(UserVO user, IaasConfig iaas) {
+	public String create(UserVO user, Iaas iaas) {
 		
 		iaas.setCreator(user.getIdcard());
         iaas.setStatus(ReviewStatus.PRO_ONLINE.getCode());
@@ -61,7 +61,7 @@ public class IaasConfigServiceImpl implements IaasConfigService {
 		
 	}
 
-	private void verifyParams(IaasConfig iaas) {
+	private void verifyParams(Iaas iaas) {
 
         if (!"0".equals(iaas.getCanApplication()) || "1".equals(iaas.getCanApplication())) {
             throw new CustomException(CommonCode.INVALID_PARAM);
@@ -74,7 +74,7 @@ public class IaasConfigServiceImpl implements IaasConfigService {
 	@Transactional(rollbackFor = Exception.class)
 	public void publish(UserVO user, String id, Integer result, String remark) {
 		
-        IaasConfig iaas = iaasConfigMapper.selectById(id);
+        Iaas iaas = iaasConfigMapper.selectById(id);
         if (result.equals(1)) { // 上线
             iaas.setStatus(ReviewStatus.ONLINE.getCode());
             iaasConfigMapper.updateById(iaas);
@@ -109,15 +109,15 @@ public class IaasConfigServiceImpl implements IaasConfigService {
 	 */
 	@Transactional(rollbackFor = Exception.class)
     public Boolean serviceSort(String id, String ope) {
-        IaasConfig entity = iaasConfigMapper.selectById(id);
-        IaasConfig change = null;
+        Iaas entity = iaasConfigMapper.selectById(id);
+        Iaas change = null;
         if ("down".equals(ope)) {
-            List<IaasConfig> nexts = iaasConfigMapper.selectPage(new Page<IaasConfig>(1, 1), new QueryWrapper<IaasConfig>().eq("status", entity.getStatus()).gt("sort", entity.getSort()).orderByAsc("sort")).getRecords();
+            List<Iaas> nexts = iaasConfigMapper.selectPage(new Page<Iaas>(1, 1), new QueryWrapper<Iaas>().eq("status", entity.getStatus()).gt("sort", entity.getSort()).orderByAsc("sort")).getRecords();
             if (nexts != null && nexts.size() == 1) {
                 change = nexts.get(0);
             }
         } else if ("up".equals(ope)) {
-            List<IaasConfig> pres = iaasConfigMapper.selectPage(new Page<IaasConfig>(1, 1), new QueryWrapper<IaasConfig>().eq("status", entity.getStatus()).lt("sort", entity.getSort()).orderByDesc("sort")).getRecords();
+            List<Iaas> pres = iaasConfigMapper.selectPage(new Page<Iaas>(1, 1), new QueryWrapper<Iaas>().eq("status", entity.getStatus()).lt("sort", entity.getSort()).orderByDesc("sort")).getRecords();
             if (pres != null && pres.size() == 1) {
                 change = pres.get(0);
             }
@@ -135,11 +135,11 @@ public class IaasConfigServiceImpl implements IaasConfigService {
 	/**
 	 * 分页查询iaas 服务列表
 	 */
-	public IPage<IaasConfig> getPage(IPage<IaasConfig> page, UserVO user, 
+	public IPage<Iaas> getPage(IPage<Iaas> page, UserVO user, 
 			Integer status, String name, String subType) {
-		IPage<IaasConfig> iaasPage = iaasConfigMapper.getPage(page, user, status, name,subType);
+		IPage<Iaas> iaasPage = iaasConfigMapper.getPage(page, user, status, name,subType);
 		
-		List<IaasConfig> records = iaasPage.getRecords();
+		List<Iaas> records = iaasPage.getRecords();
 		if(CollectionUtils.isNotEmpty(records)) {
 			records.forEach(iaasConfig->{
 				String configSubType = iaasConfig.getSubType();
@@ -168,7 +168,7 @@ public class IaasConfigServiceImpl implements IaasConfigService {
 	@Transactional(rollbackFor = Exception.class)
 	public void delete(UserVO user, String id) {
 		
-		IaasConfig iaas = iaasConfigMapper.selectById(id);
+		Iaas iaas = iaasConfigMapper.selectById(id);
         iaas.setStatus(ReviewStatus.DELETE.getCode());
         iaasConfigMapper.updateById(iaas);
         systemApi.saveLog(user.getIdcard(), "IaaS服务id："+id, "删除服务", IpUtil.getIp());
@@ -179,7 +179,7 @@ public class IaasConfigServiceImpl implements IaasConfigService {
 	 * 修改服务并重新上传文件
 	 */
 	@Transactional(rollbackFor = Exception.class)
-	public String edit(UserVO user,IaasConfig iaas) {
+	public String edit(UserVO user,Iaas iaas) {
 		
 		verifyParams(iaas);
         if (StringUtils.isEmpty(iaas.getCreator())) iaas.setCreator(null);
@@ -197,9 +197,9 @@ public class IaasConfigServiceImpl implements IaasConfigService {
 	/**
 	 * 根据id 获取Iaas配置详情
 	 */
-	public IaasConfig getDetail(UserVO user, String id) {
+	public Iaas getDetail(UserVO user, String id) {
 		
-		IaasConfig iaas = iaasConfigMapper.selectById(id);
+		Iaas iaas = iaasConfigMapper.selectById(id);
         if (iaas != null) {
             iaas.setUser(user);
             
@@ -216,9 +216,9 @@ public class IaasConfigServiceImpl implements IaasConfigService {
 	 * 设置流程id
 	 */
 	@Transactional(rollbackFor = Exception.class)
-	public IaasConfig setWorkflow(String id, String workFlowId) {
+	public Iaas setWorkflow(String id, String workFlowId) {
 		
-		IaasConfig iaas = iaasConfigMapper.selectById(id);
+		Iaas iaas = iaasConfigMapper.selectById(id);
 		if(iaas != null) {
 			iaas.setWorkFlowId(workFlowId);
 			iaasConfigMapper.updateById(iaas);

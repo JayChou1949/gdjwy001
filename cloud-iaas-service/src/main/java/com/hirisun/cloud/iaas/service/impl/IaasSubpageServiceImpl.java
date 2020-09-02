@@ -12,9 +12,9 @@ import com.hirisun.cloud.api.system.FilesApi;
 import com.hirisun.cloud.api.system.FunChaApi;
 import com.hirisun.cloud.api.system.FunDetailApi;
 import com.hirisun.cloud.common.util.UUIDUtil;
-import com.hirisun.cloud.iaas.bean.IaasSubpageConfig;
-import com.hirisun.cloud.iaas.mapper.IaasSubpageConfigMapper;
-import com.hirisun.cloud.iaas.service.IaasConfigSubpageService;
+import com.hirisun.cloud.iaas.bean.IaasSubpage;
+import com.hirisun.cloud.iaas.mapper.IaasSubpageMapper;
+import com.hirisun.cloud.iaas.service.IaasSubpageService;
 import com.hirisun.cloud.model.app.param.SubpageParam;
 import com.hirisun.cloud.model.app.vo.AppSceneVo;
 import com.hirisun.cloud.model.app.vo.FunChaVo;
@@ -23,10 +23,10 @@ import com.hirisun.cloud.model.file.FilesVo;
 import com.hirisun.cloud.model.user.UserVO;
 
 @Service
-public class IaasConfigSubpageServiceImpl implements IaasConfigSubpageService {
+public class IaasSubpageServiceImpl implements IaasSubpageService {
 
 	@Autowired
-	private IaasSubpageConfigMapper iaasSubpageConfigMapper;
+	private IaasSubpageMapper iaasSubpageConfigMapper;
 	@Autowired
 	private FilesApi filesApi;
 	@Autowired
@@ -40,7 +40,7 @@ public class IaasConfigSubpageServiceImpl implements IaasConfigSubpageService {
 	 * 保存iaas 二级页面
 	 */
 	@Transactional(rollbackFor = Exception.class)
-	public void saveIaasPage(UserVO user, IaasSubpageConfig iaas) {
+	public void saveIaasPage(UserVO user, IaasSubpage iaas) {
 		
 		//页面设置一个master 就是iaas id
 //		iaas.setMasterId(iaas.geti);
@@ -76,7 +76,7 @@ public class IaasConfigSubpageServiceImpl implements IaasConfigSubpageService {
 	 * 更新iaas二级页面详情信息
 	 */
 	@Transactional(rollbackFor = Exception.class)
-	public void updateIaasPage(UserVO user, IaasSubpageConfig iaas) {
+	public void updateIaasPage(UserVO user, IaasSubpage iaas) {
 		deleteSubpage(iaas.getMasterId());
 		saveIaasPage(user, iaas);
 	}
@@ -89,7 +89,7 @@ public class IaasConfigSubpageServiceImpl implements IaasConfigSubpageService {
 		SubpageParam param = new SubpageParam();
     	param.setMasterId(iaasId);
 		
-		IaasSubpageConfig page = iaasSubpageConfigMapper.selectOne(new QueryWrapper<IaasSubpageConfig>().lambda().eq(IaasSubpageConfig::getMasterId,iaasId));
+		IaasSubpage page = iaasSubpageConfigMapper.selectOne(new QueryWrapper<IaasSubpage>().lambda().eq(IaasSubpage::getMasterId,iaasId));
 		appSceneApi.remove(param);
 		funChaApi.remove(param);
 		funDetailApi.remove(param);
@@ -98,21 +98,21 @@ public class IaasConfigSubpageServiceImpl implements IaasConfigSubpageService {
         	param.setSubpageId(page.getId());
         	filesApi.remove(param);
         }
-        iaasSubpageConfigMapper.delete(new QueryWrapper<IaasSubpageConfig>()
-        		.lambda().eq(IaasSubpageConfig::getMasterId,iaasId));
+        iaasSubpageConfigMapper.delete(new QueryWrapper<IaasSubpage>()
+        		.lambda().eq(IaasSubpage::getMasterId,iaasId));
     }
 
 	/**
 	 * 获取iaas二级页面详情信息
 	 */
-	public IaasSubpageConfig getDetail(String iaasId) {
+	public IaasSubpage getDetail(String iaasId) {
 
 		SubpageParam param = new SubpageParam();
     	param.setMasterId(iaasId);
 		
 		
-		IaasSubpageConfig subpage =  iaasSubpageConfigMapper.selectOne(new QueryWrapper<IaasSubpageConfig>()
-				.lambda().eq(IaasSubpageConfig::getMasterId,iaasId));
+		IaasSubpage subpage =  iaasSubpageConfigMapper.selectOne(new QueryWrapper<IaasSubpage>()
+				.lambda().eq(IaasSubpage::getMasterId,iaasId));
         if (subpage != null) {
         	
         	param.setRefId(subpage.getId());

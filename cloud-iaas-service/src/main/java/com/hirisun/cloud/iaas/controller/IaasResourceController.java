@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hirisun.cloud.common.annotation.LoginUser;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
-import com.hirisun.cloud.iaas.bean.IaasConfig;
+import com.hirisun.cloud.iaas.bean.Iaas;
 import com.hirisun.cloud.model.user.UserVO;
 
 import io.swagger.annotations.Api;
