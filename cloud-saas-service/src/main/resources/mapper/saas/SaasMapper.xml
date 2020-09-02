@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.hirisun.cloud.saas.mapper.SaasConfigMapper">
+<mapper namespace="com.hirisun.cloud.saas.mapper.SaasMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.hirisun.cloud.saas.bean.SaasConfig">
+    <resultMap id="BaseResultMap" type="com.hirisun.cloud.saas.bean.Saas">
         <id column="ID" property="id" />
         <result column="NAME" property="name" />
         <result column="SHORT_NAME" property="shortName" />
@@ -95,7 +95,7 @@
         </if>
     </select>
 
-    <select id="getNewPage" resultType="com.hirisun.cloud.saas.bean.SaasConfig">
+    <select id="getNewPage" resultType="com.hirisun.cloud.saas.bean.Saas">
         select * from T_SAAS_CONFIG
         <where>
             AND STATUS = 2 and SERVICE_FLAG = 0 and home = 1
@@ -178,7 +178,7 @@
         order by s.SORT asc,s.NAME desc
     </select>
 
-    <select id="getOnlineList" resultType="com.hirisun.cloud.saas.bean.SaasConfig">
+    <select id="getOnlineList" resultType="com.hirisun.cloud.saas.bean.Saas">
         select s.* from T_SAAS_CONFIG s
         where s.status = 2 and s.SERVICE_FLAG = #{serviceFlag} and s.home = 1
         order by instr('0,2,1', s.BUILD_STATUS) asc,s.VIEW_COUNT desc,s.SORT desc
@@ -190,7 +190,7 @@
         WHERE S.ID = #{serviceId}
     </select>
 
-    <select id="getAppName" resultType="com.hirisun.cloud.saas.bean.SaasConfig">
+    <select id="getAppName" resultType="com.hirisun.cloud.saas.bean.Saas">
         SELECT b.NAME FROM T_SAAS_CONFIG a
           JOIN SYS_DICT b ON a.SUB_TYPE = b.ID
           JOIN TB_SAAS_APPLICATION_EXT c on a.id=c.SERVICE_ID
