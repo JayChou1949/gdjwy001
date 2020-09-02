@@ -1,5 +1,6 @@
 package com.hirisun.cloud.saas.service.impl;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -114,24 +115,19 @@ public class SaasServiceImpl implements SaasService {
 				name, subType,serviceFlag,pilotApp);
 		
 		List<Saas> records = page2.getRecords();
+		
 		if(CollectionUtils.isNotEmpty(records)) {
 			records.forEach(iaasConfig->{
 				String configSubType = iaasConfig.getSubType();
-				
-				List<SysDictVO> dictVoList = JSON.parseObject(systemApi.feignList(), 
-		    			new TypeReference<List<SysDictVO>>(){});
-				
-				if(CollectionUtils.isNotEmpty(dictVoList)) {
-					dictVoList.forEach(sysDictVO->{
-						if(configSubType.equals(sysDictVO.getId())) {
-							iaasConfig.setSubTypeName(sysDictVO.getName());
-						}
-					});
+				if(StringUtils.isNotBlank(configSubType)) {
+					SysDictVO sysDictVO = systemApi.feignGetById(configSubType);
+					if(sysDictVO != null)
+						iaasConfig.setSubTypeName(sysDictVO.getName());
 				}
 			});
 		}
 		
-		return null;
+		return page2;
 	}
 
 	@Override
