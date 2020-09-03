@@ -16,10 +16,10 @@
 
 
 	<select id="getByMasterId" resultMap="BaseResultMap">
-		select * from T_FUN_DETAIL WHERE MASTER_ID = #{masterId}  order by REMARK
+		select * from TB_FUN_DETAIL WHERE MASTER_ID = #{masterId}  order by REMARK
 	</select>
 	
 	<select id="getExps" resultType="com.hirisun.cloud.system.bean.FunDetailExp">
-		select * from T_FUN_DETAIL_EXP WHERE APP_ID = #{id}  order by REMARK
+		select * from TB_FUN_DETAIL_EXP WHERE APP_ID = #{id}  order by REMARK
 	</select>
 </mapper>

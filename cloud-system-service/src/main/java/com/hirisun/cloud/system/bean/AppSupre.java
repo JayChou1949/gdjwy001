@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
-@TableName("T_APP_SUPRE")
+@TableName("TB_APP_SUPRE")
 public class AppSupre implements Serializable {
 
 	private static final long serialVersionUID = 7990305644481403414L;

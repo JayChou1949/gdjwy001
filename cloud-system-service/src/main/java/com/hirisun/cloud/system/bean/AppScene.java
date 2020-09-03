@@ -10,7 +10,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import io.swagger.annotations.ApiModelProperty;
 
-@TableName("T_APP_SCENE")
+@TableName("TB_APP_SCENE")
 public class AppScene implements Serializable {
 
 	private static final long serialVersionUID = 1385420744393643170L;

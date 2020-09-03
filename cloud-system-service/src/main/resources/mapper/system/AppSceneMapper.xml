@@ -14,10 +14,10 @@
         <collection property="iaasSupres" select="getAppSupre" column="ID"></collection>
     </resultMap>
 	<select id="getByMasterId" resultMap="BaseResultMap">
-	    select * from T_APP_SCENE WHERE MASTER_ID = #{masterId} order by REMARK
+	    select * from TB_APP_SCENE WHERE MASTER_ID = #{masterId} order by REMARK
 	</select>
 
     <select id="getAppSupre" resultType="com.hirisun.cloud.system.bean.AppScene">
-        select * from T_APP_SCENE WHERE APP_ID = #{id}  order by REMARK
+        select * from TB_APP_SCENE WHERE APP_ID = #{id}  order by REMARK
     </select>
 </mapper>

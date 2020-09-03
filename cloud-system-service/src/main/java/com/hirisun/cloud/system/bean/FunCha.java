@@ -10,7 +10,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModelProperty;
 
 
-@TableName("T_FUN_CHA")
+@TableName("TB_FUN_CHA")
 public class FunCha implements Serializable {
 
 	private static final long serialVersionUID = -1237900938170616753L;

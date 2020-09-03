@@ -3,8 +3,7 @@ package com.hirisun.cloud.system.controller.manage;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,14 +26,14 @@ public class FunDetailController {
 	
 	@ApiIgnore
     @ApiOperation("保存功能详情")
-    @PostMapping("/save")
+	@PutMapping("/save")
     public void save(@RequestBody SubpageParam param) {
 		funDetailService.save(param);
 	}
 	
 	@ApiIgnore
     @ApiOperation("根据masterId获取功能详情")
-	@PostMapping("/find")
+	@PutMapping("/find")
     public List<FunDetailVo> find(@RequestBody SubpageParam param) {
 		List<FunDetailVo> list = funDetailService.getByMasterId(param);
 		return list;
@@ -42,7 +41,7 @@ public class FunDetailController {
 	
 	@ApiIgnore
     @ApiOperation("根据masterId删除功能详情")
-	@PostMapping("/remove")
+	@PutMapping("/remove")
     public void remove(@RequestBody SubpageParam param) {
 		funDetailService.remove(param);
 	}
