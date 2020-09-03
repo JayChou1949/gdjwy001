@@ -45,7 +45,7 @@
 
     <select id="getPage" resultMap="BaseResultMap">
         SELECT S.*<!-- ,(SELECT NAME FROM SYS_DICT D WHERE D.ID = S.SUB_TYPE) SUB_TYPE_NAME -->
-        FROM T_PAAS_CONFIG S
+        FROM TB_PAAS S
         WHERE
         <choose>
             <when test="status != null and status == 0">
@@ -70,7 +70,7 @@
     <select id="getLabel" resultMap="BaseResultMap">
         <!--select ss.SERVICE_ID,ss.USE
         from TB_SUBPAGE ss
-        left join T_PAAS_CONFIG s on ss.SERVICE_ID = s.ID
+        left join TB_PAAS s on ss.SERVICE_ID = s.ID
         where s.STATUS = 2 and ss.USE is not null
         <if test="home != null">
             and s.HOME = #{home}
@@ -82,7 +82,7 @@
             and s.SUB_TYPE = #{typeId}
         </if>-->
         select s.ID,s.TAG_DESC
-        from T_PAAS_CONFIG s
+        from TB_PAAS s
 
         where s.STATUS = 2 and s.TAG_DESC is not null
         <if test="home != null">
@@ -98,7 +98,7 @@
 
     <select id="getPageByCondition" resultType="com.hirisun.cloud.paas.bean.Paas">
         select s.*
-        from T_PAAS_CONFIG s
+        from TB_PAAS s
         where s.STATUS = 2
         <if test="home != null">
             and s.HOME = #{home}
@@ -123,14 +123,14 @@
 
     <select id="getOnlineService" resultMap="onLineService">
         SELECT s.ID,o.TARGET_ID,MIN(o.MODIFIED_TIME) AS ONLINETIME
-        FROM T_PAAS_CONFIG s,TB_OPERATE_RECORD o
+        FROM TB_PAAS s,TB_OPERATE_RECORD o
         WHERE s.ID = o.TARGET_ID AND s.STATUS = 2 AND s.HOME = 1 AND o.RESULT = '上线'
         GROUP BY s.ID,o.TARGET_ID
         ORDER BY ONLINETIME DESC
     </select>
 
     <select id="getCategoryNameById" resultType="java.lang.String">
-        select dict.NAME from SYS_DICT dict,T_PAAS_CONFIG p where  dict.ID = p.SUB_TYPE and p.ID = #{id}
+        select dict.NAME from SYS_DICT dict,TB_PAAS p where  dict.ID = p.SUB_TYPE and p.ID = #{id}
     </select>
 
 </mapper>
