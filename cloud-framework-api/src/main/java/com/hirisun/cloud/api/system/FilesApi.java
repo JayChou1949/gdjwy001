@@ -3,8 +3,6 @@ package com.hirisun.cloud.api.system;
 import java.util.List;
 
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -21,7 +19,7 @@ public interface FilesApi {
 	@ApiIgnore
     @ApiOperation("保存文件信息")
     @PutMapping("/system/files/refFiles")
-	public void refFiles(SubpageParam param);
+	public void refFiles(@RequestBody SubpageParam param);
 	
 	@ApiIgnore
     @ApiOperation("根据 SaasSubpageId 删除文件信息")

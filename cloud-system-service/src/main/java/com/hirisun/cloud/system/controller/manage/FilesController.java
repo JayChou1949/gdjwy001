@@ -25,7 +25,7 @@ public class FilesController {
 	@ApiIgnore
     @ApiOperation("保存文件信息")
     @PutMapping("/refFiles")
-	public void refFiles(SubpageParam param) {
+	public void refFiles(@RequestBody SubpageParam param) {
 		filesService.refFiles(param);
 	}
 	

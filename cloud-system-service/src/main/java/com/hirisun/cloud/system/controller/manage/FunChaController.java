@@ -27,7 +27,7 @@ public class FunChaController {
 	
 	@ApiIgnore
     @ApiOperation("保存功能特点")
-    @PostMapping("/save")
+	@PutMapping("/save")
     public void save(@RequestBody SubpageParam param) {
 		funChaService.save(param);
 	}
