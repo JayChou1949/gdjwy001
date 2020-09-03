@@ -1,12 +1,13 @@
 package com.hirisun.cloud.api.system;
 
-import com.hirisun.cloud.model.system.SysDictVO;
 import io.swagger.annotations.ApiOperation;
+import springfox.documentation.annotations.ApiIgnore;
+
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.List;
+import com.hirisun.cloud.model.system.SysDictVO;
 
 
 /**
@@ -43,10 +44,8 @@ public interface SystemApi {
     @GetMapping("/system/dictManage/feign/getByValue")
     public String feignGetByValue(@RequestParam("value") String value);
 
-    /**
-     * 根据字典值获取数据字典
-     */
-    @ApiOperation(value = "feign调用根据字典id获取数据字典列表")
-    @GetMapping("/system/dictManage/feign/getDictById")
-    public List<SysDictVO> getDictById(@RequestParam String id);
+    @ApiIgnore
+    @ApiOperation(value = "feign调用根据字典值获取数据字典列表")
+    @GetMapping("/system/dictManage/feign/getById")
+    public SysDictVO feignGetById(@RequestParam("id") String id);
 }

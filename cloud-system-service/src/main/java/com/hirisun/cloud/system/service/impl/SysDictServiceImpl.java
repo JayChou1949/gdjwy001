@@ -5,11 +5,13 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hirisun.cloud.common.constant.RedisKey;
 import com.hirisun.cloud.common.util.UUIDUtil;
+import com.hirisun.cloud.model.system.SysDictVO;
 import com.hirisun.cloud.redis.service.RedisService;
 import com.hirisun.cloud.system.bean.SysDict;
 import com.hirisun.cloud.system.mapper.SysDictMapper;
 import com.hirisun.cloud.system.service.SysDictService;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -120,4 +122,22 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
             }
         });
     }
+
+	@Override
+	public SysDictVO feignGetById(String id) {
+		
+		SysDictVO vo = null;
+		
+		List<Object> list =  redisService.range("REDIS_SYS_DICT",0,-1);
+		for(Object item : list) {
+			SysDict dict = JSON.parseObject(item.toString(), SysDict.class);
+			if (dict.getId().equals(id)) {
+            	vo = new SysDictVO();
+            	BeanUtils.copyProperties(dict, vo);
+            	break;
+            }
+		}
+		
+		return vo;
+	}
 }

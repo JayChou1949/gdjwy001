@@ -1,5 +1,6 @@
 package com.hirisun.cloud.system.service;
 
+import com.hirisun.cloud.model.system.SysDictVO;
 import com.hirisun.cloud.system.bean.SysDict;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -24,4 +25,6 @@ public interface SysDictService extends IService<SysDict> {
     void syncSysDictData();
 
     boolean isBasePaaSService(String id);
+    
+    SysDictVO feignGetById(String id);
 }

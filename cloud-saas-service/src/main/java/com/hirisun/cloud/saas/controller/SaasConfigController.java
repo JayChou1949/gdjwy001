@@ -95,16 +95,17 @@ public class SaasConfigController {
             @ApiImplicitParam(name="status", value="状态, 0:审核中 1: 待上线 2: 上线 3:驳回 4:删除", required = true,dataType="String"),
             @ApiImplicitParam(name="name", value="服务名", dataType="String"),
             @ApiImplicitParam(name = "subType",value = "子类", dataType = "String"),
-            @ApiImplicitParam(name = "subType",value = "子类", dataType = "String"),
+            @ApiImplicitParam(name = "pilotApp",value = " 是否是试点应用：0-非试点,1-2019,2-2020", dataType = "String"),
     })
     @GetMapping(value = "/page")
     public QueryResponseResult page(@LoginUser UserVO user, 
-    		@RequestParam(required = false, defaultValue = "1") Integer pageNum,
-                  @RequestParam(required = false, defaultValue = "20") Integer pageSize, Integer status,
-                  @RequestParam(required = false) String name,
-                  @RequestParam(required = false) String subType,
-                  @RequestParam(required = false,defaultValue = "0") Integer serviceFlag,
-                 @RequestParam(required = false) Integer pilotApp) {
+    		@RequestParam(value="pageNum",required = false, defaultValue = "1") Integer pageNum,
+                  @RequestParam(value="pageSize",required = false, defaultValue = "20") Integer pageSize, 
+                  @RequestParam(value="status",required = false) Integer status,
+                  @RequestParam(value="name",required = false) String name,
+                  @RequestParam(value="subType",required = false) String subType,
+                  @RequestParam(value="serviceFlag",required = false,defaultValue = "0") Integer serviceFlag,
+                 @RequestParam(value="pilotApp",required = false) Integer pilotApp) {
         IPage<Saas> page = new Page<>();
         page.setCurrent(pageNum);
         page.setSize(pageSize);

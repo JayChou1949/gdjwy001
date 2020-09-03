@@ -135,17 +135,13 @@ public class PaasServiceImpl implements PaasService {
 		if(CollectionUtils.isNotEmpty(records)) {
 			records.forEach(iaasConfig->{
 				String configSubType = iaasConfig.getSubType();
-				
-				List<SysDictVO> dictVoList = JSON.parseObject(systemApi.feignList(), 
-		    			new TypeReference<List<SysDictVO>>(){});
-				
-				if(CollectionUtils.isNotEmpty(dictVoList)) {
-					dictVoList.forEach(sysDictVO->{
-						if(configSubType.equals(sysDictVO.getId())) {
-							iaasConfig.setSubTypeName(sysDictVO.getName());
-						}
-					});
+				if(StringUtils.isNotBlank(configSubType)) {
+					SysDictVO sysDictVO = systemApi.feignGetById(configSubType);
+					if(sysDictVO != null) {
+						iaasConfig.setSubTypeName(sysDictVO.getName());
+					}
 				}
+				
 			});
 		}
 		
