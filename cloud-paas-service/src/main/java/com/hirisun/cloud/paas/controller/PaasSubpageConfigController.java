@@ -2,10 +2,10 @@ package com.hirisun.cloud.paas.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,7 +31,7 @@ public class PaasSubpageConfigController {
     @ApiOperation("新增")
     @PostMapping(value = "/create")
     @ResponseBody
-    public ResponseResult create(@LoginUser UserVO user, @ModelAttribute PaasSubpage paas) {
+    public ResponseResult create(@LoginUser UserVO user, @RequestBody PaasSubpage paas) {
     	paasSubpageConfigService.savePaasPage(user,paas);
         return ResponseResult.success();
     }
@@ -40,7 +40,7 @@ public class PaasSubpageConfigController {
     @ApiOperation("修改二级页面配置信息")
     @PostMapping(value = "/edit")
     @ResponseBody
-    public ResponseResult edit(@LoginUser UserVO user, @ModelAttribute PaasSubpage paas) {
+    public ResponseResult edit(@LoginUser UserVO user, @RequestBody PaasSubpage paas) {
     	paasSubpageConfigService.updateIaasPage(user,paas);
         return ResponseResult.success();
     }
@@ -49,7 +49,7 @@ public class PaasSubpageConfigController {
     @ApiImplicitParam(name="iaasId", value="服务id", required = true, dataType="String")
     @GetMapping(value = "/detail")
     @ResponseBody
-    public ResponseResult detail(@LoginUser UserVO user, @PathVariable String iaasId) {
+    public ResponseResult detail(@LoginUser UserVO user, @RequestParam(name = "iaasId") String iaasId) {
     	PaasSubpage iaas = paasSubpageConfigService.getDetail(iaasId);
         return QueryResponseResult.success(iaas);
     }

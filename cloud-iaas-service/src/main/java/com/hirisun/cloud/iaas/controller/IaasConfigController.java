@@ -1,9 +1,10 @@
 package com.hirisun.cloud.iaas.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -38,8 +39,8 @@ public class IaasConfigController {
     @ApiResponses(
             @ApiResponse(code = 200, message = "成功返回id", response = String.class)
     )
-    @GetMapping("/create")
-    public QueryResponseResult create(@LoginUser UserVO user,@ModelAttribute Iaas iaas) {
+    @PostMapping("/create")
+    public QueryResponseResult create(@LoginUser UserVO user,@RequestBody Iaas iaas) {
 		
 		String iaasConfigId = iaasConfigService.create(user, iaas);
         return QueryResponseResult.success(iaasConfigId);

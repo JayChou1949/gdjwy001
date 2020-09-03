@@ -5,7 +5,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,7 +33,7 @@ public class IaasSubpageController {
     @ApiOperation("新增")
     @PostMapping(value = "/create")
     @ResponseBody
-    public ResponseResult create(@LoginUser UserVO user, @ModelAttribute IaasSubpage iaas) {
+    public ResponseResult create(@LoginUser UserVO user, @RequestBody IaasSubpage iaas) {
         iaasSubpageService.saveIaasPage(user,iaas);
         return ResponseResult.success();
     }
@@ -40,7 +42,7 @@ public class IaasSubpageController {
     @ApiOperation("修改二级页面配置信息")
     @PostMapping(value = "/edit")
     @ResponseBody
-    public ResponseResult edit(@LoginUser UserVO user, @ModelAttribute IaasSubpage iaas) {
+    public ResponseResult edit(@LoginUser UserVO user, @RequestBody IaasSubpage iaas) {
         iaasSubpageService.updateIaasPage(user,iaas);
         return ResponseResult.success();
     }
@@ -49,7 +51,7 @@ public class IaasSubpageController {
     @ApiImplicitParam(name="iaasId", value="服务id", required = true, dataType="String")
     @GetMapping(value = "/detail")
     @ResponseBody
-    public ResponseResult detail(@LoginUser UserVO user, @PathVariable String iaasId) {
+    public ResponseResult detail(@LoginUser UserVO user, @RequestParam(name = "iaasId") String iaasId) {
     	IaasSubpage iaas = iaasSubpageService.getDetail(iaasId);
         return QueryResponseResult.success(iaas);
     }

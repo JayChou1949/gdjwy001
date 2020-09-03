@@ -1,9 +1,11 @@
 package com.hirisun.cloud.system.controller.manage;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hirisun.cloud.model.system.OperateRecordVo;
@@ -23,8 +25,8 @@ public class OperateRecordController {
 	
 	@ApiIgnore
     @ApiOperation("根据配置id验证是否存在上线的记录")
-    @PostMapping("/exits")
-    public boolean isNotEmpty(String configId) {
+    @GetMapping("/exits")
+    public boolean isNotEmpty(@RequestParam("configId") String configId) {
 		return operateRecordService.validateExits(configId);
 	}
 	
