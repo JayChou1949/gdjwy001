@@ -14,7 +14,8 @@ public enum OrderCode implements ResultCode {
     USER_CANT_EDIT_OTHER_USER_APPLY(2508,"只能删除自己的申请!"),
     FALLBACK_ID_NOT_NULL(2508,"回退环节ID不能为空,回退失败!"),
     WORK_ORDER_NOT_NULL(2509,"申请工单不存在"),
-    FEIGN_METHOD_ERROR(2509,"远程方法调用失败")
+    FEIGN_METHOD_ERROR(2509,"远程方法调用失败"),
+    SERVICE_EXCEPTION(2509,"获取对应应用异常,请检查应用是否存在")
     ;
     /**
      * 状态码

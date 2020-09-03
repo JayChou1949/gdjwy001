@@ -23,4 +23,9 @@ public interface RedisKey {
      */
     String KEY_PUBLISH_PREFIX = "PublishOrdNum:";
 
+    /**
+     * SAAS服务注册回收申请单号前缀
+     */
+    String KEY_SAAS_PREFIX = "SaasOrdNum:";
+
 }

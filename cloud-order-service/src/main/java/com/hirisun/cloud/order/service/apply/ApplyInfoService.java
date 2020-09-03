@@ -9,6 +9,7 @@ import com.hirisun.cloud.order.bean.apply.ApplyInfo;
 import com.hirisun.cloud.order.continer.IImplHandler;
 import com.hirisun.cloud.order.vo.ApproveVO;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 /**
@@ -75,5 +76,7 @@ public interface ApplyInfoService extends IService<ApplyInfo> {
     public QueryResponseResult termination(String applyInfoId);
 
     public QueryResponseResult newTodo(UserVO user);
+
+    public QueryResponseResult updateInfo(UserVO user, HttpServletRequest request) throws  Exception;
 
 }

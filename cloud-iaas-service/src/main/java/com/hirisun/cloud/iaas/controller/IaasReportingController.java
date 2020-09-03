@@ -29,7 +29,6 @@ import com.hirisun.cloud.iaas.bean.IaasZysb;
 import com.hirisun.cloud.iaas.service.IIaasZysbService;
 import com.hirisun.cloud.model.export.vo.ReportExportVo;
 import com.hirisun.cloud.model.user.UserVO;
-import com.hirisun.cloud.model.workflow.ApproveVo;
 import com.hirisun.cloud.model.workflow.FallBackVO;
 import com.hirisun.cloud.redis.lock.DistributeLock;
 
@@ -382,10 +381,10 @@ public class IaasReportingController {
         return QueryResponseResult.success("未找到待办数据");
     }
 
-    @ApiOperation(value = "加办")
-    @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public ResponseResult review(@LoginUser UserVO user, @RequestBody ApproveVo appVo) {
-    		return null;
+//    @ApiOperation(value = "加办")
+//    @RequestMapping(value = "/add", method = RequestMethod.POST)
+//    public ResponseResult review(@LoginUser UserVO user, @RequestBody ApproveVO appVo) {
+//    		return null;
 //        String uuid = UUIDUtil.getUUID();
 //        String lockKey = appVo.getCurrentActivityId().intern();
 //        R r = R.error();
@@ -399,7 +398,7 @@ public class IaasReportingController {
 //            lock.unlock(lockKey, uuid);
 //        }
 //        return r;
-    }
+//    }
 
     @ApiOperation(value = "中止业务")
     @ApiImplicitParams({

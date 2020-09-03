@@ -2,40 +2,34 @@ package com.hirisun.cloud.order.service.apply.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.battcn.boot.swagger.model.Order;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.hirisun.cloud.api.daas.DaasShoppingCartApi;
-import com.hirisun.cloud.api.file.FileApi;
 import com.hirisun.cloud.api.iaas.IaasShoppingCartApi;
 import com.hirisun.cloud.api.paas.PaasShoppingCartApi;
-import com.hirisun.cloud.api.saas.SaasApplicationApi;
 import com.hirisun.cloud.api.saas.SaasShoppingCartApi;
 import com.hirisun.cloud.api.system.FilesApi;
 import com.hirisun.cloud.api.system.SmsApi;
 import com.hirisun.cloud.api.user.UserApi;
 import com.hirisun.cloud.api.workflow.WorkflowApi;
-import com.hirisun.cloud.common.constant.BusinessName;
 import com.hirisun.cloud.common.contains.*;
 import com.hirisun.cloud.common.exception.CustomException;
 import com.hirisun.cloud.common.util.UUIDUtil;
 import com.hirisun.cloud.common.util.WorkflowUtil;
+import com.hirisun.cloud.common.vo.CommonCode;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.model.app.param.SubpageParam;
-import com.hirisun.cloud.model.apply.ApplyFeedbackVO;
 import com.hirisun.cloud.model.apply.ApplyReviewRecordVO;
 import com.hirisun.cloud.model.apply.FallBackVO;
-import com.hirisun.cloud.model.common.WorkOrder;
+import com.hirisun.cloud.model.apply.UpdateApplyInfoVO;
 import com.hirisun.cloud.model.file.FilesVo;
 import com.hirisun.cloud.model.param.FilesParam;
-import com.hirisun.cloud.model.saas.vo.SaasConfigVO;
-import com.hirisun.cloud.model.service.AppReviewInfoVo;
-import com.hirisun.cloud.model.shopping.vo.ShoppingCartVo;
 import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.model.workflow.WorkflowActivityVO;
 import com.hirisun.cloud.model.workflow.WorkflowInstanceVO;
@@ -43,6 +37,7 @@ import com.hirisun.cloud.model.workflow.WorkflowNodeVO;
 import com.hirisun.cloud.order.bean.apply.ApplyFeedback;
 import com.hirisun.cloud.order.bean.apply.ApplyInfo;
 import com.hirisun.cloud.order.bean.apply.ApplyReviewRecord;
+import com.hirisun.cloud.order.bean.apply.UpdateApplyInfo;
 import com.hirisun.cloud.order.continer.FormNum;
 import com.hirisun.cloud.order.continer.HandlerWrapper;
 import com.hirisun.cloud.order.continer.IApplicationHandler;
@@ -57,6 +52,7 @@ import com.hirisun.cloud.order.vo.OrderCode;
 import com.hirisun.cloud.redis.lock.DistributeLock;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,6 +61,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -444,7 +441,7 @@ public class ApplyInfoServiceImpl extends ServiceImpl<ApplyInfoMapper, ApplyInfo
                 throw new CustomException(OrderCode.WORKFLOW_MISSING);
             }
             //检查环节名，是否是业务办理，
-            boolean isImpl= WorkflowUtil.compareNodeAbility(model.getNodeFeature(), WorkflowNodeAbilityType.APPLY.getCode());
+            boolean isImpl= WorkflowUtil.compareNodeAbility(model.getNodeFeature(), WorkflowNodeAbilityType.IMPL.getCode());
             if (isImpl){
                 //下一环节名为业务办理,设置订单状态为 待实施
                 info.setStatus(ApplyInfoStatus.IMPL.getCode());
@@ -821,6 +818,175 @@ public class ApplyInfoServiceImpl extends ServiceImpl<ApplyInfoMapper, ApplyInfo
         map.put("total", total);
 
         return QueryResponseResult.success(map);
+    }
+
+    @Override
+    public QueryResponseResult updateInfo(UserVO user, HttpServletRequest request) throws Exception {
+        String json = IOUtils.toString(request.getInputStream(), "UTF-8");
+        UpdateApplyInfo origin = JSONObject.parseObject(json, UpdateApplyInfo.class);
+        ApplyInfo info = origin.getInfo();
+        info.setFormNum(this.getById(info.getId()).getFormNum());
+        HandlerWrapper hw = FormNum.getHandlerWrapperByName(info.getFormNum());
+        UpdateApplyInfo updateInfo = parseUpdateApplicationInfo(json, hw.getApplicationType());
+        updateObj(user, hw.getFormNum(), updateInfo, hw.getHandler());
+        //如果是关系型数据库，还要更新实施信息
+        if(info.getFormNum() != null){
+            if(FormNum.PAAS_RELATIONAL_DATABASE.toString().equals(info.getFormNum())){
+                IImplHandler implHandler = hw.getImplHandler();
+                String infoJson = JSON.toJSONString(info);
+                //TODO
+//                List<PaasRdbBase> rdbBasesImplList = JSON.parseArray(JSON.parseObject(infoJson).getString("implServerList"),PaasRdbBase.class);
+//                if(CollectionUtils.isNotEmpty(rdbBasesImplList)){
+//                    implHandler.update(info.getId(),rdbBasesImplList);
+//                }
+            }
+        }
+        return QueryResponseResult.success(null);
+    }
+    private void updateObj(UserVO user, FormNum formNum,
+                        UpdateApplyInfo updateInfo, IApplicationHandler handler) {
+        ApplyInfo info = updateInfo.getInfo();
+        if (info == null || StringUtils.isEmpty(info.getId())) {
+            throw new CustomException(CommonCode.INVALID_PARAM);
+        }
+        String uuid = UUIDUtil.getUUID();
+        String lockKey = info.getId().intern();
+        try {
+            if (lock.lock(lockKey, uuid)) {
+                info.setResourceType(formNum.getResourceType().getCode());
+                info.setFormNum(formNum.name());
+                info.setDraft("0"); // 不是草稿
+//                info.setFlowNew("1");
+                this.update(user, updateInfo, handler);
+            } else {
+                throw new CustomException(CommonCode.SERVER_ERROR);
+            }
+        } finally {
+            lock.unlock(lockKey, uuid);
+        }
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public <S> void update(UserVO user, UpdateApplyInfo updateInfo, IApplicationHandler<S> handler) {
+//        ApplyInfo info = updateInfo.getInfo();
+//        info.setStatus(null);
+//        info.setWorkFlowId(null);
+//        info.setOrderNumber(null);
+//
+//        String type = updateInfo.getType();
+//
+//        boolean isRdbAddAccout = false;
+//
+//        ApplyInfo dbInfo = this.getById(info.getId());
+//
+//        ApplyInfoStatus status = ApplyInfoStatus.codeOf(dbInfo.getStatus());
+//        // 只有以下状态可以修改数据(购物车,审核驳回,实施驳回,部门内审核驳回)
+//        if (status != ApplyInfoStatus.REVIEW_REJECT
+//                && status != ApplyInfoStatus.IMPL_REJECT
+//                && status != ApplyInfoStatus.SHOPPING_CART
+//                && status != ApplyInfoStatus.INNER_REJECT) {
+//            if (status == ApplyInfoStatus.REVIEW) {
+//                boolean canEdit = false;
+////                FlowStep step = flowStepService.getById(dbInfo.getWorkFlowId());
+//                if (step != null && FWT_REVIEW_STEP_NAME.equals(step.getName())) {
+//                    // 如果是服务台复核,那么复核人可以修改
+//                    List<User> userList = flowStepUserService.findUserByFlowStepId(dbInfo.getFlowStepId());
+//                    if (userList != null && !userList.isEmpty()) {
+//                        for (User u : userList) {
+//                            if (Objects.equals(user.getIdcard(), u.getIdcard())) {
+//                                canEdit = true;
+//                                break;
+//                            }
+//                        }
+//                    }
+//                }
+//                if ("1".equals(dbInfo.getFlowNew())) {
+//                    canEdit = true;
+//                }
+//                if (!canEdit) {
+//                    throw new BaseException("该状态不能修改");
+//                }
+//            } else {
+//                //如果是关系型数据库的新增数据库，业务办理环节可以修改,不抛出异常
+//                if(info.getFormNum().equals(FormNum.PAAS_RELATIONAL_DATABASE.toString()) && status == ApplicationInfoStatus.IMPL){
+//                    List<PaasRdbBase>  baseList = (List<PaasRdbBase>)handler.getByAppInfoId(info.getId());
+//                    logger.debug("update::baseList -> {}",baseList);
+//                    if(baseList.size()==1){
+//                        if(RdbApplyType.ADD_ACCOUNT.getCode().equals(baseList.get(0).getApplyType())){
+//                            logger.debug("update::PAAS_RELATIONAL_DATABASE + IMPL + ADD_ACCOUNT");
+//                            isRdbAddAccout = true;
+//                        }else {
+//                            logger.debug("update:::PAAS_RELATIONAL_DATABASE + IMPL + ADD_DATABASE");
+//                            throw new BaseException("该状态不能修改");
+//                        }
+//                    }else {
+//                        logger.debug("update::PAAS_RELATIONAL_DATABASE + IMPL+baseList!=1");
+//                        throw new BaseException("该状态不能修改");
+//                    }
+//                }else {
+//                    logger.debug("update::non (PAAS_RELATIONAL_DATABASE + IMPL) + non （REVIEW + ...） ");
+//                    throw new BaseException("该状态不能修改");
+//                }
+//            }
+//        }
+//
+//        // 待发送消息
+//        List<Message> message = null;
+//        /*
+//         * 修改状态
+//         * 1. 如果状态为购物车,则不改变当前任何状态,只修改申请数据
+//         * 2. 如果提交到科信审核,则修改状态为待审核
+//         * 3. 如果提交到部门内审核,则修改为部门内待审核
+//         * 4. 如果是服务台复核,则不改变当前任何状态,只修改申请数据
+//         * 5. 如果是关系型数据库新增账号业务办理，不改变当前任何状态,只修改申请数据 （2020-4-23）
+//         */
+//        if (!"1".equals(dbInfo.getFlowNew())) {
+//            if (status == ApplicationInfoStatus.SHOPPING_CART) {
+//                //购物车状态,只修改申请数据
+//            } else if (status == ApplicationInfoStatus.REVIEW) {
+//                // 服务台复核
+//            } else if(status == ApplicationInfoStatus.IMPL && isRdbAddAccout){
+//                //关系型数据库新增账号业务办理
+//            }else {
+//                if ("kx".equals(type)) {
+//                    // 科信审核
+//                    List<FlowStep> flowStepList = flowStepService.getFlowStepList(info.getServiceTypeId(), info.getResourceType(), TYPE_REVIEW);
+//                    String flowStepId = flowStepList.get(0).getId();
+//                    this.update(info.getId(), ApplicationInfoStatus.REVIEW, flowStepId, null);
+//
+//                    message = buildProcessingMessage(dbInfo, flowStepUserService.findUserByFlowStepId(flowStepId));
+//                } else {
+//                    // 部门内审核
+//                    List<String> userIds = updateInfo.getUserIds();
+//                    if (userIds == null || userIds.isEmpty()) {
+//                        throw new BaseException("请选择审核人!");
+//                    }
+//                    innerReviewUserService.infoUser(info.getId(), userIds);
+//                    this.update(info.getId(), ApplicationInfoStatus.INNER_REVIEW, null, null);
+//
+//                    message = buildProcessingMessage(dbInfo, userService.findUserByIds(userIds));
+//                }
+//            }
+//        }
+//        // 关联服务器信息
+//        if (handler != null) {
+//            handler.update(info);
+//        }
+//        // 关联文件信息
+//        refFiles(info.getFileList(), info.getId());
+//        // 更新主表
+//        info.setServiceTypeId(null);
+//        info.setHwPoliceCategory(AreaPoliceCategoryUtils.getPoliceCategory(info.getAppName()));
+//        info.updateById();
+//
+//        // 异步发送消息
+//        if (message != null) {
+//            messageProvider.sendMessageAsync(message);
+//        }
+    }
+    private static <S> UpdateApplyInfo<S> parseUpdateApplicationInfo(String json, Class type) {
+        return JSON.parseObject(json,
+                new TypeReference<UpdateApplyInfo<S>>(type) {});
     }
 
     /**

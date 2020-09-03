@@ -174,7 +174,7 @@ public class SaasWorkflowServiceImpl implements SaasWorkflowService {
                 throw new CustomException(OrderCode.WORKFLOW_MISSING);
             }
             //检查环节名，是否是业务办理，
-            boolean isImpl= WorkflowUtil.compareNodeAbility(model.getNodeFeature(), WorkflowNodeAbilityType.APPLY.getCode());
+            boolean isImpl= WorkflowUtil.compareNodeAbility(model.getNodeFeature(), WorkflowNodeAbilityType.IMPL.getCode());
             if (isImpl){
                 //下一环节名为业务办理,设置订单状态为 待实施
                 info.setStatus(ApplyInfoStatus.IMPL.getCode());

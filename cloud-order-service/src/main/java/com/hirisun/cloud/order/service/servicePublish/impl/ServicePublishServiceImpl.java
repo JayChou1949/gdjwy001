@@ -471,10 +471,10 @@ public class ServicePublishServiceImpl extends ServiceImpl<ServicePublishMapper,
         if (null==instance){
             throw new CustomException(CommonCode.FLOW_INSTANCE_NULL_ERROR);
         }
-        ActivityParam param = new ActivityParam();
-        param.setActivitystatus(0);
-        param.setIsstart(0);
-        param.setInstanceId(instance.getId());
+//        ActivityParam param = new ActivityParam();
+//        param.setActivitystatus(0);
+//        param.setIsstart(0);
+//        param.setInstanceId(instance.getId());
 
         Map<String,String> map = new HashMap<>();
         map.put("name", BusinessName.SAAS_RESOURCE);
@@ -500,7 +500,10 @@ public class ServicePublishServiceImpl extends ServiceImpl<ServicePublishMapper,
         try {
             if (lock.lock(lockKey, uuid)) {
                 deleteById(user, id);
-                workflowApi.terminationOrder(id);
+                Map<String, String> stringStringMap = workflowApi.terminationOrder(id);
+                if (!"200".equals(stringStringMap.get("code"))) {
+                    return QueryResponseResult.fail(stringStringMap.get("msg"));
+                }
             } else {
                 return QueryResponseResult.fail("系统繁忙,请稍后重试");
             }
@@ -584,9 +587,9 @@ public class ServicePublishServiceImpl extends ServiceImpl<ServicePublishMapper,
 
     @Override
     public QueryResponseResult approve(UserVO user, FallBackVO vo) {
+        ServicePublish info = this.getById(vo.getApplyReviewRecord().getApplyId());
         ApplyReviewRecordVO approve = vo.getApplyReviewRecord();
         approve.setCreator(user.getIdcard());
-        ServicePublish info = this.getById(vo.getApplyReviewRecord().getApplyId());
         WorkflowActivityVO activity =workflowApi.getActivityById(vo.getCurrentActivityId());
         if (activity==null) {
             throw new CustomException(OrderCode.WORKFLOW_ACTIVITY_MISSING);
@@ -613,7 +616,7 @@ public class ServicePublishServiceImpl extends ServiceImpl<ServicePublishMapper,
             }else{
                 return QueryResponseResult.fail(resultMap.get("msg"));
             }
-            boolean isImpl= WorkflowUtil.compareNodeAbility(model.getNodeFeature(), WorkflowNodeAbilityType.APPLY.getCode());
+            boolean isImpl= WorkflowUtil.compareNodeAbility(model.getNodeFeature(), WorkflowNodeAbilityType.IMPL.getCode());
             if (isImpl){
                 info.setStatus(ApplyInfoStatus.IMPL.getCode());
             }else {
@@ -628,8 +631,6 @@ public class ServicePublishServiceImpl extends ServiceImpl<ServicePublishMapper,
             WorkflowNodeVO fallbackModel = workflowApi.getNodeById(modelIds);
             boolean isApply= WorkflowUtil.compareNodeAbility(fallbackModel.getNodeFeature(), WorkflowNodeAbilityType.APPLY.getCode());
             if (isApply) {
-//                activityService.fallbackOnApproveNotPass(vo, map);
-//                info.setStatus(ApplicationInfoStatus.REVIEW.getCode());
                 Map<String,String> resultMap=workflowApi.fallbackOnApproveNotPass(vo, new HashMap());
                 if (resultMap.get("code") != null && !resultMap.get("code").equals("200")) {
                     return QueryResponseResult.fail(resultMap.get("msg"));

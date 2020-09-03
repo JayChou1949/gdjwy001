@@ -2,13 +2,17 @@ package com.hirisun.cloud.system.controller.manage;
 
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.hirisun.cloud.common.util.TreeUtils;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
+import com.hirisun.cloud.model.system.SysDictVO;
+import com.hirisun.cloud.model.workflow.WorkflowNodeVO;
 import com.hirisun.cloud.system.bean.SysDict;
 import com.hirisun.cloud.system.service.SysDictService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -104,6 +108,22 @@ public class SysDictManageController {
     public String syncSysDictData() {
         sysDictService.syncSysDictData();
         return JSON.toJSONString(null);
+    }
+
+    /**
+     * 根据字典值获取数据字典
+     */
+    @ApiOperation(value = "feign调用根据字典id获取数据字典列表")
+    @GetMapping("/feign/getDictById")
+    public List<SysDictVO> getDictById(@RequestParam String id) {
+        List<SysDict> sysDictList = sysDictService.getSysDictList();
+        sysDictList=sysDictList.stream().filter(item->item.getValue()!=null&&item.getId().equals(id)).collect(Collectors.toList());
+        if(CollectionUtils.isNotEmpty(sysDictList)) {
+            List<SysDictVO> list = JSON.parseObject(JSON.toJSON(sysDictList).toString(),
+                    new TypeReference<List<SysDictVO>>(){});
+            return list;
+        }
+        return null;
     }
 }
 

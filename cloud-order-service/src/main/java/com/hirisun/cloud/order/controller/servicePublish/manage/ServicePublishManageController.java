@@ -16,10 +16,7 @@ import com.hirisun.cloud.order.service.apply.ApplyInfoService;
 import com.hirisun.cloud.order.service.servicePublish.ServicePublishService;
 import com.hirisun.cloud.order.vo.ApproveVO;
 import com.hirisun.cloud.order.vo.ImplRequest;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +36,7 @@ import java.util.*;
  */
 @Slf4j
 @RestController
+@Api(tags = "服务发布申请管理")
 @RequestMapping("/order/servicePublishManage")
 public class ServicePublishManageController {
 

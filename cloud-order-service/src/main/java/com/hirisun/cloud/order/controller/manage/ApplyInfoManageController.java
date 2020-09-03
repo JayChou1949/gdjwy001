@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 /**
@@ -198,9 +199,9 @@ public class ApplyInfoManageController {
     }
 
     @ApiOperation(value = "修改申请信息")
-    @RequestMapping(value = "/update", method = RequestMethod.GET)
-    public QueryResponseResult update(@LoginUser UserVO user) {
-        return applyInfoService.newTodo(user);
+    @PutMapping("/update")
+    public QueryResponseResult updateInfo(@LoginUser UserVO user, HttpServletRequest request)throws Exception {
+        return applyInfoService.updateInfo(user,request);
     }
 
     @ApiOperation(value = "业务办理")
