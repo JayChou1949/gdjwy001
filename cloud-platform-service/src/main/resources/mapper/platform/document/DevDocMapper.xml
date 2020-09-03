@@ -58,7 +58,7 @@
            2.后台管理分数据权限
            -->
         <if test="user != null and user.type != 100 and !param.isFront">
-            AND D.CREATOR = #{ser.idCard}
+            AND D.CREATOR = #{ser.idcard}
         </if>
 
         ORDER BY D.SORT_NUM ASC, D.UPDATE_TIME DESC

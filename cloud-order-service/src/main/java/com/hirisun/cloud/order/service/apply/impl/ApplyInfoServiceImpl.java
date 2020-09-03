@@ -821,9 +821,9 @@ public class ApplyInfoServiceImpl extends ServiceImpl<ApplyInfoMapper, ApplyInfo
     }
 
     @Override
-    public QueryResponseResult updateInfo(UserVO user, HttpServletRequest request) throws Exception {
-        String json = IOUtils.toString(request.getInputStream(), "UTF-8");
-        UpdateApplyInfo origin = JSONObject.parseObject(json, UpdateApplyInfo.class);
+    public QueryResponseResult updateInfo(UserVO user, UpdateApplyInfo origin) throws Exception {
+        String json = JSON.toJSONString(origin);
+//        UpdateApplyInfo origin = JSONObject.parseObject(json, UpdateApplyInfo.class);
         ApplyInfo info = origin.getInfo();
         info.setFormNum(this.getById(info.getId()).getFormNum());
         HandlerWrapper hw = FormNum.getHandlerWrapperByName(info.getFormNum());

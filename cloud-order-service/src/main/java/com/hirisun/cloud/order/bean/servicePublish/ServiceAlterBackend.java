@@ -2,7 +2,7 @@ package com.hirisun.cloud.order.bean.servicePublish;
 
 import java.math.BigDecimal;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDateTime;
+import java.util.Date;
 import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
@@ -26,10 +26,10 @@ public class ServiceAlterBackend implements Serializable {
     private String id;
 
     @TableField("CREATE_TIME")
-    private LocalDateTime createTime;
+    private Date createTime;
 
     @TableField("MODIFIED_TIME")
-    private LocalDateTime modifiedTime;
+    private Date modifiedTime;
 
     @TableField("ALTER_ID")
     private String alterId;
@@ -106,19 +106,19 @@ public class ServiceAlterBackend implements Serializable {
         this.id = id;
     }
 
-    public LocalDateTime getCreateTime() {
+    public Date getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(LocalDateTime createTime) {
+    public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
 
-    public LocalDateTime getModifiedTime() {
+    public Date getModifiedTime() {
         return modifiedTime;
     }
 
-    public void setModifiedTime(LocalDateTime modifiedTime) {
+    public void setModifiedTime(Date modifiedTime) {
         this.modifiedTime = modifiedTime;
     }
 

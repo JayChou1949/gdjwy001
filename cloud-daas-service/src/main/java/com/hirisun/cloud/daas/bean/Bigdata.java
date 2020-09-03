@@ -2,9 +2,10 @@ package com.hirisun.cloud.daas.bean;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
+import java.util.Date;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -31,11 +32,11 @@ public class Bigdata implements Serializable {
 
     @ApiModelProperty(value = "创建时间")
     @TableField("CREATE_TIME")
-    private LocalDateTime createTime;
+    private Date createTime;
 
     @ApiModelProperty(value = "修改时间")
     @TableField("MODIFIED_TIME")
-    private LocalDateTime modifiedTime;
+    private Date modifiedTime;
 
     @ApiModelProperty(value = "状态, 0:审核中 1: 待上线 2: 上线 3:驳回 4:删除")
     @TableField("STATUS")
@@ -83,7 +84,7 @@ public class Bigdata implements Serializable {
 
     @ApiModelProperty(value = "服务更新时间")
     @TableField("UPDATE_AT")
-    private LocalDateTime updateAt;
+    private Date updateAt;
 
     @ApiModelProperty(value = "API产品ID")
     @TableField("APIPRODUCT_ID")
@@ -158,286 +159,6 @@ public class Bigdata implements Serializable {
     @TableField("DATA_TYPE")
     private String dataType;
 
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public LocalDateTime getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(LocalDateTime createTime) {
-        this.createTime = createTime;
-    }
-
-    public LocalDateTime getModifiedTime() {
-        return modifiedTime;
-    }
-
-    public void setModifiedTime(LocalDateTime modifiedTime) {
-        this.modifiedTime = modifiedTime;
-    }
-
-    public Long getStatus() {
-        return status;
-    }
-
-    public void setStatus(Long status) {
-        this.status = status;
-    }
-
-    public String getCreator() {
-        return creator;
-    }
-
-    public void setCreator(String creator) {
-        this.creator = creator;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    public String getBusinessType() {
-        return businessType;
-    }
-
-    public void setBusinessType(String businessType) {
-        this.businessType = businessType;
-    }
-
-    public String getServiceType() {
-        return serviceType;
-    }
-
-    public void setServiceType(String serviceType) {
-        this.serviceType = serviceType;
-    }
-
-    public String getProvider() {
-        return provider;
-    }
-
-    public void setProvider(String provider) {
-        this.provider = provider;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
-    public String getRemark() {
-        return remark;
-    }
-
-    public void setRemark(String remark) {
-        this.remark = remark;
-    }
-
-    public String getFileId() {
-        return fileId;
-    }
-
-    public void setFileId(String fileId) {
-        this.fileId = fileId;
-    }
-
-    public String getApigGuid() {
-        return apigGuid;
-    }
-
-    public void setApigGuid(String apigGuid) {
-        this.apigGuid = apigGuid;
-    }
-
-    public String getApigClusterId() {
-        return apigClusterId;
-    }
-
-    public void setApigClusterId(String apigClusterId) {
-        this.apigClusterId = apigClusterId;
-    }
-
-    public LocalDateTime getUpdateAt() {
-        return updateAt;
-    }
-
-    public void setUpdateAt(LocalDateTime updateAt) {
-        this.updateAt = updateAt;
-    }
-
-    public String getApiproductId() {
-        return apiproductId;
-    }
-
-    public void setApiproductId(String apiproductId) {
-        this.apiproductId = apiproductId;
-    }
-
-    public String getDomainId() {
-        return domainId;
-    }
-
-    public void setDomainId(String domainId) {
-        this.domainId = domainId;
-    }
-
-    public String getProjectId() {
-        return projectId;
-    }
-
-    public void setProjectId(String projectId) {
-        this.projectId = projectId;
-    }
-
-    public Integer getCataLog() {
-        return cataLog;
-    }
-
-    public void setCataLog(Integer cataLog) {
-        this.cataLog = cataLog;
-    }
-
-    public String getUpdateCycle() {
-        return updateCycle;
-    }
-
-    public void setUpdateCycle(String updateCycle) {
-        this.updateCycle = updateCycle;
-    }
-
-    public String getDataResource() {
-        return dataResource;
-    }
-
-    public void setDataResource(String dataResource) {
-        this.dataResource = dataResource;
-    }
-
-    public String getDataFrom() {
-        return dataFrom;
-    }
-
-    public void setDataFrom(String dataFrom) {
-        this.dataFrom = dataFrom;
-    }
-
-    public String getFromSystem() {
-        return fromSystem;
-    }
-
-    public void setFromSystem(String fromSystem) {
-        this.fromSystem = fromSystem;
-    }
-
-    public String getFromNet() {
-        return fromNet;
-    }
-
-    public void setFromNet(String fromNet) {
-        this.fromNet = fromNet;
-    }
-
-    public String getCollectionUnit() {
-        return collectionUnit;
-    }
-
-    public void setCollectionUnit(String collectionUnit) {
-        this.collectionUnit = collectionUnit;
-    }
-
-    public String getExplanation() {
-        return explanation;
-    }
-
-    public void setExplanation(String explanation) {
-        this.explanation = explanation;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    public String getServiceMode() {
-        return serviceMode;
-    }
-
-    public void setServiceMode(String serviceMode) {
-        this.serviceMode = serviceMode;
-    }
-
-    public String getAreaName() {
-        return areaName;
-    }
-
-    public void setAreaName(String areaName) {
-        this.areaName = areaName;
-    }
-
-    public String getPoliceCategory() {
-        return policeCategory;
-    }
-
-    public void setPoliceCategory(String policeCategory) {
-        this.policeCategory = policeCategory;
-    }
-
-    public String getSuffix() {
-        return suffix;
-    }
-
-    public void setSuffix(String suffix) {
-        this.suffix = suffix;
-    }
-
-    public String getCityCodeName() {
-        return cityCodeName;
-    }
-
-    public void setCityCodeName(String cityCodeName) {
-        this.cityCodeName = cityCodeName;
-    }
-
-    public String getResourceStatusName() {
-        return resourceStatusName;
-    }
-
-    public void setResourceStatusName(String resourceStatusName) {
-        this.resourceStatusName = resourceStatusName;
-    }
-
-    public String getDataType() {
-        return dataType;
-    }
-
-    public void setDataType(String dataType) {
-        this.dataType = dataType;
-    }
 
     @Override
     public String toString() {

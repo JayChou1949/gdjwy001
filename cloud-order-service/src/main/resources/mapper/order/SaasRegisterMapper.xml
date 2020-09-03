@@ -166,7 +166,7 @@
     </select>
 
 
-    <select id="getResponsePage" resultType="com.upd.hwcloud.bean.entity.SaasRegister">
+    <select id="getResponsePage" resultType="com.hirisun.cloud.order.bean.register.SaasRegister">
         select ID,NAME,CREATOR,CREATOR_NAME,CREATE_TIME,BUILD_STATUS from TB_SAAS_REGISTER
         <where>
             ((JS_PRINCIPAL = #{name} and JS_UNIT = #{orgName})
@@ -307,7 +307,7 @@
         ORDER BY ai.MODIFIED_TIME DESC
     </select>
 
-    <select id="getWorkbenchResourcePage" resultType="com.upd.hwcloud.bean.vo.workbench.ResourceOverviewVO">
+    <select id="getWorkbenchResourcePage" resultType="com.hirisun.cloud.model.workbench.vo.ResourceOverviewVO">
         select  sr.NAME appName,s.NAME serviceNAME,s.ID appId,sr.ID infoId,sr.CREATOR_NAME,sr.ORDER_NUMBER,(select count(DISTINCT sa.CREATOR) USERNUM from TB_SAAS_APPLICATION sa,TB_SAAS_APPLICATION_EXT ext where sa.ID = ext.MASTER_ID and ext.SERVICE_ID  = s.ID and sa.STATUS = 3) as userNum,s.STATUS,s.REGIST_ID,s.VIEW_COUNT from TB_SAAS_REGISTER sr,TB_SAAS s
         where   sr.ID = s.REGIST_ID and sr.STATUS = 3
         <if test="p.queryVO.policeCategory !=null and p.queryVO.policeCategory !=''">
@@ -368,7 +368,7 @@
         and act.ACTIVITYSTATUS = '待办'
     </select>
 
-    <select id="saasRegisterStatisticsPage" resultType="com.upd.hwcloud.bean.vo.workbench.SaasStatisticsVO">
+    <select id="saasRegisterStatisticsPage" resultType="com.hirisun.cloud.model.workbench.vo.SaasStatisticsVO">
         select sr.ID,sr.NAME,sr.CREATOR,sr.CREATOR_NAME,to_char(sr.MODIFIED_TIME,'yyyy-mm-dd') onlineTime,s.NAME serviceName,s.ID serviceID,s.STATUS,(select  count(distinct sa.CREATOR) from TB_SAAS_APPLICATION sa Left join TB_SAAS_APPLICATION_EXT ext ON  sa.ID = ext.MASTER_ID
         where sa.STATUS = 3 and ext.SERVICE_ID = s.ID  and sa.RECOVER_FLAG  != -1)  userNum,s.VIEW_COUNT
         from TB_SAAS_REGISTER sr,TB_SAAS s

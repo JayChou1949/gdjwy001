@@ -6,6 +6,7 @@ import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.model.apply.FallBackVO;
 import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.order.bean.apply.ApplyInfo;
+import com.hirisun.cloud.order.bean.apply.UpdateApplyInfo;
 import com.hirisun.cloud.order.continer.IImplHandler;
 import com.hirisun.cloud.order.vo.ApproveVO;
 
@@ -77,6 +78,6 @@ public interface ApplyInfoService extends IService<ApplyInfo> {
 
     public QueryResponseResult newTodo(UserVO user);
 
-    public QueryResponseResult updateInfo(UserVO user, HttpServletRequest request) throws  Exception;
+    public QueryResponseResult updateInfo(UserVO user, UpdateApplyInfo request) throws  Exception;
 
 }

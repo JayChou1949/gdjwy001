@@ -114,10 +114,7 @@ public class RegisterServiceImpl<M extends RegisterMapper<T>, T extends Register
         String codeMiddle = null;
         SysDictVO dict = null;
         if (StringUtils.isNotEmpty(info.getSubType())) {
-            List<SysDictVO> dictList = systemApi.getDictById(info.getSubType());
-            if (CollectionUtils.isNotEmpty(dictList)) {
-                dict = dictList.get(0);
-            }
+            dict = systemApi.feignGetById(info.getSubType());
         }
         if (!StringUtils.equals(info.getArea(),"政府机构")) {
             OrgVO orgVO = new OrgVO();

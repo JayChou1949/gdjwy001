@@ -1,7 +1,7 @@
 package com.hirisun.cloud.order.bean.servicePublish;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDateTime;
+import java.util.Date;
 import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
@@ -37,10 +37,10 @@ public class ServiceFeedbackReply implements Serializable {
     private String creator;
 
     @TableField("CREATE_TIME")
-    private LocalDateTime createTime;
+    private Date createTime;
 
     @TableField("MODIFIED_TIME")
-    private LocalDateTime modifiedTime;
+    private Date modifiedTime;
 
     @ApiModelProperty(value = "回复人姓名")
     @TableField("CREATOR_NAME")
@@ -83,19 +83,19 @@ public class ServiceFeedbackReply implements Serializable {
         this.creator = creator;
     }
 
-    public LocalDateTime getCreateTime() {
+    public Date getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(LocalDateTime createTime) {
+    public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
 
-    public LocalDateTime getModifiedTime() {
+    public Date getModifiedTime() {
         return modifiedTime;
     }
 
-    public void setModifiedTime(LocalDateTime modifiedTime) {
+    public void setModifiedTime(Date modifiedTime) {
         this.modifiedTime = modifiedTime;
     }
 

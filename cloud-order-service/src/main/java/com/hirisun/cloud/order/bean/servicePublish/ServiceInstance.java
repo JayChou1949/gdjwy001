@@ -1,7 +1,7 @@
 package com.hirisun.cloud.order.bean.servicePublish;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDateTime;
+import java.util.Date;
 import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
@@ -61,11 +61,11 @@ public class ServiceInstance implements Serializable {
 
     @ApiModelProperty(value = "实例创建时间")
     @TableField("CREATED_AT")
-    private LocalDateTime createdAt;
+    private Date createdAt;
 
     @ApiModelProperty(value = "实例更新时间")
     @TableField("UPDATED_AT")
-    private LocalDateTime updatedAt;
+    private Date updatedAt;
 
     @ApiModelProperty(value = "堆栈名")
     @TableField("ACTUAL_NAME")
@@ -182,19 +182,19 @@ public class ServiceInstance implements Serializable {
         this.status = status;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Date getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getUpdatedAt() {
+    public Date getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
+    public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
 

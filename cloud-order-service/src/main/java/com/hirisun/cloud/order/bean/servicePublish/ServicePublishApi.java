@@ -2,7 +2,7 @@ package com.hirisun.cloud.order.bean.servicePublish;
 
 import java.math.BigDecimal;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDateTime;
+import java.util.Date;
 import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
 import java.util.List;
@@ -32,10 +32,10 @@ public class ServicePublishApi implements Serializable {
     private String id;
 
     @TableField("CREATE_TIME")
-    private LocalDateTime createTime;
+    private Date createTime;
 
     @TableField("MODIFIED_TIME")
-    private LocalDateTime modifiedTime;
+    private Date modifiedTime;
 
     @ApiModelProperty(value = "服务发布ID")
     @TableField("PUBLISH_ID")

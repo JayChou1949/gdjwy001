@@ -94,7 +94,7 @@
         ,T_WORKFLOW_NODE m
         <where>
             and ai.ID=ins.BUSINESS_ID and act.INSTANCE_ID = ins.ID  and m.ID=act.NODE_ID
-            and act.HANDLE_PERSONS =#{user.idCard}
+            and act.HANDLE_PERSONS =#{user.idcard}
             AND act.ACTIVITY_STATUS=0 AND act.ACTIVITY_TYPE is NULL
             <if test="(param.startDate != null and param.startDate != '') and (param.endDate != null and param.endDate != '')">
                 AND TO_CHAR(ai.CREATE_TIME,'YYYY-MM-DD') &gt;= #{param.startDate}
@@ -102,7 +102,7 @@
             </if>
             <!-- 选择处理人为:我 -->
             <if test="user.type != 100">
-                and (act.HANDLE_PERSONS =  #{user.idCard} or m.NOTICE_PERSION like concat(concat('%', #{user.idCard}),'%') )
+                and (act.HANDLE_PERSONS =  #{user.idcard} or m.NOTICE_PERSION like concat(concat('%', #{user.idcard}),'%') )
             </if>
 
             <if test="param.serviceName != null and param.serviceName !=''">
@@ -129,7 +129,7 @@
         WHERE
         ai.RESOURCE_TYPE = #{resourceType}
         and ai.STATUS in (1,2,7,101,102)
-        and act.HANDLE_PERSONS = #{user.idCard}
+        and act.HANDLE_PERSONS = #{user.idcard}
         and act.ACTIVITY_TYPE is null
         and act.ACTIVITY_STATUS = 0
     </select>

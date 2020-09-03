@@ -2,7 +2,7 @@ package com.hirisun.cloud.order.bean.servicePublish;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.time.LocalDateTime;
+import java.util.Date;
 import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
 import java.util.List;
@@ -30,10 +30,10 @@ public class ServiceAlterApiProduct implements Serializable {
     private String id;
 
     @TableField("CREATE_TIME")
-    private LocalDateTime createTime;
+    private Date createTime;
 
     @TableField("MODIFIED_TIME")
-    private LocalDateTime modifiedTime;
+    private Date modifiedTime;
 
     @TableField("ALTER_ID")
     private String alterId;

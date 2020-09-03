@@ -51,6 +51,26 @@
         <result column="REGION_ID" property="regionId" />
         <result column="SERVICE_CODE" property="serviceCode" />
     </resultMap>
+    <sql id="publicQuery">
+        <choose>
+            <when test="p.status == null or p.status == ''">
+                AND ai.STATUS not in (-1,0)
+            </when>
+            <when test="p.status == 1">
+                AND ai.STATUS in (1,7,101,102)
+            </when>
+            <when test="p.status == 5">
+                AND ai.STATUS in (5,8)
+            </when>
+            <otherwise>
+                AND ai.STATUS = #{p.status}
+            </otherwise>
+        </choose>
+        <!-- 可以按申请人/申请单号查询 -->
+        <if test="p.userName != null and p.userName != ''">
+            and ai.CREATOR_NAME like #{p.userName}
+        </if>
+    </sql>
 
     <select id="getPage" resultMap="BaseResultMap">
         SELECT distinct ai.*,ins.ID instanceId

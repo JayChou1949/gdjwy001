@@ -18,6 +18,7 @@ import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.model.workflow.WorkflowActivityVO;
 import com.hirisun.cloud.model.workflow.WorkflowNodeVO;
 import com.hirisun.cloud.order.bean.apply.ApplyInfo;
+import com.hirisun.cloud.order.bean.apply.UpdateApplyInfo;
 import com.hirisun.cloud.order.continer.FormNum;
 import com.hirisun.cloud.order.continer.HandlerWrapper;
 import com.hirisun.cloud.order.service.apply.ApplyInfoService;
@@ -200,7 +201,7 @@ public class ApplyInfoManageController {
 
     @ApiOperation(value = "修改申请信息")
     @PutMapping("/update")
-    public QueryResponseResult updateInfo(@LoginUser UserVO user, HttpServletRequest request)throws Exception {
+    public QueryResponseResult<UpdateApplyInfo> updateInfo(@LoginUser UserVO user, @RequestBody UpdateApplyInfo request)throws Exception {
         return applyInfoService.updateInfo(user,request);
     }
 
@@ -241,8 +242,8 @@ public class ApplyInfoManageController {
 //                    if(firewall != null){
 //                        if(firewall.getOpeningHours() == 1){
 //                            logger.debug("防火墙零时开通");
-//                            LocalDateTime now = LocalDateTime.now();
-//                            LocalDateTime endDateTime = now.plusMonths(3);
+//                            Date now = Date.now();
+//                            Date endDateTime = now.plusMonths(3);
 //                            try{
 //                                Date startTime = localDateTime2Date(now);
 //                                Date endTime = localDateTime2Date(endDateTime);

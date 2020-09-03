@@ -49,7 +49,7 @@ public class Register<T extends Register> extends Model<Register<T>> {
      */
          @TableField("BUILD_STATUS")
          @ApiModelProperty(value = "服务状态")
-    protected Long buildStatus;
+    protected Integer buildStatus;
 
     @TableField(value = "CREATE_TIME", fill = FieldFill.INSERT)
     protected Date createTime;

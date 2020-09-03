@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
 import java.util.Date;
@@ -72,7 +71,7 @@ public class PaasLibraWhitelistImpl extends Model<PaasLibraWhitelistImpl> {
      * 申请时间
      */
          @TableField("APPLY_TIME")
-    private LocalDateTime applyTime;
+    private Date applyTime;
 
         /**
      * 数据库账号
@@ -177,11 +176,11 @@ public class PaasLibraWhitelistImpl extends Model<PaasLibraWhitelistImpl> {
         return this;
     }
 
-    public LocalDateTime getApplyTime() {
+    public Date getApplyTime() {
         return applyTime;
     }
 
-    public PaasLibraWhitelistImpl setApplyTime(LocalDateTime applyTime) {
+    public PaasLibraWhitelistImpl setApplyTime(Date applyTime) {
         this.applyTime = applyTime;
         return this;
     }

@@ -3,9 +3,9 @@ package com.hirisun.cloud.paas.bean;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * <p>
@@ -66,10 +66,10 @@ public class PassTyyhUser extends Model<PassTyyhUser> {
     private String appInfoId;
 
     @TableField("CREATE_TIME")
-    private LocalDateTime createTime;
+    private Date createTime;
 
     @TableField("MODIFIED_TIME")
-    private LocalDateTime modifiedTime;
+    private Date modifiedTime;
 
         /**
      * 职务
@@ -168,20 +168,20 @@ public class PassTyyhUser extends Model<PassTyyhUser> {
         return this;
     }
 
-    public LocalDateTime getCreateTime() {
+    public Date getCreateTime() {
         return createTime;
     }
 
-    public PassTyyhUser setCreateTime(LocalDateTime createTime) {
+    public PassTyyhUser setCreateTime(Date createTime) {
         this.createTime = createTime;
         return this;
     }
 
-    public LocalDateTime getModifiedTime() {
+    public Date getModifiedTime() {
         return modifiedTime;
     }
 
-    public PassTyyhUser setModifiedTime(LocalDateTime modifiedTime) {
+    public PassTyyhUser setModifiedTime(Date modifiedTime) {
         this.modifiedTime = modifiedTime;
         return this;
     }

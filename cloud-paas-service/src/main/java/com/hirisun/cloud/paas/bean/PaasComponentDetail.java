@@ -2,8 +2,6 @@ package com.hirisun.cloud.paas.bean;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
-
-import java.time.LocalDateTime;
 import java.io.Serializable;
 import java.util.Date;
 
