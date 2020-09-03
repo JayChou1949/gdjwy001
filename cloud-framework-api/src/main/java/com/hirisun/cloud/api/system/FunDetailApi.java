@@ -23,11 +23,11 @@ public interface FunDetailApi {
 	
 	@ApiIgnore
     @ApiOperation("根据masterId获取功能详情")
-    @GetMapping("/system/fundetail/find")
+	@PostMapping("/system/fundetail/find")
     public List<FunDetailVo> find(@RequestBody SubpageParam param);
 	
 	@ApiIgnore
     @ApiOperation("根据masterId删除功能详情")
-    @GetMapping("/system/fundetail/remove")
+	@PostMapping("/system/fundetail/remove")
     public void remove(@RequestBody SubpageParam param);
 }

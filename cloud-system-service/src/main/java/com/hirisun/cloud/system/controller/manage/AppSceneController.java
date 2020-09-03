@@ -34,7 +34,7 @@ public class AppSceneController {
 	
 	@ApiIgnore
     @ApiOperation("根据masterId获取应用场景")
-    @GetMapping("/get")
+	@PostMapping("/get")
     public List<AppSceneVo> getByMasterId(@RequestBody SubpageParam param) {
 		List<AppSceneVo> list = appSceneService.getByMasterId(param.getMasterId());
 		return list;
@@ -42,7 +42,7 @@ public class AppSceneController {
 	
 	@ApiIgnore
     @ApiOperation("根据masterId删除应用场景")
-    @GetMapping("/remove")
+	@PostMapping("/remove")
     public void remove(@RequestBody SubpageParam param) {
 		appSceneService.remove(param.getMasterId());
 	}

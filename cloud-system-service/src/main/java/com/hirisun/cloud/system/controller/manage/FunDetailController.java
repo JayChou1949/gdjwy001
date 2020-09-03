@@ -34,7 +34,7 @@ public class FunDetailController {
 	
 	@ApiIgnore
     @ApiOperation("根据masterId获取功能详情")
-    @GetMapping("/find")
+	@PostMapping("/find")
     public List<FunDetailVo> find(@RequestBody SubpageParam param) {
 		List<FunDetailVo> list = funDetailService.getByMasterId(param);
 		return list;
@@ -42,7 +42,7 @@ public class FunDetailController {
 	
 	@ApiIgnore
     @ApiOperation("根据masterId删除功能详情")
-    @GetMapping("/remove")
+	@PostMapping("/remove")
     public void remove(@RequestBody SubpageParam param) {
 		funDetailService.remove(param);
 	}

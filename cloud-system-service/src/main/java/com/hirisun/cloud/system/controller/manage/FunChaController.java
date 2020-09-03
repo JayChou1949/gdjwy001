@@ -3,8 +3,8 @@ package com.hirisun.cloud.system.controller.manage;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,7 +34,7 @@ public class FunChaController {
 	
 	@ApiIgnore
     @ApiOperation("根据masterId获取功能特点")
-    @GetMapping("/find")
+	@PutMapping("/find")
     public List<FunChaVo> find(@RequestBody SubpageParam param) {
 		List<FunChaVo> list = funChaService.find(param);
 		return list;
@@ -42,7 +42,7 @@ public class FunChaController {
 	
 	@ApiIgnore
     @ApiOperation("根据masterId删除功能特点")
-    @GetMapping("/remove")
+	@PutMapping("/remove")
     public void remove(@RequestBody SubpageParam param) {
 		funChaService.remove(param);
 	}
