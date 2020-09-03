@@ -83,6 +83,14 @@ public class FileController implements FileApi {
                                           @ApiParam(value = "所属二级菜单名",required = true) @RequestParam("businessTag") String businessTag) {
         return QueryResponseResult.success(fileService.fdfs_upload(file, businessKey, businessTag));
     }
+    
+    @ApiOperation(value = "前端文件上传,返回FileSystem",notes = "前端文件上传,返回FileSystem")
+    @PostMapping(value = "/v2/uploadFile")
+    public QueryResponseResult uploadFile2(@RequestPart("file") MultipartFile file,
+                                          @ApiParam(value = "所属一级菜单名",required = true) @RequestParam("businessKey") String businessKey,
+                                          @ApiParam(value = "所属二级菜单名",required = true) @RequestParam("businessTag") String businessTag) {
+        return QueryResponseResult.success(fileService.fdfs_uploadV2(file, businessKey, businessTag));
+    }
 
     @ApiOperation(value = "根据文件ID获得文件信息",notes = "前端根据文件ID获得文件信息")
     @GetMapping("/getFileById")

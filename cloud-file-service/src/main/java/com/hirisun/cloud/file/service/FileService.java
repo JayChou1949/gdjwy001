@@ -23,6 +23,8 @@ public interface FileService {
      */
     String fdfs_upload(MultipartFile file,String businessKey,String businessTag);
     
+    FileSystem fdfs_uploadV2(MultipartFile file, String businessKey, String businessTag);
+    
     /**
      * 根据fileId删除文件
      * @param fileId
