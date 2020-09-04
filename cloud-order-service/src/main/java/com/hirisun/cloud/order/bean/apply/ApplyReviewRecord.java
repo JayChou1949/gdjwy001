@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hirisun.cloud.model.file.FilesVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 /**
  * <p>
@@ -19,6 +20,7 @@ import io.swagger.annotations.ApiModelProperty;
  * @author wuxiaoxing
  * @since 2020-08-12
  */
+@Data
 @TableName("T_APPLY_REVIEW_RECORD")
 @ApiModel(value="ApplyReviewRecord对象", description="服务申请审核信息表")
 public class ApplyReviewRecord implements Serializable {
@@ -76,93 +78,17 @@ public class ApplyReviewRecord implements Serializable {
     @TableField(exist = false)
     private List<FilesVo> fileList;
 
-    public List<FilesVo> getFileList() {
-        return fileList;
-    }
+    /**
+     * 是否关系型数据库新增账号流程
+     */
+    @ApiModelProperty(value = "是否关系型数据库新增账号流程")
+    @TableField(exist = false)
+    private int  rdbAddAccount;
 
-    public void setFileList(List<FilesVo> fileList) {
-        this.fileList = fileList;
-    }
+    @ApiModelProperty(value = "资源是否同意回收")
+    @TableField(exist = false)
+    private int resourceRecoveredAgree;
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getCreator() {
-        return creator;
-    }
-
-    public void setCreator(String creator) {
-        this.creator = creator;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getModifiedTime() {
-        return modifiedTime;
-    }
-
-    public void setModifiedTime(Date modifiedTime) {
-        this.modifiedTime = modifiedTime;
-    }
-
-    public String getRemark() {
-        return remark;
-    }
-
-    public void setRemark(String remark) {
-        this.remark = remark;
-    }
-
-    public String getStepName() {
-        return stepName;
-    }
-
-    public void setStepName(String stepName) {
-        this.stepName = stepName;
-    }
-
-    public String getApplyId() {
-        return applyId;
-    }
-
-    public void setApplyId(String applyId) {
-        this.applyId = applyId;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getWorkflowNodeId() {
-        return workflowNodeId;
-    }
-
-    public void setWorkflowNodeId(String workflowNodeId) {
-        this.workflowNodeId = workflowNodeId;
-    }
-
-    public Integer getResult() {
-        return result;
-    }
-
-    public void setResult(Integer result) {
-        this.result = result;
-    }
 
     @Override
     public String toString() {

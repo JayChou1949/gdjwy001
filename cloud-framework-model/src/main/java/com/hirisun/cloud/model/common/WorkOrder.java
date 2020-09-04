@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -32,4 +33,13 @@ public class WorkOrder<T> {
 
     @ApiModelProperty(value = "申请人")
     private String creator;
+
+    private String businessName;
+
+//    private String userName;
+
+    private Date modifiedTime;
+
+    private String orderNumber;
+
 }

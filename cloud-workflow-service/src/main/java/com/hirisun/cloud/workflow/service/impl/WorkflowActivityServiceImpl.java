@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.hirisun.cloud.common.contains.ApplicationInfoStatus;
+import com.hirisun.cloud.common.contains.*;
 import org.apache.catalina.User;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -26,9 +26,6 @@ import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hirisun.cloud.api.system.SmsApi;
-import com.hirisun.cloud.common.contains.WorkflowActivityStatus;
-import com.hirisun.cloud.common.contains.WorkflowInstanceStatus;
-import com.hirisun.cloud.common.contains.WorkflowNodeAbilityType;
 import com.hirisun.cloud.common.exception.CustomException;
 import com.hirisun.cloud.common.util.UUIDUtil;
 import com.hirisun.cloud.common.util.WorkflowUtil;
@@ -272,6 +269,7 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
     public Map<String,String> advanceActivity(String currentActivityId, Map<String, String> map) {
 
         Map<String, String> resultMap = new ConcurrentHashMap<>();
+        resultMap.put("code", RequestCode.FAIL.getCode());
         WorkflowActivity currentActivity = null;
         if (currentActivityId!=null&&!currentActivityId.equals("")) {
             currentActivity=this.getById(currentActivityId);
@@ -317,7 +315,7 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
                 instance.setCompleteTime(new Date());
                 instance.setInstanceStatus(WorkflowInstanceStatus.COMPLETE.getCode());
                 workflowInstanceService.updateById(instance);
-                resultMap.put("code", "201");//成功，无下个环节
+                resultMap.put("code", RequestCode.COMPLETE.getCode());//成功，无下个环节
                 return resultMap;
             }
         }else {
@@ -355,7 +353,7 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
         currentActivity.setActivityStatus(WorkflowActivityStatus.SUBMIT.getCode());
         workflowActivityService.updateById(currentActivity);
         //返回下一环节的名字
-        resultMap.put("code", "200");
+        resultMap.put("code", RequestCode.SUCCESS.getCode());
         resultMap.put("data", JSON.toJSONString(nextNode));
         return resultMap;
     }
@@ -369,7 +367,7 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
     @Override
     public Map<String,String> fallbackOnApproveNotPass(FallBackVO vo, Map<String, String> map) {
         Map<String,String> resultMap = new HashMap();
-        resultMap.put("code", "201");
+        resultMap.put("code", RequestCode.FAIL.getCode());
         if (vo==null) {
             resultMap.put("msg", "流转信息不能为空");
             return resultMap;
@@ -451,7 +449,7 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
 
     public Map<String,String> updateActivityStatus(String modelId,WorkflowActivity currentActivity){
         Map<String, String> resultMap = new HashMap<>();
-        resultMap.put("code", "201");
+        resultMap.put("code", RequestCode.FAIL.getCode());
         try {
             WorkflowNode model=workflowNodeService.getNextNodeById(modelId);
             String id = model.getId();
@@ -472,7 +470,7 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
             resultMap.put("msg", "流转失败");
             return resultMap;
         }
-        resultMap.put("code", "200");
+        resultMap.put("code", RequestCode.SUCCESS.getCode());
         resultMap.put("msg","成功");
         return resultMap;
     }
@@ -492,7 +490,7 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
     @Override
     public Map<String,String> adviseActivity(String currentActivityId) {
         Map resultMap = new HashMap();
-        resultMap.put("code", "201");
+        resultMap.put("code", RequestCode.FAIL.getCode());
         WorkflowActivity currentActivity;
         if (currentActivityId!=null&&!currentActivityId.equals("")) {
             currentActivity=this.getById(currentActivityId);
@@ -507,7 +505,7 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
         currentActivity.setHandleTime(new Date());
         currentActivity.setActivityStatus(WorkflowActivityStatus.SUBMIT.getCode());
         this.updateById(currentActivity);
-        resultMap.put("code", "200");
+        resultMap.put("code", RequestCode.SUCCESS.getCode());
         resultMap.put("msg", "成功");
         return resultMap;
     }
@@ -673,7 +671,7 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
     @Override
     public Map<String, String> add(String handlerPersonIds, String currentActivityId,String creatorId) {
         Map<String, String> resultMap = new HashMap<>();
-        resultMap.put("code", "201");
+        resultMap.put("code", RequestCode.FAIL.getCode());
         WorkflowActivity currentActivity = null;
 
         if (currentActivityId!=null&&!currentActivityId.equals("")) {
@@ -706,7 +704,7 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
         WorkflowNode curmodel = workflowNodeService.getById(currentActivity.getNodeId());
         resultMap.put("stepName", curmodel.getNodeName());
         resultMap.put("type","6");
-        resultMap.put("code", "200");
+        resultMap.put("code", RequestCode.SUCCESS.getCode());
         resultMap.put("msg","成功");
         return resultMap;
     }
@@ -719,7 +717,7 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
     @Override
     public Map<String,String> terminationOrder(String applyInfoId) {
         Map<String, String> resultMap = new HashMap<>();
-        resultMap.put("code", "201");
+        resultMap.put("code", RequestCode.FAIL.getCode());
 
         WorkflowInstance instance=workflowInstanceService.getOne(new QueryWrapper<WorkflowInstance>().lambda().eq(WorkflowInstance::getBusinessId,applyInfoId));
         if(instance==null){
@@ -734,7 +732,7 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
                 .eq(WorkflowActivity::getInstanceId, instanceId)
                 .eq(WorkflowActivity::getActivityStatus, WorkflowActivityStatus.WAITING.getCode())
                 .set(WorkflowActivity::getActivityStatus, WorkflowActivityStatus.TERMINAT.getCode()));
-        resultMap.put("code", "200");
+        resultMap.put("code", RequestCode.SUCCESS.getCode());
         resultMap.put("msg", "成功");
         return resultMap;
     }
@@ -747,7 +745,7 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
     @Override
     public Map<String,String> rejectApply(String currentActivityId,String fallBackModelId) {
         Map resultMap = new HashMap();
-        resultMap.put("code", "201");
+        resultMap.put("code", RequestCode.FAIL.getCode());
         if (StringUtils.isEmpty(currentActivityId)) {
             resultMap.put("msg","当前环节ID不能为空,回退失败");
             return resultMap;
@@ -799,7 +797,7 @@ public class WorkflowActivityServiceImpl extends ServiceImpl<WorkflowActivityMap
             this.updateById(activity);
             resultMap.put("nodeId", activity.getNodeId());
         }
-        resultMap.put("code", "200");
+        resultMap.put("code", RequestCode.SUCCESS.getCode());
         resultMap.put("msg", "成功");
         return resultMap;
     }

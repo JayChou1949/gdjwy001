@@ -64,6 +64,15 @@ public class ApplyReviewRecordVO implements Serializable {
 
     private List<FilesVo> fileList;
 
+    /**
+     * 是否关系型数据库新增账号流程
+     */
+    @ApiModelProperty(value = "是否关系型数据库新增账号流程")
+    private int  rdbAddAccount;
+
+    @ApiModelProperty(value = "资源是否同意回收")
+    private int resourceRecoveredAgree;
+
 
 
     @Override

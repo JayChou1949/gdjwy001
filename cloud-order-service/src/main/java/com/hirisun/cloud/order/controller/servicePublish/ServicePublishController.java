@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
  * @author wuxiaoxing
  * @since 2020-09-01
  */
-@Controller
+@RestController
 @RequestMapping("/servicePublish")
 public class ServicePublishController {
 

@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import com.hirisun.cloud.common.contains.RequestCode;
 import com.hirisun.cloud.common.contains.WorkflowActivityStatus;
 import com.hirisun.cloud.order.continer.ShoppingCartStatus;
 import org.apache.commons.lang.time.DateFormatUtils;
@@ -163,8 +164,7 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
             map.put("name",info.getServiceTypeName());
             map.put("order",info.getOrderNumber());
             Map resultMap = workflowApi.advanceActivity(firstActivity.getId(),map);
-            if (!"200".equals(resultMap.get("code"))) {
-                logger.error("advanceCurrentActivity调用失败:{}",resultMap.get("msg"));
+            if (!RequestCode.SUCCESS.getCode().equals(resultMap.get("code"))) {
                 throw new CustomException(OrderCode.FEIGN_METHOD_ERROR);
             }
         }

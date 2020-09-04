@@ -4,6 +4,7 @@ package com.hirisun.cloud.order.controller.servicePublish;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * <p>
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Controller;
  * @author wuxiaoxing
  * @since 2020-09-01
  */
-@Controller
+@RestController
 @RequestMapping("/serviceAlter")
 public class ServiceAlterController {
 

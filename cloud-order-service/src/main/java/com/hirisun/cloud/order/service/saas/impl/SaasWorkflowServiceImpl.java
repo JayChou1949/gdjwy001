@@ -15,6 +15,7 @@ import com.hirisun.cloud.api.system.SmsApi;
 import com.hirisun.cloud.api.workflow.WorkflowApi;
 import com.hirisun.cloud.common.constant.BusinessName;
 import com.hirisun.cloud.common.contains.ApplyInfoStatus;
+import com.hirisun.cloud.common.contains.RequestCode;
 import com.hirisun.cloud.common.contains.WorkflowNodeAbilityType;
 import com.hirisun.cloud.common.enumer.ModelName;
 import com.hirisun.cloud.common.exception.CustomException;
@@ -137,7 +138,7 @@ public class SaasWorkflowServiceImpl implements SaasWorkflowService {
         }
         if ("adviser".equals(activity.getActivityType())){
             Map<String,String> resultMap=workflowApi.adviseActivity(vo.getCurrentActivityId());
-            if (resultMap.get("code") != null && resultMap.get("code").equals("200")) {
+            if (resultMap.get("code") != null && resultMap.get("code").equals(RequestCode.SUCCESS.getCode())) {
                 approve.setStepName(resultMap.get("nodeName"));
                 approve.setWorkflowNodeId(resultMap.get("nodeId"));
                 approve.setType(resultMap.get("type"));
@@ -159,13 +160,11 @@ public class SaasWorkflowServiceImpl implements SaasWorkflowService {
         map.put("order", info.getOrderNumber());
         if (approve.getResult()!=null&&approve.getResult().equals(1)){
             Map resultMap = workflowApi.advanceActivity(vo.getCurrentActivityId(),map);
-            //r数据格式：
-            // {code: 200,msg: "操作成功",data:"大数据办审批"}
             WorkflowNodeVO model=null;
             try {
-                if (resultMap.get("code") != null && resultMap.get("code").equals("200")) {
+                if (resultMap.get("code") != null && resultMap.get("code").equals(RequestCode.SUCCESS.getCode())) {
                     model = JSON.parseObject(resultMap.get("data").toString(),WorkflowNodeVO.class);//此处转换失败，则直接抛方法内错误
-                }else if(resultMap.get("code") != null && resultMap.get("code").equals("201")){
+                }else if(resultMap.get("code") != null && resultMap.get("code").equals(RequestCode.COMPLETE.getCode())){
                     return QueryResponseResult.success(null);
                 }else{
                     return QueryResponseResult.fail(resultMap.get("msg"));
@@ -202,7 +201,7 @@ public class SaasWorkflowServiceImpl implements SaasWorkflowService {
                 info.setStatus(ApplyInfoStatus.INNER_REVIEW.getCode());
             }else{
                 Map<String,String> resultMap=workflowApi.fallbackOnApproveNotPass(vo, map);
-                if (resultMap.get("code") != null && !resultMap.get("code").equals("200")) {
+                if (resultMap.get("code") != null && !resultMap.get("code").equals(RequestCode.SUCCESS.getCode())) {
                     return QueryResponseResult.fail(resultMap.get("msg"));
                 }
                 //订单状态设置为 科信待审核
@@ -262,7 +261,7 @@ public class SaasWorkflowServiceImpl implements SaasWorkflowService {
             Map map = new HashMap();
             map.put("depApproveUserIds", info.getCreator());
             Map resultMap = workflowApi.advanceActivity(activityId,map);
-            if (!"200".equals(resultMap.get("code"))) {
+            if (!RequestCode.SUCCESS.getCode().equals(resultMap.get("code"))) {
                 throw new CustomException(OrderCode.FEIGN_METHOD_ERROR);
             }
             saasApplicationApi.updateCarryTime(info.getId());
@@ -277,7 +276,7 @@ public class SaasWorkflowServiceImpl implements SaasWorkflowService {
             map.put("name", BusinessName.SAAS_RESOURCE);
             map.put("order", info.getOrderNumber());
             Map<String,String> resultMap=workflowApi.fallbackOnApproveNotPass(vo, map);
-            if (resultMap.get("code") != null && !resultMap.get("code").equals("200")) {
+            if (resultMap.get("code") != null && !resultMap.get("code").equals(RequestCode.SUCCESS.getCode())) {
                 return QueryResponseResult.fail(resultMap.get("msg"));
             }
         }

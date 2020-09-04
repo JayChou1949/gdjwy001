@@ -400,7 +400,7 @@ public class ApplyInfoServiceImpl extends ServiceImpl<ApplyInfoMapper, ApplyInfo
         }
         if ("adviser".equals(activity.getActivityType())){
             Map<String,String> resultMap=workflowApi.adviseActivity(vo.getCurrentActivityId());
-            if (resultMap.get("code") != null && resultMap.get("code").equals("200")) {
+            if (resultMap.get("code") != null && resultMap.get("code").equals(RequestCode.SUCCESS.getCode())) {
                 approve.setStepName(resultMap.get("nodeName"));
                 approve.setWorkflowNodeId(resultMap.get("nodeId"));
                 approve.setType(resultMap.get("type"));
@@ -430,9 +430,9 @@ public class ApplyInfoServiceImpl extends ServiceImpl<ApplyInfoMapper, ApplyInfo
             // {code: 200,msg: "操作成功",data:"大数据办审批"}
             WorkflowNodeVO model=null;
             try {
-                if (resultMap.get("code") != null && resultMap.get("code").equals("200")) {
+                if (resultMap.get("code") != null && resultMap.get("code").equals(RequestCode.SUCCESS.getCode())) {
                     model = JSON.parseObject(resultMap.get("data").toString(),WorkflowNodeVO.class);//此处转换失败，则直接抛方法内错误
-                }else if(resultMap.get("code") != null && resultMap.get("code").equals("201")){
+                }else if(resultMap.get("code") != null && resultMap.get("code").equals(RequestCode.COMPLETE.getCode())){
                     return QueryResponseResult.success(null);
                 }else{
                     return QueryResponseResult.fail(resultMap.get("msg"));
@@ -461,7 +461,7 @@ public class ApplyInfoServiceImpl extends ServiceImpl<ApplyInfoMapper, ApplyInfo
             boolean isApply= WorkflowUtil.compareNodeAbility(fallbackModel.getNodeFeature(), WorkflowNodeAbilityType.APPLY.getCode());
             if (isApply) {
                 Map<String,String> resultMap=workflowApi.fallbackOnApproveNotPass(vo, new HashMap());
-                if (resultMap.get("code") != null && !resultMap.get("code").equals("200")) {
+                if (resultMap.get("code") != null && !resultMap.get("code").equals(RequestCode.SUCCESS.getCode())) {
                     return QueryResponseResult.fail(resultMap.get("msg"));
                 }
                 //订单状态设置为 科信审核驳回
@@ -482,7 +482,7 @@ public class ApplyInfoServiceImpl extends ServiceImpl<ApplyInfoMapper, ApplyInfo
                     map.put("depApproveUserIds", sb.substring(1).toString());
                     //1.复制回退环节历史流程环节信息，设置为待办，处理人时间修改等插入流转表；2.复核后环节后的到当前环节间流转信息设置为已回退
                     Map<String,String> resultMap=workflowApi.fallbackOnApproveNotPass(vo, map);
-                    if (resultMap.get("code") != null && !resultMap.get("code").equals("200")) {
+                    if (resultMap.get("code") != null && !resultMap.get("code").equals(RequestCode.SUCCESS.getCode())) {
                         return QueryResponseResult.fail(resultMap.get("msg"));
                     }
                     //订单状态设置为 科信待审核
@@ -491,7 +491,7 @@ public class ApplyInfoServiceImpl extends ServiceImpl<ApplyInfoMapper, ApplyInfo
             }else{
 //                1.复制回退环节历史流程环节信息，设置为待办，处理人时间修改等插入流转表；2.复核后环节后的到当前环节间流转信息设置为已回退
                 Map<String,String> resultMap=workflowApi.fallbackOnApproveNotPass(vo, map);
-                if (resultMap.get("code") != null && !resultMap.get("code").equals("200")) {
+                if (resultMap.get("code") != null && !resultMap.get("code").equals(RequestCode.SUCCESS.getCode())) {
                     return QueryResponseResult.fail(resultMap.get("msg"));
                 }
                 //订单状态设置为 科信待审核
@@ -625,7 +625,7 @@ public class ApplyInfoServiceImpl extends ServiceImpl<ApplyInfoMapper, ApplyInfo
     public QueryResponseResult add(UserVO user, ApproveVO approveVO) {
         ApplyInfo info = applyInfoService.getById(approveVO.getApplyReviewRecord().getApplyId());
         Map<String, String> resultMap = workflowApi.add(approveVO.getUserIds(), approveVO.getCurrentActivityId(), user.getIdcard());
-        if ("200".equals(resultMap.get("code"))) {
+        if (RequestCode.SUCCESS.getCode().equals(resultMap.get("code"))) {
             ApplyReviewRecord applyReviewRecord= approveVO.getApplyReviewRecord();
             applyReviewRecord.setType(resultMap.get("type"));
             applyReviewRecord.setStepName(resultMap.get("stepName"));
@@ -647,7 +647,7 @@ public class ApplyInfoServiceImpl extends ServiceImpl<ApplyInfoMapper, ApplyInfo
         ApplyReviewRecordVO approve = vo.getApplyReviewRecord();
         approve.setCreator(user.getIdcard());
         Map<String,String> resultMap=workflowApi.adviseActivity(vo.getCurrentActivityId());
-        if (resultMap.get("code") != null && resultMap.get("code").equals("200")) {
+        if (resultMap.get("code") != null && resultMap.get("code").equals(RequestCode.SUCCESS.getCode())) {
             approve.setStepName(resultMap.get("nodeName"));
             approve.setWorkflowNodeId(resultMap.get("nodeId"));
             approve.setType(resultMap.get("type"));
@@ -706,8 +706,7 @@ public class ApplyInfoServiceImpl extends ServiceImpl<ApplyInfoMapper, ApplyInfo
         map.put("depApproveUserIds",userIds);
 
         Map resultMap = workflowApi.advanceActivity(firstActivity.getId(),map);
-        if (!"200".equals(resultMap.get("code"))) {
-            log.error("advanceCurrentActivity调用失败:{}",resultMap.get("msg"));
+        if (!RequestCode.SUCCESS.getCode().equals(resultMap.get("code"))) {
             throw new CustomException(OrderCode.FEIGN_METHOD_ERROR);
         }
         applyInfoService.updateById(info);
@@ -724,7 +723,7 @@ public class ApplyInfoServiceImpl extends ServiceImpl<ApplyInfoMapper, ApplyInfo
 
                 ApplyInfo info = applyInfoService.getById(applyInfoId);
                 Map<String,String> resultMap =  workflowApi.activityForward(activityId, userIds);
-                if (!"200".equals(resultMap.get("code"))) {
+                if (!RequestCode.SUCCESS.getCode().equals(resultMap.get("code"))) {
                     return QueryResponseResult.fail(resultMap.get("msg"));
                 }
                 String[] handlePersonArr = userIds.split(",");
@@ -749,7 +748,7 @@ public class ApplyInfoServiceImpl extends ServiceImpl<ApplyInfoMapper, ApplyInfo
             return QueryResponseResult.fail("未找到待办数据");
         }
         Map<String,String> rejectMsgMap=workflowApi.rejectApply(vo.getCurrentActivityId(), vo.getFallBackModelIds());
-        if ("200".equals(rejectMsgMap.get("code"))) {
+        if (RequestCode.SUCCESS.getCode().equals(rejectMsgMap.get("code"))) {
             approve.setType("4");
             WorkflowNodeVO curmodel = workflowApi.getNodeById(rejectMsgMap.get("nodeId"));
             approve.setStepName(curmodel.getNodeName()+"回退");

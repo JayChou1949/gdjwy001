@@ -22,5 +22,13 @@ public class SubpageParam implements Serializable{
 	private List<FilesVo> files;
 	private String refId;
 	private String subpageId;
+
+	public SubpageParam() {
+
+	}
+	public SubpageParam(String refId,List<FilesVo> files){
+		this.refId = refId;
+		this.files = files;
+	}
 	
 }

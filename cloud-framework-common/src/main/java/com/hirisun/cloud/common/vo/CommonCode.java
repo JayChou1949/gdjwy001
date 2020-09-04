@@ -9,6 +9,7 @@ package com.hirisun.cloud.common.vo;
 public enum CommonCode implements ResultCode{
     SUCCESS(0,"成功"),
     FAIL(1,"操作失败"),
+    COMPLETE(2,"操作完成"),
     INVALID_PARAM(1001,"非法参数"),
     JSON_RESOLVE_FAIL(1002,"JSON解析错误"),
     UPDATE_FAIL(1006,"数据更新失败"),

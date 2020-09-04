@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hirisun.cloud.api.workflow.WorkflowApi;
 import com.hirisun.cloud.common.annotation.LoginUser;
 import com.hirisun.cloud.common.contains.ApplyInfoStatus;
+import com.hirisun.cloud.common.contains.RequestCode;
 import com.hirisun.cloud.common.contains.WorkflowNodeAbilityType;
 import com.hirisun.cloud.common.util.ExceptionPrintUtil;
 import com.hirisun.cloud.common.util.UUIDUtil;
@@ -268,7 +269,7 @@ public class ApplyInfoManageController {
         }
         if ("1".equals(implRequest.getResult())){
             Map map = new HashMap();
-            map.put("depApproveUserIds", info.getCreator());
+//            map.put("depApproveUserIds", info.getCreator());
             workflowApi.advanceActivity(activityId,map);
         }else {
             if (nodeId==null||nodeId.trim().equals("")) {
@@ -294,7 +295,7 @@ public class ApplyInfoManageController {
                     vo.setFallBackModelIds(firstNode.getId());
                 }
                 Map<String,String> resultMap=workflowApi.fallbackOnApproveNotPass(vo, map);
-                if (resultMap.get("code") != null && !resultMap.get("code").equals("200")) {
+                if (resultMap.get("code") != null && !resultMap.get("code").equals(RequestCode.SUCCESS.getCode())) {
                     return QueryResponseResult.fail(resultMap.get("msg"));
                 }
 

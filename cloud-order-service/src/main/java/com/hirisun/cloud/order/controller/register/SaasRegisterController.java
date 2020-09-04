@@ -14,12 +14,9 @@ import com.hirisun.cloud.order.service.register.SaasRegisterService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,7 +30,7 @@ import java.util.Map;
  * @since 2020-09-02
  */
 @Api(tags = "应用注册申请管理")
-@Controller
+@RestController
 @RequestMapping("/saasRegister")
 public class SaasRegisterController extends RegisterController<SaasRegisterService,SaasRegister>{
     String FLOW_CODE = "ZCSAAS";
@@ -42,12 +39,11 @@ public class SaasRegisterController extends RegisterController<SaasRegisterServi
     private SaasRegisterService saasRegisterService;
 
     @ApiOperation("应用信息变更")
-    @RequestMapping(value = "/change",method = RequestMethod.POST)
-    public QueryResponseResult change(@LoginUser UserVO user, @RequestBody SaasRegister info, String oldName){
-        saasRegisterService.change(user,info,oldName);
+    @PutMapping("/change")
+    public QueryResponseResult change(@LoginUser UserVO user, @RequestBody SaasRegister info){
+        saasRegisterService.change(user,info,info.getOldName());
         return QueryResponseResult.success(null);
     }
-
 
     @Override
     public String getFlowcode() {
