@@ -1,8 +1,8 @@
 package com.hirisun.cloud.paas.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -38,7 +38,7 @@ public class PaasConfigController {
 	@ApiResponses(
             @ApiResponse(code = 200, message = "成功返回id", response = String.class)
     )
-    @PostMapping(value = "/create")
+    @PutMapping(value = "/create")
     @ResponseBody
     public QueryResponseResult create(@LoginUser UserVO user, @RequestBody Paas paas) {
 		paas.setCreator(user.getIdcard());
@@ -53,7 +53,7 @@ public class PaasConfigController {
 	@ApiResponses(
             @ApiResponse(code = 200, message = "success", response = ResponseResult.class)
     )
-	@PostMapping(value = "/sort")
+	@PutMapping(value = "/sort")
     @ResponseBody
     public ResponseResult sort(String id,String ope) {
 		paasConfigService.serviceSort(id,ope);
@@ -69,7 +69,7 @@ public class PaasConfigController {
             @ApiImplicitParam(name="result", value="操作结果 1:上线,其它:下线", required = true, dataType="String"),
             @ApiImplicitParam(name="remark", value="操作描述", dataType="String"),
     })
-	@PostMapping(value = "/publish")
+	@PutMapping(value = "/publish")
     @ResponseBody
     public ResponseResult publish(@LoginUser UserVO user,String id, Integer result,
                      String remark) {
@@ -95,7 +95,7 @@ public class PaasConfigController {
             @ApiImplicitParam(name="name", value="服务名", dataType="String"),
             @ApiImplicitParam(name = "subType",value = "子类",dataType = "String")
     })
-    @PostMapping(value = "/page")
+    @GetMapping(value = "/page")
     @ResponseBody
     public QueryResponseResult page(@LoginUser UserVO user, @RequestParam(required = false, defaultValue = "1") Integer pageNum,
                   @RequestParam(required = false, defaultValue = "20") Integer pageSize, Integer status,
@@ -112,7 +112,7 @@ public class PaasConfigController {
             @ApiResponse(code = 200, message = "success", response = ResponseResult.class)
     )
     @ApiImplicitParam(name="id", value="服务id", required = true,dataType="String")
-    @PostMapping(value = "/delete")
+    @PutMapping(value = "/delete")
     @ResponseBody
     public ResponseResult delete(@LoginUser UserVO user,String id) {
     	paasConfigService.delete(user, id);
@@ -123,7 +123,7 @@ public class PaasConfigController {
     @ApiResponses(
             @ApiResponse(code = 200, message = "成功返回id", response = ResponseResult.class)
     )
-    @PostMapping(value = "/edit")
+    @PutMapping(value = "/edit")
     @ResponseBody
     public ResponseResult edit(@LoginUser UserVO user, @RequestBody Paas paas) {
     	paasConfigService.edit(paas);
@@ -135,7 +135,7 @@ public class PaasConfigController {
             @ApiResponse(code = 200, message = "返回 paas 配置", response = Paas.class)
     )
     @ApiImplicitParam(name="id", value="服务id", required = true,dataType="String")
-    @PostMapping(value = "/detail")
+    @GetMapping(value = "/detail")
     @ResponseBody
     public QueryResponseResult detail(@LoginUser UserVO user,String id) {
     	Paas detail = paasConfigService.getDetail(user, id);
@@ -148,7 +148,7 @@ public class PaasConfigController {
     )
     @ApiImplicitParams({ @ApiImplicitParam(name="id", value="服务id", required = true, dataType="String"),
             @ApiImplicitParam(name="flowId", value="流程id", required = true, dataType="String")})
-    @PostMapping(value = "/set/workflow")
+    @PutMapping(value = "/set/workflow")
     @ResponseBody
     public QueryResponseResult setflow(@LoginUser UserVO user, String id,String flowId) {
     	Paas paasConfig = paasConfigService.setWorkflow(id, flowId);
