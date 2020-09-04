@@ -7,5 +7,5 @@ import com.hirisun.cloud.system.bean.AppScene;
 
 public interface AppSceneMapper extends BaseMapper<AppScene> {
 
-    List<AppScene> getByMasterId(String masterId);
+    List<AppScene> getByMasterId(String iaasId);
 }

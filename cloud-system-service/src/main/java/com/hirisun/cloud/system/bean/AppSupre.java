@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
-@TableName("TB_APP_SUPRE")
+@TableName("TB_IAAS_APP_SUPRE")
 public class AppSupre implements Serializable {
 
 	private static final long serialVersionUID = 7990305644481403414L;
@@ -15,8 +15,8 @@ public class AppSupre implements Serializable {
 	@TableId(value = "ID",type = IdType.UUID)
     private String id;
 
-	@TableField("MASTER_ID")
-    private String masterId;
+	@TableField("IAAS_ID")
+    private String iaasId;
 
         /**
      * 应用场景ID
@@ -52,12 +52,12 @@ public class AppSupre implements Serializable {
         return this;
     }
 
-    public String getMasterId() {
-		return masterId;
+	public String getIaasId() {
+		return iaasId;
 	}
 
-	public void setMasterId(String masterId) {
-		this.masterId = masterId;
+	public void setIaasId(String iaasId) {
+		this.iaasId = iaasId;
 	}
 
 	public String getAppId() {

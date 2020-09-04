@@ -10,7 +10,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import io.swagger.annotations.ApiModelProperty;
 
-@TableName("TB_APP_SCENE")
+@TableName("TB_IAAS_APP_SCENE")
 public class AppScene implements Serializable {
 
 	private static final long serialVersionUID = 1385420744393643170L;
@@ -18,8 +18,8 @@ public class AppScene implements Serializable {
 	@TableId(value = "ID",type = IdType.UUID)
     private String id;
 
-    @TableField("MASTER_ID")
-    private String masterId;
+	@TableField("IAAS_ID")
+    private String iaasId;
 
         /**
      * 图标
@@ -65,12 +65,12 @@ public class AppScene implements Serializable {
 		this.supres = supres;
 	}
 
-	public String getMasterId() {
-		return masterId;
+	public String getIaasId() {
+		return iaasId;
 	}
 
-	public void setMasterId(String masterId) {
-		this.masterId = masterId;
+	public void setIaasId(String iaasId) {
+		this.iaasId = iaasId;
 	}
 
 	public String getImage() {
