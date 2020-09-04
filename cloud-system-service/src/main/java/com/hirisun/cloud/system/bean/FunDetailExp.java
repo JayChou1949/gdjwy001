@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
-@TableName("TB_FUN_DETAIL_EXP")
+@TableName("TB_IAAS_FUN_DETAIL_EXP")
 public class FunDetailExp implements Serializable {
 
 	private static final long serialVersionUID = 3658060234202173657L;

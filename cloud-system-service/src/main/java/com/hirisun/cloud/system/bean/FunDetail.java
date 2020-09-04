@@ -10,7 +10,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import io.swagger.annotations.ApiModelProperty;
 
-@TableName("TB_FUN_DETAIL")
+@TableName("TB_IAAS_FUN_DETAIL")
 public class FunDetail implements Serializable {
 
 	private static final long serialVersionUID = 3099177564260369299L;
