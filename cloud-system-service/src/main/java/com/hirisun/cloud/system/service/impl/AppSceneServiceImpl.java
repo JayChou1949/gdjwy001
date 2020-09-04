@@ -47,7 +47,7 @@ public class AppSceneServiceImpl implements AppSceneService {
         	
             scene.setId(null);
             scene.setRemark(i+"");
-            scene.setMasterId(masterId);
+            scene.setIaasId(masterId);
             i++;
             appSceneMapper.insert(scene);
             String appId = scene.getId();
@@ -58,7 +58,7 @@ public class AppSceneServiceImpl implements AppSceneService {
             	AppSupre supre = JsonUtils.voToBean(appSupreVo, AppSupre.class);
                 supre.setId(null);
                 supre.setRemark(j+"");
-                supre.setMasterId(masterId);
+                supre.setIaasId(masterId);
                 supre.setAppId(appId);
                 j++;
                 appSupreMapper.insert(supre);
@@ -89,7 +89,7 @@ public class AppSceneServiceImpl implements AppSceneService {
 	public void remove(String masterId) {
 		
 		appSceneMapper.delete(new QueryWrapper<AppScene>()
-				.lambda().eq(AppScene::getMasterId,masterId));
+				.lambda().eq(AppScene::getIaasId,masterId));
 		
 		
 		

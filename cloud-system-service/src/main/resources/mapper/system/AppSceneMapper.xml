@@ -5,7 +5,7 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.hirisun.cloud.system.bean.AppScene">
         <id column="ID" property="id" />
-        <result column="MASTER_ID" property="masterId" />
+        <result column="IAAS_ID" property="iaasId" />
         <result column="IMAGE" property="image" />
         <result column="TITLE" property="title" />
         <result column="DESCRIPTION" property="description" />
@@ -14,10 +14,10 @@
         <collection property="iaasSupres" select="getAppSupre" column="ID"></collection>
     </resultMap>
 	<select id="getByMasterId" resultMap="BaseResultMap">
-	    select * from TB_APP_SCENE WHERE MASTER_ID = #{masterId} order by REMARK
+	    select * from TB_IAAS_APP_SCENE WHERE "IAAS_ID" = #{iaasId} order by REMARK
 	</select>
 
     <select id="getAppSupre" resultType="com.hirisun.cloud.system.bean.AppScene">
-        select * from TB_APP_SCENE WHERE APP_ID = #{id}  order by REMARK
+        select * from TB_IAAS_APP_SCENE WHERE APP_ID = #{id}  order by REMARK
     </select>
 </mapper>
