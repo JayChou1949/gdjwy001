@@ -14,6 +14,11 @@ public class RedisKey {
 
     public static  String KEY_RESOURCE_RECOVER = "ResourceRecover:";
     
+    /**
+     * 门户首页访问量
+     */
+    public static String KEY_APP_VIEW_COUNT = "AppViewCount";
+    
     
 
 

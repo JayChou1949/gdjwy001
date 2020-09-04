@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hirisun.cloud.common.constant.RedisKey;
+import com.hirisun.cloud.common.util.TreeUtils;
 import com.hirisun.cloud.common.util.UUIDUtil;
 import com.hirisun.cloud.model.system.SysDictVO;
 import com.hirisun.cloud.redis.service.RedisService;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -139,5 +141,23 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
 		}
 		
 		return vo;
+	}
+
+	@Override
+	public List<SysDictVO> findDictByValue(String value) {
+		
+		List<SysDictVO> voList = new ArrayList<SysDictVO>();
+		
+		List<Object> list =  redisService.range("REDIS_SYS_DICT",0,-1);
+		for(Object item : list) {
+			SysDict dict = JSON.parseObject(item.toString(), SysDict.class);
+			if (dict.getValue().equals(value)) {
+				SysDictVO vo = new SysDictVO();
+            	BeanUtils.copyProperties(dict, vo);
+            	voList.add(vo);
+            }
+		}
+		voList=(List<SysDictVO>)TreeUtils.listWithTree(voList);
+		return voList;
 	}
 }

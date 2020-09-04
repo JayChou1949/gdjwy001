@@ -3,6 +3,8 @@ package com.hirisun.cloud.api.system;
 import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.util.List;
+
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -48,4 +50,9 @@ public interface SystemApi {
     @ApiOperation(value = "feign调用根据字典值获取数据字典列表")
     @GetMapping("/system/dictManage/feign/getById")
     public SysDictVO feignGetById(@RequestParam("id") String id);
+    
+    @ApiIgnore
+    @ApiOperation(value = "feign调用根据字典值获取数据字典列表")
+    @GetMapping("/system/dictManage/feign/findByvalue")
+    public List<SysDictVO> findDictByValue(@RequestParam("value") String value);
 }

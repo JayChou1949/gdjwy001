@@ -1,26 +1,31 @@
 package com.hirisun.cloud.system.controller.manage;
 
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.alibaba.fastjson.JSON;
 import com.hirisun.cloud.common.util.TreeUtils;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.model.system.SysDictVO;
 import com.hirisun.cloud.system.bean.SysDict;
 import com.hirisun.cloud.system.service.SysDictService;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
 import springfox.documentation.annotations.ApiIgnore;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -99,6 +104,14 @@ public class SysDictManageController {
         sysDictList=(List<SysDict>)TreeUtils.listWithTree(sysDictList);
         sysDictList=sysDictList.stream().filter(item->item.getValue()!=null&&item.getValue().equals(value)).collect(Collectors.toList());
         return JSON.toJSONString(sysDictList);
+    }
+    
+    @ApiIgnore
+    @ApiOperation(value = "feign调用根据字典值获取数据字典列表")
+    @GetMapping("/feign/findByvalue")
+    public List<SysDictVO> findDictByValue(@RequestParam("value") String value) {
+        List<SysDictVO> sysDictList = sysDictService.findDictByValue(value);
+        return sysDictList;
     }
 
     @ApiIgnore

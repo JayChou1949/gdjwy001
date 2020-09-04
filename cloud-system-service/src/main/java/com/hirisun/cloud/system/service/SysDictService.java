@@ -27,4 +27,6 @@ public interface SysDictService extends IService<SysDict> {
     boolean isBasePaaSService(String id);
     
     SysDictVO feignGetById(String id);
+    
+    List<SysDictVO> findDictByValue(String value);
 }
