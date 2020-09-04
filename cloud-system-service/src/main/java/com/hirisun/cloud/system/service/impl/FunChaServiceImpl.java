@@ -40,7 +40,7 @@ public class FunChaServiceImpl implements FunChaService {
             funCha.setId(null);
             funCha.setRemark(i+"");
             i++;
-            funCha.setMasterId(masterId);
+            funCha.setIaasId(masterId);
             funChaMapper.insert(funCha);
         }
     }
@@ -51,7 +51,7 @@ public class FunChaServiceImpl implements FunChaService {
 	@Transactional(rollbackFor = Exception.class)
 	public void remove(SubpageParam param) {
 		funChaMapper.delete(new QueryWrapper<FunCha>()
-				.lambda().eq(FunCha::getMasterId,param.getMasterId()));
+				.lambda().eq(FunCha::getIaasId,param.getMasterId()));
 	}
 
 	/**
@@ -60,7 +60,7 @@ public class FunChaServiceImpl implements FunChaService {
 	public List<FunChaVo> find(SubpageParam param) {
 		
 		List<FunCha> selectList = funChaMapper.selectList(new QueryWrapper<FunCha>()
-				.lambda().eq(FunCha::getMasterId, param.getMasterId())
+				.lambda().eq(FunCha::getIaasId, param.getMasterId())
                     .orderByAsc(FunCha::getRemark));
 		
 		if(CollectionUtils.isNotEmpty(selectList)) {

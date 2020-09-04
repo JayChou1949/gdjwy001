@@ -18,8 +18,8 @@ public class FunCha implements Serializable {
 	@TableId(value = "ID",type = IdType.UUID)
     private String id;
 
-    @TableField("MASTER_ID")
-    private String masterId;
+	@TableField("IAAS_ID")
+    private String iaasId;
 
         /**
      * 图标
@@ -55,12 +55,12 @@ public class FunCha implements Serializable {
         return this;
     }
 
-    public String getMasterId() {
-		return masterId;
+	public String getIaasId() {
+		return iaasId;
 	}
 
-	public void setMasterId(String masterId) {
-		this.masterId = masterId;
+	public void setIaasId(String iaasId) {
+		this.iaasId = iaasId;
 	}
 
 	public String getImage() {

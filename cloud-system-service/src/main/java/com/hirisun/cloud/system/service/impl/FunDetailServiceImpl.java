@@ -45,7 +45,7 @@ public class FunDetailServiceImpl implements FunDetailService {
         	FunDetail funDetail = JsonUtils.voToBean(funDetailVo, FunDetail.class);
         	
         	funDetail.setId(null);
-        	funDetail.setMasterId(masterId);
+        	funDetail.setIaasId(masterId);
         	funDetail.setRemark(i+"");
             i++;
             funDetailMapper.insert(funDetail);
@@ -59,7 +59,7 @@ public class FunDetailServiceImpl implements FunDetailService {
             	funDetailExp.setId(null);
             	funDetailExp.setRemark(j+"");
                 j++;
-                funDetailExp.setMasterId(masterId);
+                funDetailExp.setIaasId(masterId);
                 funDetailExp.setAppId(appId);
                 detailExpService.save(funDetailExp);
             }
@@ -88,6 +88,6 @@ public class FunDetailServiceImpl implements FunDetailService {
     @Transactional(rollbackFor = Exception.class)
 	public void remove(SubpageParam param) {
     	funDetailMapper.delete(new QueryWrapper<FunDetail>()
-    			.lambda().eq(FunDetail::getMasterId,param.getMasterId()));
+    			.lambda().eq(FunDetail::getIaasId,param.getMasterId()));
 	}
 }

@@ -7,5 +7,5 @@ import com.hirisun.cloud.system.bean.FunDetail;
 
 public interface FunDetailMapper extends BaseMapper<FunDetail> {
 
-    List<FunDetail> getByMasterId(String masterId);
+    List<FunDetail> getByMasterId(String iaasId);
 }

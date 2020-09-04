@@ -5,7 +5,7 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.hirisun.cloud.system.bean.FunDetail">
         <id column="ID" property="id" />
-        <result column="MASTER_ID" property="masterId" />
+        <result column="IAAS_ID" property="iaasId" />
         <result column="IMAGE" property="image" />
         <result column="TITLE" property="title" />
         <result column="DESCRIPTION" property="description" />
@@ -16,7 +16,7 @@
 
 
 	<select id="getByMasterId" resultMap="BaseResultMap">
-		select * from TB_IAAS_FUN_DETAIL WHERE MASTER_ID = #{masterId}  order by REMARK
+		select * from TB_IAAS_FUN_DETAIL WHERE IAAS_ID = #{iaasId}  order by REMARK
 	</select>
 	
 	<select id="getExps" resultType="com.hirisun.cloud.system.bean.FunDetailExp">
