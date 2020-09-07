@@ -2,6 +2,7 @@ package com.hirisun.cloud.paas.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -53,7 +54,7 @@ public class PaasConfigController {
 	@ApiResponses(
             @ApiResponse(code = 200, message = "success", response = ResponseResult.class)
     )
-	@PutMapping(value = "/sort")
+	@PostMapping(value = "/sort")
     @ResponseBody
     public ResponseResult sort(String id,String ope) {
 		paasConfigService.serviceSort(id,ope);
@@ -69,7 +70,7 @@ public class PaasConfigController {
             @ApiImplicitParam(name="result", value="操作结果 1:上线,其它:下线", required = true, dataType="String"),
             @ApiImplicitParam(name="remark", value="操作描述", dataType="String"),
     })
-	@PutMapping(value = "/publish")
+	@PostMapping(value = "/publish")
     @ResponseBody
     public ResponseResult publish(@LoginUser UserVO user,String id, Integer result,
                      String remark) {
@@ -112,7 +113,7 @@ public class PaasConfigController {
             @ApiResponse(code = 200, message = "success", response = ResponseResult.class)
     )
     @ApiImplicitParam(name="id", value="服务id", required = true,dataType="String")
-    @PutMapping(value = "/delete")
+    @PostMapping(value = "/delete")
     @ResponseBody
     public ResponseResult delete(@LoginUser UserVO user,String id) {
     	paasConfigService.delete(user, id);
@@ -148,7 +149,7 @@ public class PaasConfigController {
     )
     @ApiImplicitParams({ @ApiImplicitParam(name="id", value="服务id", required = true, dataType="String"),
             @ApiImplicitParam(name="flowId", value="流程id", required = true, dataType="String")})
-    @PutMapping(value = "/set/workflow")
+    @PostMapping(value = "/set/workflow")
     @ResponseBody
     public QueryResponseResult setflow(@LoginUser UserVO user, String id,String flowId) {
     	Paas paasConfig = paasConfigService.setWorkflow(id, flowId);
