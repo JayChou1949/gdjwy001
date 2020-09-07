@@ -15,8 +15,8 @@ public class AppSupreVo implements Serializable {
 	@ApiModelProperty(value = "id")
     private String id;
 
-	@ApiModelProperty(value = "masterId")
-    private String masterId;
+	@ApiModelProperty(value = "iaasId")
+	private String iaasId;
 
 	@ApiModelProperty(value = "应用场景ID")
     private String appId;

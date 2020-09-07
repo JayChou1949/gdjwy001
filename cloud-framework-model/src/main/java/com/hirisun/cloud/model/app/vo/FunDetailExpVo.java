@@ -15,9 +15,8 @@ public class FunDetailExpVo implements Serializable {
 	@ApiModelProperty(value = "id")
     private String id;
 
-	@ApiModelProperty("MASTER_ID")
-    private String masterId;
-
+	@ApiModelProperty(value = "iaasId")
+	private String iaasId;
 
 	@ApiModelProperty("appId")
     private String appId;

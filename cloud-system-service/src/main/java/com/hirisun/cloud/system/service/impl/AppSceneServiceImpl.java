@@ -52,17 +52,20 @@ public class AppSceneServiceImpl implements AppSceneService {
             appSceneMapper.insert(scene);
             String appId = scene.getId();
             List<AppSupreVo> supres = appSceneVo.getSupres();
-            int j = 1;
-            for (AppSupreVo appSupreVo:supres){
-            	
-            	AppSupre supre = JsonUtils.voToBean(appSupreVo, AppSupre.class);
-                supre.setId(null);
-                supre.setRemark(j+"");
-                supre.setIaasId(masterId);
-                supre.setAppId(appId);
-                j++;
-                appSupreMapper.insert(supre);
+            if(CollectionUtils.isNotEmpty(supres)) {
+            	int j = 1;
+                for (AppSupreVo appSupreVo:supres){
+                	
+                	AppSupre supre = JsonUtils.voToBean(appSupreVo, AppSupre.class);
+                    supre.setId(null);
+                    supre.setRemark(j+"");
+                    supre.setIaasId(masterId);
+                    supre.setAppId(appId);
+                    j++;
+                    appSupreMapper.insert(supre);
+                }
             }
+            
         }
     
 	}
