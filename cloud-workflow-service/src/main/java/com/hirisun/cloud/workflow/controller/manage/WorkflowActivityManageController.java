@@ -6,8 +6,10 @@ import java.util.stream.Collectors;
 
 import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.hirisun.cloud.common.contains.RequestCode;
 import com.hirisun.cloud.common.contains.WorkflowActivityStatus;
 import com.hirisun.cloud.common.util.UUIDUtil;
+import com.hirisun.cloud.common.vo.CommonCode;
 import com.hirisun.cloud.model.workflow.WorkflowVO;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
@@ -80,7 +82,7 @@ public class WorkflowActivityManageController {
     @PostMapping("/feign/activityForward")
     public Map<String,String> activityForward(@RequestParam String currentActivityId,@RequestParam String handlePersonIds) {
         Map<String, String> resultMap = new HashMap();
-        resultMap.put("code", "201");
+        resultMap.put("code", RequestCode.FAIL.getCode());
         WorkflowActivity currentActivity = workflowActivityService.getById(currentActivityId);
         if (currentActivity == null) {
             resultMap.put("msg","不存在当前环节");
@@ -104,7 +106,7 @@ public class WorkflowActivityManageController {
         currentActivity.setActivityStatus(WorkflowActivityStatus.FORWARD.getCode());
         currentActivity.setHandleTime(new Date());
         workflowActivityService.updateById(currentActivity);
-        resultMap.put("code", "200");
+        resultMap.put("code", RequestCode.SUCCESS.getCode());
         resultMap.put("msg","不存在当前环节");
         return resultMap;
     }

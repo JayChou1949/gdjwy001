@@ -7,7 +7,7 @@ public enum WorkflowNodeAbilityType {
 
     REVIEW("1", "审核"),
     ADD("2", "加办"),
-    IMPL("3", "上线"),
+    IMPL("3", "实施"),
     REJECT("4", "驳回"),
     DELETE("5", "删除"),
     FALLBACK("6", "反馈"),

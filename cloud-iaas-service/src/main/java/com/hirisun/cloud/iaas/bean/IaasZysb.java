@@ -29,7 +29,7 @@ public class IaasZysb extends Model<IaasZysb> {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "ID",type = IdType.UUID)
+    @TableId(value = "ID",type = IdType.ASSIGN_UUID)
     private String id;
 
         /**

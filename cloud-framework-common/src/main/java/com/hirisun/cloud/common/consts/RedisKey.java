@@ -12,6 +12,11 @@ public interface RedisKey {
     public static String MONITOR_LOG="MONITOR_LOG";
 
     public static String ABNORMAL_LOG="ABNORMAL_LOG";
+
+    /**
+     * 申请单号前缀
+     */
+    String KEY_ORDER_NUM_PREFIX = "OrderNum:";
     
     /**
      * daas列表配置

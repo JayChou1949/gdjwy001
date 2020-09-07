@@ -114,7 +114,7 @@ public class ServicePublishManageController {
     @PostMapping("/submit")
     public QueryResponseResult submit(@LoginUser UserVO user,
                                       @ApiParam(value = "申请单id,多个使用逗号分隔",required =  true) @RequestParam(value = "id") String id,
-                                      @ApiParam(value = "审核类型,inner:部门内审核 kx:科信审核",required =  true) @RequestParam(value = "type", defaultValue = "inner") String type,
+                                      @ApiParam(value = "审核类型,inner:部门内审核 kx:科信审核",required =  true) @RequestParam(value = "type", defaultValue = "kx") String type,
                                       @ApiParam(value = "审核人id,多个使用逗号分隔",required =  true) @RequestParam(value = "userIds", required = false) String userIds) {
         return servicePublishService.submit(user, id, type, userIds);
     }

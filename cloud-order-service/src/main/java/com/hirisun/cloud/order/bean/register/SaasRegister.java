@@ -207,6 +207,10 @@ public class SaasRegister extends Register<SaasRegister> implements Serializable
     @TableField("GOV_PRINCIPAL_POST_TYPE")
     private String govPrincipalPostType;
 
+    @ApiModelProperty(value = "应用旧名称")
+    @TableField(exist = false)
+    private String oldName;
+
 //    @ApiModelProperty(value = "版本")
 //    @TableField("WORK_FLOW_VERSION")
 //    private Integer workFlowVersion;

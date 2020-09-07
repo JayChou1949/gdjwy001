@@ -19,6 +19,7 @@ import com.hirisun.cloud.api.order.ApplyReviewRecordApi;
 import com.hirisun.cloud.api.workflow.WorkflowApi;
 import com.hirisun.cloud.common.constant.RedisKey;
 import com.hirisun.cloud.common.contains.ApplyInfoStatus;
+import com.hirisun.cloud.common.contains.RequestCode;
 import com.hirisun.cloud.common.contains.WorkflowActivityStatus;
 import com.hirisun.cloud.common.vo.CommonCode;
 import com.hirisun.cloud.model.apply.ApplyReviewRecordVO;
@@ -165,7 +166,7 @@ public class SaasApplicationMergeServiceImpl extends ServiceImpl<SaasApplication
             throw new CustomException(SaasExceptionCode.WORKFLOW_ACTIVITY_MISSING);
         }
         Map resultMap = workflowApi.advanceActivity(firstActivity.getId(),map);
-        if (!"200".equals(resultMap.get("code"))) {
+        if (!RequestCode.SUCCESS.getCode().equals(resultMap.get("code"))) {
             throw new CustomException(SaasExceptionCode.FEIGN_METHOD_ERROR);
         }
         smsApi.buildSuccessMessage(user.getIdcard(), BusinessName.SAAS_RESOURCE, merge.getOrderNumber());

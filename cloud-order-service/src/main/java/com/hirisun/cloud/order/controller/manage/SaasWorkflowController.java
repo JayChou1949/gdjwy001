@@ -8,6 +8,7 @@ import com.hirisun.cloud.api.saas.SaasApplicationApi;
 import com.hirisun.cloud.api.workflow.WorkflowApi;
 import com.hirisun.cloud.common.annotation.LoginUser;
 import com.hirisun.cloud.common.contains.ApplyInfoStatus;
+import com.hirisun.cloud.common.contains.RequestCode;
 import com.hirisun.cloud.common.util.UUIDUtil;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.model.apply.FallBackVO;
@@ -119,7 +120,7 @@ public class SaasWorkflowController {
             if (lock.lock(lockKey, uuid)) {
                 saasApplicationApi.deleteById(user.getId(), id);
                 Map<String, String> stringStringMap = workflowApi.terminationOrder(id);
-                if (!"200".equals(stringStringMap.get("code"))) {
+                if (!RequestCode.SUCCESS.getCode().equals(stringStringMap.get("code"))) {
                     return QueryResponseResult.fail(stringStringMap.get("msg"));
                 }
             } else {
@@ -156,7 +157,7 @@ public class SaasWorkflowController {
         try {
             if (lock.lock(lockKey, uuid)) {
                 Map<String,String> resultMap =  workflowApi.activityForward(activityId, userIds);
-                if (!"200".equals(resultMap.get("code"))) {
+                if (!RequestCode.SUCCESS.getCode().equals(resultMap.get("code"))) {
                     return QueryResponseResult.fail(resultMap.get("msg"));
                 }
                 return QueryResponseResult.success(null);

@@ -18,10 +18,7 @@ import com.hirisun.cloud.api.user.UserApi;
 import com.hirisun.cloud.api.workflow.WorkflowApi;
 import com.hirisun.cloud.common.constant.BusinessName;
 import com.hirisun.cloud.common.consts.RedisKey;
-import com.hirisun.cloud.common.contains.ApplicationInfoStatus;
-import com.hirisun.cloud.common.contains.ApplyInfoStatus;
-import com.hirisun.cloud.common.contains.WorkflowActivityStatus;
-import com.hirisun.cloud.common.contains.WorkflowNodeAbilityType;
+import com.hirisun.cloud.common.contains.*;
 import com.hirisun.cloud.common.enumer.ModelName;
 import com.hirisun.cloud.common.exception.CustomException;
 import com.hirisun.cloud.common.util.ExceptionPrintUtil;
@@ -486,7 +483,7 @@ public class ServicePublishServiceImpl extends ServiceImpl<ServicePublishMapper,
             throw new CustomException(OrderCode.WORKFLOW_ACTIVITY_MISSING);
         }
         Map resultMap = workflowApi.advanceActivity(firstActivity.getId(),map);
-        if (!"200".equals(resultMap.get("code"))) {
+        if (!RequestCode.SUCCESS.getCode().equals(resultMap.get("code"))) {
             throw new CustomException(OrderCode.FEIGN_METHOD_ERROR);
         }
         smsApi.buildSuccessMessage(user.getIdcard(), BusinessName.SAAS_RESOURCE, info.getOrderNumber());
@@ -501,7 +498,7 @@ public class ServicePublishServiceImpl extends ServiceImpl<ServicePublishMapper,
             if (lock.lock(lockKey, uuid)) {
                 deleteById(user, id);
                 Map<String, String> stringStringMap = workflowApi.terminationOrder(id);
-                if (!"200".equals(stringStringMap.get("code"))) {
+                if (!RequestCode.SUCCESS.getCode().equals(stringStringMap.get("code"))) {
                     return QueryResponseResult.fail(stringStringMap.get("msg"));
                 }
             } else {
@@ -553,7 +550,7 @@ public class ServicePublishServiceImpl extends ServiceImpl<ServicePublishMapper,
         map.put("depApproveUserIds",userIds);
 
         Map resultMap = workflowApi.advanceActivity(firstActivity.getId(),map);
-        if (!"200".equals(resultMap.get("code"))) {
+        if (!RequestCode.SUCCESS.getCode().equals(resultMap.get("code"))) {
             throw new CustomException(OrderCode.FEIGN_METHOD_ERROR);
         }
         updateById(info);
@@ -568,7 +565,7 @@ public class ServicePublishServiceImpl extends ServiceImpl<ServicePublishMapper,
         try {
             if (lock.lock(lockKey, uuid)) {
                 Map<String,String> resultMap = workflowApi.activityForward(activityId, userIds);
-                if (!"200".equals(resultMap.get("code"))) {
+                if (!RequestCode.SUCCESS.getCode().equals(resultMap.get("code"))) {
                     return QueryResponseResult.fail(resultMap.get("msg"));
                 }
                 ServicePublish servicePublish = getById(applyInfoId);
@@ -596,7 +593,7 @@ public class ServicePublishServiceImpl extends ServiceImpl<ServicePublishMapper,
         }
         if ("adviser".equals(activity.getActivityType())){
             Map<String,String> resultMap=workflowApi.adviseActivity(vo.getCurrentActivityId());
-            if (resultMap.get("code") != null && resultMap.get("code").equals("200")) {
+            if (resultMap.get("code") != null && resultMap.get("code").equals(RequestCode.SUCCESS.getCode())) {
                 return QueryResponseResult.success(null);
             }else{
                 return QueryResponseResult.fail(resultMap.get("msg"));
@@ -609,9 +606,9 @@ public class ServicePublishServiceImpl extends ServiceImpl<ServicePublishMapper,
         if ("1".equals(approve.getResult())){
             WorkflowNodeVO model=null;
             Map resultMap = workflowApi.advanceActivity(vo.getCurrentActivityId(),map);
-            if (resultMap.get("code") != null && resultMap.get("code").equals("200")) {
+            if (resultMap.get("code") != null && resultMap.get("code").equals(RequestCode.SUCCESS.getCode())) {
                 model = JSON.parseObject(resultMap.get("data").toString(),WorkflowNodeVO.class);//此处转换失败，则直接抛方法内错误
-            }else if(resultMap.get("code") != null && resultMap.get("code").equals("201")){
+            }else if(resultMap.get("code") != null && resultMap.get("code").equals(RequestCode.COMPLETE.getCode())){
                 return QueryResponseResult.success(null);
             }else{
                 return QueryResponseResult.fail(resultMap.get("msg"));
@@ -632,7 +629,7 @@ public class ServicePublishServiceImpl extends ServiceImpl<ServicePublishMapper,
             boolean isApply= WorkflowUtil.compareNodeAbility(fallbackModel.getNodeFeature(), WorkflowNodeAbilityType.APPLY.getCode());
             if (isApply) {
                 Map<String,String> resultMap=workflowApi.fallbackOnApproveNotPass(vo, new HashMap());
-                if (resultMap.get("code") != null && !resultMap.get("code").equals("200")) {
+                if (resultMap.get("code") != null && !resultMap.get("code").equals(RequestCode.SUCCESS.getCode())) {
                     return QueryResponseResult.fail(resultMap.get("msg"));
                 }
                 //订单状态设置为 科信审核驳回
@@ -653,7 +650,7 @@ public class ServicePublishServiceImpl extends ServiceImpl<ServicePublishMapper,
                     map.put("depApproveUserIds", sb.substring(1).toString());
                     //1.复制回退环节历史流程环节信息，设置为待办，处理人时间修改等插入流转表；2.复核后环节后的到当前环节间流转信息设置为已回退
                     Map<String,String> resultMap=workflowApi.fallbackOnApproveNotPass(vo, map);
-                    if (resultMap.get("code") != null && !resultMap.get("code").equals("200")) {
+                    if (resultMap.get("code") != null && !resultMap.get("code").equals(RequestCode.SUCCESS.getCode())) {
                         return QueryResponseResult.fail(resultMap.get("msg"));
                     }
                     //订单状态设置为 科信待审核
@@ -661,7 +658,7 @@ public class ServicePublishServiceImpl extends ServiceImpl<ServicePublishMapper,
                 }
             }else {
                 Map<String,String> resultMap=workflowApi.fallbackOnApproveNotPass(vo, map);
-                if (resultMap.get("code") != null && !resultMap.get("code").equals("200")) {
+                if (resultMap.get("code") != null && !resultMap.get("code").equals(RequestCode.SUCCESS.getCode())) {
                     return QueryResponseResult.fail(resultMap.get("msg"));
                 }
                 info.setStatus(ApplyInfoStatus.REVIEW.getCode());
@@ -691,7 +688,7 @@ public class ServicePublishServiceImpl extends ServiceImpl<ServicePublishMapper,
             return QueryResponseResult.fail("未找到待办数据");
         }
         Map<String,String> rejectMsgMap=workflowApi.rejectApply(vo.getCurrentActivityId(), vo.getFallBackModelIds());
-        if ("200".equals(rejectMsgMap.get("code"))) {
+        if (RequestCode.SUCCESS.getCode().equals(rejectMsgMap.get("code"))) {
             approve.setType("4");
             WorkflowNodeVO curmodel = workflowApi.getNodeById(rejectMsgMap.get("nodeId"));
             approve.setStepName(curmodel.getNodeName()+"回退");
@@ -746,9 +743,9 @@ public class ServicePublishServiceImpl extends ServiceImpl<ServicePublishMapper,
         }
         if ("1".equals(implRequest.getResult())){
             Map map = new HashMap();
-            map.put("depApproveUserIds", info.getCreator());
+//            map.put("depApproveUserIds", info.getCreator());
             Map resultMap = workflowApi.advanceActivity(activityId,map);
-            if (!"200".equals(resultMap.get("code"))) {
+            if (!RequestCode.SUCCESS.getCode().equals(resultMap.get("code"))) {
                 throw new CustomException(OrderCode.FEIGN_METHOD_ERROR);
             }
             smsApi.buildCompleteMessage(info.getCreator(),BusinessName.SAAS_RESOURCE,info.getOrderNumber());
@@ -763,7 +760,7 @@ public class ServicePublishServiceImpl extends ServiceImpl<ServicePublishMapper,
             vo.setCurrentActivityId(activityId);
             vo.setFallBackModelIds(modelId);
             Map<String,String> resultMap=workflowApi.fallbackOnApproveNotPass(vo, map);
-            if (resultMap.get("code") != null && !resultMap.get("code").equals("200")) {
+            if (resultMap.get("code") != null && !resultMap.get("code").equals(RequestCode.SUCCESS.getCode())) {
                 return QueryResponseResult.fail(resultMap.get("msg"));
             }
         }

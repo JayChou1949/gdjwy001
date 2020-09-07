@@ -8,11 +8,11 @@ import java.util.Date;
 import java.util.List;
 
 import com.hirisun.cloud.model.apply.ApplyReviewRecordVO;
-import com.hirisun.cloud.model.common.WorkOrder;
 import com.hirisun.cloud.model.file.FilesVo;
 import com.hirisun.cloud.model.ncov.vo.file.FileVo;
 import com.hirisun.cloud.model.user.UserVO;
 import com.hirisun.cloud.order.bean.apply.ApplyReviewRecord;
+import com.hirisun.cloud.order.vo.WorkOrder;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
