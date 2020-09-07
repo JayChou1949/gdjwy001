@@ -16,8 +16,8 @@ public class FunChaVo implements Serializable {
 	@ApiModelProperty(value = "id")
     private String id;
 
-	@ApiModelProperty(value = "masterId")
-    private String masterId;
+	@ApiModelProperty(value = "iaasId")
+	private String iaasId;
 
     @ApiModelProperty(value = "图标")
     private String image;

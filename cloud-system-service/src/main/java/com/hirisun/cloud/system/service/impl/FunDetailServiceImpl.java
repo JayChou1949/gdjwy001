@@ -38,33 +38,36 @@ public class FunDetailServiceImpl implements FunDetailService {
 		
 		List<FunDetailVo> funDetails = param.getFunDetails();
 		String masterId = param.getMasterId();
-		
-        int i=1;
-        for (FunDetailVo funDetailVo : funDetails){
-        	
-        	FunDetail funDetail = JsonUtils.voToBean(funDetailVo, FunDetail.class);
-        	
-        	funDetail.setId(null);
-        	funDetail.setIaasId(masterId);
-        	funDetail.setRemark(i+"");
-            i++;
-            funDetailMapper.insert(funDetail);
-            String appId = funDetailVo.getId();
-            List<FunDetailExpVo> funDetailExpVoList = funDetailVo.getDetailExps();
-            int j=1;
-            for (FunDetailExpVo funDetailExpVo:funDetailExpVoList){
-            	
-            	FunDetailExp funDetailExp = JsonUtils.voToBean(funDetailExpVo, FunDetailExp.class);
-            	
-            	funDetailExp.setId(null);
-            	funDetailExp.setRemark(j+"");
-                j++;
-                funDetailExp.setIaasId(masterId);
-                funDetailExp.setAppId(appId);
-                detailExpService.save(funDetailExp);
-            }
-            
-        }
+		if(CollectionUtils.isNotEmpty(funDetails)) {
+			int i=1;
+	        for (FunDetailVo funDetailVo : funDetails){
+	        	
+	        	FunDetail funDetail = JsonUtils.voToBean(funDetailVo, FunDetail.class);
+	        	
+	        	funDetail.setId(null);
+	        	funDetail.setIaasId(masterId);
+	        	funDetail.setRemark(i+"");
+	            i++;
+	            funDetailMapper.insert(funDetail);
+	            String appId = funDetailVo.getId();
+	            List<FunDetailExpVo> funDetailExpVoList = funDetailVo.getDetailExps();
+	            if(CollectionUtils.isNotEmpty(funDetailExpVoList)) {
+	            	int j=1;
+		            for (FunDetailExpVo funDetailExpVo:funDetailExpVoList){
+		            	
+		            	FunDetailExp funDetailExp = JsonUtils.voToBean(funDetailExpVo, FunDetailExp.class);
+		            	
+		            	funDetailExp.setId(null);
+		            	funDetailExp.setRemark(j+"");
+		                j++;
+		                funDetailExp.setIaasId(masterId);
+		                funDetailExp.setAppId(appId);
+		                detailExpService.save(funDetailExp);
+		            }
+	            }
+	        }
+		}
+        
     }
 
 	/**

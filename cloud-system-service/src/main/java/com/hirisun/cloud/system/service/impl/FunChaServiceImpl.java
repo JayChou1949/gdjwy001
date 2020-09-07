@@ -33,16 +33,17 @@ public class FunChaServiceImpl implements FunChaService {
 		List<FunChaVo> funChaList = param.getFunCha();
 		
 		String masterId = param.getMasterId();
-		
-        int i=1;
-        for (FunChaVo funChaVo:funChaList){
-            FunCha funCha = JsonUtils.voToBean(funChaVo, FunCha.class);
-            funCha.setId(null);
-            funCha.setRemark(i+"");
-            i++;
-            funCha.setIaasId(masterId);
-            funChaMapper.insert(funCha);
-        }
+		if(CollectionUtils.isNotEmpty(funChaList)) {
+			int i=1;
+	        for (FunChaVo funChaVo:funChaList){
+	            FunCha funCha = JsonUtils.voToBean(funChaVo, FunCha.class);
+	            funCha.setId(null);
+	            funCha.setRemark(i+"");
+	            i++;
+	            funCha.setIaasId(masterId);
+	            funChaMapper.insert(funCha);
+	        }
+		}
     }
 
 	/**
