@@ -58,19 +58,6 @@ public class IaasReportServiceImpl extends ServiceImpl<IaasReportMapper, IaasRep
 		return poToVo(iaasList);
 	}
 
-	@Override
-	public List<IaasReportVo> getListByApplyId(String appInfoId) {
-		List<IaasReport> iaasList =  iaasReportMapper.selectList(new QueryWrapper<IaasReport>().lambda()
-				.eq(IaasReport::getAppInfoId,appInfoId).orderByDesc(Re));
-
-		if(CollectionUtils.isNotEmpty(iaasList)) {
-			iaasList = iaasList.parallelStream()
-					.filter(iaas->StringUtils.equals(iaas.getResourceName(),"弹性云服务器")).collect(Collectors.toList());
-		}
-
-		return poToVo(iaasList);
-	}
-
 	private List<IaasReportVo> poToVo(List<IaasReport> iaasList) {
 		
 		List<IaasReportVo> list = new ArrayList<IaasReportVo>();
