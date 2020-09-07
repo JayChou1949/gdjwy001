@@ -2,7 +2,7 @@ package com.hirisun.cloud.paas.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,7 +29,7 @@ public class PaasSubpageConfigController {
     private PaasSubpageService paasSubpageConfigService;
 
     @ApiOperation("新增")
-    @PostMapping(value = "/create")
+    @PutMapping(value = "/create")
     @ResponseBody
     public ResponseResult create(@LoginUser UserVO user, @RequestBody PaasSubpage paas) {
     	paasSubpageConfigService.savePaasPage(user,paas);
@@ -38,7 +38,7 @@ public class PaasSubpageConfigController {
 
 
     @ApiOperation("修改二级页面配置信息")
-    @PostMapping(value = "/edit")
+    @PutMapping(value = "/edit")
     @ResponseBody
     public ResponseResult edit(@LoginUser UserVO user, @RequestBody PaasSubpage paas) {
     	paasSubpageConfigService.updateIaasPage(user,paas);
