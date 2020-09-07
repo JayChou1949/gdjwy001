@@ -4,7 +4,8 @@ package com.hirisun.cloud.daas.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hirisun.cloud.common.vo.QueryResponseResult;
 import com.hirisun.cloud.daas.bean.Bigdata;
-import com.hirisun.cloud.daas.service.BigdataService;
+import com.hirisun.cloud.daas.service.IBigdataService;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -30,7 +31,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class BigdataController {
 
     @Autowired
-    private BigdataService bigdataService;
+    private IBigdataService bigdataService;
 
     @ApiOperation("分页查询大数据目录")
     @ApiImplicitParams({
