@@ -1,6 +1,0 @@
-spring:
-  application:
-    name: cloud-user-service
-mybatis-plus:
-  configuration:
-    jdbc-type-for-null: 'null'
